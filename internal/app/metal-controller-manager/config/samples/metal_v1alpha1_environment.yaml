@@ -1,0 +1,26 @@
+apiVersion: metal.arges.dev/v1alpha1
+kind: Environment
+metadata:
+  name: default
+spec:
+  kernel:
+    url: 'https://github.com/talos-systems/talos/releases/download/v0.4.0-alpha.5/vmlinuz'
+    sha512: ''
+    args:
+      - initrd=initramfs.xz
+      - page_poison=1
+      - slab_nomerge
+      - slub_debug=P
+      - pti=on
+      - random.trust_cpu=on
+      - ima_template=ima-ng
+      - ima_appraise=fix
+      - ima_hash=sha512
+      - console=tty0
+      - console=ttyS0
+      - printk.devkmsg=on
+      - talos.platform=metal
+      - talos.config=http://192.168.1.10:8080/assets/controlplane.yaml
+  initrd:
+    url: 'https://github.com/talos-systems/talos/releases/download/v0.4.0-alpha.5/initramfs.xz'
+    sha512: ''

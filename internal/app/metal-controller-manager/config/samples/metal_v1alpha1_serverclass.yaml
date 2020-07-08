@@ -1,0 +1,19 @@
+apiVersion: metal.arges.dev/v1alpha1
+kind: ServerClass
+metadata:
+  name: serverclass-sample
+spec:
+  qualifiers:
+    cpu:
+      - manufacturer: "Intel(R) Corporation"
+        version: "Intel(R) Atom(TM) CPU C3558 @ 2.20GHz"
+    systemInformation:
+      - family: Unknown
+        manufacturer: Unknown
+        productName: Unknown
+        serialNumber: Unknown
+        skuNumber: Unknown
+        version: Unknown
+    labelSelectors:
+      - key1: "val1"
+      - key2: "val2"      

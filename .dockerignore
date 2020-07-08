@@ -1,0 +1,11 @@
+*
+!api
+!cmd
+!config
+!hack
+!internal
+!pkg
+!go.mod
+!go.sum
+!*.go
+!README.md

@@ -1,0 +1,29 @@
+namePrefix: capm-
+
+# Labels to add to all resources and selectors.
+commonLabels:
+  cluster.x-k8s.io/provider: "infrastructure-metal"
+bases:
+  - crd
+  - webhook
+  - default
+
+patchesJson6902:
+  - target:
+      group: apiextensions.k8s.io
+      version: v1
+      kind: CustomResourceDefinition
+      name: metalclusters.infrastructure.cluster.x-k8s.io
+    path: patch_crd_webhook_namespace.yaml
+  - target:
+      group: apiextensions.k8s.io
+      version: v1
+      kind: CustomResourceDefinition
+      name: metalmachines.infrastructure.cluster.x-k8s.io
+    path: patch_crd_webhook_namespace.yaml
+  - target:
+      group: apiextensions.k8s.io
+      version: v1
+      kind: CustomResourceDefinition
+      name: metalmachinetemplates.infrastructure.cluster.x-k8s.io
+    path: patch_crd_webhook_namespace.yaml

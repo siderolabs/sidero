@@ -1,0 +1,4 @@
+bases:
+  - ../internal/app/cluster-api-provider/config
+  - ../internal/app/metal-controller-manager/config
+  - ../internal/app/metal-metadata-server/config

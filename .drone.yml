@@ -1,0 +1,156 @@
+---
+kind: secret
+name: kubeconfig
+
+get:
+  path: buildx
+  name: kubeconfig
+
+---
+kind: pipeline
+name: default
+
+services:
+  - name: docker
+    image: docker:19.03-dind
+    entrypoint:
+      - dockerd
+    command:
+      - --dns=8.8.8.8
+      - --dns=8.8.4.4
+      - --log-level=error
+    privileged: true
+    volumes:
+      - name: docker-socket
+        path: /var/run
+
+steps:
+  - name: setup-ci
+    image: autonomy/build-container:latest
+    commands:
+      - git fetch --tags
+      - apk add coreutils
+      - echo -e "$BUILDX_KUBECONFIG" > /root/.kube/config
+      - docker buildx create --driver kubernetes --driver-opt replicas=2 --driver-opt namespace=ci --driver-opt image=moby/buildkit:v0.6.2 --name ci --buildkitd-flags="--allow-insecure-entitlement security.insecure" --use
+      - docker buildx inspect --bootstrap
+    environment:
+      BUILDX_KUBECONFIG:
+        from_secret: kubeconfig
+    privileged: true
+    volumes:
+      - name: docker-socket
+        path: /var/run
+      - name: docker
+        path: /root/.docker/buildx
+      - name: kube
+        path: /root/.kube
+
+  - name: build-pull-request
+    image: autonomy/build-container:latest
+    pull: always
+    commands:
+      - make
+    when:
+      event:
+        include:
+          - pull_request
+    volumes:
+      - name: docker-socket
+        path: /var/run
+      - name: docker
+        path: /root/.docker/buildx
+      - name: kube
+        path: /root/.kube
+
+  - name: build-and-publish
+    image: autonomy/build-container:latest
+    pull: always
+    environment:
+      DOCKER_USERNAME:
+        from_secret: docker_username
+      DOCKER_PASSWORD:
+        from_secret: docker_password
+    commands:
+      - docker login --username "$${DOCKER_USERNAME}" --password "$${DOCKER_PASSWORD}"
+      - make PUSH=true
+    when:
+      event:
+        exclude:
+          - pull_request
+    volumes:
+      - name: docker-socket
+        path: /var/run
+      - name: docker
+        path: /root/.docker/buildx
+      - name: kube
+        path: /root/.kube
+
+  - name: build-release
+    image: autonomy/build-container:latest
+    pull: always
+    commands:
+      - make release
+    when:
+      event:
+        - tag
+    volumes:
+      - name: docker-socket
+        path: /var/run
+      - name: docker
+        path: /root/.docker/buildx
+      - name: kube
+        path: /root/.kube
+
+  - name: release
+    image: plugins/github-release
+    settings:
+      api_key:
+        from_secret: github_token
+      checksum:
+        - sha256
+        - sha512
+      draft: true
+      files:
+        - _out/*
+    when:
+      event:
+        - tag
+
+volumes:
+  - name: docker-socket
+    temp: {}
+  - name: docker
+    temp: {}
+  - name: kube
+    temp: {}
+---
+kind: pipeline
+name: notify
+
+clone:
+  disable: true
+
+steps:
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+      channel: proj-talos-maintainers
+    when:
+      status:
+        - success
+        - failure
+
+trigger:
+  status:
+    - success
+    - failure
+
+depends_on:
+  - default
+---
+kind: signature
+hmac: 2475d9bd27e9222d15c506e7a86bf1dd9899096437aede2eb13839e7f010e7cb
+
+...

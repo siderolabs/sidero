@@ -1,0 +1,30 @@
+# permissions for end users to edit serverclasses.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: serverclass-editor-role
+rules:
+- apiGroups:
+  - metal.arges.dev
+  resources:
+  - serverclasses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - metal.arges.dev
+  resources:
+  - serverclasses/status
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
