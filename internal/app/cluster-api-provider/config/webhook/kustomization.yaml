@@ -1,7 +1,6 @@
 namespace: capi-webhook-system
 
 resources:
-  - manifests.yaml
   - service.yaml
   - ../certmanager
   - ../manager

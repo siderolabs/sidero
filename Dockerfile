@@ -30,6 +30,7 @@ RUN controller-gen \
   webhook output:webhook:dir="./internal/app/metal-controller-manager/config/webhook"
 FROM scratch AS manifests
 COPY --from=manifests-build /src/internal/app/cluster-api-provider/config ./internal/app/cluster-api-provider/config
+COPY --from=manifests-build /src/internal/app/metal-controller-manager/config ./internal/app/metal-controller-manager/config
 
 FROM base AS generate-build
 RUN controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
@@ -54,11 +55,12 @@ RUN cd ./internal/app/cluster-api-provider/config/manager \
   && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/cluster-api-provider:${TAG} \
   && cd - \
   && kustomize build config > /infrastructure-components.yaml \
-  && cp ./internal/app/cluster-api-provider/config/metadata/metadata.yaml /metadata.yaml
+  && cp ./config/metadata/metadata.yaml /metadata.yaml
 
 FROM scratch AS release
-COPY --from=release-build /infrastructure-components.yaml /infrastructure-components.yaml
-COPY --from=release-build /metadata.yaml /metadata.yaml
+ARG TAG
+COPY --from=release-build /infrastructure-components.yaml /infrastructure-sidero/${TAG}/components.yaml
+COPY --from=release-build /metadata.yaml /infrastructure-sidero/${TAG}/metadata.yaml
 
 FROM base AS build-cluster-api-provider
 RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /manager ./internal/app/cluster-api-provider

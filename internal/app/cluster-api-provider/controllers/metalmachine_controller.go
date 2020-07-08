@@ -92,7 +92,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rer
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-	// Always attempt to Patch the argesMachine object and status after each reconciliation.
+	// Always attempt to Patch the MetalMachine object and status after each reconciliation.
 	defer func() {
 		if err := patchHelper.Patch(ctx, metalMachine); err != nil {
 			logger.Error(err, "failed to patch metalMachine")

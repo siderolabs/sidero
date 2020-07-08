@@ -1,17 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# Value of this field is prepended to the
-# names of all resources, e.g. a deployment named
-# "wordpress" becomes "alices-wordpress".
-# Note that it should also match with the prefix (text before '-') of the namespace
-# field above.
-namePrefix: metal-
-
-# Labels to add to all resources and selectors.
-commonLabels:
-  control-plane: metal-controller-manager
-
 bases:
   - crd
   - rbac
@@ -22,6 +11,8 @@ bases:
 #- ../certmanager
 # [PROMETHEUS] To enable prometheus monitor, uncomment all sections with 'PROMETHEUS'.
 #- ../prometheus
+
+namePrefix: sidero-
 
 patchesStrategicMerge:
   # Protect the /metrics endpoint by putting it behind auth.
