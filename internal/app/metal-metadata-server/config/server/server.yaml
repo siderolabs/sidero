@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: metadata-server
+  namespace: system
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: http
+  selector:
+    app: server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metadata-server
+  namespace: system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    spec:
+      containers:
+        - image: server:latest
+          imagePullPolicy: Always
+          name: server
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 30Mi
+            requests:
+              cpu: 100m
+              memory: 20Mi
+      terminationGracePeriodSeconds: 10

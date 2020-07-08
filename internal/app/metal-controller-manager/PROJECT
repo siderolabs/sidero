@@ -1,0 +1,13 @@
+domain: arges.dev
+repo: github.com/talos-systems/sidero/internal/app/metal-controller-manager
+resources:
+- group: metal
+  kind: Environment
+  version: v1alpha1
+- group: metal
+  kind: Server
+  version: v1alpha1
+- group: metal
+  kind: ServerClass
+  version: v1alpha1
+version: "2"

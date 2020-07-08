@@ -1,0 +1,26 @@
+# permissions to do edit servers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: server-editor-role
+rules:
+- apiGroups:
+  - metal.arges.dev
+  resources:
+  - servers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - metal.arges.dev
+  resources:
+  - servers/status
+  verbs:
+  - get
+  - patch
+  - update

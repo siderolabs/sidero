@@ -1,0 +1,2 @@
+resources:
+  - cluster_role_binding.yaml

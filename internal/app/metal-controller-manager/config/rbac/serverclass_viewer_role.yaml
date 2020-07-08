@@ -1,0 +1,20 @@
+# permissions for end users to view serverclasses.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: serverclass-viewer-role
+rules:
+- apiGroups:
+  - metal.arges.dev
+  resources:
+  - serverclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - metal.arges.dev
+  resources:
+  - serverclasses/status
+  verbs:
+  - get
