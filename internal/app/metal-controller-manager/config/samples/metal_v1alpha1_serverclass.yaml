@@ -1,4 +1,4 @@
-apiVersion: metal.arges.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha1
 kind: ServerClass
 metadata:
   name: serverclass-sample
@@ -16,4 +16,4 @@ spec:
         version: Unknown
     labelSelectors:
       - key1: "val1"
-      - key2: "val2"      
+      - key2: "val2"

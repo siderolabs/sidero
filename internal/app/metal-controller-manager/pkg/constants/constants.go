@@ -14,5 +14,5 @@ limitations under the License.
 package constants
 
 const (
-	DataDirectory = "/var/lib/arges"
+	DataDirectory = "/var/lib/sidero"
 )

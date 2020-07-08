@@ -74,7 +74,7 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	serverGVR := schema.GroupVersionResource{
-		Group:    "metal.arges.dev",
+		Group:    "metal.sidero.dev",
 		Version:  metalVersion,
 		Resource: "servers",
 	}
@@ -252,10 +252,10 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 			switch config := configStruct.(type) {
 			case *v1alpha1.Config:
 				if _, ok := config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"]; ok {
-					config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] += fmt.Sprintf(",metal.arges.dev/uuid=%s", serverObj.Name)
+					config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] += fmt.Sprintf(",metal.sidero.dev/uuid=%s", serverObj.Name)
 				} else {
 					config.MachineConfig.MachineKubelet.KubeletExtraArgs = make(map[string]string)
-					config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] = fmt.Sprintf("metal.arges.dev/uuid=%s", serverObj.Name)
+					config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] = fmt.Sprintf("metal.sidero.dev/uuid=%s", serverObj.Name)
 				}
 
 				decodedData, err = config.Bytes()

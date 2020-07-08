@@ -7,7 +7,7 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - environments
   verbs:
@@ -19,7 +19,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - environments/status
   verbs:
@@ -27,7 +27,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - serverclasses
   verbs:
@@ -39,7 +39,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - serverclasses/status
   verbs:
@@ -47,7 +47,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - servers
   verbs:
@@ -59,7 +59,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - servers/status
   verbs:

@@ -1,4 +1,4 @@
-domain: arges.dev
+domain: sidero.dev
 repo: github.com/talos-systems/sidero/internal/app/metal-controller-manager
 resources:
 - group: metal

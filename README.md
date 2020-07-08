@@ -61,7 +61,7 @@ metadata:
   name: talos-0
 spec:
   serverRef:
-    apiVersion: metal.arges.dev/v1alpha1
+    apiVersion: metal.sidero.dev/v1alpha1
     kind: Server
     name: "00000000-0000-0000-0000-d05099d333e0"
     namespace: default

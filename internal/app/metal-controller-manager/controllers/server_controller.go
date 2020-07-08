@@ -32,8 +32,8 @@ type ServerReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=metal.arges.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=metal.arges.dev,resources=servers/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers/status,verbs=get;update;patch
 
 func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()

@@ -1,4 +1,4 @@
-apiVersion: metal.arges.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha1
 kind: Environment
 metadata:
   name: default

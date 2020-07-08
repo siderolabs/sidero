@@ -26,7 +26,7 @@ import (
 // readHandler is called when client starts file download from server
 func readHandler(filename string, rf io.ReaderFrom) error {
 	// TODO(andrewrynhard): Clean the file name path.
-	filename = filepath.Join("/var/lib/arges/tftp", filename)
+	filename = filepath.Join("/var/lib/sidero/tftp", filename)
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -48,7 +48,7 @@ func readHandler(filename string, rf io.ReaderFrom) error {
 }
 
 func ServeTFTP() error {
-	if err := os.MkdirAll("/var/lib/arges/tftp", 0777); err != nil {
+	if err := os.MkdirAll("/var/lib/sidero/tftp", 0777); err != nil {
 		return err
 	}
 

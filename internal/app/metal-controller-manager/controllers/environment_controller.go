@@ -42,8 +42,8 @@ type EnvironmentReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=metal.arges.dev,resources=environments,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=metal.arges.dev,resources=environments/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=metal.sidero.dev,resources=environments,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=metal.sidero.dev,resources=environments/status,verbs=get;update;patch
 
 func (r *EnvironmentReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return r.reconcile(req)
@@ -71,7 +71,7 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 		return ctrl.Result{}, fmt.Errorf("unable to get environment: %w", err)
 	}
 
-	envs := filepath.Join("/var/lib/arges/env", env.GetName())
+	envs := filepath.Join("/var/lib/sidero/env", env.GetName())
 
 	if _, err := os.Stat(envs); os.IsNotExist(err) {
 		if err = os.MkdirAll(envs, 0777); err != nil {
