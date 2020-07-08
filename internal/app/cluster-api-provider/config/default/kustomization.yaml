@@ -1,6 +1,3 @@
-resources:
-  - namespace.yaml
-
 bases:
   - ../rbac
   - ../manager
