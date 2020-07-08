@@ -11,6 +11,7 @@ import (
 	"github.com/go-logr/logr"
 	infrav1 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
 	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/internal/pkg/ipmi"
+	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/pkg/constants"
 	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
@@ -42,10 +43,10 @@ type MetalMachineReconciler struct {
 // +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=metalmachines,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=metalmachines/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=cluster.x-k8s.io,resources=machines;machines/status,verbs=get;list;watch
-// +kubebuilder:rbac:groups=metal.arges.dev,resources=serverclasses,verbs=get;list;watch;
-// +kubebuilder:rbac:groups=metal.arges.dev,resources=serverclasses/status,verbs=get;list;watch;
-// +kubebuilder:rbac:groups=metal.arges.dev,resources=servers,verbs=get;list;watch;
-// +kubebuilder:rbac:groups=metal.arges.dev,resources=servers/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=metal.sidero.dev,resources=serverclasses,verbs=get;list;watch;
+// +kubebuilder:rbac:groups=metal.sidero.dev,resources=serverclasses/status,verbs=get;list;watch;
+// +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;
+// +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers/status,verbs=get;update;patch
 
 func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rerr error) {
 	ctx := context.Background()
@@ -162,7 +163,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rer
 	}
 
 	// Set the providerID, as its required in upstream capi for machine lifecycle
-	metalMachine.Spec.ProviderID = pointer.StringPtr(fmt.Sprintf("metal://%s", serverResource.Name))
+	metalMachine.Spec.ProviderID = pointer.StringPtr(fmt.Sprintf("%s://%s", constants.ProviderID, serverResource.Name))
 
 	err = r.patchProviderID(ctx, cluster, metalMachine)
 	if err != nil {
@@ -310,7 +311,7 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 	nodes, err = clientset.CoreV1().Nodes().List(
 		ctx,
 		metav1.ListOptions{
-			LabelSelector: fmt.Sprintf("metal.arges.dev/uuid=%s", metalMachine.Spec.ServerRef.Name),
+			LabelSelector: fmt.Sprintf("metal.sidero.dev/uuid=%s", metalMachine.Spec.ServerRef.Name),
 		},
 	)
 	if err != nil {
@@ -325,7 +326,7 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 		return fmt.Errorf("multiple nodes found with same uuid label")
 	}
 
-	providerID := fmt.Sprintf("metal://%s", metalMachine.Spec.ServerRef.Name)
+	providerID := fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name)
 
 	for _, node := range nodes.Items {
 		if node.Spec.ProviderID == providerID {

@@ -8,7 +8,7 @@ ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
 WORKDIR /tmp
-RUN go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.8
+RUN go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.3.0
 RUN go get k8s.io/code-generator/cmd/conversion-gen@v0.18.2
 WORKDIR /src
 COPY ./go.mod ./
@@ -109,11 +109,11 @@ COPY --from=initramfs-archive /initramfs.xz /initramfs.xz
 FROM scratch AS metal-controller-manager
 COPY --from=docker.io/autonomy/ca-certificates:v0.2.0 / /
 COPY --from=docker.io/autonomy/fhs:v0.2.0 / /
-COPY --from=assets /undionly.kpxe /var/lib/arges/tftp/undionly.kpxe
-COPY --from=assets /undionly.kpxe /var/lib/arges/tftp/undionly.kpxe.0
-COPY --from=assets /ipxe.efi /var/lib/arges/tftp/ipxe.efi
-COPY --from=initramfs /initramfs.xz /var/lib/arges/env/discovery/initramfs.xz
-ADD https://github.com/talos-systems/talos/releases/download/v0.4.1/vmlinuz /var/lib/arges/env/discovery/vmlinuz
+COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe
+COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe.0
+COPY --from=assets /ipxe.efi /var/lib/sidero/tftp/ipxe.efi
+COPY --from=initramfs /initramfs.xz /var/lib/sidero/env/discovery/initramfs.xz
+ADD https://github.com/talos-systems/talos/releases/download/v0.4.1/vmlinuz /var/lib/sidero/env/discovery/vmlinuz
 COPY --from=build-metal-controller-manager /manager /manager
 ENTRYPOINT [ "/manager" ]
 

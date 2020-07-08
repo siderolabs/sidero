@@ -91,17 +91,17 @@ release: manifests ## Create the release YAML. The build result will be ouput to
 .PHONY: cluster-api-provider
 cluster-api-provider: ## Build the CAPI provider container image.
 	@$(MAKE) generate APP="$@"
-	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)"
+	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
 ..PHONY: metal-controller-manager
 metal-controller-manager: ## Build the CAPI provider container image.
 	@$(MAKE) generate APP="$@"
-	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)"
+	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
 PHONY: metal-metadata-server
 metal-metadata-server: ## Build the CAPI provider container image.
 	@$(MAKE) generate APP="$@"
-	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)"
+	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
 # Development
 

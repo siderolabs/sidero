@@ -65,7 +65,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - serverclasses
   verbs:
@@ -73,7 +73,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - serverclasses/status
   verbs:
@@ -81,7 +81,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - servers
   verbs:
@@ -89,7 +89,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - servers/status
   verbs:

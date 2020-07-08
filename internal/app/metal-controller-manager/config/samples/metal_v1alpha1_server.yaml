@@ -1,4 +1,4 @@
-apiVersion: metal.arges.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha1
 kind: Server
 metadata:
   name: server-sample

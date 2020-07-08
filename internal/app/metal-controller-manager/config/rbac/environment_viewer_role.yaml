@@ -5,7 +5,7 @@ metadata:
   name: environment-viewer-role
 rules:
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - environments
   verbs:
@@ -13,7 +13,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - metal.arges.dev
+  - metal.sidero.dev
   resources:
   - environments/status
   verbs:

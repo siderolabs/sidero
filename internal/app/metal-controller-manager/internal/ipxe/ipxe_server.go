@@ -116,7 +116,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 								"ip=dhcp",
 								"console=tty0",
 								"console=ttyS0",
-								"arges.endpoint=" + fmt.Sprintf("%s:%s", apiEndpoint, server.Port),
+								"sidero.endpoint=" + fmt.Sprintf("%s:%s", apiEndpoint, server.Port),
 							},
 						},
 					},
@@ -185,7 +185,7 @@ func ServeIPXE(endpoint string) error {
 
 	mux.Handle("/boot.ipxe", logRequest(http.HandlerFunc(bootFileHandler)))
 	mux.Handle("/ipxe", logRequest(http.HandlerFunc(ipxeHandler)))
-	mux.Handle("/env/", logRequest(http.StripPrefix("/env/", http.FileServer(http.Dir("/var/lib/arges/env")))))
+	mux.Handle("/env/", logRequest(http.StripPrefix("/env/", http.FileServer(http.Dir("/var/lib/sidero/env")))))
 
 	log.Println("Listening...")
 	return http.ListenAndServe(":8081", mux)

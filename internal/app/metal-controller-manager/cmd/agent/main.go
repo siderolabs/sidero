@@ -140,7 +140,7 @@ func setup() error {
 	}
 
 	log.SetOutput(kmsg)
-	log.SetPrefix("[arges]" + " ")
+	log.SetPrefix("[sidero]" + " ")
 	log.SetFlags(0)
 
 	return nil
@@ -159,7 +159,7 @@ func main() {
 	}
 
 	var endpoint *string
-	if endpoint = procfs.ProcCmdline().Get("arges.endpoint").First(); endpoint == nil {
+	if endpoint = procfs.ProcCmdline().Get("sidero.endpoint").First(); endpoint == nil {
 		log.Fatal(fmt.Errorf("no endpoint found"))
 	}
 

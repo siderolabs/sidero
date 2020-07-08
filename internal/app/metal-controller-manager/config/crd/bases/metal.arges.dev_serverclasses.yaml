@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.8
   creationTimestamp: null
-  name: serverclasses.metal.arges.dev
+  name: serverclasses.metal.sidero.dev
 spec:
-  group: metal.arges.dev
+  group: metal.sidero.dev
   names:
     kind: ServerClass
     listKind: ServerClassList
