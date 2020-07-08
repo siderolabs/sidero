@@ -52,9 +52,12 @@ COPY ./internal/app/metal-metadata-server/config ./internal/app/metal-metadata-s
 ARG REGISTRY_AND_USERNAME
 ARG TAG
 RUN cd ./internal/app/cluster-api-provider/config/manager \
-  && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/cluster-api-provider:${TAG} \
-  && cd - \
-  && kustomize build config > /infrastructure-components.yaml \
+  && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/cluster-api-provider:${TAG}
+RUN cd ./internal/app/metal-controller-manager/config/manager \
+  && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/metal-controller-manager:${TAG}
+RUN cd ./internal/app/metal-metadata-server/config/server \
+  && kustomize edit set image server=${REGISTRY_AND_USERNAME}/metal-metadata-server:${TAG}
+RUN kustomize build config > /infrastructure-components.yaml \
   && cp ./config/metadata/metadata.yaml /metadata.yaml
 
 FROM scratch AS release

@@ -17,7 +17,7 @@ COMMON_ARGS += --platform=$(PLATFORM)
 COMMON_ARGS += --build-arg=REGISTRY_AND_USERNAME=$(REGISTRY_AND_USERNAME)
 COMMON_ARGS += --build-arg=TAG=$(TAG)
 
-all: manifests container
+all: manifests generate cluster-api-provider metal-controller-manager metal-metadata-server
 
 
 # Help Menu
