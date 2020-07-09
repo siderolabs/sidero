@@ -19,14 +19,15 @@ import (
 	"log"
 	"net"
 
-	metal1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/api"
-	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/pkg/client"
 	"google.golang.org/grpc"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+
+	metal1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/api"
+	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/pkg/client"
 )
 
 const (
@@ -37,11 +38,9 @@ type server struct {
 	api.UnimplementedDiscoveryServer
 }
 
-// CreateServer implements api.DiscoveryServer
+// CreateServer implements api.DiscoveryServer.
 func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) (*api.CreateServerResponse, error) {
-	var (
-		config *rest.Config
-	)
+	var config *rest.Config
 
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -94,7 +93,8 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 	return &api.CreateServerResponse{}, nil
 }
 
-func ServerAPI() error {
+// Server starts the server.
+func Serve() error {
 	lis, err := net.Listen("tcp", ":"+Port)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
@@ -103,6 +103,7 @@ func ServerAPI() error {
 	s := grpc.NewServer()
 
 	api.RegisterDiscoveryServer(s, &server{})
+
 	if err := s.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)
 	}

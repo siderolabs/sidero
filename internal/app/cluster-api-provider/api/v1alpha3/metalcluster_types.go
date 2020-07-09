@@ -14,14 +14,14 @@ const (
 	ClusterFinalizer = "metalcluster.infrastructure.cluster.x-k8s.io"
 )
 
-// MetalClusterSpec defines the desired state of MetalCluster
+// MetalClusterSpec defines the desired state of MetalCluster.
 type MetalClusterSpec struct {
 	// ControlPlaneEndpoint represents the endpoint used to communicate with the control plane.
 	// +optional
 	ControlPlaneEndpoint capiv1.APIEndpoint `json:"controlPlaneEndpoint"`
 }
 
-// MetalClusterStatus defines the observed state of MetalCluster
+// MetalClusterStatus defines the observed state of MetalCluster.
 type MetalClusterStatus struct {
 	Ready bool `json:"ready"`
 }
@@ -34,7 +34,7 @@ type MetalClusterStatus struct {
 // +kubebuilder:storageversion
 // +kubebuilder:subresource:status
 
-// MetalCluster is the Schema for the metalclusters API
+// MetalCluster is the Schema for the metalclusters API.
 type MetalCluster struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -45,7 +45,7 @@ type MetalCluster struct {
 
 // +kubebuilder:object:root=true
 
-// MetalClusterList contains a list of MetalCluster
+// MetalClusterList contains a list of MetalCluster.
 type MetalClusterList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

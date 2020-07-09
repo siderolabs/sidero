@@ -7,9 +7,10 @@ import (
 )
 
 func NewClient(kubeconfig *string) (dynamic.Interface, error) {
-
-	var config *rest.Config
-	var err error
+	var (
+		config *rest.Config
+		err    error
+	)
 
 	if kubeconfig == nil {
 		config, err = rest.InClusterConfig()

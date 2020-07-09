@@ -21,7 +21,7 @@ spec:
   - name: v1alpha2
     schema:
       openAPIV3Schema:
-        description: MetalMachine is the Schema for the metalmachines API
+        description: MetalMachine is the Schema for the metalmachines API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -36,7 +36,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: MetalMachineSpec defines the desired state of MetalMachine
+            description: MetalMachineSpec defines the desired state of MetalMachine.
             properties:
               providerID:
                 description: ProviderID is the unique identifier as specified by the
@@ -103,7 +103,7 @@ spec:
                 type: object
             type: object
           status:
-            description: MetalMachineStatus defines the observed state of MetalMachine
+            description: MetalMachineStatus defines the observed state of MetalMachine.
             properties:
               errorMessage:
                 description: "ErrorMessage will be set in the event that there is
@@ -168,7 +168,7 @@ spec:
     name: v1alpha3
     schema:
       openAPIV3Schema:
-        description: MetalMachine is the Schema for the metalmachines API
+        description: MetalMachine is the Schema for the metalmachines API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -183,7 +183,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: MetalMachineSpec defines the desired state of MetalMachine
+            description: MetalMachineSpec defines the desired state of MetalMachine.
             properties:
               providerID:
                 description: ProviderID is the unique identifier as specified by the
@@ -309,7 +309,7 @@ spec:
                 type: object
             type: object
           status:
-            description: MetalMachineStatus defines the observed state of MetalMachine
+            description: MetalMachineStatus defines the observed state of MetalMachine.
             properties:
               failureMessage:
                 description: "FailureMessage will be set in the event that there is

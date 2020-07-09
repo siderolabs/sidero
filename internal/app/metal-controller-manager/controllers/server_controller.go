@@ -17,15 +17,16 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 	goipmi "github.com/vmware/goipmi"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+
+	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 )
 
-// ServerReconciler reconciles a Server object
+// ServerReconciler reconciles a Server object.
 type ServerReconciler struct {
 	client.Client
 	Log    logr.Logger

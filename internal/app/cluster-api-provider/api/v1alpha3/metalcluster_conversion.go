@@ -4,5 +4,5 @@
 
 package v1alpha3
 
-func (*MetalCluster) Hub()             {}
-func (*MetalClusterList) Hub()         {}
+func (*MetalCluster) Hub()     {}
+func (*MetalClusterList) Hub() {}

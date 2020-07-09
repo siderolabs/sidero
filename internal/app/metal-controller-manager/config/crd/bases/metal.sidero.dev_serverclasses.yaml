@@ -28,7 +28,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: ServerClass is the Schema for the serverclasses API
+        description: ServerClass is the Schema for the serverclasses API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -43,7 +43,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: ServerClassSpec defines the desired state of ServerClass
+            description: ServerClassSpec defines the desired state of ServerClass.
             properties:
               qualifiers:
                 properties:
@@ -84,7 +84,7 @@ spec:
             - qualifiers
             type: object
           status:
-            description: ServerClassStatus defines the observed state of ServerClass
+            description: ServerClassStatus defines the observed state of ServerClass.
             properties:
               serversAvailable:
                 items:

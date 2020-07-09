@@ -22,7 +22,7 @@ spec:
     schema:
       openAPIV3Schema:
         description: MetalMachineTemplate is the Schema for the metalmachinetemplates
-          API
+          API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -37,7 +37,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: MetalMachineTemplateSpec defines the desired state of MetalMachineTemplate
+            description: MetalMachineTemplateSpec defines the desired state of MetalMachineTemplate.
             properties:
               template:
                 properties:
@@ -121,7 +121,7 @@ spec:
             type: object
           status:
             description: MetalMachineTemplateStatus defines the observed state of
-              MetalMachineTemplate
+              MetalMachineTemplate.
             type: object
         type: object
     served: true
@@ -130,7 +130,7 @@ spec:
     schema:
       openAPIV3Schema:
         description: MetalMachineTemplate is the Schema for the metalmachinetemplates
-          API
+          API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -145,7 +145,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: MetalMachineTemplateSpec defines the desired state of MetalMachineTemplate
+            description: MetalMachineTemplateSpec defines the desired state of MetalMachineTemplate.
             properties:
               template:
                 properties:
@@ -292,7 +292,7 @@ spec:
             type: object
           status:
             description: MetalMachineTemplateStatus defines the observed state of
-              MetalMachineTemplate
+              MetalMachineTemplate.
             type: object
         type: object
     served: true

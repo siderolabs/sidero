@@ -1,14 +1,16 @@
+// nolint: golint,stylecheck
 package v1alpha2
 
 import (
-	infrav1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
 	apiconversion "k8s.io/apimachinery/pkg/conversion"
 	utilconversion "sigs.k8s.io/cluster-api/util/conversion"
 	"sigs.k8s.io/controller-runtime/pkg/conversion"
+
+	infrav1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
 )
 
 // ConvertTo converts this MetalMachine to the Hub version (v1alpha3).
-func (src *MetalMachine) ConvertTo(dstRaw conversion.Hub) error { // nolint
+func (src *MetalMachine) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*infrav1alpha3.MetalMachine)
 
 	if err := Convert_v1alpha2_MetalMachine_To_v1alpha3_MetalMachine(src, dst, nil); err != nil {
@@ -25,7 +27,7 @@ func (src *MetalMachine) ConvertTo(dstRaw conversion.Hub) error { // nolint
 }
 
 // ConvertFrom converts from the Hub version (v1alpha3) to this version.
-func (dst *MetalMachine) ConvertFrom(srcRaw conversion.Hub) error { // nolint
+func (dst *MetalMachine) ConvertFrom(srcRaw conversion.Hub) error {
 	src := srcRaw.(*infrav1alpha3.MetalMachine)
 	if err := Convert_v1alpha3_MetalMachine_To_v1alpha2_MetalMachine(src, dst, nil); err != nil {
 		return err
@@ -40,18 +42,18 @@ func (dst *MetalMachine) ConvertFrom(srcRaw conversion.Hub) error { // nolint
 }
 
 // ConvertTo converts this MetalMachineList to the Hub version (v1alpha3).
-func (src *MetalMachineList) ConvertTo(dstRaw conversion.Hub) error { // nolint
+func (src *MetalMachineList) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*infrav1alpha3.MetalMachineList)
 	return Convert_v1alpha2_MetalMachineList_To_v1alpha3_MetalMachineList(src, dst, nil)
 }
 
 // ConvertFrom converts from the Hub version (v1alpha3) to this version.
-func (dst *MetalMachineList) ConvertFrom(srcRaw conversion.Hub) error { // nolint
+func (dst *MetalMachineList) ConvertFrom(srcRaw conversion.Hub) error {
 	src := srcRaw.(*infrav1alpha3.MetalMachineList)
 	return Convert_v1alpha3_MetalMachineList_To_v1alpha2_MetalMachineList(src, dst, nil)
 }
 
-func Convert_v1alpha2_MetalMachineSpec_To_v1alpha3_MetalMachineSpec(in *MetalMachineSpec, out *infrav1alpha3.MetalMachineSpec, s apiconversion.Scope) error { // nolint
+func Convert_v1alpha2_MetalMachineSpec_To_v1alpha3_MetalMachineSpec(in *MetalMachineSpec, out *infrav1alpha3.MetalMachineSpec, s apiconversion.Scope) error {
 	if err := autoConvert_v1alpha2_MetalMachineSpec_To_v1alpha3_MetalMachineSpec(in, out, s); err != nil {
 		return err
 	}
@@ -60,7 +62,7 @@ func Convert_v1alpha2_MetalMachineSpec_To_v1alpha3_MetalMachineSpec(in *MetalMac
 }
 
 // Convert_v1alpha3_MetalMachineSpec_To_v1alpha2_MetalMachineSpec converts from the Hub version (v1alpha3) of the MetalMachineSpec to this version.
-func Convert_v1alpha3_MetalMachineSpec_To_v1alpha2_MetalMachineSpec(in *infrav1alpha3.MetalMachineSpec, out *MetalMachineSpec, s apiconversion.Scope) error { // nolint
+func Convert_v1alpha3_MetalMachineSpec_To_v1alpha2_MetalMachineSpec(in *infrav1alpha3.MetalMachineSpec, out *MetalMachineSpec, s apiconversion.Scope) error {
 	if err := autoConvert_v1alpha3_MetalMachineSpec_To_v1alpha2_MetalMachineSpec(in, out, s); err != nil {
 		return err
 	}
@@ -69,7 +71,7 @@ func Convert_v1alpha3_MetalMachineSpec_To_v1alpha2_MetalMachineSpec(in *infrav1a
 }
 
 // Convert_v1alpha2_MetalMachineStatus_To_v1alpha3_MetalMachineStatus converts this MetalMachineStatus to the Hub version (v1alpha3).
-func Convert_v1alpha2_MetalMachineStatus_To_v1alpha3_MetalMachineStatus(in *MetalMachineStatus, out *infrav1alpha3.MetalMachineStatus, s apiconversion.Scope) error { // nolint
+func Convert_v1alpha2_MetalMachineStatus_To_v1alpha3_MetalMachineStatus(in *MetalMachineStatus, out *infrav1alpha3.MetalMachineStatus, s apiconversion.Scope) error {
 	if err := autoConvert_v1alpha2_MetalMachineStatus_To_v1alpha3_MetalMachineStatus(in, out, s); err != nil {
 		return err
 	}
@@ -82,7 +84,7 @@ func Convert_v1alpha2_MetalMachineStatus_To_v1alpha3_MetalMachineStatus(in *Meta
 }
 
 // Convert_v1alpha3_MetalMachineStatus_To_v1alpha2_MetalMachineStatus converts from the Hub version (v1alpha3) of the MetalMachineStatus to this version.
-func Convert_v1alpha3_MetalMachineStatus_To_v1alpha2_MetalMachineStatus(in *infrav1alpha3.MetalMachineStatus, out *MetalMachineStatus, s apiconversion.Scope) error { // nolint
+func Convert_v1alpha3_MetalMachineStatus_To_v1alpha2_MetalMachineStatus(in *infrav1alpha3.MetalMachineStatus, out *MetalMachineStatus, s apiconversion.Scope) error {
 	if err := autoConvert_v1alpha3_MetalMachineStatus_To_v1alpha2_MetalMachineStatus(in, out, s); err != nil {
 		return err
 	}

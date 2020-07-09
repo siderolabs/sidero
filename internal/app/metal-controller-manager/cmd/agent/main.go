@@ -22,45 +22,11 @@ import (
 
 	"github.com/talos-systems/go-procfs/procfs"
 	"github.com/talos-systems/go-smbios/smbios"
-	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/api"
 	"golang.org/x/sys/unix"
 	"google.golang.org/grpc"
-)
 
-func print(s *smbios.Smbios) {
-	log.Println(s.BIOSInformation().Vendor())
-	log.Println(s.BIOSInformation().Version())
-	log.Println(s.BIOSInformation().ReleaseDate())
-	log.Println(s.SystemInformation().Manufacturer())
-	log.Println(s.SystemInformation().ProductName())
-	log.Println(s.SystemInformation().Version())
-	log.Println(s.SystemInformation().SerialNumber())
-	log.Println(s.SystemInformation().SKUNumber())
-	log.Println(s.SystemInformation().Family())
-	log.Println(s.BaseboardInformation().Manufacturer())
-	log.Println(s.BaseboardInformation().Product())
-	log.Println(s.BaseboardInformation().Version())
-	log.Println(s.BaseboardInformation().SerialNumber())
-	log.Println(s.BaseboardInformation().AssetTag())
-	log.Println(s.BaseboardInformation().LocationInChassis())
-	log.Println(s.SystemEnclosure().Manufacturer())
-	log.Println(s.SystemEnclosure().Version())
-	log.Println(s.SystemEnclosure().SerialNumber())
-	log.Println(s.SystemEnclosure().AssetTagNumber())
-	log.Println(s.SystemEnclosure().SKUNumber())
-	log.Println(s.ProcessorInformation().SocketDesignation())
-	log.Println(s.ProcessorInformation().ProcessorManufacturer())
-	log.Println(s.ProcessorInformation().ProcessorVersion())
-	log.Println(s.ProcessorInformation().SerialNumber())
-	log.Println(s.ProcessorInformation().AssetTag())
-	log.Println(s.ProcessorInformation().PartNumber())
-	log.Println(s.CacheInformation().SocketDesignation())
-	log.Println(s.PortConnectorInformation().InternalReferenceDesignator())
-	log.Println(s.PortConnectorInformation().ExternalReferenceDesignator())
-	log.Println(s.SystemSlots().SlotDesignation())
-	log.Println(s.BIOSLanguageInformation().CurrentLanguage())
-	log.Println(s.GroupAssociations().GroupName())
-}
+	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/api"
+)
 
 func create(endpoint string, s *smbios.Smbios) error {
 	conn, err := grpc.Dial(endpoint, grpc.WithInsecure(), grpc.WithBlock())
@@ -102,19 +68,19 @@ func create(endpoint string, s *smbios.Smbios) error {
 }
 
 func setup() error {
-	if err := os.MkdirAll("/dev", 0777); err != nil {
+	if err := os.MkdirAll("/dev", 0o777); err != nil {
 		return err
 	}
 
-	if err := os.MkdirAll("/proc", 0777); err != nil {
+	if err := os.MkdirAll("/proc", 0o777); err != nil {
 		return err
 	}
 
-	if err := os.MkdirAll("/sys", 0777); err != nil {
+	if err := os.MkdirAll("/sys", 0o777); err != nil {
 		return err
 	}
 
-	if err := os.MkdirAll("/tmp", 0777); err != nil {
+	if err := os.MkdirAll("/tmp", 0o777); err != nil {
 		return err
 	}
 
@@ -134,7 +100,7 @@ func setup() error {
 		return err
 	}
 
-	kmsg, err := os.OpenFile("/dev/kmsg", os.O_RDWR|unix.O_CLOEXEC|unix.O_NONBLOCK|unix.O_NOCTTY, 0666)
+	kmsg, err := os.OpenFile("/dev/kmsg", os.O_RDWR|unix.O_CLOEXEC|unix.O_NONBLOCK|unix.O_NOCTTY, 0o666)
 	if err != nil {
 		return fmt.Errorf("failed to open /dev/kmsg: %w", err)
 	}
@@ -171,5 +137,6 @@ func main() {
 
 	log.Println("Discovery complete")
 
+	// nolint: errcheck
 	unix.Reboot(unix.LINUX_REBOOT_CMD_POWER_OFF)
 }

@@ -23,12 +23,12 @@ type Qualifiers struct {
 	LabelSelectors    []map[string]string `json:"labelSelectors,omitempty"`
 }
 
-// ServerClassSpec defines the desired state of ServerClass
+// ServerClassSpec defines the desired state of ServerClass.
 type ServerClassSpec struct {
 	Qualifiers Qualifiers `json:"qualifiers"`
 }
 
-// ServerClassStatus defines the observed state of ServerClass
+// ServerClassStatus defines the observed state of ServerClass.
 type ServerClassStatus struct {
 	ServersAvailable []string `json:"serversAvailable"`
 	ServersInUse     []string `json:"serversInUse"`
@@ -40,7 +40,7 @@ type ServerClassStatus struct {
 // +kubebuilder:printcolumn:name="Available",type="string",JSONPath=".status.serversAvailable",description="the number of available servers"
 // +kubebuilder:printcolumn:name="In Use",type="string",JSONPath=".status.serversInUse",description="the number of servers in use"
 
-// ServerClass is the Schema for the serverclasses API
+// ServerClass is the Schema for the serverclasses API.
 type ServerClass struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -51,7 +51,7 @@ type ServerClass struct {
 
 // +kubebuilder:object:root=true
 
-// ServerClassList contains a list of ServerClass
+// ServerClassList contains a list of ServerClass.
 type ServerClassList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

@@ -2,19 +2,21 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+// nolint: golint,stylecheck
 package v1alpha2
 
 import (
 	"log"
 
-	infrav1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
 	apiconversion "k8s.io/apimachinery/pkg/conversion"
 	utilconversion "sigs.k8s.io/cluster-api/util/conversion"
 	"sigs.k8s.io/controller-runtime/pkg/conversion"
+
+	infrav1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
 )
 
 // ConvertTo converts this MetalCluster to the Hub version (v1alpha3).
-func (src *MetalCluster) ConvertTo(dstRaw conversion.Hub) error { // nolint
+func (src *MetalCluster) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*infrav1alpha3.MetalCluster)
 
 	if err := Convert_v1alpha2_MetalCluster_To_v1alpha3_MetalCluster(src, dst, nil); err != nil {
@@ -44,7 +46,7 @@ func (src *MetalCluster) ConvertTo(dstRaw conversion.Hub) error { // nolint
 }
 
 // ConvertFrom converts from the Hub version (v1alpha3) to this version.
-func (dst *MetalCluster) ConvertFrom(srcRaw conversion.Hub) error { // nolint
+func (dst *MetalCluster) ConvertFrom(srcRaw conversion.Hub) error {
 	src := srcRaw.(*infrav1alpha3.MetalCluster)
 
 	if err := Convert_v1alpha3_MetalCluster_To_v1alpha2_MetalCluster(src, dst, nil); err != nil {
@@ -76,19 +78,19 @@ func (dst *MetalCluster) ConvertFrom(srcRaw conversion.Hub) error { // nolint
 }
 
 // ConvertTo converts this MetalClusterList to the Hub version (v1alpha3).
-func (src *MetalClusterList) ConvertTo(dstRaw conversion.Hub) error { // nolint
+func (src *MetalClusterList) ConvertTo(dstRaw conversion.Hub) error {
 	dst := dstRaw.(*infrav1alpha3.MetalClusterList)
 	return Convert_v1alpha2_MetalClusterList_To_v1alpha3_MetalClusterList(src, dst, nil)
 }
 
 // ConvertFrom converts from the Hub version (v1alpha3) to this version.
-func (dst *MetalClusterList) ConvertFrom(srcRaw conversion.Hub) error { // nolint
+func (dst *MetalClusterList) ConvertFrom(srcRaw conversion.Hub) error {
 	src := srcRaw.(*infrav1alpha3.MetalClusterList)
 	return Convert_v1alpha3_MetalClusterList_To_v1alpha2_MetalClusterList(src, dst, nil)
 }
 
 // Convert_v1alpha2_MetalClusterStatus_To_v1alpha3_MetalClusterStatus converts MetalCluster.Status from v1alpha2 to v1alpha3.
-func Convert_v1alpha2_MetalClusterStatus_To_v1alpha3_MetalClusterStatus(in *MetalClusterStatus, out *infrav1alpha3.MetalClusterStatus, s apiconversion.Scope) error { // nolint
+func Convert_v1alpha2_MetalClusterStatus_To_v1alpha3_MetalClusterStatus(in *MetalClusterStatus, out *infrav1alpha3.MetalClusterStatus, s apiconversion.Scope) error {
 	if err := autoConvert_v1alpha2_MetalClusterStatus_To_v1alpha3_MetalClusterStatus(in, out, s); err != nil {
 		return err
 	}
@@ -97,7 +99,7 @@ func Convert_v1alpha2_MetalClusterStatus_To_v1alpha3_MetalClusterStatus(in *Meta
 }
 
 // Convert_v1alpha2_MetalClusterSpec_To_v1alpha3_MetalClusterSpec.
-func Convert_v1alpha2_MetalClusterSpec_To_v1alpha3_MetalClusterSpec(in *MetalClusterSpec, out *infrav1alpha3.MetalClusterSpec, s apiconversion.Scope) error { //nolint
+func Convert_v1alpha2_MetalClusterSpec_To_v1alpha3_MetalClusterSpec(in *MetalClusterSpec, out *infrav1alpha3.MetalClusterSpec, s apiconversion.Scope) error {
 	if err := autoConvert_v1alpha2_MetalClusterSpec_To_v1alpha3_MetalClusterSpec(in, out, s); err != nil {
 		return err
 	}
@@ -106,7 +108,7 @@ func Convert_v1alpha2_MetalClusterSpec_To_v1alpha3_MetalClusterSpec(in *MetalClu
 }
 
 // Convert_v1alpha3_MetalClusterSpec_To_v1alpha2_MetalClusterSpec converts from the Hub version (v1alpha3) of the MetalClusterSpec to this version.
-func Convert_v1alpha3_MetalClusterSpec_To_v1alpha2_MetalClusterSpec(in *infrav1alpha3.MetalClusterSpec, out *MetalClusterSpec, s apiconversion.Scope) error { // nolint
+func Convert_v1alpha3_MetalClusterSpec_To_v1alpha2_MetalClusterSpec(in *infrav1alpha3.MetalClusterSpec, out *MetalClusterSpec, s apiconversion.Scope) error {
 	if err := autoConvert_v1alpha3_MetalClusterSpec_To_v1alpha2_MetalClusterSpec(in, out, s); err != nil {
 		return err
 	}
@@ -115,7 +117,7 @@ func Convert_v1alpha3_MetalClusterSpec_To_v1alpha2_MetalClusterSpec(in *infrav1a
 }
 
 // Convert_v1alpha3_MetalClusterStatus_To_v1alpha2_MetalClusterStatus.
-func Convert_v1alpha3_MetalClusterStatus_To_v1alpha2_MetalClusterStatus(in *infrav1alpha3.MetalClusterStatus, out *MetalClusterStatus, s apiconversion.Scope) error { //nolint
+func Convert_v1alpha3_MetalClusterStatus_To_v1alpha2_MetalClusterStatus(in *infrav1alpha3.MetalClusterStatus, out *MetalClusterStatus, s apiconversion.Scope) error {
 	if err := autoConvert_v1alpha3_MetalClusterStatus_To_v1alpha2_MetalClusterStatus(in, out, s); err != nil {
 		return err
 	}

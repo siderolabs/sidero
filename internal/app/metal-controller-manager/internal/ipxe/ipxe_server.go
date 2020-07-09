@@ -24,15 +24,16 @@ import (
 	"strings"
 	"text/template"
 
-	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/server"
-	agentclient "github.com/talos-systems/sidero/internal/app/metal-controller-manager/pkg/client"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/server"
+	agentclient "github.com/talos-systems/sidero/internal/app/metal-controller-manager/pkg/client"
 )
 
 const bootFile = `#!ipxe
@@ -45,12 +46,10 @@ initrd /env/{{ .Env.Name }}/initramfs.xz
 boot
 `))
 
-var (
-	apiEndpoint string
-)
+var apiEndpoint string
 
 func bootFileHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, bootFile)
+	fmt.Fprint(w, bootFile)
 }
 
 func ipxeHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,6 +57,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		config *rest.Config
 		err    error
 	)
+
 	kubeconfig, ok := os.LookupEnv("KUBECONFIG")
 	if ok {
 		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
@@ -93,7 +93,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		// If we can't find the server then we know that discovery has not been
 		// performed yet.
 		if apierrors.IsNotFound(err) {
-			var args = struct {
+			args := struct {
 				Env metalv1alpha1.Environment
 			}{
 				Env: metalv1alpha1.Environment{
@@ -124,6 +124,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			var buf bytes.Buffer
+
 			err = ipxeTemplate.Execute(&buf, args)
 			if err != nil {
 				log.Printf("error rendering template: %v", err)
@@ -138,12 +139,12 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			return
-		} else {
-			log.Printf("error looking up server: %v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-
-			return
 		}
+
+		log.Printf("error looking up server: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return
 	}
 
 	var env metalv1alpha1.Environment
@@ -157,13 +158,14 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var args = struct {
+	args := struct {
 		Env metalv1alpha1.Environment
 	}{
 		Env: env,
 	}
 
 	var buf bytes.Buffer
+
 	err = ipxeTemplate.Execute(&buf, args)
 	if err != nil {
 		log.Printf("error rendering template: %v", err)
@@ -188,6 +190,7 @@ func ServeIPXE(endpoint string) error {
 	mux.Handle("/env/", logRequest(http.StripPrefix("/env/", http.FileServer(http.Dir("/var/lib/sidero/env")))))
 
 	log.Println("Listening...")
+
 	return http.ListenAndServe(":8081", mux)
 }
 
@@ -202,7 +205,9 @@ func logRequest(next http.Handler) http.Handler {
 
 func labelsFromRequest(req *http.Request) map[string]string {
 	values := req.URL.Query()
+
 	labels := map[string]string{}
+
 	for key := range values {
 		switch strings.ToLower(key) {
 		case "mac":
@@ -215,6 +220,7 @@ func labelsFromRequest(req *http.Request) map[string]string {
 			labels[key] = values.Get(key)
 		}
 	}
+
 	return labels
 }
 
@@ -223,5 +229,6 @@ func parseMAC(s string) (net.HardwareAddr, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return macAddr, err
 }

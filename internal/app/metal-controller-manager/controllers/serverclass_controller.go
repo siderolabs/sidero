@@ -19,7 +19,6 @@ import (
 	"reflect"
 
 	"github.com/go-logr/logr"
-	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -28,9 +27,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+
+	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 )
 
-// ServerClassReconciler reconciles a ServerClass object
+// ServerClassReconciler reconciles a ServerClass object.
 type ServerClassReconciler struct {
 	client.Client
 	Log    logr.Logger
@@ -67,9 +68,11 @@ func (sr *serverResults) filterCPU(filters []metalv1alpha1.CPUInformation) serve
 
 	for _, server := range sr.items {
 		var match bool
+
 		for _, cpu := range filters {
 			if server.Spec.CPU != nil && reflect.DeepEqual(cpu, *server.Spec.CPU) {
 				match = true
+
 				break
 			}
 		}
@@ -79,6 +82,7 @@ func (sr *serverResults) filterCPU(filters []metalv1alpha1.CPUInformation) serve
 			delete(sr.items, server.ObjectMeta.Name)
 		}
 	}
+
 	return sr
 }
 
@@ -89,6 +93,7 @@ func (sr *serverResults) filterSysInfo(filters []metalv1alpha1.SystemInformation
 
 	for _, server := range sr.items {
 		var match bool
+
 		for _, sysInfo := range filters {
 			if server.Spec.SystemInformation != nil && reflect.DeepEqual(sysInfo, *server.Spec.SystemInformation) {
 				match = true
@@ -112,6 +117,7 @@ func (sr *serverResults) filterLabels(filters []map[string]string) serverFilter 
 
 	for _, server := range sr.items {
 		var match bool
+
 		for _, label := range filters {
 			for labelKey, labelVal := range label {
 				if val, ok := server.ObjectMeta.Labels[labelKey]; ok {

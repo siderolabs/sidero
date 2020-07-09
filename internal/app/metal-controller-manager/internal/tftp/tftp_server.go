@@ -21,12 +21,12 @@ import (
 	"time"
 
 	"github.com/pin/tftp"
+	"github.com/talos-systems/talos/pkg/safepath"
 )
 
-// readHandler is called when client starts file download from server
+// readHandler is called when client starts file download from server.
 func readHandler(filename string, rf io.ReaderFrom) error {
-	// TODO(andrewrynhard): Clean the file name path.
-	filename = filepath.Join("/var/lib/sidero/tftp", filename)
+	filename = filepath.Join("/var/lib/sidero/tftp", safepath.CleanPath(filename))
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -48,7 +48,7 @@ func readHandler(filename string, rf io.ReaderFrom) error {
 }
 
 func ServeTFTP() error {
-	if err := os.MkdirAll("/var/lib/sidero/tftp", 0777); err != nil {
+	if err := os.MkdirAll("/var/lib/sidero/tftp", 0o777); err != nil {
 		return err
 	}
 

@@ -15,7 +15,7 @@ const (
 	MachineFinalizer = "metalmachine.infrastructure.cluster.x-k8s.io"
 )
 
-// MetalMachineSpec defines the desired state of MetalMachine
+// MetalMachineSpec defines the desired state of MetalMachine.
 type MetalMachineSpec struct {
 	// ProviderID is the unique identifier as specified by the cloud provider.
 	// +optional
@@ -24,7 +24,7 @@ type MetalMachineSpec struct {
 	ServerRef *corev1.ObjectReference `json:"serverRef,omitempty"`
 }
 
-// MetalMachineStatus defines the observed state of MetalMachine
+// MetalMachineStatus defines the observed state of MetalMachine.
 type MetalMachineStatus struct {
 	Ready bool `json:"ready"`
 
@@ -71,7 +71,7 @@ type MetalMachineStatus struct {
 // +kubebuilder:resource:path=metalmachines,scope=Namespaced,categories=cluster-api
 // +kubebuilder:subresource:status
 
-// MetalMachine is the Schema for the metalmachines API
+// MetalMachine is the Schema for the metalmachines API.
 type MetalMachine struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -82,7 +82,7 @@ type MetalMachine struct {
 
 // +kubebuilder:object:root=true
 
-// MetalMachineList contains a list of MetalMachine
+// MetalMachineList contains a list of MetalMachine.
 type MetalMachineList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
