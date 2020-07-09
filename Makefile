@@ -82,6 +82,7 @@ docker-%: ## Builds the specified target defined in the Dockerfile using the doc
 .PHONY: generate
 generate: ## Generate source code.
 	@$(MAKE) local-$@ DEST=./
+	@$(MAKE) fmt
 
 .PHONY: manifests
 manifests: ## Generate manifests (e.g. CRD, RBAC, etc.).
