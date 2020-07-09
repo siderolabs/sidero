@@ -19,10 +19,6 @@ import (
 	"flag"
 	"os"
 
-	infrav1alpha2 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha2"
-	infrav1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
-	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/controllers"
-	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	cgrecord "k8s.io/client-go/tools/record"
@@ -30,6 +26,11 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	infrav1alpha2 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha2"
+	infrav1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
+	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/controllers"
+	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -38,6 +39,7 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 )
 
+// nolint: wsl
 func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
 	_ = capiv1.AddToScheme(scheme)
@@ -48,9 +50,11 @@ func init() {
 }
 
 func main() {
-	var metricsAddr string
-	var enableLeaderElection bool
-	var webhookPort int
+	var (
+		metricsAddr          string
+		enableLeaderElection bool
+		webhookPort          int
+	)
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
@@ -90,6 +94,7 @@ func main() {
 			setupLog.Error(err, "unable to create controller", "controller", "MetalCluster")
 			os.Exit(1)
 		}
+
 		if err = (&controllers.MetalMachineReconciler{
 			Client: mgr.GetClient(),
 			Log:    ctrl.Log.WithName("controllers").WithName("MetalMachine"),
@@ -103,10 +108,12 @@ func main() {
 			setupLog.Error(err, "unable to create webhook", "webhook", "MetalCluster")
 			os.Exit(1)
 		}
+
 		if err = (&infrav1alpha3.MetalMachine{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "MetalMachine")
 			os.Exit(1)
 		}
+
 		if err = (&infrav1alpha3.MetalMachineTemplate{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "MetalMachineTemplate")
 			os.Exit(1)
@@ -115,6 +122,7 @@ func main() {
 	// +kubebuilder:scaffold:builder
 
 	setupLog.Info("starting manager")
+
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)

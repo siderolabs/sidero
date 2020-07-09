@@ -3,13 +3,18 @@
 # The base target provides the base for running various tasks against the source
 # code
 
-FROM golang:1.13 AS base
+FROM golang:1.14 AS base
 ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
 WORKDIR /tmp
 RUN go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.3.0
 RUN go get k8s.io/code-generator/cmd/conversion-gen@v0.18.2
+RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /usr/local/bin v1.28.0
+RUN cd $(mktemp -d) \
+  && go mod init tmp \
+  && go get mvdan.cc/gofumpt/gofumports@abc0db2c416aca0f60ea33c23c76665f6e7ba0b6 \
+  && mv /go/bin/gofumports /usr/local/bin/gofumports
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
@@ -150,7 +155,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build go test -v -count 1 -race ${
 #
 FROM base AS lint-go
 ENV GOGC=50
-RUN --mount=type=cache,target=/root/.cache/go-build /go/bin/golangci-lint run
+RUN --mount=type=cache,target=/root/.cache/go-build /usr/local/bin/golangci-lint run --enable-all --disable gochecknoglobals,gochecknoinits,lll,goerr113,funlen,nestif,maligned,gomnd,gocognit,gocyclo
 ARG MODULE
 RUN FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)
 #

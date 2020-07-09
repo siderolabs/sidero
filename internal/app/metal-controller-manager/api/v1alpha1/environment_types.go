@@ -35,7 +35,7 @@ type Initrd struct {
 	Asset `json:",inline"`
 }
 
-// EnvironmentSpec defines the desired state of Environment
+// EnvironmentSpec defines the desired state of Environment.
 type EnvironmentSpec struct {
 	Kernel Kernel `json:"kernel,omitempty"`
 	Initrd Initrd `json:"initrd,omitempty"`
@@ -47,7 +47,7 @@ type AssetCondition struct {
 	Type   string `json:"type"`
 }
 
-// EnvironmentStatus defines the observed state of Environment
+// EnvironmentStatus defines the observed state of Environment.
 type EnvironmentStatus struct {
 	Conditions []AssetCondition `json:"conditions,omitempty"`
 }
@@ -59,7 +59,7 @@ type EnvironmentStatus struct {
 // +kubebuilder:printcolumn:name="Initrd",type="string",JSONPath=".spec.initrd.url",description="the initrd for the environment"
 // +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].status",description="indicates the readiness of the environment"
 
-// Environment is the Schema for the environments API
+// Environment is the Schema for the environments API.
 type Environment struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -70,7 +70,7 @@ type Environment struct {
 
 // +kubebuilder:object:root=true
 
-// EnvironmentList contains a list of Environment
+// EnvironmentList contains a list of Environment.
 type EnvironmentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

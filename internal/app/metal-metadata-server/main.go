@@ -11,8 +11,6 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch"
 	"github.com/ghodss/yaml"
-	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/internal/app/metal-metadata-server/pkg/client"
 	"github.com/talos-systems/talos/pkg/config"
 	"github.com/talos-systems/talos/pkg/config/types/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -20,10 +18,15 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/internal/app/metal-metadata-server/pkg/client"
 )
 
-var kubeconfig *string
-var port *string
+var (
+	kubeconfig *string
+	port       *string
+)
 
 const (
 	capiVersion  = "v1alpha3"
@@ -36,19 +39,21 @@ func main() {
 	flag.Parse()
 
 	http.HandleFunc("/configdata", FetchConfig)
-	http.ListenAndServe(":"+*port, nil)
+	log.Fatal(http.ListenAndServe(":"+*port, nil))
 }
 
 func FetchConfig(w http.ResponseWriter, r *http.Request) {
 	ctx := context.TODO()
 
 	vals := r.URL.Query()
+
 	uuid := vals.Get("uuid")
+
 	if len(uuid) == 0 {
 		http.Error(w, "uuid param not found", 500)
 	}
 
-	log.Printf("recieved metadata request for uuid: %s", uuid)
+	log.Printf("received metadata request for uuid: %s", uuid)
 
 	k8sClient, err := client.NewClient(kubeconfig)
 	if err != nil {
@@ -87,6 +92,7 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.Error(w, err.Error(), 500)
+
 		return
 	}
 
@@ -95,6 +101,7 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 		serverRefString, _, err := unstructured.NestedString(metalMachine.Object, "spec", "serverRef", "name")
 		if err != nil {
 			http.Error(w, err.Error(), 500)
+
 			return
 		}
 
@@ -108,10 +115,13 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 			ownerList, present, err := unstructured.NestedSlice(metalMachine.Object, "metadata", "ownerReferences")
 			if err != nil {
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
+
 			if !present {
 				http.Error(w, "ownerRefList not found for metalMachine", 404)
+
 				return
 			}
 
@@ -119,30 +129,37 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 
 			for _, ownerItem := range ownerList {
 				tempOwnerRef := &metav1.OwnerReference{}
+
 				err = runtime.DefaultUnstructuredConverter.FromUnstructured(ownerItem.(map[string]interface{}), tempOwnerRef)
 				if err != nil {
 					http.Error(w, err.Error(), 500)
+
 					return
 				}
 
 				if tempOwnerRef.APIVersion == "cluster.x-k8s.io/"+capiVersion && tempOwnerRef.Kind == "Machine" {
 					ownerRef = tempOwnerRef
+
 					break
 				}
 			}
 
 			if ownerRef == nil {
 				http.Error(w, "unable to find ownerref for metalMachine", 500)
+
 				return
 			}
 
 			metalMachineNS, present, err := unstructured.NestedString(metalMachine.Object, "metadata", "namespace")
 			if err != nil {
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
+
 			if !present {
 				http.Error(w, "namespace not found for metalMachine", 404)
+
 				return
 			}
 
@@ -150,20 +167,25 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				if apierrors.IsNotFound(err) {
 					http.Error(w, "machine not found", 404)
+
 					return
 				}
 
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
 
 			bootstrapSecretName, present, err := unstructured.NestedString(machineData.Object, "spec", "bootstrap", "dataSecretName")
 			if err != nil {
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
+
 			if !present {
 				http.Error(w, "dataSecretName not found for machine", 404)
+
 				return
 			}
 
@@ -171,26 +193,32 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				if apierrors.IsNotFound(err) {
 					http.Error(w, "bootstrap secret not found", 404)
+
 					return
 				}
 
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
 
 			bootstrapData, present, err := unstructured.NestedString(bootstrapSecretData.Object, "data", "value")
 			if err != nil {
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
+
 			if !present {
 				http.Error(w, "bootstrap data not found", 404)
+
 				return
 			}
 
 			decodedData, err := base64.StdEncoding.DecodeString(bootstrapData)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
 
@@ -198,6 +226,7 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 			serverRef, err := k8sClient.Resource(serverGVR).Get(ctx, serverRefString, metav1.GetOptions{})
 			if err != nil {
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
 
@@ -206,6 +235,7 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 			err = runtime.DefaultUnstructuredConverter.FromUnstructured(serverRef.UnstructuredContent(), serverObj)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
 
@@ -214,30 +244,35 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 				marshalledPatches, err := json.Marshal(serverObj.Spec.ConfigPatches)
 				if err != nil {
 					http.Error(w, err.Error(), 500)
+
 					return
 				}
 
 				jsonDecodedData, err := yaml.YAMLToJSON(decodedData)
 				if err != nil {
 					http.Error(w, err.Error(), 500)
+
 					return
 				}
 
 				patch, err := jsonpatch.DecodePatch(marshalledPatches)
 				if err != nil {
 					http.Error(w, err.Error(), 500)
+
 					return
 				}
 
 				jsonDecodedData, err = patch.Apply(jsonDecodedData)
 				if err != nil {
 					http.Error(w, err.Error(), 500)
+
 					return
 				}
 
 				decodedData, err = yaml.JSONToYAML(jsonDecodedData)
 				if err != nil {
 					http.Error(w, err.Error(), 500)
+
 					return
 				}
 			}
@@ -246,9 +281,11 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 			configStruct, err := config.NewFromBytes(decodedData)
 			if err != nil {
 				http.Error(w, err.Error(), 500)
+
 				return
 			}
 
+			// nolint: gocritic
 			switch config := configStruct.(type) {
 			case *v1alpha1.Config:
 				if _, ok := config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"]; ok {
@@ -261,17 +298,20 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 				decodedData, err = config.Bytes()
 				if err != nil {
 					http.Error(w, err.Error(), 500)
+
 					return
 				}
 			}
 
 			// Finally return config data
-			w.Write(decodedData)
+			if _, err = w.Write(decodedData); err != nil {
+				log.Printf("Failed to write data: %v", err)
+			}
+
 			return
 		}
 	}
 
 	// Made it through all metal machines w/ no result
 	http.Error(w, "matching machine not found", 404)
-	return
 }

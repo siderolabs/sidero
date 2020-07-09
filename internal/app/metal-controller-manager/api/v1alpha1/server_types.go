@@ -21,7 +21,7 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// BMC defines data about how to talk to the node via ipmitool
+// BMC defines data about how to talk to the node via ipmitool.
 type BMC struct {
 	Endpoint string `json:"endpoint"`
 	User     string `json:"user"`
@@ -51,7 +51,7 @@ type ConfigPatches struct {
 	Value apiextensions.JSON `json:"value,omitempty"`
 }
 
-// ServerSpec defines the desired state of Server
+// ServerSpec defines the desired state of Server.
 type ServerSpec struct {
 	SystemInformation *SystemInformation `json:"system,omitempty"`
 	CPU               *CPUInformation    `json:"cpu,omitempty"`
@@ -59,7 +59,7 @@ type ServerSpec struct {
 	ConfigPatches     []ConfigPatches    `json:"configPatches,omitempty"`
 }
 
-// ServerStatus defines the observed state of Server
+// ServerStatus defines the observed state of Server.
 type ServerStatus struct {
 	Ready bool `json:"ready,omitempty"`
 	InUse bool `json:"inUse,omitempty"`
@@ -69,7 +69,7 @@ type ServerStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster
 
-// Server is the Schema for the servers API
+// Server is the Schema for the servers API.
 type Server struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -80,7 +80,7 @@ type Server struct {
 
 // +kubebuilder:object:root=true
 
-// ServerList contains a list of Server
+// ServerList contains a list of Server.
 type ServerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

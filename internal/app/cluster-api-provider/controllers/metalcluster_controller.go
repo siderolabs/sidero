@@ -9,7 +9,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	infrav1 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
@@ -20,9 +19,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	infrav1 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
 )
 
-// MetalClusterReconciler reconciles a MetalCluster object
+// MetalClusterReconciler reconciles a MetalCluster object.
 type MetalClusterReconciler struct {
 	client.Client
 	Log      logr.Logger
@@ -34,16 +35,19 @@ type MetalClusterReconciler struct {
 // +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=metalclusters/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=cluster.x-k8s.io,resources=clusters;clusters/status,verbs=get;list;watch
 
-func (r *MetalClusterReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rerr error) {
+func (r *MetalClusterReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err error) {
 	ctx := context.TODO()
 	log := r.Log.WithValues("metalcluster", req.NamespacedName)
 
 	// Fetch the metalCluster instance
+
 	metalCluster := &infrav1.MetalCluster{}
-	err := r.Get(ctx, req.NamespacedName, metalCluster)
+
+	err = r.Get(ctx, req.NamespacedName, metalCluster)
 	if apierrors.IsNotFound(err) {
 		return reconcile.Result{}, nil
 	}
+
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -55,6 +59,7 @@ func (r *MetalClusterReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rer
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+
 	if cluster == nil {
 		log.Info("Cluster Controller has not yet set OwnerRef")
 		return ctrl.Result{}, fmt.Errorf("no ownerref for cluster %s", metalCluster.ObjectMeta.Name)
@@ -70,10 +75,11 @@ func (r *MetalClusterReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rer
 
 	// Always attempt to Patch the metalCluster object and status after each reconciliation.
 	defer func() {
-		if err := patchHelper.Patch(ctx, metalCluster); err != nil {
+		if e := patchHelper.Patch(ctx, metalCluster); err != nil {
 			log.Error(err, "failed to patch metalCluster")
-			if rerr == nil {
-				rerr = err
+
+			if e == nil {
+				err = e
 			}
 		}
 	}()
@@ -84,17 +90,14 @@ func (r *MetalClusterReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rer
 	// Handle deleted machines
 	if !metalCluster.ObjectMeta.DeletionTimestamp.IsZero() {
 		log.Info("deleting cluster")
-		return r.reconcileDelete(metalCluster)
+
+		// Cluster is deleted so remove the finalizer.
+		controllerutil.RemoveFinalizer(metalCluster, infrav1.ClusterFinalizer)
+
+		return ctrl.Result{}, nil
 	}
 
 	metalCluster.Status.Ready = true
-
-	return ctrl.Result{}, nil
-}
-
-func (r *MetalClusterReconciler) reconcileDelete(metalCluster *infrav1.MetalCluster) (ctrl.Result, error) {
-	// Cluster is deleted so remove the finalizer.
-	controllerutil.RemoveFinalizer(metalCluster, infrav1.ClusterFinalizer)
 
 	return ctrl.Result{}, nil
 }

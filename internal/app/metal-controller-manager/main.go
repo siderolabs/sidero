@@ -18,18 +18,23 @@ import (
 	"fmt"
 	"os"
 
-	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/controllers"
-	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/ipxe"
-	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/server"
-	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/tftp"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/controllers"
+	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/ipxe"
+	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/server"
+	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/internal/tftp"
 	// +kubebuilder:scaffold:imports
+)
+
+const (
+	defaultMaxConcurrentReconciles = 10
 )
 
 var (
@@ -37,6 +42,7 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 )
 
+// nolint: wsl
 func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
 
@@ -77,7 +83,7 @@ func main() {
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Environment"),
 		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: 10}); err != nil {
+	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Environment")
 		os.Exit(1)
 	}
@@ -86,7 +92,7 @@ func main() {
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Server"),
 		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: 10}); err != nil {
+	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Server")
 		os.Exit(1)
 	}
@@ -95,7 +101,7 @@ func main() {
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("ServerClass"),
 		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: 10}); err != nil {
+	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ServerClass")
 		os.Exit(1)
 	}
@@ -128,12 +134,13 @@ func main() {
 	setupLog.Info("starting internal API server")
 
 	go func() {
-		if err := server.ServerAPI(); err != nil {
+		if err := server.Serve(); err != nil {
 			setupLog.Error(err, "unable to start API server", "controller", "Environment")
 		}
 	}()
 
 	setupLog.Info("starting manager")
+
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)

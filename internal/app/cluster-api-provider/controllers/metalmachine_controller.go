@@ -9,12 +9,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	infrav1 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
-	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/internal/pkg/ipmi"
-	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/pkg/constants"
-	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,9 +25,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+
+	infrav1 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
+	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/internal/pkg/ipmi"
+	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/pkg/constants"
+	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 )
 
-// MetalMachineReconciler reconciles a MetalMachine object
+// MetalMachineReconciler reconciles a MetalMachine object.
 type MetalMachineReconciler struct {
 	client.Client
 	Log      logr.Logger
@@ -48,16 +48,18 @@ type MetalMachineReconciler struct {
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers/status,verbs=get;update;patch
 
-func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rerr error) {
+func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err error) {
 	ctx := context.Background()
 	logger := r.Log.WithValues("metalmachine", req.NamespacedName)
 
 	// Fetch the metalMachine instance.
 	metalMachine := &infrav1.MetalMachine{}
-	err := r.Get(ctx, req.NamespacedName, metalMachine)
+
+	err = r.Get(ctx, req.NamespacedName, metalMachine)
 	if apierrors.IsNotFound(err) {
 		return ctrl.Result{}, nil
 	}
+
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -66,6 +68,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rer
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+
 	if machine == nil {
 		return ctrl.Result{}, fmt.Errorf("no ownerref for machine %s", metalMachine.ObjectMeta.Name)
 	}
@@ -92,12 +95,14 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rer
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+
 	// Always attempt to Patch the MetalMachine object and status after each reconciliation.
 	defer func() {
-		if err := patchHelper.Patch(ctx, metalMachine); err != nil {
+		if e := patchHelper.Patch(ctx, metalMachine); err != nil {
 			logger.Error(err, "failed to patch metalMachine")
-			if rerr == nil {
-				rerr = err
+
+			if e == nil {
+				err = e
 			}
 		}
 	}()
@@ -119,7 +124,9 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rer
 			Name:      metalMachine.Spec.ServerRef.Name,
 		}
 
-		r.Get(ctx, namespacedName, serverResource)
+		if err = r.Get(ctx, namespacedName, serverResource); err != nil {
+			return ctrl.Result{}, err
+		}
 	} else {
 		if metalMachine.Spec.ServerClassRef == nil {
 			return ctrl.Result{}, fmt.Errorf("either a server or serverclass ref must be supplied")
@@ -130,7 +137,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rer
 			return ctrl.Result{}, err
 		}
 
-		metalMachine.Spec.ServerRef = &v1.ObjectReference{
+		metalMachine.Spec.ServerRef = &corev1.ObjectReference{
 			Kind: serverResource.Kind,
 			Name: serverResource.Name,
 		}
@@ -171,12 +178,11 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, rer
 	}
 
 	metalMachine.Status.Ready = true
+
 	return ctrl.Result{}, nil
 }
 
 func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachine *infrav1.MetalMachine) (ctrl.Result, error) {
-	//TODO(rsmitty): add in call to reset node via talos api
-
 	serverResource := &metalv1alpha1.Server{}
 
 	// Use server ref if already provided
@@ -186,7 +192,9 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 			Name:      metalMachine.Spec.ServerRef.Name,
 		}
 
-		r.Get(ctx, namespacedName, serverResource)
+		if err := r.Get(ctx, namespacedName, serverResource); err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
 	if serverResource.Spec.BMC != nil {
@@ -280,7 +288,8 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 }
 
 func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *capiv1.Cluster, metalMachine *infrav1.MetalMachine) error {
-	kubeconfigSecret := &v1.Secret{}
+	kubeconfigSecret := &corev1.Secret{}
+
 	err := r.Client.Get(ctx,
 		types.NamespacedName{
 			Namespace: cluster.Namespace,
@@ -288,7 +297,6 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 		},
 		kubeconfigSecret,
 	)
-
 	if err != nil {
 		return err
 	}
@@ -303,12 +311,7 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 		return err
 	}
 
-	nodes, err := clientset.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
-	if err != nil {
-		return err
-	}
-
-	nodes, err = clientset.CoreV1().Nodes().List(
+	nodes, err := clientset.CoreV1().Nodes().List(
 		ctx,
 		metav1.ListOptions{
 			LabelSelector: fmt.Sprintf("metal.sidero.dev/uuid=%s", metalMachine.Spec.ServerRef.Name),
@@ -329,11 +332,14 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 	providerID := fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name)
 
 	for _, node := range nodes.Items {
+		node := node
+
 		if node.Spec.ProviderID == providerID {
 			continue
 		}
 
 		node.Spec.ProviderID = providerID
+
 		_, err = clientset.CoreV1().Nodes().Update(ctx, &node, metav1.UpdateOptions{})
 		if err != nil {
 			return err

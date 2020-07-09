@@ -19,7 +19,7 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Server is the Schema for the servers API
+        description: Server is the Schema for the servers API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,10 +34,10 @@ spec:
           metadata:
             type: object
           spec:
-            description: ServerSpec defines the desired state of Server
+            description: ServerSpec defines the desired state of Server.
             properties:
               bmc:
-                description: BMC defines data about how to talk to the node via ipmitool
+                description: BMC defines data about how to talk to the node via ipmitool.
                 properties:
                   endpoint:
                     type: string
@@ -88,7 +88,7 @@ spec:
                 type: object
             type: object
           status:
-            description: ServerStatus defines the observed state of Server
+            description: ServerStatus defines the observed state of Server.
             properties:
               inUse:
                 type: boolean

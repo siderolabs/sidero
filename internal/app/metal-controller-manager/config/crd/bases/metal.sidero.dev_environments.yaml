@@ -32,7 +32,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Environment is the Schema for the environments API
+        description: Environment is the Schema for the environments API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -47,7 +47,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: EnvironmentSpec defines the desired state of Environment
+            description: EnvironmentSpec defines the desired state of Environment.
             properties:
               initrd:
                 properties:
@@ -69,7 +69,7 @@ spec:
                 type: object
             type: object
           status:
-            description: EnvironmentStatus defines the observed state of Environment
+            description: EnvironmentStatus defines the observed state of Environment.
             properties:
               conditions:
                 items:

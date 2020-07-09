@@ -6,17 +6,20 @@ package api
 import (
 	context "context"
 	fmt "fmt"
+	math "math"
+
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var _ = proto.Marshal
-var _ = fmt.Errorf
-var _ = math.Inf
+var (
+	_ = proto.Marshal
+	_ = fmt.Errorf
+	_ = math.Inf
+)
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -47,15 +50,19 @@ func (*SystemInformation) Descriptor() ([]byte, []int) {
 func (m *SystemInformation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SystemInformation.Unmarshal(m, b)
 }
+
 func (m *SystemInformation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SystemInformation.Marshal(b, m, deterministic)
 }
+
 func (m *SystemInformation) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_SystemInformation.Merge(m, src)
 }
+
 func (m *SystemInformation) XXX_Size() int {
 	return xxx_messageInfo_SystemInformation.Size(m)
 }
+
 func (m *SystemInformation) XXX_DiscardUnknown() {
 	xxx_messageInfo_SystemInformation.DiscardUnknown(m)
 }
@@ -129,15 +136,19 @@ func (*CPU) Descriptor() ([]byte, []int) {
 func (m *CPU) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CPU.Unmarshal(m, b)
 }
+
 func (m *CPU) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CPU.Marshal(b, m, deterministic)
 }
+
 func (m *CPU) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CPU.Merge(m, src)
 }
+
 func (m *CPU) XXX_Size() int {
 	return xxx_messageInfo_CPU.Size(m)
 }
+
 func (m *CPU) XXX_DiscardUnknown() {
 	xxx_messageInfo_CPU.DiscardUnknown(m)
 }
@@ -176,15 +187,19 @@ func (*CreateServerRequest) Descriptor() ([]byte, []int) {
 func (m *CreateServerRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateServerRequest.Unmarshal(m, b)
 }
+
 func (m *CreateServerRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CreateServerRequest.Marshal(b, m, deterministic)
 }
+
 func (m *CreateServerRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CreateServerRequest.Merge(m, src)
 }
+
 func (m *CreateServerRequest) XXX_Size() int {
 	return xxx_messageInfo_CreateServerRequest.Size(m)
 }
+
 func (m *CreateServerRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_CreateServerRequest.DiscardUnknown(m)
 }
@@ -221,15 +236,19 @@ func (*CreateServerResponse) Descriptor() ([]byte, []int) {
 func (m *CreateServerResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateServerResponse.Unmarshal(m, b)
 }
+
 func (m *CreateServerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_CreateServerResponse.Marshal(b, m, deterministic)
 }
+
 func (m *CreateServerResponse) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CreateServerResponse.Merge(m, src)
 }
+
 func (m *CreateServerResponse) XXX_Size() int {
 	return xxx_messageInfo_CreateServerResponse.Size(m)
 }
+
 func (m *CreateServerResponse) XXX_DiscardUnknown() {
 	xxx_messageInfo_CreateServerResponse.DiscardUnknown(m)
 }
@@ -276,8 +295,10 @@ var fileDescriptor_1e7ff60feb39c8d0 = []byte{
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
-var _ context.Context
-var _ grpc.ClientConnInterface
+var (
+	_ context.Context
+	_ grpc.ClientConnInterface
+)
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.

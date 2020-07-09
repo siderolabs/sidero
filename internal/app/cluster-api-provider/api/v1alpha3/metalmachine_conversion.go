@@ -4,5 +4,5 @@
 
 package v1alpha3
 
-func (*MetalMachine) Hub()             {}
-func (*MetalMachineList) Hub()         {}
+func (*MetalMachine) Hub()     {}
+func (*MetalMachineList) Hub() {}

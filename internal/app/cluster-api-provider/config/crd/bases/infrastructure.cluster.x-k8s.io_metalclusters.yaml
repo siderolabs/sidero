@@ -21,7 +21,7 @@ spec:
   - name: v1alpha2
     schema:
       openAPIV3Schema:
-        description: MetalCluster is the Schema for the metalclusters API
+        description: MetalCluster is the Schema for the metalclusters API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -36,7 +36,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: MetalClusterSpec defines the desired state of MetalCluster
+            description: MetalClusterSpec defines the desired state of MetalCluster.
             properties:
               apiEndpoints:
                 items:
@@ -54,7 +54,7 @@ spec:
                 type: array
             type: object
           status:
-            description: MetalClusterStatus defines the observed state of MetalCluster
+            description: MetalClusterStatus defines the observed state of MetalCluster.
             properties:
               apiEndpoints:
                 description: APIEndpoints represents the endpoints to communicate
@@ -98,7 +98,7 @@ spec:
     name: v1alpha3
     schema:
       openAPIV3Schema:
-        description: MetalCluster is the Schema for the metalclusters API
+        description: MetalCluster is the Schema for the metalclusters API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -113,7 +113,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: MetalClusterSpec defines the desired state of MetalCluster
+            description: MetalClusterSpec defines the desired state of MetalCluster.
             properties:
               controlPlaneEndpoint:
                 description: ControlPlaneEndpoint represents the endpoint used to
@@ -132,7 +132,7 @@ spec:
                 type: object
             type: object
           status:
-            description: MetalClusterStatus defines the observed state of MetalCluster
+            description: MetalClusterStatus defines the observed state of MetalCluster.
             properties:
               ready:
                 type: boolean

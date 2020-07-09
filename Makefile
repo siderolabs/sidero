@@ -4,8 +4,11 @@ SHA ?= $(shell git describe --match=none --always --abbrev=8 --dirty)
 TAG ?= $(shell git describe --tag --always --dirty)
 BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 REGISTRY_AND_USERNAME := $(REGISTRY)/$(USERNAME)
+IMAGE := $(REGISTRY_AND_USERNAME)/$(NAME)
+MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
+PKGS ?= ./...
 
 BUILD := docker buildx build
 PLATFORM ?= linux/amd64
@@ -16,6 +19,8 @@ COMMON_ARGS += --progress=$(PROGRESS)
 COMMON_ARGS += --platform=$(PLATFORM)
 COMMON_ARGS += --build-arg=REGISTRY_AND_USERNAME=$(REGISTRY_AND_USERNAME)
 COMMON_ARGS += --build-arg=TAG=$(TAG)
+COMMON_ARGS += --build-arg=MODULE=$(MODULE)
+COMMON_ARGS += --build-arg=PKGS=$(PKGS)
 
 all: manifests generate cluster-api-provider metal-controller-manager metal-metadata-server
 
@@ -70,7 +75,7 @@ local-%: ## Builds the specified target defined in the Dockerfile using the loca
 	@$(MAKE) target-$* TARGET_ARGS="--output=type=local,dest=$(DEST) $(TARGET_ARGS)"
 
 docker-%: ## Builds the specified target defined in the Dockerfile using the docker output type. The build result will be loaded into docker.
-	@$(MAKE) target-$* TARGET_ARGS="--tag $(REGISTRY_AND_USERNAME)/$(NAME):$(TAG) $(TARGET_ARGS)"
+	@$(MAKE) target-$* TARGET_ARGS="--tag $(IMAGE):$(TAG) $(TARGET_ARGS)"
 
 # Code Generation
 
@@ -90,17 +95,14 @@ release: manifests ## Create the release YAML. The build result will be ouput to
 
 .PHONY: cluster-api-provider
 cluster-api-provider: ## Build the CAPI provider container image.
-	@$(MAKE) generate APP="$@"
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
 ..PHONY: metal-controller-manager
 metal-controller-manager: ## Build the CAPI provider container image.
-	@$(MAKE) generate APP="$@"
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
 PHONY: metal-metadata-server
 metal-metadata-server: ## Build the CAPI provider container image.
-	@$(MAKE) generate APP="$@"
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
 # Development
@@ -124,7 +126,7 @@ uninstall: manifests ## Uninstall CRDs from a cluster.
 .PHONY: run
 run: install ## Run the controller locally. This is for testing purposes only.
 	@$(MAKE) docker-container TARGET_ARGS="--load"
-	@docker run --rm -it --net host -v $(PWD):/src -v $(KUBECONFIG):/root/.kube/config -e KUBECONFIG=/root/.kube/config $(REGISTRY_AND_USERNAME)/$(NAME):$(TAG)
+	@docker run --rm -it --net host -v $(PWD):/src -v $(KUBECONFIG):/root/.kube/config -e KUBECONFIG=/root/.kube/config $(IMAGE):$(TAG)
 
 # Code Quality
 

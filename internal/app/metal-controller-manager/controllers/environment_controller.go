@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/hashicorp/go-multierror"
@@ -31,11 +32,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 
-	"github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 )
 
-// EnvironmentReconciler reconciles a Environment object
+// EnvironmentReconciler reconciles a Environment object.
 type EnvironmentReconciler struct {
 	client.Client
 	Log    logr.Logger
@@ -74,14 +74,14 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 	envs := filepath.Join("/var/lib/sidero/env", env.GetName())
 
 	if _, err := os.Stat(envs); os.IsNotExist(err) {
-		if err = os.MkdirAll(envs, 0777); err != nil {
+		if err = os.MkdirAll(envs, 0o777); err != nil {
 			return ctrl.Result{}, fmt.Errorf("error creating environment directory: %w", err)
 		}
 	}
 
 	var (
-		assets     = []v1alpha1.Asset{env.Spec.Kernel.Asset, env.Spec.Initrd.Asset}
-		conditions = []v1alpha1.AssetCondition{}
+		assets     = []metalv1alpha1.Asset{env.Spec.Kernel.Asset, env.Spec.Initrd.Asset}
+		conditions = []metalv1alpha1.AssetCondition{}
 		wg         sync.WaitGroup
 		mu         sync.Mutex
 		result     *multierror.Error
@@ -101,7 +101,7 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 				l.Info("saving asset", "url", asset.URL)
 
 				if err := save(asset, file); err != nil {
-					condition := v1alpha1.AssetCondition{
+					condition := metalv1alpha1.AssetCondition{
 						Asset:  asset,
 						Status: "False",
 						Type:   "Ready",
@@ -116,7 +116,7 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 
 				l.Info("saved asset", "url", asset.URL)
 
-				condition := v1alpha1.AssetCondition{
+				condition := metalv1alpha1.AssetCondition{
 					Asset:  asset,
 					Status: "True",
 					Type:   "Ready",
@@ -146,7 +146,7 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 		if ready {
 			l.Info("update not required", "file", file)
 
-			condition := v1alpha1.AssetCondition{
+			condition := metalv1alpha1.AssetCondition{
 				Asset:  asset,
 				Status: "True",
 				Type:   "Ready",
@@ -170,7 +170,7 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 			l.Info("updating asset", "url", asset.URL)
 
 			if err := save(asset, file); err != nil {
-				condition := v1alpha1.AssetCondition{
+				condition := metalv1alpha1.AssetCondition{
 					Asset:  asset,
 					Status: "False",
 					Type:   "Ready",
@@ -185,7 +185,7 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 
 			l.Info("updated asset", "url", asset.URL)
 
-			condition := v1alpha1.AssetCondition{
+			condition := metalv1alpha1.AssetCondition{
 				Asset:  asset,
 				Status: "True",
 				Type:   "Ready",
@@ -212,20 +212,32 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 	return ctrl.Result{}, nil
 }
 
-func save(asset v1alpha1.Asset, file string) error {
+func save(asset metalv1alpha1.Asset, file string) error {
 	url := asset.URL
 
 	if url == "" {
 		return errors.New("missing URL")
 	}
 
-	resp, err := http.Get(url)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
 
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
-		w, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY, 0666)
+		w, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY, 0o666)
 		if err != nil {
 			return err
 		}
