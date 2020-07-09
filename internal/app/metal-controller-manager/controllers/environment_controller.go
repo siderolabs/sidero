@@ -219,7 +219,7 @@ func save(asset metalv1alpha1.Asset, file string) error {
 		return errors.New("missing URL")
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
