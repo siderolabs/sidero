@@ -45,6 +45,23 @@ steps:
       - name: kube
         path: /root/.kube
 
+  - name: lint-pull-request
+    image: autonomy/build-container:latest
+    pull: always
+    commands:
+      - make lint
+    when:
+      event:
+        include:
+          - pull_request
+    volumes:
+      - name: docker-socket
+        path: /var/run
+      - name: docker
+        path: /root/.docker/buildx
+      - name: kube
+        path: /root/.kube
+
   - name: build-pull-request
     image: autonomy/build-container:latest
     pull: always
@@ -151,6 +168,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: 2475d9bd27e9222d15c506e7a86bf1dd9899096437aede2eb13839e7f010e7cb
+hmac: c4390b59ccfc2edefe5caa09da5aae14589ccffafe7d9b92cdc45f4a9341da8d
 
 ...
