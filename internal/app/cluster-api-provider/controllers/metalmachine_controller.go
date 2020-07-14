@@ -47,6 +47,7 @@ type MetalMachineReconciler struct {
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=serverclasses/status,verbs=get;list;watch;
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
 
 func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err error) {
 	ctx := context.Background()
@@ -120,7 +121,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 	// Use server ref if already provided
 	if metalMachine.Spec.ServerRef != nil {
 		namespacedName := types.NamespacedName{
-			Namespace: metalMachine.Spec.ServerRef.Namespace,
+			Namespace: "",
 			Name:      metalMachine.Spec.ServerRef.Name,
 		}
 
@@ -188,7 +189,7 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 	// Use server ref if already provided
 	if metalMachine.Spec.ServerRef != nil {
 		namespacedName := types.NamespacedName{
-			Namespace: metalMachine.Spec.ServerRef.Namespace,
+			Namespace: "",
 			Name:      metalMachine.Spec.ServerRef.Name,
 		}
 

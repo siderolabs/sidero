@@ -63,3 +63,5 @@ vars:
 #    kind: Service
 #    version: v1
 #    name: webhook-service
+
+namespace: sidero-system

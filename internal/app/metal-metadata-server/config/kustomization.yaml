@@ -6,3 +6,5 @@ bases:
   - server
 
 namePrefix: sidero-
+
+namespace: sidero-system
