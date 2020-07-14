@@ -1,3 +1,5 @@
 bases:
   - ../rbac
   - ../manager
+
+namespace: sidero-system
