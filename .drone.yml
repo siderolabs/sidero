@@ -1,28 +1,7 @@
 ---
-kind: secret
-name: kubeconfig
-
-get:
-  path: buildx
-  name: kubeconfig
-
----
 kind: pipeline
+type: kubernetes
 name: default
-
-services:
-  - name: docker
-    image: docker:19.03-dind
-    entrypoint:
-      - dockerd
-    command:
-      - --dns=8.8.8.8
-      - --dns=8.8.4.4
-      - --log-level=error
-    privileged: true
-    volumes:
-      - name: docker-socket
-        path: /var/run
 
 steps:
   - name: setup-ci
@@ -30,20 +9,16 @@ steps:
     commands:
       - git fetch --tags
       - apk add coreutils
-      - echo -e "$BUILDX_KUBECONFIG" > /root/.kube/config
-      - docker buildx create --driver kubernetes --driver-opt replicas=2 --driver-opt namespace=ci --driver-opt image=moby/buildkit:v0.6.2 --name ci --buildkitd-flags="--allow-insecure-entitlement security.insecure" --use
+      - docker buildx create --driver docker-container --platform linux/amd64 --buildkitd-flags "--allow-insecure-entitlement security.insecure" --name local --use unix:///var/outer-run/docker.sock
       - docker buildx inspect --bootstrap
-    environment:
-      BUILDX_KUBECONFIG:
-        from_secret: kubeconfig
     privileged: true
     volumes:
       - name: docker-socket
         path: /var/run
+      - name: outerdockersock
+        path: /var/outer-run
       - name: docker
         path: /root/.docker/buildx
-      - name: kube
-        path: /root/.kube
 
   - name: lint-pull-request
     image: autonomy/build-container:latest
@@ -57,10 +32,10 @@ steps:
     volumes:
       - name: docker-socket
         path: /var/run
+      - name: outerdockersock
+        path: /var/outer-run
       - name: docker
         path: /root/.docker/buildx
-      - name: kube
-        path: /root/.kube
 
   - name: build-pull-request
     image: autonomy/build-container:latest
@@ -74,10 +49,10 @@ steps:
     volumes:
       - name: docker-socket
         path: /var/run
+      - name: outerdockersock
+        path: /var/outer-run
       - name: docker
         path: /root/.docker/buildx
-      - name: kube
-        path: /root/.kube
 
   - name: build-and-publish
     image: autonomy/build-container:latest
@@ -97,10 +72,10 @@ steps:
     volumes:
       - name: docker-socket
         path: /var/run
+      - name: outerdockersock
+        path: /var/outer-run
       - name: docker
         path: /root/.docker/buildx
-      - name: kube
-        path: /root/.kube
 
   - name: build-release
     image: autonomy/build-container:latest
@@ -113,10 +88,10 @@ steps:
     volumes:
       - name: docker-socket
         path: /var/run
+      - name: outerdockersock
+        path: /var/outer-run
       - name: docker
         path: /root/.docker/buildx
-      - name: kube
-        path: /root/.kube
 
   - name: release
     image: plugins/github-release
@@ -136,12 +111,14 @@ steps:
 volumes:
   - name: docker-socket
     temp: {}
+  - name: outerdockersock
+    host:
+      path: /var/ci-docker
   - name: docker
-    temp: {}
-  - name: kube
     temp: {}
 ---
 kind: pipeline
+type: kubernetes
 name: notify
 
 clone:
@@ -168,6 +145,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: c4390b59ccfc2edefe5caa09da5aae14589ccffafe7d9b92cdc45f4a9341da8d
+hmac: 5d8ec3f1bc212c1998296bf013ea866a1579df266563bf1d99e2ffff5839c765
 
 ...
