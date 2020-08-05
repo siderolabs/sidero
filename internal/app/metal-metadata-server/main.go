@@ -295,7 +295,9 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 				if _, ok := config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"]; ok {
 					config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] += fmt.Sprintf(",metal.sidero.dev/uuid=%s", serverObj.Name)
 				} else {
-					config.MachineConfig.MachineKubelet.KubeletExtraArgs = make(map[string]string)
+					if config.MachineConfig.MachineKubelet.KubeletExtraArgs == nil {
+						config.MachineConfig.MachineKubelet.KubeletExtraArgs = make(map[string]string)
+					}
 					config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] = fmt.Sprintf("metal.sidero.dev/uuid=%s", serverObj.Name)
 				}
 
