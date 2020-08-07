@@ -7,6 +7,9 @@ resources:
 - bases/metal.sidero.dev_serverclasses.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
+commonLabels:
+  clusterctl.cluster.x-k8s.io/move: ""
+
 patchesStrategicMerge:
 # [WEBHOOK] To enable webhook, uncomment all the sections with [WEBHOOK] prefix.
 # patches here are for enabling the conversion webhook for each CRD
