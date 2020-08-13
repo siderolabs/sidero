@@ -4,7 +4,7 @@ bases:
   - webhook
   - default
 
-namePrefix: sidero-provider-
+namePrefix: caps-
 
 patchesJson6902:
   - target:

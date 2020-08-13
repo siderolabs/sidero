@@ -16,9 +16,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	infrav1alpha2 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha2"
-	infrav1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
-	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/controllers"
+	infrav1alpha2 "github.com/talos-systems/sidero/internal/app/cluster-api-provider-sidero/api/v1alpha2"
+	infrav1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider-sidero/api/v1alpha3"
+	"github.com/talos-systems/sidero/internal/app/cluster-api-provider-sidero/controllers"
 	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 	// +kubebuilder:scaffold:imports
 )

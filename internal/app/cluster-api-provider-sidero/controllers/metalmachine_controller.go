@@ -26,9 +26,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	infrav1 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
-	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/internal/pkg/ipmi"
-	"github.com/talos-systems/sidero/internal/app/cluster-api-provider/pkg/constants"
+	infrav1 "github.com/talos-systems/sidero/internal/app/cluster-api-provider-sidero/api/v1alpha3"
+	"github.com/talos-systems/sidero/internal/app/cluster-api-provider-sidero/internal/pkg/ipmi"
+	"github.com/talos-systems/sidero/internal/app/cluster-api-provider-sidero/pkg/constants"
 	metalv1alpha1 "github.com/talos-systems/sidero/internal/app/metal-controller-manager/api/v1alpha1"
 )
 

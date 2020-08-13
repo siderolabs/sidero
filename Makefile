@@ -22,7 +22,7 @@ COMMON_ARGS += --build-arg=TAG=$(TAG)
 COMMON_ARGS += --build-arg=MODULE=$(MODULE)
 COMMON_ARGS += --build-arg=PKGS=$(PKGS)
 
-all: manifests generate cluster-api-provider metal-controller-manager metal-metadata-server
+all: manifests generate cluster-api-provider-sidero metal-controller-manager metal-metadata-server
 
 
 # Help Menu
@@ -94,8 +94,8 @@ manifests: ## Generate manifests (e.g. CRD, RBAC, etc.).
 release: manifests ## Create the release YAML. The build result will be ouput to the specified local destination.
 	@$(MAKE) local-$@ DEST=./$(ARTIFACTS)
 
-.PHONY: cluster-api-provider
-cluster-api-provider: ## Build the CAPI provider container image.
+.PHONY: cluster-api-provider-sidero
+cluster-api-provider-sidero: ## Build the CAPI provider container image.
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
 ..PHONY: metal-controller-manager

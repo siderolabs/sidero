@@ -12,7 +12,7 @@ import (
 	utilconversion "sigs.k8s.io/cluster-api/util/conversion"
 	"sigs.k8s.io/controller-runtime/pkg/conversion"
 
-	infrav1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
+	infrav1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider-sidero/api/v1alpha3"
 )
 
 // ConvertTo converts this MetalCluster to the Hub version (v1alpha3).
