@@ -19,7 +19,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	infrastructurev1alpha2 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha2"
+	infrastructurev1alpha2 "github.com/talos-systems/sidero/internal/app/cluster-api-provider-sidero/api/v1alpha2"
 	// +kubebuilder:scaffold:imports
 )
 

@@ -1,5 +1,5 @@
 domain: cluster.x-k8s.io
-repo: github.com/talos-systems/sidero/internal/app/cluster-api-provider
+repo: github.com/talos-systems/sidero/internal/app/cluster-api-provider-sidero
 resources:
 - group: infrastructure
   kind: MetalCluster

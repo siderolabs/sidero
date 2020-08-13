@@ -2,7 +2,7 @@ resources:
   - namespace.yaml
 
 bases:
-  - ../internal/app/cluster-api-provider/config
+  - ../internal/app/cluster-api-provider-sidero/config
   - ../internal/app/metal-controller-manager/config
   - ../internal/app/metal-metadata-server/config
 

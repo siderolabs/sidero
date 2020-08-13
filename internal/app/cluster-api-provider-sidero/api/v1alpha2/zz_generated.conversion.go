@@ -15,7 +15,7 @@ import (
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 
-	v1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider/api/v1alpha3"
+	v1alpha3 "github.com/talos-systems/sidero/internal/app/cluster-api-provider-sidero/api/v1alpha3"
 )
 
 func init() {
