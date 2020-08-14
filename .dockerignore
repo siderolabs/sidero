@@ -5,6 +5,7 @@
 !hack
 !internal
 !pkg
+!templates
 !go.mod
 !go.sum
 !*.go
