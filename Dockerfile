@@ -33,6 +33,7 @@ RUN controller-gen \
   crd:crdVersions=v1 paths="./internal/app/metal-controller-manager/api/..." output:crd:dir="./internal/app/metal-controller-manager/config/crd/bases" \
   rbac:roleName=manager-role paths="./internal/app/metal-controller-manager/controllers/..." output:rbac:dir="./internal/app/metal-controller-manager/config/rbac" \
   webhook output:webhook:dir="./internal/app/metal-controller-manager/config/webhook"
+
 FROM scratch AS manifests
 COPY --from=manifests-build /src/internal/app/cluster-api-provider-sidero/config ./internal/app/cluster-api-provider-sidero/config
 COPY --from=manifests-build /src/internal/app/metal-controller-manager/config ./internal/app/metal-controller-manager/config
@@ -51,6 +52,7 @@ RUN apt update -y \
   && tar -xf kustomize_v3.5.4_linux_amd64.tar.gz -C /usr/local/bin \
   && rm kustomize_v3.5.4_linux_amd64.tar.gz
 COPY ./config ./config
+COPY ./templates ./templates
 COPY ./internal/app/cluster-api-provider-sidero/config ./internal/app/cluster-api-provider-sidero/config
 COPY ./internal/app/metal-controller-manager/config ./internal/app/metal-controller-manager/config
 COPY ./internal/app/metal-metadata-server/config ./internal/app/metal-metadata-server/config
@@ -63,12 +65,14 @@ RUN cd ./internal/app/metal-controller-manager/config/manager \
 RUN cd ./internal/app/metal-metadata-server/config/server \
   && kustomize edit set image server=${REGISTRY_AND_USERNAME}/metal-metadata-server:${TAG}
 RUN kustomize build config > /infrastructure-components.yaml \
-  && cp ./config/metadata/metadata.yaml /metadata.yaml
+  && cp ./config/metadata/metadata.yaml /metadata.yaml \
+  && cp ./templates/cluster-template.yaml /cluster-template.yaml
 
 FROM scratch AS release
 ARG TAG
 COPY --from=release-build /infrastructure-components.yaml /infrastructure-sidero/${TAG}/components.yaml
 COPY --from=release-build /metadata.yaml /infrastructure-sidero/${TAG}/metadata.yaml
+COPY --from=release-build /cluster-template.yaml /infrastructure-sidero/${TAG}/cluster-template.yaml
 
 FROM base AS build-cluster-api-provider-sidero
 RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /manager ./internal/app/cluster-api-provider-sidero
