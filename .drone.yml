@@ -103,7 +103,7 @@ steps:
         - sha512
       draft: true
       files:
-        - _out/*
+        - _out/infrastructure-sidero/*/*
     when:
       event:
         - tag
@@ -145,6 +145,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: 5d8ec3f1bc212c1998296bf013ea866a1579df266563bf1d99e2ffff5839c765
+hmac: 2e149f883fae864cd2b573775ebec2e997ad8ec2414b51fbc8995dc7758cec51
 
 ...

@@ -70,7 +70,7 @@ RUN kustomize build config > /infrastructure-components.yaml \
 
 FROM scratch AS release
 ARG TAG
-COPY --from=release-build /infrastructure-components.yaml /infrastructure-sidero/${TAG}/components.yaml
+COPY --from=release-build /infrastructure-components.yaml /infrastructure-sidero/${TAG}/infrastructure-components.yaml
 COPY --from=release-build /metadata.yaml /infrastructure-sidero/${TAG}/metadata.yaml
 COPY --from=release-build /cluster-template.yaml /infrastructure-sidero/${TAG}/cluster-template.yaml
 
