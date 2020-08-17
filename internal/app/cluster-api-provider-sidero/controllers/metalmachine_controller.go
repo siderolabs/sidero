@@ -186,7 +186,6 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachine *infrav1.MetalMachine) (ctrl.Result, error) {
 	serverResource := &metalv1alpha1.Server{}
 
-	// Use server ref if already provided
 	if metalMachine.Spec.ServerRef != nil {
 		namespacedName := types.NamespacedName{
 			Namespace: "",
@@ -194,6 +193,14 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 		}
 
 		if err := r.Get(ctx, namespacedName, serverResource); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		// Remove in-use label
+		serverPatch := client.MergeFrom(serverResource.DeepCopy())
+		serverResource.Status.InUse = false
+
+		if err := r.Status().Patch(ctx, serverResource, serverPatch); err != nil {
 			return ctrl.Result{}, err
 		}
 	}
@@ -215,27 +222,7 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 		}
 	}
 
-	// Remove in-use bool from server object
-	if metalMachine.Spec.ServerRef != nil {
-		serverObj := &metalv1alpha1.Server{}
-
-		namespacedName := types.NamespacedName{
-			Namespace: "",
-			Name:      metalMachine.Spec.ServerRef.Name,
-		}
-
-		if err := r.Get(ctx, namespacedName, serverObj); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		serverObj.Status.InUse = false
-
-		if err := r.Status().Update(ctx, serverObj); err != nil {
-			return ctrl.Result{}, err
-		}
-	}
-
-	// Cluster is deleted so remove the finalizer.
+	// Machine is deleted so remove the finalizer.
 	controllerutil.RemoveFinalizer(metalMachine, infrav1.MachineFinalizer)
 
 	return ctrl.Result{}, nil
@@ -265,27 +252,38 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 		return nil, fmt.Errorf("no servers available in serverclass")
 	}
 
-	// Fetch first server in avail list
-	firstAvailServer := serverClassResource.Status.ServersAvailable[0]
-	serverObj := &metalv1alpha1.Server{}
+	// Fetch server from available list
+	// nb: we added this loop to double check that an available server isn't "in use" because
+	//     we saw raciness between server selection and it being removed from the ServersAvailable list.
+	for _, availServer := range serverClassResource.Status.ServersAvailable {
+		serverObj := &metalv1alpha1.Server{}
 
-	namespacedName = types.NamespacedName{
-		Namespace: "",
-		Name:      firstAvailServer,
+		namespacedName = types.NamespacedName{
+			Namespace: "",
+			Name:      availServer,
+		}
+
+		if err := r.Get(ctx, namespacedName, serverObj); err != nil {
+			return nil, err
+		}
+
+		// double check that server hasn't been marked in use
+		if serverObj.Status.InUse {
+			continue
+		}
+
+		// patch server with in use bool
+		serverPatch := client.MergeFrom(serverObj.DeepCopy())
+		serverObj.Status.InUse = true
+
+		if err := r.Status().Patch(ctx, serverObj, serverPatch); err != nil {
+			return nil, err
+		}
+
+		return serverObj, nil
 	}
 
-	if err := r.Get(ctx, namespacedName, serverObj); err != nil {
-		return nil, err
-	}
-
-	// Update server status to in use
-	serverObj.Status.InUse = true
-
-	if err := r.Status().Update(ctx, serverObj); err != nil {
-		return nil, err
-	}
-
-	return serverObj, nil
+	return nil, fmt.Errorf("no servers available in serverclass")
 }
 
 func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *capiv1.Cluster, metalMachine *infrav1.MetalMachine) error {
