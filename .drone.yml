@@ -103,7 +103,7 @@ steps:
         - sha512
       draft: true
       files:
-        - _out/*
+        - _out/infrastructure-sidero/$${DRONE_TAG}/*
     when:
       event:
         - tag
