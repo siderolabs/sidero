@@ -179,4 +179,4 @@ RUN npm install -g markdownlint-cli
 RUN npm i sentences-per-line
 WORKDIR /src
 COPY --from=base /src .
-RUN markdownlint --rules /node_modules/sentences-per-line/index.js .
+RUN markdownlint --ignore '**/hack/chglog/**' --rules /node_modules/sentences-per-line/index.js .

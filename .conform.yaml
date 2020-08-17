@@ -21,6 +21,7 @@ policies:
           - refactor
           - style
           - test
+          - release
         scopes:
           - '*'
   - type: license
