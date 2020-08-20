@@ -26,4 +26,5 @@ These can be used to compose a bank of Servers that are eligible for provisionin
 
 ## Metadata
 
-The metadata server...
+The metadata server may be familiar to you if you have used cloud environments previously.
+Given Talos machine configurations created by the Sidero Cluster API provider, along with patches specified by editing server resources, metadata is returned to servers who query the metadata server with their UUID as input.

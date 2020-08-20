@@ -7,6 +7,11 @@ next: "/docs/serverclasses/"
 
 # Servers
 
+Servers are the basic resource of bare metal in the Metal Controller Manager.
+These are created by PXE booting the servers and allowing them to send a registration request to the management plane.
+
+An example server may look like the following:
+
 ```yaml
 apiVersion: metal.sidero.dev/v1alpha1
 kind: Server
@@ -14,32 +19,12 @@ metadata:
   name: 00000000-0000-0000-0000-d05099d333e0
 spec:
   configPatches:
-    - op: add
-      path: /machine/network/interfaces
-      value:
-        - ignore: true
-          interface: eth1
-        - ignore: true
-          interface: eth2
-        - ignore: true
-          interface: eth3
-    - op: replace
-      path: /machine/install
-      value:
-        bootloader: true
-        disk: /dev/sda
-        force: false
-        image: docker.io/autonomy/installer:latest
-        wipe: false
     - op: replace
       path: /cluster/network/cni
       value:
         name: custom
         urls:
           - http://192.168.1.199/assets/cilium.yaml
-    - op: replace
-      path: /cluster/controlPlane/endpoint
-      value: https://management-plane.rsmitty.cloud:6443
   cpu:
     manufacturer: Intel(R) Corporation
     version: Intel(R) Atom(TM) CPU C3558 @ 2.20GHz
