@@ -128,6 +128,12 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 		if err = r.Get(ctx, namespacedName, serverResource); err != nil {
 			return ctrl.Result{}, err
 		}
+
+		// double check server is already marked in use
+		// this is especially needed after pivoting the cluster from bootstrap -> mgmt plane
+		if err = r.patchServerInUse(ctx, serverResource); err != nil {
+			return ctrl.Result{}, err
+		}
 	} else {
 		if metalMachine.Spec.ServerClassRef == nil {
 			return ctrl.Result{}, fmt.Errorf("either a server or serverclass ref must be supplied")
@@ -273,10 +279,7 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 		}
 
 		// patch server with in use bool
-		serverPatch := client.MergeFrom(serverObj.DeepCopy())
-		serverObj.Status.InUse = true
-
-		if err := r.Status().Patch(ctx, serverObj, serverPatch); err != nil {
+		if err := r.patchServerInUse(ctx, serverObj); err != nil {
 			return nil, err
 		}
 
@@ -343,6 +346,18 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+// patchServerInUse updates a server to mark it as "in use".
+func (r *MetalMachineReconciler) patchServerInUse(ctx context.Context, serverObj *metalv1alpha1.Server) error {
+	serverPatch := client.MergeFrom(serverObj.DeepCopy())
+	serverObj.Status.InUse = true
+
+	if err := r.Status().Patch(ctx, serverObj, serverPatch); err != nil {
+		return err
 	}
 
 	return nil
