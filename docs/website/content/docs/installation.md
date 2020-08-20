@@ -7,18 +7,9 @@ next: "/docs/architecture/"
 
 # Installation
 
-## Configuring `clusterctl`
+As of Cluster API version 0.3.9, Sidero is included as a default infrastructure provider in clusterctl.
 
-You will need to add Sidero to `~/.cluster-api/clusterctl.yaml`:
-
-```yaml
-providers:
-  - name: "sidero"
-    url: "file:///home/andrewrynhard/workspace/code/github.com/talos-systems/sidero/_out/infrastructure-sidero/v0.1.0-alpha.0-61f6621-dirty/components.yaml"
-    type: "InfrastructureProvider"
-```
-
-## Installing Sidero
+To install Sidero and the other Talos providers, simply issue:
 
 ```bash
 clusterctl init -b talos -c talos -i sidero

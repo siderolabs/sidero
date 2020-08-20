@@ -7,6 +7,14 @@ next: "/docs/servers/"
 
 # Environments
 
+Environments are a custom resource provided by the Metal Controller Manager.
+An environment is a codified description of what should be returned by the PXE server when a physical server attempts to PXE boot.
+
+Especially important in the environment types are the kernel args.
+From here, one can tweak the IP to the metadata server as well as various other kernel options that [Talos](https://www.talos.dev/docs/v0.6/en/guides/metal/overview#kernel-parameters) and/or the Linux kernel supports.
+
+A sample environment definition looks like this:
+
 ```yaml
 apiVersion: metal.sidero.dev/v1alpha1
 kind: Environment
