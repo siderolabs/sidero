@@ -36,7 +36,7 @@ func create(endpoint string, s *smbios.Smbios) error {
 		return err
 	}
 
-	_, err = c.CreateServer(ctx, &api.CreateServerRequest{
+	serverReq := &api.CreateServerRequest{
 		SystemInformation: &api.SystemInformation{
 			Uuid:         uuid.String(),
 			Manufacturer: s.SystemInformation().Manufacturer(),
@@ -50,7 +50,17 @@ func create(endpoint string, s *smbios.Smbios) error {
 			Manufacturer: s.ProcessorInformation().ProcessorManufacturer(),
 			Version:      s.ProcessorInformation().ProcessorVersion(),
 		},
-	})
+	}
+
+	// set hostname only if we can fetch it w/out error
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Printf("encountered error fetching hostname: %q", err)
+	} else {
+		serverReq.Hostname = hostname
+	}
+
+	_, err = c.CreateServer(ctx, serverReq)
 	if err != nil {
 		return err
 	}

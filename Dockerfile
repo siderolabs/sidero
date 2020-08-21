@@ -39,11 +39,23 @@ COPY --from=manifests-build /src/app/cluster-api-provider-sidero/config ./app/cl
 COPY --from=manifests-build /src/app/metal-controller-manager/config ./app/metal-controller-manager/config
 
 FROM base AS generate-build
+RUN apt-get update \
+    && apt-get install -y unzip \
+    && curl -L https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-linux-x86_64.zip -o /tmp/protoc.zip \
+    && unzip -o /tmp/protoc.zip -d /usr/local bin/protoc \
+    && unzip -o /tmp/protoc.zip -d /usr/local 'include/*' \
+    && go get github.com/golang/protobuf/protoc-gen-go@v1.3
+COPY ./app/metal-controller-manager/internal/api/discovery.proto \
+      /src/app/metal-controller-manager/internal/api/discovery.proto
+RUN protoc -I/src/app/metal-controller-manager/internal/api \
+    --go_out=plugins=grpc,paths=source_relative:/src/app/metal-controller-manager/internal/api \
+    discovery.proto
 RUN controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
 RUN	conversion-gen --input-dirs="./app/cluster-api-provider-sidero/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
 FROM scratch AS generate
 COPY --from=generate-build /src/app/cluster-api-provider-sidero/api ./app/cluster-api-provider-sidero/api
 COPY --from=generate-build /src/app/metal-controller-manager/api ./app/metal-controller-manager/api
+COPY --from=generate-build /src/app/metal-controller-manager/internal/api ./app/metal-controller-manager/internal/api
 
 FROM k8s.gcr.io/hyperkube:v1.17.0 AS release-build
 RUN apt update -y \
