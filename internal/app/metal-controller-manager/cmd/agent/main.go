@@ -20,16 +20,16 @@ import (
 )
 
 func create(endpoint string, s *smbios.Smbios) error {
-	conn, err := grpc.Dial(endpoint, grpc.WithInsecure(), grpc.WithBlock())
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, endpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
 
 	c := api.NewDiscoveryClient(conn)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 
 	uuid, err := s.SystemInformation().UUID()
 	if err != nil {
