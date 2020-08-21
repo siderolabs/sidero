@@ -3,7 +3,7 @@
 !cmd
 !config
 !hack
-!internal
+!app
 !pkg
 !templates
 !go.mod

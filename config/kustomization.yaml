@@ -2,9 +2,9 @@ resources:
   - namespace.yaml
 
 bases:
-  - ../internal/app/cluster-api-provider-sidero/config
-  - ../internal/app/metal-controller-manager/config
-  - ../internal/app/metal-metadata-server/config
+  - ../app/cluster-api-provider-sidero/config
+  - ../app/metal-controller-manager/config
+  - ../app/metal-metadata-server/config
 
 commonLabels:
   app: sidero

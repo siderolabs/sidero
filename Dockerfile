@@ -26,24 +26,24 @@ RUN ! go mod tidy -v 2>&1 | grep .
 
 FROM base AS manifests-build
 RUN controller-gen \
-  crd:crdVersions=v1 paths="./internal/app/cluster-api-provider-sidero/api/..." output:crd:dir="./internal/app/cluster-api-provider-sidero/config/crd/bases" \
-  rbac:roleName=manager-role paths="./internal/app/cluster-api-provider-sidero/controllers/..." output:rbac:dir="./internal/app/cluster-api-provider-sidero/config/rbac" \
-  webhook output:webhook:dir="./internal/app/cluster-api-provider-sidero/config/webhook"
+  crd:crdVersions=v1 paths="./app/cluster-api-provider-sidero/api/..." output:crd:dir="./app/cluster-api-provider-sidero/config/crd/bases" \
+  rbac:roleName=manager-role paths="./app/cluster-api-provider-sidero/controllers/..." output:rbac:dir="./app/cluster-api-provider-sidero/config/rbac" \
+  webhook output:webhook:dir="./app/cluster-api-provider-sidero/config/webhook"
 RUN controller-gen \
-  crd:crdVersions=v1 paths="./internal/app/metal-controller-manager/api/..." output:crd:dir="./internal/app/metal-controller-manager/config/crd/bases" \
-  rbac:roleName=manager-role paths="./internal/app/metal-controller-manager/controllers/..." output:rbac:dir="./internal/app/metal-controller-manager/config/rbac" \
-  webhook output:webhook:dir="./internal/app/metal-controller-manager/config/webhook"
+  crd:crdVersions=v1 paths="./app/metal-controller-manager/api/..." output:crd:dir="./app/metal-controller-manager/config/crd/bases" \
+  rbac:roleName=manager-role paths="./app/metal-controller-manager/controllers/..." output:rbac:dir="./app/metal-controller-manager/config/rbac" \
+  webhook output:webhook:dir="./app/metal-controller-manager/config/webhook"
 
 FROM scratch AS manifests
-COPY --from=manifests-build /src/internal/app/cluster-api-provider-sidero/config ./internal/app/cluster-api-provider-sidero/config
-COPY --from=manifests-build /src/internal/app/metal-controller-manager/config ./internal/app/metal-controller-manager/config
+COPY --from=manifests-build /src/app/cluster-api-provider-sidero/config ./app/cluster-api-provider-sidero/config
+COPY --from=manifests-build /src/app/metal-controller-manager/config ./app/metal-controller-manager/config
 
 FROM base AS generate-build
 RUN controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
-RUN	conversion-gen --input-dirs="./internal/app/cluster-api-provider-sidero/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
+RUN	conversion-gen --input-dirs="./app/cluster-api-provider-sidero/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
 FROM scratch AS generate
-COPY --from=generate-build /src/internal/app/cluster-api-provider-sidero/api ./internal/app/cluster-api-provider-sidero/api
-COPY --from=generate-build /src/internal/app/metal-controller-manager/api ./internal/app/metal-controller-manager/api
+COPY --from=generate-build /src/app/cluster-api-provider-sidero/api ./app/cluster-api-provider-sidero/api
+COPY --from=generate-build /src/app/metal-controller-manager/api ./app/metal-controller-manager/api
 
 FROM k8s.gcr.io/hyperkube:v1.17.0 AS release-build
 RUN apt update -y \
@@ -53,16 +53,16 @@ RUN apt update -y \
   && rm kustomize_v3.5.4_linux_amd64.tar.gz
 COPY ./config ./config
 COPY ./templates ./templates
-COPY ./internal/app/cluster-api-provider-sidero/config ./internal/app/cluster-api-provider-sidero/config
-COPY ./internal/app/metal-controller-manager/config ./internal/app/metal-controller-manager/config
-COPY ./internal/app/metal-metadata-server/config ./internal/app/metal-metadata-server/config
+COPY ./app/cluster-api-provider-sidero/config ./app/cluster-api-provider-sidero/config
+COPY ./app/metal-controller-manager/config ./app/metal-controller-manager/config
+COPY ./app/metal-metadata-server/config ./app/metal-metadata-server/config
 ARG REGISTRY_AND_USERNAME
 ARG TAG
-RUN cd ./internal/app/cluster-api-provider-sidero/config/manager \
+RUN cd ./app/cluster-api-provider-sidero/config/manager \
   && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/cluster-api-provider-sidero:${TAG}
-RUN cd ./internal/app/metal-controller-manager/config/manager \
+RUN cd ./app/metal-controller-manager/config/manager \
   && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/metal-controller-manager:${TAG}
-RUN cd ./internal/app/metal-metadata-server/config/server \
+RUN cd ./app/metal-metadata-server/config/server \
   && kustomize edit set image server=${REGISTRY_AND_USERNAME}/metal-metadata-server:${TAG}
 RUN kustomize build config > /infrastructure-components.yaml \
   && cp ./config/metadata/metadata.yaml /metadata.yaml \
@@ -75,7 +75,7 @@ COPY --from=release-build /metadata.yaml /infrastructure-sidero/${TAG}/metadata.
 COPY --from=release-build /cluster-template.yaml /infrastructure-sidero/${TAG}/cluster-template.yaml
 
 FROM base AS build-cluster-api-provider-sidero
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /manager ./internal/app/cluster-api-provider-sidero
+RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /manager ./app/cluster-api-provider-sidero
 RUN chmod +x /manager
 
 ## TODO(rsmitty): make bmc pkg and move to autonomy image
@@ -89,7 +89,7 @@ COPY --from=build-cluster-api-provider-sidero /manager /manager
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-controller-manager
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /manager ./internal/app/metal-controller-manager
+RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /manager ./app/metal-controller-manager
 RUN chmod +x /manager
 
 FROM alpine:3.11 AS assets
@@ -98,7 +98,7 @@ RUN curl -s -o /undionly.kpxe http://boot.ipxe.org/undionly.kpxe
 RUN curl -s -o /ipxe.efi http://boot.ipxe.org/ipxe.efi
 
 FROM base AS agent-build
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /agent ./internal/app/metal-controller-manager/cmd/agent
+RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
 RUN chmod +x /agent
 
 FROM scratch AS agent
@@ -132,7 +132,7 @@ COPY --from=build-metal-controller-manager /manager /manager
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-metadata-server
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /metal-metadata-server ./internal/app/metal-metadata-server
+RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /metal-metadata-server ./app/metal-metadata-server
 RUN chmod +x /metal-metadata-server
 
 FROM scratch AS metal-metadata-server
