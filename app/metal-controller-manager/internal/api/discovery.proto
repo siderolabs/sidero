@@ -26,6 +26,7 @@ message CPU {
 message CreateServerRequest {
   SystemInformation system_information = 1;
   CPU cpu = 2;
+  string hostname=3;
 }
 
 message CreateServerResponse {}
