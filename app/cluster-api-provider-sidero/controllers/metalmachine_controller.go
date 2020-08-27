@@ -129,9 +129,18 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 			return ctrl.Result{}, err
 		}
 
+		// Fetch the serverclass if it exists so we can ensure the server has it as an owner ref.
+		var serverClassResource *metalv1alpha1.ServerClass
+		if metalMachine.Spec.ServerClassRef != nil {
+			serverClassResource, err = r.fetchServerClass(ctx, metalMachine.Spec.ServerClassRef)
+			if err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+
 		// double check server is already marked in use
 		// this is especially needed after pivoting the cluster from bootstrap -> mgmt plane
-		if err = r.patchServerInUse(ctx, serverResource); err != nil {
+		if err = r.patchServerInUse(ctx, serverClassResource, serverResource); err != nil {
 			return ctrl.Result{}, err
 		}
 	} else {
@@ -202,11 +211,15 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 			return ctrl.Result{}, err
 		}
 
-		// Remove in-use label
-		serverPatch := client.MergeFrom(serverResource.DeepCopy())
-		serverResource.Status.InUse = false
+		patchHelper, err := patch.NewHelper(serverResource, r)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 
-		if err := r.Status().Patch(ctx, serverResource, serverPatch); err != nil {
+		serverResource.Status.InUse = false
+		serverResource.OwnerReferences = []metav1.OwnerReference{}
+
+		if err := patchHelper.Patch(ctx, serverResource); err != nil {
 			return ctrl.Result{}, err
 		}
 	}
@@ -243,14 +256,8 @@ func (r *MetalMachineReconciler) SetupWithManager(mgr ctrl.Manager, options cont
 
 func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, classRef *corev1.ObjectReference) (*metalv1alpha1.Server, error) {
 	// Grab server class and validate that we have nodes available
-	serverClassResource := &metalv1alpha1.ServerClass{}
-
-	namespacedName := types.NamespacedName{
-		Namespace: classRef.Namespace,
-		Name:      classRef.Name,
-	}
-
-	if err := r.Get(ctx, namespacedName, serverClassResource); err != nil {
+	serverClassResource, err := r.fetchServerClass(ctx, classRef)
+	if err != nil {
 		return nil, err
 	}
 
@@ -264,7 +271,7 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 	for _, availServer := range serverClassResource.Status.ServersAvailable {
 		serverObj := &metalv1alpha1.Server{}
 
-		namespacedName = types.NamespacedName{
+		namespacedName := types.NamespacedName{
 			Namespace: "",
 			Name:      availServer,
 		}
@@ -279,7 +286,7 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 		}
 
 		// patch server with in use bool
-		if err := r.patchServerInUse(ctx, serverObj); err != nil {
+		if err := r.patchServerInUse(ctx, serverClassResource, serverObj); err != nil {
 			return nil, err
 		}
 
@@ -352,13 +359,38 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 }
 
 // patchServerInUse updates a server to mark it as "in use".
-func (r *MetalMachineReconciler) patchServerInUse(ctx context.Context, serverObj *metalv1alpha1.Server) error {
-	serverPatch := client.MergeFrom(serverObj.DeepCopy())
+func (r *MetalMachineReconciler) patchServerInUse(ctx context.Context, serverClass *metalv1alpha1.ServerClass, serverObj *metalv1alpha1.Server) error {
+	patchHelper, err := patch.NewHelper(serverObj, r)
+	if err != nil {
+		return err
+	}
+
 	serverObj.Status.InUse = true
 
-	if err := r.Status().Patch(ctx, serverObj, serverPatch); err != nil {
+	if serverClass != nil {
+		serverObj.OwnerReferences = []metav1.OwnerReference{
+			*metav1.NewControllerRef(serverClass, metalv1alpha1.GroupVersion.WithKind("ServerClass")),
+		}
+	}
+
+	if err := patchHelper.Patch(ctx, serverObj); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (r *MetalMachineReconciler) fetchServerClass(ctx context.Context, classRef *corev1.ObjectReference) (*metalv1alpha1.ServerClass, error) {
+	serverClassResource := &metalv1alpha1.ServerClass{}
+
+	namespacedName := types.NamespacedName{
+		Namespace: classRef.Namespace,
+		Name:      classRef.Name,
+	}
+
+	if err := r.Get(ctx, namespacedName, serverClassResource); err != nil {
+		return nil, err
+	}
+
+	return serverClassResource, nil
 }
