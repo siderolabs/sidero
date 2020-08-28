@@ -64,4 +64,4 @@ vars:
 #    version: v1
 #    name: webhook-service
 
-namespace: sidero-system
+namespace: caps-system

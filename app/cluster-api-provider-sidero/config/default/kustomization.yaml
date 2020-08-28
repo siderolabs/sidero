@@ -2,4 +2,4 @@ bases:
   - ../rbac
   - ../manager
 
-namespace: sidero-system
+namespace: caps-system
