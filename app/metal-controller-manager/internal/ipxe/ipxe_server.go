@@ -140,7 +140,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 
 	var env metalv1alpha1.Environment
 
-	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: "default"}, &env); err != nil {
+	if err := determineEnvironment(c, obj, &env); err != nil {
 		if apierrors.IsNotFound(err) {
 			log.Printf("environment not found: %v", err)
 			w.WriteHeader(http.StatusNotFound)
@@ -222,4 +222,35 @@ func parseMAC(s string) (net.HardwareAddr, error) {
 	}
 
 	return macAddr, err
+}
+
+// determineEnvionment handles which env CRD we'll respect for a given server.
+// specied in the server spec overrides everything, specified in the server class overrides default, default is default :).
+func determineEnvironment(c client.Client, serverObj *metalv1alpha1.Server, envObj *metalv1alpha1.Environment) error {
+	envName := "default"
+
+	if serverObj.Spec.EnvironmentRef != nil {
+		envName = serverObj.Spec.EnvironmentRef.Name
+	} else if serverObj.OwnerReferences != nil {
+		// search for serverclass in owner refs. if found, fetch it and see if it's got an env ref
+		for _, owner := range serverObj.OwnerReferences {
+			if owner.Kind == "ServerClass" {
+				serverClassResource := &metalv1alpha1.ServerClass{}
+
+				if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: owner.Name}, serverClassResource); err != nil {
+					return err
+				}
+
+				if serverClassResource.Spec.EnvironmentRef != nil {
+					envName = serverClassResource.Spec.EnvironmentRef.Name
+				}
+			}
+		}
+	}
+
+	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: envName}, envObj); err != nil {
+		return err
+	}
+
+	return nil
 }

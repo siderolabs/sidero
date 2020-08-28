@@ -5,6 +5,7 @@
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -16,7 +17,8 @@ type Qualifiers struct {
 
 // ServerClassSpec defines the desired state of ServerClass.
 type ServerClassSpec struct {
-	Qualifiers Qualifiers `json:"qualifiers"`
+	EnvironmentRef *corev1.ObjectReference `json:"environmentRef,omitempty"`
+	Qualifiers     Qualifiers              `json:"qualifiers"`
 }
 
 // ServerClassStatus defines the observed state of ServerClass.

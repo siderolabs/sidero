@@ -5,6 +5,7 @@
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -44,10 +45,11 @@ type ConfigPatches struct {
 
 // ServerSpec defines the desired state of Server.
 type ServerSpec struct {
-	SystemInformation *SystemInformation `json:"system,omitempty"`
-	CPU               *CPUInformation    `json:"cpu,omitempty"`
-	BMC               *BMC               `json:"bmc,omitempty"`
-	ConfigPatches     []ConfigPatches    `json:"configPatches,omitempty"`
+	EnvironmentRef    *corev1.ObjectReference `json:"environmentRef,omitempty"`
+	SystemInformation *SystemInformation      `json:"system,omitempty"`
+	CPU               *CPUInformation         `json:"cpu,omitempty"`
+	BMC               *BMC                    `json:"bmc,omitempty"`
+	ConfigPatches     []ConfigPatches         `json:"configPatches,omitempty"`
 }
 
 // ServerStatus defines the observed state of Server.

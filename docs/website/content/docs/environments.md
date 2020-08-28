@@ -13,6 +13,13 @@ An environment is a codified description of what should be returned by the PXE s
 Especially important in the environment types are the kernel args.
 From here, one can tweak the IP to the metadata server as well as various other kernel options that [Talos](https://www.talos.dev/docs/v0.6/en/guides/metal/overview#kernel-parameters) and/or the Linux kernel supports.
 
+Environments can be supplied to a given server either at the Server or the ServerClass level.
+The heirarchy from most to least respected is:
+
+- Environment Ref provided at Server level
+- Environment Ref provided at ServerClass level
+- "default" Environment created by administrator
+
 A sample environment definition looks like this:
 
 ```yaml
