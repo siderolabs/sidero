@@ -99,10 +99,10 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 
 	// Always attempt to Patch the MetalMachine object and status after each reconciliation.
 	defer func() {
-		if e := patchHelper.Patch(ctx, metalMachine); err != nil {
-			logger.Error(err, "failed to patch metalMachine")
+		if e := patchHelper.Patch(ctx, metalMachine); e != nil {
+			logger.Error(e, "failed to patch metalMachine")
 
-			if e == nil {
+			if err == nil {
 				err = e
 			}
 		}
@@ -287,6 +287,12 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 
 		// patch server with in use bool
 		if err := r.patchServerInUse(ctx, serverClassResource, serverObj); err != nil {
+			// the server we picked was updated by another metalmachine before we finished.
+			// move on to the next one.
+			if apierrors.IsConflict(err) {
+				continue
+			}
+
 			return nil, err
 		}
 
@@ -360,12 +366,13 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 
 // patchServerInUse updates a server to mark it as "in use".
 func (r *MetalMachineReconciler) patchServerInUse(ctx context.Context, serverClass *metalv1alpha1.ServerClass, serverObj *metalv1alpha1.Server) error {
-	patchHelper, err := patch.NewHelper(serverObj, r)
-	if err != nil {
+	serverObj.Status.InUse = true
+
+	// nb: we update status and then update the object separately b/c statuses don't seem to get
+	// updated when doing the whole object below.
+	if err := r.Status().Update(ctx, serverObj); err != nil {
 		return err
 	}
-
-	serverObj.Status.InUse = true
 
 	if serverClass != nil {
 		serverObj.OwnerReferences = []metav1.OwnerReference{
@@ -373,7 +380,7 @@ func (r *MetalMachineReconciler) patchServerInUse(ctx context.Context, serverCla
 		}
 	}
 
-	if err := patchHelper.Patch(ctx, serverObj); err != nil {
+	if err := r.Update(ctx, serverObj); err != nil {
 		return err
 	}
 
