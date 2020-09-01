@@ -254,6 +254,8 @@ Now that we have the manifest, we can simply apply it:
 kubectl apply -f management-plane.yaml
 ```
 
+> NOTE: The templated manifest above is meant to act as a starting point. If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.
+
 Once the management plane is setup, you can fetch the talosconfig with a command like:
 
 ```bash
