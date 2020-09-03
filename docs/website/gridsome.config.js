@@ -45,7 +45,7 @@ module.exports = {
           },
           {
             title: "Guides",
-            items: ["/docs/bootstrapping/", "/docs/patching/"],
+            items: ["/docs/bootstrapping/", "/docs/first-cluster/","/docs/patching/"],
           },
         ],
       },

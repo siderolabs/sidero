@@ -1,7 +1,7 @@
 ---
-description: ""
+description: "A guide describing patching"
 sidebar: "docs"
-prev: "/docs/bootstrapping/"
+prev: "/docs/first-cluster/"
 ---
 
 # Patching

@@ -2,7 +2,7 @@
 description: "A guide for bootstrapping Sidero management plane"
 sidebar: "docs"
 prev: "/docs/installation/"
-next: "/docs/patching/"
+next: "/docs/first-cluster/"
 ---
 
 # Bootstrapping
@@ -53,18 +53,16 @@ $ cat /etc/dhcp/ipxe-metal.conf
 allow bootp;
 allow booting;
 
-group "management-plane" {
-  next-server 192.168.1.150;
-  if exists user-class and option user-class = "iPXE" {
-    filename "http://192.168.1.150:8081/boot.ipxe";
-  } else {
-    filename "ipxe.efi";
-  }
+next-server 192.168.1.150;
+if exists user-class and option user-class = "iPXE" {
+  filename "http://192.168.1.150:8081/boot.ipxe";
+} else {
+  filename "ipxe.efi";
+}
 
-  host talos-mgmt-0 {
-     fixed-address 192.168.254.2;
-     hardware ethernet d0:50:99:d3:33:60;
-  }
+host talos-mgmt-0 {
+    fixed-address 192.168.254.2;
+    hardware ethernet d0:50:99:d3:33:60;
 }
 ```
 
@@ -254,7 +252,7 @@ Now that we have the manifest, we can simply apply it:
 kubectl apply -f management-plane.yaml
 ```
 
-> NOTE: The templated manifest above is meant to act as a starting point. If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.
+**NOTE: The templated manifest above is meant to act as a starting point. If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.**
 
 Once the management plane is setup, you can fetch the talosconfig with a command like:
 
@@ -270,7 +268,13 @@ Once we have the kubeconfig for the management cluster, we now have the ability 
 Using clusterctl, issue:
 
 ```bash
-  clusterctl move --to-kubeconfig=/path/to/management-plane/kubeconfig
+clusterctl init --kubeconfig=/path/to/management-plane/kubeconfig -i sidero -b talos -c talos
+```
+
+Followed by:
+
+```bash
+clusterctl move --to-kubeconfig=/path/to/management-plane/kubeconfig
 ```
 
 Upon completion of this command, we can now tear down our bootstrap cluster with `talosctl cluster destroy` and begin using our management plane as our point of creation for all future clusters!
