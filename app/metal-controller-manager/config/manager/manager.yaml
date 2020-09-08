@@ -9,7 +9,7 @@ spec:
       targetPort: tftp
       protocol: UDP
   selector:
-    control-plane: controller-manager
+    control-plane: metal-controller-manager
 ---
 apiVersion: v1
 kind: Service
@@ -22,7 +22,7 @@ spec:
       targetPort: http
       protocol: TCP
   selector:
-    control-plane: controller-manager
+    control-plane: metal-controller-manager
 ---
 apiVersion: v1
 kind: Service
@@ -35,7 +35,7 @@ spec:
       targetPort: grpc
       protocol: TCP
   selector:
-    control-plane: controller-manager
+    control-plane: metal-controller-manager
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -43,16 +43,16 @@ metadata:
   name: controller-manager
   namespace: system
   labels:
-    control-plane: controller-manager
+    control-plane: metal-controller-manager
 spec:
   selector:
     matchLabels:
-      control-plane: controller-manager
+      control-plane: metal-controller-manager
   replicas: 1
   template:
     metadata:
       labels:
-        control-plane: controller-manager
+        control-plane: metal-controller-manager
     spec:
       containers:
         - command:
