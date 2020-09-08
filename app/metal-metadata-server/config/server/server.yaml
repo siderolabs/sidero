@@ -10,6 +10,7 @@ spec:
       targetPort: http
   selector:
     app: server
+    control-plane: metal-metadata-server
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -21,7 +22,11 @@ spec:
   selector:
     matchLabels:
       app: server
+      control-plane: metal-metadata-server
   template:
+    metadata:
+      labels:
+        control-plane: metal-metadata-server
     spec:
       containers:
         - image: server:latest

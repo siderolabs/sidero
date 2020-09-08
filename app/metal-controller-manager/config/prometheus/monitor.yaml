@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   labels:
-    control-plane: controller-manager
+    control-plane: caps-controller-manager
   name: metrics-monitor
   namespace: system
 spec:
@@ -11,4 +11,4 @@ spec:
     - path: /metrics
       port: https
   selector:
-    control-plane: controller-manager
+    control-plane: caps-controller-manager
