@@ -8,6 +8,12 @@ ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
 WORKDIR /tmp
+RUN apt-get update \
+  && apt-get install -y unzip \
+  && curl -L https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-linux-x86_64.zip -o /tmp/protoc.zip \
+  && unzip -o /tmp/protoc.zip -d /usr/local bin/protoc \
+  && unzip -o /tmp/protoc.zip -d /usr/local 'include/*' \
+  && go get github.com/golang/protobuf/protoc-gen-go@v1.3
 RUN go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.3.0
 RUN go get k8s.io/code-generator/cmd/conversion-gen@v0.18.2
 RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /usr/local/bin v1.28.0
@@ -39,17 +45,11 @@ COPY --from=manifests-build /src/app/cluster-api-provider-sidero/config ./app/cl
 COPY --from=manifests-build /src/app/metal-controller-manager/config ./app/metal-controller-manager/config
 
 FROM base AS generate-build
-RUN apt-get update \
-    && apt-get install -y unzip \
-    && curl -L https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-linux-x86_64.zip -o /tmp/protoc.zip \
-    && unzip -o /tmp/protoc.zip -d /usr/local bin/protoc \
-    && unzip -o /tmp/protoc.zip -d /usr/local 'include/*' \
-    && go get github.com/golang/protobuf/protoc-gen-go@v1.3
-COPY ./app/metal-controller-manager/internal/api/discovery.proto \
-      /src/app/metal-controller-manager/internal/api/discovery.proto
+COPY ./app/metal-controller-manager/internal/api/api.proto \
+  /src/app/metal-controller-manager/internal/api/api.proto
 RUN protoc -I/src/app/metal-controller-manager/internal/api \
-    --go_out=plugins=grpc,paths=source_relative:/src/app/metal-controller-manager/internal/api \
-    discovery.proto
+  --go_out=plugins=grpc,paths=source_relative:/src/app/metal-controller-manager/internal/api \
+  api.proto
 RUN controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
 RUN	conversion-gen --input-dirs="./app/cluster-api-provider-sidero/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
 FROM scratch AS generate
@@ -138,8 +138,8 @@ COPY --from=docker.io/autonomy/fhs:v0.2.0 / /
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe.0
 COPY --from=assets /ipxe.efi /var/lib/sidero/tftp/ipxe.efi
-COPY --from=initramfs /initramfs.xz /var/lib/sidero/env/discovery/initramfs.xz
-ADD https://github.com/talos-systems/talos/releases/download/v0.4.1/vmlinuz /var/lib/sidero/env/discovery/vmlinuz
+COPY --from=initramfs /initramfs.xz /var/lib/sidero/env/agent/initramfs.xz
+ADD https://github.com/talos-systems/talos/releases/download/v0.4.1/vmlinuz /var/lib/sidero/env/agent/vmlinuz
 COPY --from=build-metal-controller-manager /manager /manager
 ENTRYPOINT [ "/manager" ]
 

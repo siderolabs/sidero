@@ -7,6 +7,7 @@ package ipxe
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -16,7 +17,7 @@ import (
 	"text/template"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -25,7 +26,10 @@ import (
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/server"
 	agentclient "github.com/talos-systems/sidero/app/metal-controller-manager/pkg/client"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
 )
+
+var ErrNotInUse = errors.New("server not in use")
 
 const bootFile = `#!ipxe
 chain ipxe?uuid=${uuid}&mac=${mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}
@@ -53,104 +57,65 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	if ok {
 		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
 		if err != nil {
-			log.Printf("error creating config: %v", err)
+			log.Printf("Error creating config: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	} else {
 		config, err = rest.InClusterConfig()
 		if err != nil {
-			log.Printf("error creating config: %v", err)
+			log.Printf("Error creating config: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	}
 
 	c, err := agentclient.NewClient(config)
 	if err != nil {
-		log.Printf("error creating client: %v", err)
+		log.Printf("Error creating client: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
 	labels := labelsFromRequest(r)
 
-	log.Printf("UUID: %q", labels["uuid"])
+	uuid := labels["uuid"]
 
-	key := client.ObjectKey{
-		Name: labels["uuid"],
-	}
-
-	obj := &metalv1alpha1.Server{}
-
-	if err := c.Get(context.Background(), key, obj); err != nil {
-		// If we can't find the server then we know that discovery has not been
-		// performed yet.
-		if apierrors.IsNotFound(err) {
-			args := struct {
-				Env metalv1alpha1.Environment
-			}{
-				Env: metalv1alpha1.Environment{
-					ObjectMeta: v1.ObjectMeta{
-						Name: "discovery",
-					},
-					Spec: metalv1alpha1.EnvironmentSpec{
-						Kernel: metalv1alpha1.Kernel{
-							Args: []string{
-								"initrd=initramfs.xz",
-								"page_poison=1",
-								"slab_nomerge",
-								"slub_debug=P",
-								"pti=on",
-								"panic=0",
-								"random.trust_cpu=on",
-								"ima_template=ima-ng",
-								"ima_appraise=fix",
-								"ima_hash=sha512",
-								"ip=dhcp",
-								"console=tty0",
-								"console=ttyS0",
-								"sidero.endpoint=" + fmt.Sprintf("%s:%s", apiEndpoint, server.Port),
-							},
-						},
-					},
-				},
-			}
-
-			var buf bytes.Buffer
-
-			err = ipxeTemplate.Execute(&buf, args)
-			if err != nil {
-				log.Printf("error rendering template: %v", err)
-				w.WriteHeader(http.StatusInternalServerError)
-
-				return
-			}
-
-			if _, err := buf.WriteTo(w); err != nil {
-				log.Printf("error writing to response: %v", err)
-				w.WriteHeader(http.StatusInternalServerError)
-			}
-
-			return
-		}
-
-		log.Printf("error looking up server: %v", err)
+	obj, err := lookupServer(c, uuid)
+	if err != nil {
+		log.Printf("Error looking up server: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return
 	}
 
-	var env metalv1alpha1.Environment
-
-	if err := determineEnvironment(c, obj, &env); err != nil {
+	env, err := newEnvironment(c, obj)
+	if err != nil {
 		if apierrors.IsNotFound(err) {
-			log.Printf("environment not found: %v", err)
+			log.Printf("Environment not found: %v", err)
 			w.WriteHeader(http.StatusNotFound)
 
 			return
 		}
+
+		if errors.Is(err, ErrNotInUse) {
+			log.Printf("Server %q not in use, skipping", uuid)
+			w.WriteHeader(http.StatusNotFound)
+
+			return
+		}
+
+		log.Printf("%v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return
+	}
+
+	if obj != nil {
+		log.Printf("Using %q environment for %q", env.Name, obj.Name)
+	} else {
+		log.Printf("Using %q environment", env.Name)
 	}
 
 	args := struct {
-		Env metalv1alpha1.Environment
+		Env *metalv1alpha1.Environment
 	}{
 		Env: env,
 	}
@@ -224,33 +189,132 @@ func parseMAC(s string) (net.HardwareAddr, error) {
 	return macAddr, err
 }
 
-// determineEnvionment handles which env CRD we'll respect for a given server.
+func lookupServer(c client.Client, uuid string) (*metalv1alpha1.Server, error) {
+	key := client.ObjectKey{
+		Name: uuid,
+	}
+
+	obj := &metalv1alpha1.Server{}
+
+	if err := c.Get(context.Background(), key, obj); err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return obj, nil
+}
+
+// newEnvironment handles which env CRD we'll respect for a given server.
 // specied in the server spec overrides everything, specified in the server class overrides default, default is default :).
-func determineEnvironment(c client.Client, serverObj *metalv1alpha1.Server, envObj *metalv1alpha1.Environment) error {
-	envName := "default"
+func newEnvironment(c client.Client, server *metalv1alpha1.Server) (env *metalv1alpha1.Environment, err error) {
+	// NB: The order of this switch statement is important. It defines the
+	// precedence of which environment to boot.
+	switch {
+	case server == nil:
+		env = newAgentEnvironment()
+	case !server.Status.InUse && !server.Status.IsClean:
+		env = newAgentEnvironment()
+	case !server.Status.InUse:
+		return nil, ErrNotInUse
+	case server.Spec.EnvironmentRef != nil:
+		env, err = newEnvironmentFromServer(c, server)
+		if err != nil {
+			return nil, err
+		}
+	case server.OwnerReferences != nil:
+		env, err = newEnvironmentFromServerClass(c, server)
+		if err != nil {
+			return nil, err
+		}
+	default:
+		env, err = newDefaultEnvironment(c)
+		if err != nil {
+			return nil, err
+		}
+	}
 
-	if serverObj.Spec.EnvironmentRef != nil {
-		envName = serverObj.Spec.EnvironmentRef.Name
-	} else if serverObj.OwnerReferences != nil {
-		// search for serverclass in owner refs. if found, fetch it and see if it's got an env ref
-		for _, owner := range serverObj.OwnerReferences {
-			if owner.Kind == "ServerClass" {
-				serverClassResource := &metalv1alpha1.ServerClass{}
+	if env == nil {
+		return nil, fmt.Errorf("could not find environment for %q", server.Name)
+	}
 
-				if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: owner.Name}, serverClassResource); err != nil {
-					return err
+	return env, nil
+}
+
+func newAgentEnvironment() *metalv1alpha1.Environment {
+	args := []string{
+		"initrd=initramfs.xz",
+		"page_poison=1",
+		"slab_nomerge",
+		"slub_debug=P",
+		"pti=on",
+		"panic=0",
+		"random.trust_cpu=on",
+		"ima_template=ima-ng",
+		"ima_appraise=fix",
+		"ima_hash=sha512",
+		"ip=dhcp",
+		"console=tty0",
+		"console=ttyS0",
+		fmt.Sprintf("%s=%s:%s", constants.AgentEndpointArg, apiEndpoint, server.Port),
+	}
+
+	env := &metalv1alpha1.Environment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "agent",
+		},
+		Spec: metalv1alpha1.EnvironmentSpec{
+			Kernel: metalv1alpha1.Kernel{
+				Args: args,
+			},
+		},
+	}
+
+	return env
+}
+
+func newDefaultEnvironment(c client.Client) (env *metalv1alpha1.Environment, err error) {
+	env = &metalv1alpha1.Environment{}
+
+	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: "default"}, env); err != nil {
+		return nil, err
+	}
+
+	return env, nil
+}
+
+func newEnvironmentFromServer(c client.Client, server *metalv1alpha1.Server) (env *metalv1alpha1.Environment, err error) {
+	env = &metalv1alpha1.Environment{}
+
+	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: server.Spec.EnvironmentRef.Name}, env); err != nil {
+		return nil, err
+	}
+
+	return env, nil
+}
+
+func newEnvironmentFromServerClass(c client.Client, server *metalv1alpha1.Server) (env *metalv1alpha1.Environment, err error) {
+	for _, owner := range server.OwnerReferences {
+		if owner.Kind == "ServerClass" {
+			serverClassResource := &metalv1alpha1.ServerClass{}
+
+			if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: owner.Name}, serverClassResource); err != nil {
+				return nil, err
+			}
+
+			if serverClassResource.Spec.EnvironmentRef != nil {
+				env = &metalv1alpha1.Environment{}
+
+				if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: serverClassResource.Spec.EnvironmentRef.Name}, env); err != nil {
+					return nil, err
 				}
 
-				if serverClassResource.Spec.EnvironmentRef != nil {
-					envName = serverClassResource.Spec.EnvironmentRef.Name
-				}
+				break
 			}
 		}
 	}
 
-	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: envName}, envObj); err != nil {
-		return err
-	}
-
-	return nil
+	return env, nil
 }

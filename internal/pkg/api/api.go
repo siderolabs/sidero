@@ -67,6 +67,15 @@ func (c *Client) PowerOff() error {
 	return c.postRequest("/poweroff")
 }
 
+// PowerCycle will power cycle a given machine.
+func (c *Client) PowerCycle() error {
+	if err := c.postRequest("/poweroff"); err != nil {
+		return err
+	}
+
+	return c.postRequest("/poweron")
+}
+
 // SetPXE makes sure the node will pxe boot next time.
 func (c *Client) SetPXE() error {
 	return c.postRequest("/pxeboot")

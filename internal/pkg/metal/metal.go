@@ -15,6 +15,7 @@ import (
 type ManagementClient interface {
 	PowerOn() error
 	PowerOff() error
+	PowerCycle() error
 	IsPoweredOn() (bool, error)
 	SetPXE() error
 }

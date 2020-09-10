@@ -16,7 +16,16 @@ spec:
     singular: server
   scope: Cluster
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - description: indicates that the server has been allocated
+      jsonPath: .status.inUse
+      name: Allocated
+      type: boolean
+    - description: indicates if the server is clean or not
+      jsonPath: .status.isClean,
+      name: Clean
+      type: boolean
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: Server is the Schema for the servers API.
@@ -160,8 +169,14 @@ spec:
             properties:
               inUse:
                 type: boolean
+              isClean:
+                type: boolean
               ready:
                 type: boolean
+            required:
+            - inUse
+            - isClean
+            - ready
             type: object
         type: object
     served: true

@@ -4,8 +4,10 @@ package api;
 
 option go_package = "github.com/talos-systems/sidero/app/metal-controller-manager/internal/api";
 
-service Discovery {
+service Agent {
   rpc CreateServer(CreateServerRequest) returns (CreateServerResponse);
+  rpc MarkServerAsWiped(MarkServerAsWipedRequest)
+      returns (MarkServerAsWipedResponse);
 }
 
 message SystemInformation {
@@ -26,7 +28,11 @@ message CPU {
 message CreateServerRequest {
   SystemInformation system_information = 1;
   CPU cpu = 2;
-  string hostname=3;
+  string hostname = 3;
 }
 
-message CreateServerResponse {}
+message CreateServerResponse { bool wipe = 1; }
+
+message MarkServerAsWipedRequest { string uuid = 1; }
+
+message MarkServerAsWipedResponse {}

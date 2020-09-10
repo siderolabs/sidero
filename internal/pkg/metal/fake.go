@@ -14,6 +14,10 @@ func (fakeClient) PowerOff() error {
 	return nil
 }
 
+func (fakeClient) PowerCycle() error {
+	return nil
+}
+
 func (fakeClient) SetPXE() error {
 	return nil
 }

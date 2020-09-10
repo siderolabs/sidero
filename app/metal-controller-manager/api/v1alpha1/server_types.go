@@ -100,13 +100,16 @@ type ServerSpec struct {
 
 // ServerStatus defines the observed state of Server.
 type ServerStatus struct {
-	Ready bool `json:"ready,omitempty"`
-	InUse bool `json:"inUse,omitempty"`
+	Ready   bool `json:"ready"`
+	InUse   bool `json:"inUse"`
+	IsClean bool `json:"isClean"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster
+// +kubebuilder:printcolumn:name="Allocated",type="boolean",JSONPath=".status.inUse",description="indicates that the server has been allocated"
+// +kubebuilder:printcolumn:name="Clean",type="boolean",JSONPath=".status.isClean,",description="indicates if the server is clean or not"
 
 // Server is the Schema for the servers API.
 type Server struct {
