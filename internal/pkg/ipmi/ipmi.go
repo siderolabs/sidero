@@ -58,6 +58,11 @@ func (c *Client) IsPoweredOn() (bool, error) {
 	return status.IsSystemPowerOn(), nil
 }
 
+// PowerCycle will power cycle a given machine.
+func (c *Client) PowerCycle() error {
+	return c.IPMIClient.Control(goipmi.ControlPowerCycle)
+}
+
 // Status fetches the chassis status.
 func (c *Client) Status() (*goipmi.ChassisStatusResponse, error) {
 	req := &goipmi.Request{

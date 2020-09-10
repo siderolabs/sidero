@@ -232,7 +232,7 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 		return ctrl.Result{}, err
 	}
 
-	err = mgmtClient.PowerOff()
+	err = mgmtClient.PowerCycle()
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -276,8 +276,11 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 			return nil, err
 		}
 
-		// double check that server hasn't been marked in use
 		if serverObj.Status.InUse {
+			continue
+		}
+
+		if !serverObj.Status.IsClean {
 			continue
 		}
 
@@ -363,6 +366,7 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 // patchServerInUse updates a server to mark it as "in use".
 func (r *MetalMachineReconciler) patchServerInUse(ctx context.Context, serverClass *metalv1alpha1.ServerClass, serverObj *metalv1alpha1.Server) error {
 	serverObj.Status.InUse = true
+	serverObj.Status.IsClean = false
 
 	// nb: we update status and then update the object separately b/c statuses don't seem to get
 	// updated when doing the whole object below.

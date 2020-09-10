@@ -5,68 +5,22 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
+	"github.com/talos-systems/go-blockdevice/blockdevice/probe"
 	"github.com/talos-systems/go-procfs/procfs"
 	"github.com/talos-systems/go-smbios/smbios"
 	"golang.org/x/sys/unix"
 	"google.golang.org/grpc"
 
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/api"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
 )
-
-func create(endpoint string, s *smbios.Smbios) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	conn, err := grpc.DialContext(ctx, endpoint, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	c := api.NewDiscoveryClient(conn)
-
-	uuid, err := s.SystemInformation().UUID()
-	if err != nil {
-		return err
-	}
-
-	serverReq := &api.CreateServerRequest{
-		SystemInformation: &api.SystemInformation{
-			Uuid:         uuid.String(),
-			Manufacturer: s.SystemInformation().Manufacturer(),
-			ProductName:  s.SystemInformation().ProductName(),
-			Version:      s.SystemInformation().Version(),
-			SerialNumber: s.SystemInformation().SerialNumber(),
-			SkuNumber:    s.SystemInformation().SKUNumber(),
-			Family:       s.SystemInformation().Family(),
-		},
-		Cpu: &api.CPU{
-			Manufacturer: s.ProcessorInformation().ProcessorManufacturer(),
-			Version:      s.ProcessorInformation().ProcessorVersion(),
-		},
-	}
-
-	// set hostname only if we can fetch it w/out error
-	hostname, err := os.Hostname()
-	if err != nil {
-		log.Printf("encountered error fetching hostname: %q", err)
-	} else {
-		serverReq.Hostname = hostname
-	}
-
-	_, err = c.CreateServer(ctx, serverReq)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func setup() error {
 	if err := os.MkdirAll("/dev", 0o777); err != nil {
@@ -113,10 +67,90 @@ func setup() error {
 	return nil
 }
 
+func create(endpoint string, s *smbios.Smbios) (*api.CreateServerResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, endpoint, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	c := api.NewAgentClient(conn)
+
+	uuid, err := s.SystemInformation().UUID()
+	if err != nil {
+		return nil, err
+	}
+
+	req := &api.CreateServerRequest{
+		SystemInformation: &api.SystemInformation{
+			Uuid:         uuid.String(),
+			Manufacturer: s.SystemInformation().Manufacturer(),
+			ProductName:  s.SystemInformation().ProductName(),
+			Version:      s.SystemInformation().Version(),
+			SerialNumber: s.SystemInformation().SerialNumber(),
+			SkuNumber:    s.SystemInformation().SKUNumber(),
+			Family:       s.SystemInformation().Family(),
+		},
+		Cpu: &api.CPU{
+			Manufacturer: s.ProcessorInformation().ProcessorManufacturer(),
+			Version:      s.ProcessorInformation().ProcessorVersion(),
+		},
+	}
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Printf("encountered error fetching hostname: %q", err)
+	} else {
+		req.Hostname = hostname
+	}
+
+	resp, err := c.CreateServer(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func wipe(endpoint string, s *smbios.Smbios) error {
+	uuid, err := s.SystemInformation().UUID()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, endpoint, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	c := api.NewAgentClient(conn)
+
+	_, err = c.MarkServerAsWiped(ctx, &api.MarkServerAsWipedRequest{Uuid: uuid.String()})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func main() {
 	if err := setup(); err != nil {
 		log.Fatal(err)
 	}
+
+	var endpoint *string
+	if endpoint = procfs.ProcCmdline().Get(constants.AgentEndpointArg).First(); endpoint == nil {
+		log.Fatal(fmt.Errorf("no endpoint found"))
+	}
+
+	log.Printf("Using %q as API endpoint", *endpoint)
 
 	log.Println("Reading SMBIOS")
 
@@ -125,18 +159,42 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var endpoint *string
-	if endpoint = procfs.ProcCmdline().Get("sidero.endpoint").First(); endpoint == nil {
-		log.Fatal(fmt.Errorf("no endpoint found"))
-	}
-
-	log.Printf("Creating resource via %q", *endpoint)
-
-	if err = create(*endpoint, s); err != nil {
+	resp, err := create(*endpoint, s)
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("Discovery complete")
+	log.Println("Registration complete")
+
+	if resp.GetWipe() {
+		bds, err := probe.All()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, bd := range bds {
+			log.Printf("Resetting %s", bd.Path)
+
+			_, err := bd.Device().WriteAt(bytes.Repeat([]byte{0}, 512), 0)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			if err := bd.Reset(); err != nil {
+				log.Fatal(err)
+			}
+
+			if err := bd.Close(); err != nil {
+				log.Fatal(err)
+			}
+		}
+
+		if err := wipe(*endpoint, s); err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("Wipe complete")
+	}
 
 	// nolint: errcheck
 	unix.Reboot(unix.LINUX_REBOOT_CMD_POWER_OFF)

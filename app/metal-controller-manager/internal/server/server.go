@@ -13,10 +13,10 @@ import (
 	"google.golang.org/grpc"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	metal1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/api"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/client"
 )
@@ -26,10 +26,10 @@ const (
 )
 
 type server struct {
-	api.UnimplementedDiscoveryServer
+	api.UnimplementedAgentServer
 }
 
-// CreateServer implements api.DiscoveryServer.
+// CreateServer implements api.AgentServer.
 func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) (*api.CreateServerResponse, error) {
 	var config *rest.Config
 
@@ -43,48 +43,89 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 		return nil, err
 	}
 
-	obj := &metal1alpha1.Server{
-		TypeMeta: v1.TypeMeta{
-			Kind:       "Server",
-			APIVersion: metal1alpha1.GroupVersion.Version,
-		},
-		ObjectMeta: v1.ObjectMeta{
-			Name: in.GetSystemInformation().GetUuid(),
-		},
-	}
+	obj := &metalv1alpha1.Server{}
 
-	_, err = controllerutil.CreateOrUpdate(context.Background(), c, obj, func() error {
-		obj.Spec = metal1alpha1.ServerSpec{
-			SystemInformation: &metal1alpha1.SystemInformation{
-				Manufacturer: in.GetSystemInformation().GetManufacturer(),
-				ProductName:  in.GetSystemInformation().GetProductName(),
-				Version:      in.GetSystemInformation().GetVersion(),
-				SerialNumber: in.GetSystemInformation().GetSerialNumber(),
-				SKUNumber:    in.GetSystemInformation().GetSkuNumber(),
-				Family:       in.GetSystemInformation().GetFamily(),
-			},
-			CPU: &metal1alpha1.CPUInformation{
-				Manufacturer: in.GetCpu().GetManufacturer(),
-				Version:      in.GetCpu().GetVersion(),
-			},
-		}
-
-		return nil
-	})
-	if err != nil {
-		if !apierrors.IsAlreadyExists(err) {
+	if err = c.Get(ctx, types.NamespacedName{Name: in.GetSystemInformation().GetUuid()}, obj); err != nil {
+		if !apierrors.IsNotFound(err) {
 			return nil, err
 		}
 
-		log.Printf("%s already exists", in.GetSystemInformation().GetUuid())
-	} else {
+		obj = &metalv1alpha1.Server{
+			TypeMeta: v1.TypeMeta{
+				Kind:       "Server",
+				APIVersion: metalv1alpha1.GroupVersion.Version,
+			},
+			ObjectMeta: v1.ObjectMeta{
+				Name: in.GetSystemInformation().GetUuid(),
+			},
+			Spec: metalv1alpha1.ServerSpec{
+				SystemInformation: &metalv1alpha1.SystemInformation{
+					Manufacturer: in.GetSystemInformation().GetManufacturer(),
+					ProductName:  in.GetSystemInformation().GetProductName(),
+					Version:      in.GetSystemInformation().GetVersion(),
+					SerialNumber: in.GetSystemInformation().GetSerialNumber(),
+					SKUNumber:    in.GetSystemInformation().GetSkuNumber(),
+					Family:       in.GetSystemInformation().GetFamily(),
+				},
+				CPU: &metalv1alpha1.CPUInformation{
+					Manufacturer: in.GetCpu().GetManufacturer(),
+					Version:      in.GetCpu().GetVersion(),
+				},
+			},
+			Status: metalv1alpha1.ServerStatus{
+				IsClean: true,
+			},
+		}
+
+		if err = c.Create(ctx, obj); err != nil {
+			return nil, err
+		}
+
 		log.Printf("Added %s", in.GetSystemInformation().GetUuid())
 	}
 
-	return &api.CreateServerResponse{}, nil
+	resp := &api.CreateServerResponse{}
+
+	if !obj.Status.IsClean {
+		log.Printf("Server %q needs wipe", obj.Name)
+
+		resp.Wipe = true
+	}
+
+	return resp, nil
 }
 
-// Server starts the server.
+// MarkServerAsWiped implements api.AgentServer.
+func (s *server) MarkServerAsWiped(ctx context.Context, in *api.MarkServerAsWipedRequest) (*api.MarkServerAsWipedResponse, error) {
+	var config *rest.Config
+
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := client.NewClient(config)
+	if err != nil {
+		return nil, err
+	}
+
+	obj := &metalv1alpha1.Server{}
+
+	if err = c.Get(ctx, types.NamespacedName{Name: in.GetUuid()}, obj); err != nil {
+		return nil, err
+	}
+
+	obj.Status.IsClean = true
+
+	if err := c.Status().Update(ctx, obj); err != nil {
+		return nil, err
+	}
+
+	resp := &api.MarkServerAsWipedResponse{}
+
+	return resp, nil
+}
+
 func Serve() error {
 	lis, err := net.Listen("tcp", ":"+Port)
 	if err != nil {
@@ -93,7 +134,7 @@ func Serve() error {
 
 	s := grpc.NewServer()
 
-	api.RegisterDiscoveryServer(s, &server{})
+	api.RegisterAgentServer(s, &server{})
 
 	if err := s.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)

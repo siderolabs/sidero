@@ -5,5 +5,6 @@
 package constants
 
 const (
-	DataDirectory = "/var/lib/sidero"
+	DataDirectory    = "/var/lib/sidero"
+	AgentEndpointArg = "sidero.endpoint"
 )
