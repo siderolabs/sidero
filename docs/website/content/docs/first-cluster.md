@@ -26,7 +26,7 @@ Metal Controller Manager:
 
 ```bash
 ## Use host networking
-kubectl patch deploy -n caps-system sidero-controller-manager --type='json' -p='[{"op": "add", "path": "/spec/template/spec/hostNetwork", "value": true}]'
+kubectl patch deploy -n sidero-system sidero-controller-manager --type='json' -p='[{"op": "add", "path": "/spec/template/spec/hostNetwork", "value": true}]'
 ```
 
 Metadata Server:

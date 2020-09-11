@@ -127,23 +127,23 @@ Update the metadata server component with the following patches:
 
 ```bash
 ## Update args to use 9091 for port
-kubectl patch deploy -n caps-system sidero-metadata-server --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args", "value": ["--port=9091"]}]'
+kubectl patch deploy -n sidero-system sidero-metadata-server --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args", "value": ["--port=9091"]}]'
 
 ## Tweak container port to match
-kubectl patch deploy -n caps-system sidero-metadata-server --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/ports", "value": [{"containerPort": 9091,"name": "http"}]}]'
+kubectl patch deploy -n sidero-system sidero-metadata-server --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/ports", "value": [{"containerPort": 9091,"name": "http"}]}]'
 
 ## Use host networking
-kubectl patch deploy -n caps-system sidero-metadata-server --type='json' -p='[{"op": "add", "path": "/spec/template/spec/hostNetwork", "value": true}]'
+kubectl patch deploy -n sidero-system sidero-metadata-server --type='json' -p='[{"op": "add", "path": "/spec/template/spec/hostNetwork", "value": true}]'
 ```
 
 ### Patch the Metal Controller Manager
 
 ```bash
 ## Update args to specify the api endpoint to use for registration
-kubectl patch deploy -n caps-system sidero-controller-manager --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/1/args", "value": ["--api-endpoint='$PUBLIC_IP'","--metrics-addr=127.0.0.1:8080","--enable-leader-election"]}]'
+kubectl patch deploy -n sidero-system sidero-controller-manager --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/1/args", "value": ["--api-endpoint='$PUBLIC_IP'","--metrics-addr=127.0.0.1:8080","--enable-leader-election"]}]'
 
 ## Use host networking
-kubectl patch deploy -n caps-system sidero-controller-manager --type='json' -p='[{"op": "add", "path": "/spec/template/spec/hostNetwork", "value": true}]'
+kubectl patch deploy -n sidero-system sidero-controller-manager --type='json' -p='[{"op": "add", "path": "/spec/template/spec/hostNetwork", "value": true}]'
 ```
 
 ## Register the Servers
