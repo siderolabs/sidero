@@ -8,13 +8,13 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	goipmi "github.com/vmware/goipmi"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/internal/pkg/metal"
 )
 
 // ServerReconciler reconciles a Server object.
@@ -47,31 +47,14 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, nil
 	}
 
-	if s.Spec.BMC != nil {
-		conn := &goipmi.Connection{
-			Hostname:  s.Spec.BMC.Endpoint,
-			Username:  s.Spec.BMC.User,
-			Password:  s.Spec.BMC.Pass,
-			Interface: "lanplus",
-		}
+	mgmtClient, err := metal.NewManagementClient(&s.Spec)
+	if err != nil {
+		return f(false)
+	}
 
-		client, err := goipmi.NewClient(conn)
-		if err != nil {
-			return f(false)
-		}
-
-		ipmiReq := &goipmi.Request{
-			NetworkFunction: goipmi.NetworkFunctionChassis,
-			Command:         goipmi.CommandChassisStatus,
-			Data:            goipmi.ChassisStatusRequest{},
-		}
-
-		res := &goipmi.ChassisStatusResponse{}
-
-		err = client.Send(ipmiReq, res)
-		if err != nil {
-			return f(false)
-		}
+	_, err = mgmtClient.IsPoweredOn()
+	if err != nil {
+		return f(false)
 	}
 
 	return f(true)

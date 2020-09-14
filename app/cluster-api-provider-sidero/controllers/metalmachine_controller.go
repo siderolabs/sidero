@@ -27,9 +27,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	infrav1 "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
-	"github.com/talos-systems/sidero/app/cluster-api-provider-sidero/internal/pkg/ipmi"
 	"github.com/talos-systems/sidero/app/cluster-api-provider-sidero/pkg/constants"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/internal/pkg/metal"
 )
 
 // MetalMachineReconciler reconciles a MetalMachine object.
@@ -159,29 +159,27 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 		}
 	}
 
-	if serverResource.Spec.BMC != nil {
-		ipmiClient, err := ipmi.NewClient(*serverResource.Spec.BMC)
+	mgmtClient, err := metal.NewManagementClient(&serverResource.Spec)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	poweredOn, err := mgmtClient.IsPoweredOn()
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// Only take action if server is turned off
+	// otherwise IPMI library gets angry
+	if !poweredOn {
+		err = mgmtClient.SetPXE()
 		if err != nil {
 			return ctrl.Result{}, err
 		}
 
-		chassisStatus, err := ipmiClient.Status()
+		err = mgmtClient.PowerOn()
 		if err != nil {
 			return ctrl.Result{}, err
-		}
-
-		// Only take action if server is turned off
-		// otherwise IPMI library gets angry
-		if !chassisStatus.IsSystemPowerOn() {
-			err = ipmiClient.SetPXE()
-			if err != nil {
-				return ctrl.Result{}, err
-			}
-
-			err = ipmiClient.PowerOn()
-			if err != nil {
-				return ctrl.Result{}, err
-			}
 		}
 	}
 
@@ -224,21 +222,19 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 		}
 	}
 
-	if serverResource.Spec.BMC != nil {
-		ipmiClient, err := ipmi.NewClient(*serverResource.Spec.BMC)
-		if err != nil {
-			return ctrl.Result{}, err
-		}
+	mgmtClient, err := metal.NewManagementClient(&serverResource.Spec)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
-		err = ipmiClient.SetPXE()
-		if err != nil {
-			return ctrl.Result{}, err
-		}
+	err = mgmtClient.SetPXE()
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
-		err = ipmiClient.PowerOff()
-		if err != nil {
-			return ctrl.Result{}, err
-		}
+	err = mgmtClient.PowerOff()
+	if err != nil {
+		return ctrl.Result{}, err
 	}
 
 	// Machine is deleted so remove the finalizer.
