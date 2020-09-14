@@ -20,6 +20,11 @@ type BMC struct {
 	Pass     string `json:"pass"`
 }
 
+// ManagementAPI defines data about how to talk to the node via simple HTTP API.
+type ManagementAPI struct {
+	Endpoint string `json:"endpoint"`
+}
+
 type SystemInformation struct {
 	Manufacturer string `json:"manufacturer,omitempty"`
 	ProductName  string `json:"productName,omitempty"`
@@ -49,6 +54,7 @@ type ServerSpec struct {
 	SystemInformation *SystemInformation      `json:"system,omitempty"`
 	CPU               *CPUInformation         `json:"cpu,omitempty"`
 	BMC               *BMC                    `json:"bmc,omitempty"`
+	ManagementAPI     *ManagementAPI          `json:"managementApi,omitempty"`
 	ConfigPatches     []ConfigPatches         `json:"configPatches,omitempty"`
 }
 

@@ -43,9 +43,19 @@ func (c *Client) PowerOn() error {
 	return c.IPMIClient.Control(goipmi.ControlPowerUp)
 }
 
-// PowerOff will power on a given machine.
+// PowerOff will power off a given machine.
 func (c *Client) PowerOff() error {
 	return c.IPMIClient.Control(goipmi.ControlPowerDown)
+}
+
+// IsPoweredOn checks current power state.
+func (c *Client) IsPoweredOn() (bool, error) {
+	status, err := c.Status()
+	if err != nil {
+		return false, err
+	}
+
+	return status.IsSystemPowerOn(), nil
 }
 
 // Status fetches the chassis status.
