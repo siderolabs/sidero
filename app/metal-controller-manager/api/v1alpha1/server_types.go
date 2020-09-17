@@ -5,6 +5,8 @@
 package v1alpha1
 
 import (
+	"reflect"
+
 	corev1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,9 +36,39 @@ type SystemInformation struct {
 	Family       string `json:"family,omitempty"`
 }
 
+func (a *SystemInformation) PartialEqual(b *SystemInformation) bool {
+	return PartialEqual(a, b)
+}
+
 type CPUInformation struct {
 	Manufacturer string `json:"manufacturer,omitempty"`
 	Version      string `json:"version,omitempty"`
+}
+
+func (a *CPUInformation) PartialEqual(b *CPUInformation) bool {
+	return PartialEqual(a, b)
+}
+
+func PartialEqual(a, b interface{}) bool {
+	old := reflect.ValueOf(a)
+	new := reflect.ValueOf(b)
+
+	for i := 0; i < old.NumField(); i++ {
+		if old.Field(i).IsZero() {
+			// Skip zero values, since that indicates that the user did not supply
+			// the field, and does not want to compare it.
+			continue
+		}
+
+		f1 := old.Field(i).Interface()
+		f2 := new.Field(i).Interface()
+
+		if f1 != f2 {
+			return false
+		}
+	}
+
+	return true
 }
 
 // nb: we use apiextensions.JSON for the value below b/c we can't use interface{} with controller-gen.

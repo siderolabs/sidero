@@ -7,7 +7,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -61,7 +60,7 @@ func (sr *serverResults) filterCPU(filters []metalv1alpha1.CPUInformation) serve
 		var match bool
 
 		for _, cpu := range filters {
-			if server.Spec.CPU != nil && reflect.DeepEqual(cpu, *server.Spec.CPU) {
+			if server.Spec.CPU != nil && cpu.PartialEqual(server.Spec.CPU) {
 				match = true
 
 				break
@@ -86,7 +85,7 @@ func (sr *serverResults) filterSysInfo(filters []metalv1alpha1.SystemInformation
 		var match bool
 
 		for _, sysInfo := range filters {
-			if server.Spec.SystemInformation != nil && reflect.DeepEqual(sysInfo, *server.Spec.SystemInformation) {
+			if server.Spec.SystemInformation != nil && sysInfo.PartialEqual(server.Spec.SystemInformation) {
 				match = true
 				break
 			}
