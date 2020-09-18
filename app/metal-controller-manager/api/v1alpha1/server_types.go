@@ -53,6 +53,14 @@ func PartialEqual(a, b interface{}) bool {
 	old := reflect.ValueOf(a)
 	new := reflect.ValueOf(b)
 
+	if old.Kind() == reflect.Ptr {
+		old = old.Elem()
+	}
+
+	if new.Kind() == reflect.Ptr {
+		new = new.Elem()
+	}
+
 	for i := 0; i < old.NumField(); i++ {
 		if old.Field(i).IsZero() {
 			// Skip zero values, since that indicates that the user did not supply

@@ -11,7 +11,7 @@ import (
 	"github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 )
 
-func Test_partialEqual(t *testing.T) {
+func Test_PartialEqual(t *testing.T) {
 	type args struct {
 		a interface{}
 		b interface{}
@@ -25,19 +25,19 @@ func Test_partialEqual(t *testing.T) {
 		{
 			name: "defaults are partially equal",
 			args: args{
-				a: v1alpha1.CPUInformation{},
-				b: v1alpha1.CPUInformation{},
+				a: &v1alpha1.CPUInformation{},
+				b: &v1alpha1.CPUInformation{},
 			},
 			want: true,
 		},
 		{
 			name: "is partially equal",
 			args: args{
-				a: v1alpha1.CPUInformation{
+				a: &v1alpha1.CPUInformation{
 					Manufacturer: "QEMU",
 					// Skip Version to indicate that we don't want to compare it.
 				},
-				b: v1alpha1.CPUInformation{
+				b: &v1alpha1.CPUInformation{
 					Manufacturer: "QEMU",
 					Version:      "1.2.0",
 				},
@@ -47,23 +47,36 @@ func Test_partialEqual(t *testing.T) {
 		{
 			name: "is not partially equal",
 			args: args{
-				a: v1alpha1.CPUInformation{
+				a: &v1alpha1.CPUInformation{
 					Manufacturer: "QEMU",
 					Version:      "1.0.0",
 				},
-				b: v1alpha1.CPUInformation{
+				b: &v1alpha1.CPUInformation{
 					Manufacturer: "QEMU",
 					Version:      "1.2.0",
 				},
 			},
 			want: false,
 		},
+		{
+			name: "partially equal value",
+			args: args{
+				a: v1alpha1.CPUInformation{
+					Manufacturer: "QEMU",
+				},
+				b: v1alpha1.CPUInformation{
+					Manufacturer: "QEMU",
+					Version:      "1.2.0",
+				},
+			},
+			want: true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := v1alpha1.PartialEqual(tt.args.a, tt.args.b); got != tt.want {
-				t.Errorf("partialEqual() = %v, want %v", got, tt.want)
+				t.Errorf("PartialEqual() = %v, want %v", got, tt.want)
 			}
 		})
 	}
