@@ -5,7 +5,6 @@
 package main
 
 import (
-	"context"
 	"encoding/base64"
 	"encoding/json"
 	"flag"
@@ -52,7 +51,7 @@ func main() {
 }
 
 func FetchConfig(w http.ResponseWriter, r *http.Request) {
-	ctx := context.TODO()
+	ctx := r.Context()
 
 	vals := r.URL.Query()
 
