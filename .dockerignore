@@ -4,8 +4,9 @@
 !config
 !hack
 !app
-!pkg
 !internal
+!pkg
+!sfyra
 !templates
 !go.mod
 !go.sum
