@@ -9,9 +9,14 @@ steps:
     commands:
       - git fetch --tags
       - apk add coreutils
-      - docker buildx create --driver docker-container --platform linux/amd64 --buildkitd-flags "--allow-insecure-entitlement security.insecure" --name local --use unix:///var/outer-run/docker.sock
+      - echo -e "[registry.\"registry.ci.svc:5000\"]\nhttp = true\ninsecure = true\nmirrors = [\"registry.ci.svc:5000\"]\n" > buildkit.conf
+      - docker buildx create --driver docker-container --config buildkit.conf --platform linux/amd64 --name build-sidero --use unix:///var/outer-run/docker.sock
       - docker buildx inspect --bootstrap
     privileged: true
+    resources:
+      requests:
+        cpu: 24000
+        memory: 48GiB
     volumes:
       - name: docker-socket
         path: /var/run
@@ -41,7 +46,25 @@ steps:
     image: autonomy/build-container:latest
     pull: always
     commands:
-      - make
+      - make REGISTRY=registry.ci.svc:5000 PUSH=true
+    when:
+      event:
+        include:
+          - pull_request
+    volumes:
+      - name: docker-socket
+        path: /var/run
+      - name: outerdockersock
+        path: /var/outer-run
+      - name: docker
+        path: /root/.docker/buildx
+
+  - name: sfyra-pull-request
+    image: autonomy/build-container:latest
+    pull: always
+    commands:
+      - make run-sfyra REGISTRY=registry.ci.svc:5000
+    privileged: true
     when:
       event:
         include:
@@ -65,6 +88,24 @@ steps:
     commands:
       - docker login --username "$${DOCKER_USERNAME}" --password "$${DOCKER_PASSWORD}"
       - make PUSH=true
+    when:
+      event:
+        exclude:
+          - pull_request
+    volumes:
+      - name: docker-socket
+        path: /var/run
+      - name: outerdockersock
+        path: /var/outer-run
+      - name: docker
+        path: /root/.docker/buildx
+
+  - name: sfyra
+    image: autonomy/build-container:latest
+    pull: always
+    commands:
+      - make run-sfyra
+    privileged: true
     when:
       event:
         exclude:
@@ -145,6 +186,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: 2e149f883fae864cd2b573775ebec2e997ad8ec2414b51fbc8995dc7758cec51
+hmac: eaed83ce75f9bddcaf79aab00a3213ed406aec982940fba276c4e16abebf2e60
 
 ...

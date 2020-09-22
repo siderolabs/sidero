@@ -3,7 +3,7 @@
 # The base target provides the base for running various tasks against the source
 # code
 
-FROM golang:1.14 AS base
+FROM golang:1.15 AS base
 ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
@@ -26,7 +26,9 @@ COPY ./go.mod ./
 COPY ./go.sum ./
 RUN go mod download
 RUN go mod verify
-COPY ./ ./
+COPY ./app/ ./app/
+COPY ./hack/ ./hack/
+COPY ./internal/ ./internal/
 RUN go list -mod=readonly all >/dev/null
 RUN ! go mod tidy -v 2>&1 | grep .
 
@@ -171,7 +173,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build go test -v -count 1 -race ${
 #
 FROM base AS lint-go
 ENV GOGC=50
-RUN --mount=type=cache,target=/root/.cache/go-build /usr/local/bin/golangci-lint run --enable-all --disable gochecknoglobals,gochecknoinits,lll,goerr113,funlen,nestif,maligned,gomnd,gocognit,gocyclo
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/.cache/golangci-lint /usr/local/bin/golangci-lint run --enable-all --disable gochecknoglobals,gochecknoinits,lll,goerr113,funlen,nestif,maligned,gomnd,gocognit,gocyclo
 ARG MODULE
 RUN FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)
 #
@@ -192,3 +194,29 @@ RUN npm i sentences-per-line
 WORKDIR /src
 COPY --from=base /src .
 RUN markdownlint --ignore '**/hack/chglog/**' --rules /node_modules/sentences-per-line/index.js .
+#
+# The sfyra-build target builds the Sfyra source.
+#
+FROM base AS sfyra-base
+WORKDIR /src/sfyra
+COPY ./sfyra/go.mod ./
+COPY ./sfyra/go.sum ./
+RUN go mod download
+RUN go mod verify
+COPY ./sfyra/ ./
+RUN go list -mod=readonly all >/dev/null
+RUN ! go mod tidy -v 2>&1 | grep .
+
+FROM sfyra-base AS lint-sfyra
+ENV GOGC=50
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/.cache/golangci-lint /usr/local/bin/golangci-lint run --enable-all --disable gochecknoglobals,gochecknoinits,lll,goerr113,funlen,nestif,maligned,gomnd,gocognit,gocyclo,godox
+ARG MODULE
+RUN FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)
+
+FROM sfyra-base AS sfyra-build
+WORKDIR /src/sfyra/cmd/sfyra
+RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /sfyra
+RUN chmod +x /sfyra
+
+FROM scratch AS sfyra
+COPY --from=sfyra-build /sfyra /sfyra

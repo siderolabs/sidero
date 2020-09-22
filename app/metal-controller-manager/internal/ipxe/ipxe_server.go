@@ -214,9 +214,9 @@ func newEnvironment(c client.Client, server *metalv1alpha1.Server) (env *metalv1
 	// precedence of which environment to boot.
 	switch {
 	case server == nil:
-		env = newAgentEnvironment()
+		return newAgentEnvironment(), nil
 	case !server.Status.InUse && !server.Status.IsClean:
-		env = newAgentEnvironment()
+		return newAgentEnvironment(), nil
 	case !server.Status.InUse:
 		return nil, ErrNotInUse
 	case server.Spec.EnvironmentRef != nil:
@@ -229,7 +229,9 @@ func newEnvironment(c client.Client, server *metalv1alpha1.Server) (env *metalv1
 		if err != nil {
 			return nil, err
 		}
-	default:
+	}
+
+	if env == nil {
 		env, err = newDefaultEnvironment(c)
 		if err != nil {
 			return nil, err

@@ -9,6 +9,7 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 PKGS ?= ./...
+TALOS_RELEASE ?= v0.7.0-alpha.2
 
 BUILD := docker buildx build
 PLATFORM ?= linux/amd64
@@ -22,7 +23,7 @@ COMMON_ARGS += --build-arg=TAG=$(TAG)
 COMMON_ARGS += --build-arg=MODULE=$(MODULE)
 COMMON_ARGS += --build-arg=PKGS=$(PKGS)
 
-all: manifests generate cluster-api-provider-sidero metal-controller-manager metal-metadata-server
+all: manifests generate cluster-api-provider-sidero metal-controller-manager metal-metadata-server sfyra
 
 
 # Help Menu
@@ -98,13 +99,38 @@ release: manifests ## Create the release YAML. The build result will be ouput to
 cluster-api-provider-sidero: ## Build the CAPI provider container image.
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
-..PHONY: metal-controller-manager
+.PHONY: metal-controller-manager
 metal-controller-manager: ## Build the CAPI provider container image.
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
-PHONY: metal-metadata-server
+.PHONY: metal-metadata-server
 metal-metadata-server: ## Build the CAPI provider container image.
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
+
+# Sfyra
+
+$(ARTIFACTS)/$(TALOS_RELEASE)/%:
+	@mkdir -p $(ARTIFACTS)/$(TALOS_RELEASE)/
+	@curl -L -o "$(ARTIFACTS)/$(TALOS_RELEASE)/$*" "https://github.com/talos-systems/talos/releases/download/$(TALOS_RELEASE)/$*"
+
+.PHONY: $(ARTIFACTS)/$(TALOS_RELEASE)
+$(ARTIFACTS)/$(TALOS_RELEASE): $(ARTIFACTS)/$(TALOS_RELEASE)/vmlinuz $(ARTIFACTS)/$(TALOS_RELEASE)/initramfs.xz $(ARTIFACTS)/$(TALOS_RELEASE)/talosctl-linux-amd64
+
+.PHONY: talos-artifacts
+talos-artifacts: $(ARTIFACTS)/$(TALOS_RELEASE)
+
+.PHONY: sfyra
+sfyra: ## Build the Sfyra test binary.
+	@$(MAKE) local-$@ DEST=./$(ARTIFACTS)
+
+.PHONY: clusterctl-release
+clusterctl-release: release
+	@COMPONENTS_YAML="$(abspath $(ARTIFACTS)/infrastructure-sidero/$(TAG)/infrastructure-components.yaml)" \
+		./hack/scripts/generate-clusterctl-config.sh
+
+.PHONY: run-sfyra
+run-sfyra: talos-artifacts clusterctl-release
+	@ARTIFACTS=$(ARTIFACTS) TALOS_RELEASE=$(TALOS_RELEASE) ./hack/scripts/integration-test.sh
 
 # Development
 
@@ -139,7 +165,7 @@ lint-%: ## Runs the specified linter. Valid options are go, protobuf, and markdo
 	@$(MAKE) target-lint-$*
 
 lint: ## Runs linters on go, protobuf, and markdown file types.
-	@$(MAKE) lint-go lint-markdown
+	@$(MAKE) lint-go lint-markdown lint-sfyra
 
 # Tests
 
