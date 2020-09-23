@@ -4,16 +4,15 @@ Integration test for Sidero/Arges.
 
 ## Running
 
-Build the test binary:
+Build the test binary and Sidero, push images:
 
-    make sfyra
+    make USERNAME=<username> PUSH=true
 
-Run the test:
+Run the test (this will trigger `make release`):
 
-    make run-sfyra
+    make run-sfyra USERNAME=<username>
 
-Registry mirrors could be dropped if not being used.
-Test uses CIDR `172.24.0.0/24` by default.
+Test uses CIDRs `172.24.0.0/24`, `172.25.0.0/24` by default.
 
 Sequence of steps:
 
@@ -31,9 +30,9 @@ Build the artifacts in Talos:
 
     make initramfs kernel talosctl-linux
 
-From Sfyra directory run:
+From Sidero directory run:
 
-    (cd ../talos/; sudo -E ../sfyra/_out/integration-test -skip-teardown)
+    (cd ../talos/; sudo -E ../sidero/_out/sfyra -skip-teardown)
 
 This command doesn't tear down the cluster after the test run, so it can be re-run any time for quick another round of testing.
 
@@ -41,20 +40,3 @@ To destroy Sfyra environment use `talosctl`:
 
     sudo -E talosctl cluster destroy --provisioner=qemu --name=sfyra
     sudo -E talosctl cluster destroy --provisioner=qemu --name=sfyra-management
-
-## Running with Sidero HEAD
-
-Build Sidero and push to registry under your username:
-
-    make USERNAME=smira PUSH=true
-    make release USERNAME=smira PUSH=true
-
-Create/update `clusterctl` config file to install Sidero for that version:
-
-    $ cat ~/.cluster-api/clusterctl.yaml
-    providers:
-    - name: "sidero"
-        url: "file:///home/smira/Documents/sidero/_out/infrastructure-sidero/v0.1.0-alpha.1-12-g8f9ba14-dirty/infrastructure-components.yaml"
-        type: "InfrastructureProvider"
-
-Update the path to match your directory layout.
