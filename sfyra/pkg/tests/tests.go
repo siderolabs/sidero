@@ -64,5 +64,9 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			"TestManagementCluster",
 			TestManagementCluster(ctx, metalClient, cluster, vmSet, capiManager),
 		},
+		{
+			"TestServerReset",
+			TestServerReset(ctx, metalClient, vmSet),
+		},
 	}, nil, nil).Run() == 0
 }
