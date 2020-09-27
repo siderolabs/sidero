@@ -9,8 +9,7 @@ steps:
     commands:
       - git fetch --tags
       - apk add coreutils
-      - echo -e "[registry.\"registry.ci.svc:5000\"]\nhttp = true\ninsecure = true\nmirrors = [\"registry.ci.svc:5000\"]\n" > buildkit.conf
-      - docker buildx create --driver docker-container --config buildkit.conf --platform linux/amd64 --name build-sidero --use unix:///var/outer-run/docker.sock
+      - docker buildx create --driver docker-container --platform linux/amd64 --name build-sidero --use unix:///var/outer-run/docker.sock
       - docker buildx inspect --bootstrap
     privileged: true
     resources:
@@ -46,7 +45,7 @@ steps:
     image: autonomy/build-container:latest
     pull: always
     commands:
-      - make REGISTRY=registry.ci.svc:5000 PUSH=true
+      - make REGISTRY=registry.dev.talos-systems.io PUSH=true
     when:
       event:
         include:
@@ -63,7 +62,7 @@ steps:
     image: autonomy/build-container:latest
     pull: always
     commands:
-      - make run-sfyra REGISTRY=registry.ci.svc:5000
+      - make run-sfyra REGISTRY=registry.dev.talos-systems.io
     privileged: true
     when:
       event:
