@@ -7,7 +7,6 @@ package tests
 import (
 	"context"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"strconv"
@@ -15,20 +14,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	cabpt "github.com/talos-systems/cluster-api-bootstrap-provider-talos/api/v1alpha3"
-	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
 	"github.com/talos-systems/go-retry/retry"
-	talosclusterapi "github.com/talos-systems/talos/pkg/machinery/api/cluster"
-	talosclient "github.com/talos-systems/talos/pkg/machinery/client"
-	clientconfig "github.com/talos-systems/talos/pkg/machinery/client/config"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
@@ -38,7 +29,6 @@ import (
 	capiclient "sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
 	"github.com/talos-systems/sidero/sfyra/pkg/capi"
 	"github.com/talos-systems/sidero/sfyra/pkg/loadbalancer"
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
@@ -168,80 +158,9 @@ func TestManagementCluster(ctx context.Context, metalClient client.Client, clust
 
 		t.Log("verifying cluster health")
 
-		var (
-			cluster      v1alpha3.Cluster
-			controlPlane cacpt.TalosControlPlane
-			machines     v1alpha3.MachineList
-			talosConfig  cabpt.TalosConfig
-		)
-
-		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: managementClusterName}, &cluster))
-		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Namespace: cluster.Spec.ControlPlaneRef.Namespace, Name: cluster.Spec.ControlPlaneRef.Name}, &controlPlane))
-
-		labelSelector, err := labels.Parse(controlPlane.Status.Selector)
+		cluster, err := capi.NewCluster(ctx, metalClient, managementClusterName, vmSet)
 		require.NoError(t, err)
 
-		require.NoError(t, metalClient.List(ctx, &machines, client.MatchingLabelsSelector{Selector: labelSelector}))
-
-		require.GreaterOrEqual(t, len(machines.Items), 1)
-
-		configRef := machines.Items[0].Spec.Bootstrap.ConfigRef
-
-		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Namespace: configRef.Namespace, Name: configRef.Name}, &talosConfig))
-
-		var clientConfig *clientconfig.Config
-		clientConfig, err = clientconfig.FromString(talosConfig.Status.TalosConfig)
-
-		require.NoError(t, err)
-
-		// TODO: endpoints in talosconfig should be filled by Sidero
-		var metalMachine sidero.MetalMachine
-
-		require.NoError(t, metalClient.Get(ctx,
-			types.NamespacedName{Namespace: machines.Items[0].Spec.InfrastructureRef.Namespace, Name: machines.Items[0].Spec.InfrastructureRef.Name},
-			&metalMachine))
-
-		nodeUUID := metalMachine.Spec.ServerRef.Name
-
-		for _, node := range vmSet.Nodes() {
-			if node.UUID.String() == nodeUUID {
-				clientConfig.Contexts[clientConfig.Context].Endpoints = append(clientConfig.Contexts[clientConfig.Context].Endpoints, node.PrivateIP.String())
-			}
-		}
-
-		var talosClient *talosclient.Client
-
-		talosClient, err = talosclient.New(ctx, talosclient.WithConfig(clientConfig))
-		require.NoError(t, err)
-
-		require.NoError(t, talosHealth(ctx, talosClient, clientConfig.Contexts[clientConfig.Context].Endpoints))
-	}
-}
-
-func talosHealth(ctx context.Context, talosClient *talosclient.Client, nodes []string) error {
-	resp, err := talosClient.ClusterHealthCheck(talosclient.WithNodes(ctx, nodes...), 3*time.Minute, &talosclusterapi.ClusterInfo{})
-	if err != nil {
-		return err
-	}
-
-	if err := resp.CloseSend(); err != nil {
-		return err
-	}
-
-	for {
-		msg, err := resp.Recv()
-		if err != nil {
-			if err == io.EOF || status.Code(err) == codes.Canceled {
-				return nil
-			}
-
-			return err
-		}
-
-		if msg.GetMetadata().GetError() != "" {
-			return fmt.Errorf("healthcheck error: %s", msg.GetMetadata().GetError())
-		}
-
-		fmt.Fprintln(os.Stderr, msg.GetMessage())
+		require.NoError(t, cluster.Health(ctx))
 	}
 }
