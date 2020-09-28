@@ -34,6 +34,7 @@ func main() {
 	flag.Var(&options.RegistryMirrors, "registry-mirrors", "registry mirrors to use")
 	flag.StringVar(&options.TalosKernelURL, "talos-kernel-url", options.TalosKernelURL, "Talos kernel image URL for Cluster API Environment")
 	flag.StringVar(&options.TalosInitrdURL, "talos-initrd-url", options.TalosInitrdURL, "Talos initramfs image URL for Cluster API Environment")
+	flag.StringVar(&options.ClusterctlConfigPath, "clusterctl-config", options.ClusterctlConfigPath, "path to the clusterctl config file")
 
 	testing.Init()
 
@@ -93,6 +94,7 @@ func main() {
 		}
 
 		clusterAPI, err := capi.NewManager(ctx, bootstrapCluster, capi.Options{
+			ClusterctlConfigPath:    options.ClusterctlConfigPath,
 			BootstrapProviders:      options.BootstrapProviders,
 			InfrastructureProviders: options.InfrastructureProviders,
 			ControlPlaneProviders:   options.ControlPlaneProviders,

@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -93,8 +92,6 @@ func (cluster *Cluster) Setup(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-
-	log.Printf("cluster.options = %v", cluster.options)
 
 	cluster.stateDir = filepath.Join(defaultStateDir, "clusters")
 
