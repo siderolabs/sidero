@@ -23,7 +23,7 @@ policies:
           - test
           - release
         scopes:
-          - '*'
+          - ^v0.1
   - type: license
     spec:
       skipPaths:

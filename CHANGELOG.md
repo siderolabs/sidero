@@ -1,4 +1,47 @@
 
+<a name="v0.1.0-alpha.2"></a>
+## [v0.1.0-alpha.2](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.1...v0.1.0-alpha.2) (2020-09-28)
+
+### Chore
+
+* update reference to internal registry
+* merge Sfyra into Sidero repository
+* add additional logging for metadata server
+* update namespace to caps-system
+
+### Docs
+
+* update Sfyra docs
+* add a post-pivot/create first workload cluster guide
+* add note about templated cluster manifest
+* add full bootstrapping guide
+
+### Feat
+
+* add reset functionality
+* allow qualifers to be partially equal
+* support environment ref at server and server class level
+* add serverclass as an owner to servers if needed
+
+### Fix
+
+* close file in TFTP handler
+* use proper context in metadata server
+* ensure proper checking of "in-use" status when fetching metadata
+* address panic in PartialEqual
+* revert "update namespace to caps-system"
+* update labels and labelselectors for each app
+* move to update instead of patching server inuse
+
+### Refactor
+
+* extract common ManagmentClient interface, add HTTP API
+
+### Test
+
+* add reset test
+
+
 <a name="v0.1.0-alpha.1"></a>
 ## [v0.1.0-alpha.1](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.0...v0.1.0-alpha.1) (2020-08-25)
 
@@ -21,6 +64,10 @@
 ### Refactor
 
 * move `internal/app` to `app` so that we can expose API
+
+### Release
+
+* **v0.1.0-alpha.1:** prepare release
 
 
 <a name="v0.1.0-alpha.0"></a>
