@@ -11,6 +11,8 @@ ARTIFACTS := _out
 PKGS ?= ./...
 TALOS_RELEASE ?= v0.7.0-alpha.2
 
+SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
+
 BUILD := docker buildx build
 PLATFORM ?= linux/amd64
 PROGRESS ?= auto
@@ -126,11 +128,15 @@ sfyra: ## Build the Sfyra test binary.
 .PHONY: clusterctl-release
 clusterctl-release: release
 	@COMPONENTS_YAML="$(abspath $(ARTIFACTS)/infrastructure-sidero/$(TAG)/infrastructure-components.yaml)" \
+		CLUSTERCTL_CONFIG=$(SFYRA_CLUSTERCTL_CONFIG) \
 		./hack/scripts/generate-clusterctl-config.sh
 
 .PHONY: run-sfyra
 run-sfyra: talos-artifacts clusterctl-release
-	@ARTIFACTS=$(ARTIFACTS) TALOS_RELEASE=$(TALOS_RELEASE) ./hack/scripts/integration-test.sh
+	@ARTIFACTS=$(ARTIFACTS) \
+		CLUSTERCTL_CONFIG=$(SFYRA_CLUSTERCTL_CONFIG) \
+		TALOS_RELEASE=$(TALOS_RELEASE) \
+		./hack/scripts/integration-test.sh
 
 # Development
 

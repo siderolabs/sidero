@@ -20,6 +20,7 @@ type Options struct {
 	TalosInitrdURL string
 	TalosInstaller string
 
+	ClusterctlConfigPath    string
 	BootstrapProviders      []string
 	InfrastructureProviders []string
 	ControlPlaneProviders   []string

@@ -43,5 +43,6 @@ ${PREFIX} "${INTEGRATION_TEST}" \
     -bootstrap-vmlinuz "${BOOTSTRAP_VMLINUZ}" \
     -bootstrap-installer "${BOOTSTRAP_INSTALLER}" \
     -talosctl-path "${TALOSCTL}" \
+    -clusterctl-config "${CLUSTERCTL_CONFIG}" \
     ${REGISTRY_MIRROR_FLAGS} \
     -test.v

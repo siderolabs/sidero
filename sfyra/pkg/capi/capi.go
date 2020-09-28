@@ -43,6 +43,7 @@ type Manager struct {
 
 // Options for the CAPI installer.
 type Options struct {
+	ClusterctlConfigPath    string
 	BootstrapProviders      []string
 	InfrastructureProviders []string
 	ControlPlaneProviders   []string
@@ -57,7 +58,7 @@ func NewManager(ctx context.Context, cluster talos.Cluster, options Options) (*M
 
 	var err error
 
-	clusterAPI.client, err = client.New("")
+	clusterAPI.client, err = client.New(options.ClusterctlConfigPath)
 	if err != nil {
 		return nil, err
 	}

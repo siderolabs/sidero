@@ -2,9 +2,9 @@
 
 set -eou pipefail
 
-mkdir -p ~/.cluster-api
+mkdir -p `dirname "${CLUSTERCTL_CONFIG}"`
 
-cat > ~/.cluster-api/clusterctl.yaml <<EOF
+cat > "${CLUSTERCTL_CONFIG}" <<EOF
 providers:
   - name: "sidero"
     url: "file://${COMPONENTS_YAML}"
