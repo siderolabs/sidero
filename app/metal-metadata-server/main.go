@@ -5,7 +5,7 @@
 package main
 
 import (
-	"encoding/base64"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -16,54 +16,72 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/talos-systems/talos/pkg/config"
 	"github.com/talos-systems/talos/pkg/config/types/v1alpha1"
+	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/cluster-api/util"
+	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-metadata-server/pkg/client"
 )
 
 var (
-	kubeconfig *string
-	port       *string
+	kubeconfigPath *string
+	port           *string
 )
 
-const (
-	capiVersion  = "v1alpha3"
-	metalVersion = "v1alpha1"
-)
+type errorWithCode struct {
+	errorCode int
+	errorObj  error
+}
 
-func throwError(w http.ResponseWriter, code int, err error) {
-	http.Error(w, err.Error(), code)
-	log.Println(err)
+type metadataConfigs struct {
+	client runtimeclient.Client
+}
+
+func throwError(w http.ResponseWriter, ewc errorWithCode) {
+	http.Error(w, ewc.errorObj.Error(), ewc.errorCode)
+	log.Println(ewc.errorObj)
 }
 
 func main() {
-	kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	kubeconfigPath = flag.String("kubeconfig-path", "", "absolute path to the kubeconfig file")
 	port = flag.String("port", "8080", "port to use for serving metadata")
 	flag.Parse()
 
-	http.HandleFunc("/configdata", FetchConfig)
+	k8sClient, err := client.NewClient(kubeconfigPath)
+	if err != nil {
+		log.Fatal(fmt.Errorf("failure talking to kubernetes: %s", err))
+	}
+
+	mm := metadataConfigs{
+		client: k8sClient,
+	}
+
+	http.HandleFunc("/configdata", mm.FetchConfig)
 	log.Fatal(http.ListenAndServe(":"+*port, nil))
 }
 
-func FetchConfig(w http.ResponseWriter, r *http.Request) {
+func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
+	// Parse info out of incoming request
 	ctx := r.Context()
 
 	vals := r.URL.Query()
 
 	uuid := vals.Get("uuid")
 
+	// Throw out requests with no uuid param
 	if len(uuid) == 0 {
 		throwError(
 			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"received metadata request with empty uuid",
-			),
+			errorWithCode{
+				http.StatusInternalServerError,
+				fmt.Errorf(
+					"received metadata request with empty uuid",
+				),
+			},
 		)
 
 		return
@@ -71,88 +89,215 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("received metadata request for uuid: %s", uuid)
 
-	k8sClient, err := client.NewClient(kubeconfig)
-	if err != nil {
+	// Find all MetalMachine resources that have this UUID as a ServerRef in their spec.
+	// It's an error if 0 or more than 1 result is found.
+	matchingMetalMachine, ewc := m.matchingMetalMachine(ctx, uuid)
+	if ewc.errorObj != nil {
 		throwError(
 			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure talking to kubernetes: %s",
-				err,
-			),
+			ewc,
 		)
 
 		return
 	}
 
-	metalMachineGVR := schema.GroupVersionResource{
-		Group:    "infrastructure.cluster.x-k8s.io",
-		Version:  capiVersion,
-		Resource: "metalmachines",
-	}
-
-	capiMachineGVR := schema.GroupVersionResource{
-		Group:    "cluster.x-k8s.io",
-		Version:  capiVersion,
-		Resource: "machines",
-	}
-
-	secretGVR := schema.GroupVersionResource{
-		Version:  "v1",
-		Resource: "secrets",
-	}
-
-	serverGVR := schema.GroupVersionResource{
-		Group:    "metal.sidero.dev",
-		Version:  metalVersion,
-		Resource: "servers",
-	}
-
-	metalMachineList, err := k8sClient.Resource(metalMachineGVR).Namespace("").List(ctx, metav1.ListOptions{})
+	// Given the MetalMachine, find the Machine resource that owns it
+	ownerMachine, err := util.GetOwnerMachine(ctx, m.client, matchingMetalMachine.ObjectMeta)
 	if err != nil {
-		if apierrors.IsNotFound(err) {
-			throwError(
-				w,
-				http.StatusNotFound,
+		throwError(
+			w,
+			errorWithCode{
+				http.StatusInternalServerError,
 				fmt.Errorf(
-					"failure listing metal machines",
+					"failure fetching owner machine from metal machine %s/%s: %s",
+					matchingMetalMachine.GetNamespace(),
+					matchingMetalMachine.GetName(),
+					err,
 				),
-			)
-
-			return
-		}
-
-		throwError(w, http.StatusInternalServerError, fmt.Errorf("failure listing metal machines: %w", err))
+			},
+		)
 
 		return
 	}
 
-	numMatchingMachines := 0
+	// Dig bootstrap secret name out of owner Machine resource and fetch secret data
+	bootstrapSecretName := ownerMachine.Spec.Bootstrap.DataSecretName
 
-	var matchingMetalMachine unstructured.Unstructured
+	if bootstrapSecretName == nil {
+		throwError(
+			w,
+			errorWithCode{
+				http.StatusNotFound,
+				fmt.Errorf(
+					"no dataSecretName present for machine %s/%s",
+					ownerMachine.Namespace,
+					ownerMachine.Name,
+				),
+			},
+		)
 
-	// range through all metalmachines and find all that match our server string
-	for _, metalMachine := range metalMachineList.Items {
-		serverRefString, _, err := unstructured.NestedString(metalMachine.Object, "spec", "serverRef", "name")
-		if err != nil {
-			throwError(w,
+		return
+	}
+
+	decodedData, ewc := m.fetchBootstrapSecret(
+		ctx,
+		types.NamespacedName{
+			Name:      *bootstrapSecretName,
+			Namespace: ownerMachine.Namespace,
+		},
+	)
+	if ewc.errorObj != nil {
+		throwError(
+			w,
+			ewc,
+		)
+
+		return
+	}
+
+	// Get the server resource by the UUID that was passed in.
+	// We do this to fetch any configPatches in the server resource that we need to handle.
+	serverObj := &metalv1alpha1.Server{}
+
+	err = m.client.Get(
+		ctx,
+		types.NamespacedName{
+			Namespace: "",
+			Name:      uuid,
+		},
+		serverObj,
+	)
+	if err != nil {
+		throwError(
+			w,
+			errorWithCode{
 				http.StatusInternalServerError,
 				fmt.Errorf(
-					"failure finding serverRef name from metal machine %s/%s: %s",
-					metalMachine.GetNamespace(),
-					metalMachine.GetName(),
+					"failure fetching server %s: %s",
+					uuid,
 					err,
-				))
+				),
+			},
+		)
+
+		return
+	}
+
+	// Handle patches added to server object
+	if len(serverObj.Spec.ConfigPatches) > 0 {
+		decodedData, ewc = patchConfigs(decodedData, serverObj.Spec.ConfigPatches)
+		if ewc.errorObj != nil {
+			throwError(
+				w,
+				ewc,
+			)
 
 			return
 		}
+	}
 
-		// Check if server ref isn't set. Assuming this is an unstructured thing where it's not an error, just empty.
-		if serverRefString == "" {
+	// Append or add a node label to kubelet extra args.
+	// We must do this so that we can map a given server resource to a k8s node in the workload cluster.
+	decodedData, ewc = labelNodes(decodedData, serverObj.Name)
+	if ewc.errorObj != nil {
+		throwError(
+			w,
+			ewc,
+		)
+
+		return
+	}
+
+	// Finally return config data
+	if _, err = w.Write(decodedData); err != nil {
+		log.Printf("failed to write data: %v", err)
+		return
+	}
+
+	log.Printf("successfully returned metadata for %q", uuid)
+}
+
+// patchConfigs is responsible for applying a set of configPatches to the bootstrap data.
+func patchConfigs(decodedData []byte, patches []metalv1alpha1.ConfigPatches) ([]byte, errorWithCode) {
+	marshalledPatches, err := json.Marshal(patches)
+	if err != nil {
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure marshalling config patches from server: %s", err)}
+	}
+
+	jsonDecodedData, err := yaml.YAMLToJSON(decodedData)
+	if err != nil {
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure converting bootstrap data to json: %s", err)}
+	}
+
+	patch, err := jsonpatch.DecodePatch(marshalledPatches)
+	if err != nil {
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure decoding config patches from server to rfc6902 patch: %s", err)}
+	}
+
+	jsonDecodedData, err = patch.Apply(jsonDecodedData)
+	if err != nil {
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure applying rfc6902 patches to machine config: %s", err)}
+	}
+
+	decodedData, err = yaml.JSONToYAML(jsonDecodedData)
+	if err != nil {
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure converting bootstrap data from json to yaml: %s", err)}
+	}
+
+	return decodedData, errorWithCode{}
+}
+
+// labelNodes is responsible for editing the kubelet extra args such that a given
+// server gets registered with a label containing the UUID of the server resource it's actually running on.
+func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
+	configStruct, err := config.NewFromBytes(decodedData)
+	if err != nil {
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure creating config struct: %s", err)}
+	}
+
+	switch config := configStruct.(type) {
+	case *v1alpha1.Config:
+		if _, ok := config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"]; ok {
+			config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] += fmt.Sprintf(",metal.sidero.dev/uuid=%s", serverName)
+		} else {
+			if config.MachineConfig.MachineKubelet.KubeletExtraArgs == nil {
+				config.MachineConfig.MachineKubelet.KubeletExtraArgs = make(map[string]string)
+			}
+			config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] = fmt.Sprintf("metal.sidero.dev/uuid=%s", serverName)
+		}
+
+		decodedData, err = config.Bytes()
+		if err != nil {
+			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure converting config to bytes: %s", err)}
+		}
+	default:
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unknown config type")}
+	}
+
+	return decodedData, errorWithCode{}
+}
+
+// matchingMetalMachine is responsible for looking up MetalMachines that contain a ServerRef with the UUID that requested metadata.
+func (m *metadataConfigs) matchingMetalMachine(ctx context.Context, serverName string) (v1alpha3.MetalMachine, errorWithCode) {
+	metalMachineList := &v1alpha3.MetalMachineList{}
+
+	err := m.client.List(ctx, metalMachineList)
+	if err != nil {
+		return v1alpha3.MetalMachine{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure listing metal machines: %w", err)}
+	}
+
+	numMatchingMachines := 0
+
+	var matchingMetalMachine v1alpha3.MetalMachine
+
+	// range through all metalmachines and find all that match our server string
+	for _, metalMachine := range metalMachineList.Items {
+		// handle metalmachines where serverref hasn't been updated yet
+		if metalMachine.Spec.ServerRef == nil {
 			continue
 		}
 
-		if serverRefString == uuid {
+		if metalMachine.Spec.ServerRef.Name == serverName {
 			numMatchingMachines++
 
 			matchingMetalMachine = metalMachine
@@ -162,421 +307,35 @@ func FetchConfig(w http.ResponseWriter, r *http.Request) {
 	// bail early if we have multiple matches or no matches
 	switch {
 	case numMatchingMachines > 1:
-		throwError(
-			w,
-			http.StatusNotFound,
-			fmt.Errorf(
-				"multiple matching metal machines for uuid %q, possible orphaned cluster",
-				uuid,
-			),
-		)
+		return v1alpha3.MetalMachine{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("multiple matching metal machines for uuid %q, possible orphaned cluster", serverName)}
 
-		return
 	case numMatchingMachines == 0:
-		throwError(
-			w,
-			http.StatusNotFound,
-			fmt.Errorf(
-				"failure finding matching metal machine for uuid: %q",
-				uuid,
-			),
-		)
-
-		return
+		return v1alpha3.MetalMachine{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure finding matching metal machine for uuid: %q", serverName)}
 	}
 
-	// If we have a match, fetch the bootstrap data from machine resource that owns this metal machine
-	ownerList, present, err := unstructured.NestedSlice(matchingMetalMachine.Object, "metadata", "ownerReferences")
-	if err != nil {
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure fetching ownerRefs from metal machine %s/%s: %s",
-				matchingMetalMachine.GetNamespace(),
-				matchingMetalMachine.GetName(),
-				err,
-			),
-		)
+	return matchingMetalMachine, errorWithCode{}
+}
 
-		return
-	}
+// fetchBootstrapSecret is responsible for fetching a secret that contains the bootstrap data created by our bootstrap provider.
+func (m *metadataConfigs) fetchBootstrapSecret(ctx context.Context, secretNSN types.NamespacedName) ([]byte, errorWithCode) {
+	bootstrapSecretData := &v1.Secret{}
 
-	if !present {
-		throwError(
-			w,
-			http.StatusNotFound,
-			fmt.Errorf(
-				"ownerRefList not found for metalMachine",
-			),
-		)
-
-		return
-	}
-
-	var ownerRef *metav1.OwnerReference
-
-	for _, ownerItem := range ownerList {
-		tempOwnerRef := &metav1.OwnerReference{}
-
-		err = runtime.DefaultUnstructuredConverter.FromUnstructured(ownerItem.(map[string]interface{}), tempOwnerRef)
-		if err != nil {
-			throwError(
-				w,
-				http.StatusInternalServerError,
-				fmt.Errorf("failure converting ownerItem to ownerRef: %s", err),
-			)
-
-			return
-		}
-
-		if tempOwnerRef.APIVersion == "cluster.x-k8s.io/"+capiVersion && tempOwnerRef.Kind == "Machine" {
-			ownerRef = tempOwnerRef
-			break
-		}
-	}
-
-	if ownerRef == nil {
-		throwError(
-			w,
-			http.StatusNotFound,
-			fmt.Errorf(
-				"no ownerrefs for metal machine %s/%s",
-				matchingMetalMachine.GetNamespace(),
-				matchingMetalMachine.GetName(),
-			),
-		)
-
-		return
-	}
-
-	metalMachineNS, present, err := unstructured.NestedString(matchingMetalMachine.Object, "metadata", "namespace")
-	if err != nil {
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure fetching namespace for metal machine %s/%s: %s",
-				matchingMetalMachine.GetNamespace(),
-				matchingMetalMachine.GetName(),
-				err,
-			),
-		)
-
-		return
-	}
-
-	if !present {
-		throwError(
-			w,
-			http.StatusNotFound,
-			fmt.Errorf(
-				"no namespace present for metal machine %s/%s",
-				matchingMetalMachine.GetNamespace(),
-				matchingMetalMachine.GetName(),
-			),
-		)
-
-		return
-	}
-
-	machineData, err := k8sClient.Resource(capiMachineGVR).Namespace(metalMachineNS).Get(ctx, ownerRef.Name, metav1.GetOptions{})
-	if err != nil {
-		if apierrors.IsNotFound(err) {
-			throwError(
-				w,
-				http.StatusNotFound,
-				fmt.Errorf(
-					"owner machine %s/%s not found",
-					metalMachineNS,
-					ownerRef.Name,
-				),
-			)
-
-			return
-		}
-
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure fetching machine based on owner ref %s: %s",
-				ownerRef.Name,
-				err,
-			),
-		)
-
-		return
-	}
-
-	bootstrapSecretName, present, err := unstructured.NestedString(machineData.Object, "spec", "bootstrap", "dataSecretName")
-	if err != nil {
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure fetching bootstrap dataSecretName from machine %s/%s: %s",
-				machineData.GetNamespace(),
-				machineData.GetName(),
-				err,
-			),
-		)
-
-		return
-	}
-
-	if !present {
-		throwError(
-			w,
-			http.StatusNotFound,
-			fmt.Errorf(
-				"no dataSecretName present for machine %s/%s: %s",
-				machineData.GetNamespace(),
-				machineData.GetName(),
-				err,
-			),
-		)
-
-		return
-	}
-
-	bootstrapSecretData, err := k8sClient.Resource(secretGVR).Namespace(metalMachineNS).Get(
+	err := m.client.Get(
 		ctx,
-		bootstrapSecretName,
-		metav1.GetOptions{},
+		secretNSN,
+		bootstrapSecretData,
 	)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			throwError(
-				w,
-				http.StatusNotFound,
-				fmt.Errorf(
-					"bootstrap secret %s/%s not found",
-					metalMachineNS,
-					bootstrapSecretName,
-				),
-			)
-
-			return
+			return nil, errorWithCode{http.StatusNotFound, fmt.Errorf("bootstrap secret %s/%s not found", secretNSN.Namespace, secretNSN.Name)}
 		}
 
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure fetching bootstrap secret data from secret %s/%s: %s",
-				metalMachineNS,
-				bootstrapSecretName,
-				err,
-			),
-		)
-
-		return
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure fetching bootstrap secret data from secret %s/%s: %s", secretNSN.Namespace, secretNSN.Name, err)}
 	}
 
-	bootstrapData, present, err := unstructured.NestedString(bootstrapSecretData.Object, "data", "value")
-	if err != nil {
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure fetching value key from bootstrap secret %s/%s: %s",
-				bootstrapSecretData.GetName(),
-				bootstrapSecretData.GetNamespace(),
-				err,
-			),
-		)
-
-		return
+	if _, ok := bootstrapSecretData.Data["value"]; !ok {
+		return nil, errorWithCode{http.StatusNotFound, fmt.Errorf("value key not found in bootstrap data: %s/%s", secretNSN.Namespace, secretNSN.Name)}
 	}
 
-	if !present {
-		throwError(
-			w,
-			http.StatusNotFound,
-			fmt.Errorf(
-				"no bootstrap data found in value key of secret %s/%s",
-				bootstrapSecretData.GetName(),
-				bootstrapSecretData.GetNamespace(),
-			),
-		)
-
-		return
-	}
-
-	decodedData, err := base64.StdEncoding.DecodeString(bootstrapData)
-	if err != nil {
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure decoding base64 from bootstrap data: %s",
-				err,
-			),
-		)
-
-		return
-	}
-
-	// Convert server uuid to unstructured obj and then to structured obj.
-	serverRef, err := k8sClient.Resource(serverGVR).Get(ctx, uuid, metav1.GetOptions{})
-	if err != nil {
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure fetching server %s: %s",
-				uuid,
-				err,
-			),
-		)
-
-		return
-	}
-
-	serverObj := &metalv1alpha1.Server{}
-
-	err = runtime.DefaultUnstructuredConverter.FromUnstructured(serverRef.UnstructuredContent(), serverObj)
-	if err != nil {
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure converting server to metalv1alpha1.Server type %s: %s",
-				uuid,
-				err,
-			),
-		)
-
-		return
-	}
-
-	// Handle patches added to server object
-	if len(serverObj.Spec.ConfigPatches) > 0 {
-		marshalledPatches, err := json.Marshal(serverObj.Spec.ConfigPatches)
-		if err != nil {
-			throwError(
-				w,
-				http.StatusInternalServerError,
-				fmt.Errorf(
-					"failure marshalling config patches from server %s: %s",
-					serverObj.Name,
-					err,
-				),
-			)
-
-			return
-		}
-
-		jsonDecodedData, err := yaml.YAMLToJSON(decodedData)
-		if err != nil {
-			throwError(
-				w,
-				http.StatusInternalServerError,
-				fmt.Errorf(
-					"failure converting bootstrap data to json: %s",
-					err,
-				),
-			)
-
-			return
-		}
-
-		patch, err := jsonpatch.DecodePatch(marshalledPatches)
-		if err != nil {
-			throwError(
-				w,
-				http.StatusInternalServerError,
-				fmt.Errorf(
-					"failure decoding config patches from server %s to rfc6902 patch: %s",
-					serverObj.Name,
-					err,
-				),
-			)
-
-			return
-		}
-
-		jsonDecodedData, err = patch.Apply(jsonDecodedData)
-		if err != nil {
-			throwError(
-				w,
-				http.StatusInternalServerError,
-				fmt.Errorf(
-					"failure applying rfc6902 patches to machine config: %s",
-					err,
-				),
-			)
-
-			return
-		}
-
-		decodedData, err = yaml.JSONToYAML(jsonDecodedData)
-		if err != nil {
-			throwError(
-				w,
-				http.StatusInternalServerError,
-				fmt.Errorf(
-					"failure converting bootstrap data from json to yaml: %s",
-					err,
-				),
-			)
-
-			return
-		}
-	}
-
-	// Append or add a node label to kubelet extra args
-	configStruct, err := config.NewFromBytes(decodedData)
-	if err != nil {
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"failure creating config struct: %s",
-				err,
-			),
-		)
-
-		return
-	}
-
-	switch config := configStruct.(type) {
-	case *v1alpha1.Config:
-		if _, ok := config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"]; ok {
-			config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] += fmt.Sprintf(",metal.sidero.dev/uuid=%s", serverObj.Name)
-		} else {
-			if config.MachineConfig.MachineKubelet.KubeletExtraArgs == nil {
-				config.MachineConfig.MachineKubelet.KubeletExtraArgs = make(map[string]string)
-			}
-			config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] = fmt.Sprintf("metal.sidero.dev/uuid=%s", serverObj.Name)
-		}
-
-		decodedData, err = config.Bytes()
-		if err != nil {
-			throwError(
-				w,
-				http.StatusInternalServerError,
-				fmt.Errorf(
-					"failure converting config to bytes: %s",
-					err,
-				),
-			)
-
-			return
-		}
-	default:
-		throwError(
-			w,
-			http.StatusInternalServerError,
-			fmt.Errorf(
-				"unknown config type",
-			),
-		)
-	}
-
-	// Finally return config data
-	if _, err = w.Write(decodedData); err != nil {
-		log.Printf("Failed to write data: %v", err)
-	}
+	return bootstrapSecretData.Data["value"], errorWithCode{}
 }
