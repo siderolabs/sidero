@@ -34,6 +34,10 @@ func TestServerReset(ctx context.Context, metalClient client.Client, vmSet *vm.S
 		serverNamesToCheck := []string{}
 
 		for i := range machines.Items {
+			if machines.Items[i].Spec.ServerRef == nil {
+				continue
+			}
+
 			serverNamesToCheck = append(serverNamesToCheck, machines.Items[i].Spec.ServerRef.Name)
 
 			err = metalClient.Delete(ctx, &machines.Items[i])
