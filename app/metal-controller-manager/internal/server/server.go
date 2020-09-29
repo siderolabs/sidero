@@ -72,9 +72,6 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 					Version:      in.GetCpu().GetVersion(),
 				},
 			},
-			Status: metalv1alpha1.ServerStatus{
-				IsClean: true,
-			},
 		}
 
 		if err = c.Create(ctx, obj); err != nil {
