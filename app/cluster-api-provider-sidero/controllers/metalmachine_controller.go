@@ -222,21 +222,6 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 		}
 	}
 
-	mgmtClient, err := metal.NewManagementClient(&serverResource.Spec)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	err = mgmtClient.SetPXE()
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	err = mgmtClient.PowerCycle()
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
 	// Machine is deleted so remove the finalizer.
 	controllerutil.RemoveFinalizer(metalMachine, infrav1.MachineFinalizer)
 
