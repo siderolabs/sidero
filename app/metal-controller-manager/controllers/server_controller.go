@@ -6,6 +6,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -29,7 +30,7 @@ type ServerReconciler struct {
 
 func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
-	_ = r.Log.WithValues("server", req.NamespacedName)
+	log := r.Log.WithValues("server", req.NamespacedName)
 
 	s := metalv1alpha1.Server{}
 
@@ -37,27 +38,60 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	f := func(ready bool) (ctrl.Result, error) {
+	f := func(ready, requeue bool) (ctrl.Result, error) {
 		s.Status.Ready = ready
 
+		result := ctrl.Result{Requeue: requeue}
+
 		if err := r.Status().Update(ctx, &s); err != nil {
-			return ctrl.Result{}, err
+			return result, err
 		}
 
-		return ctrl.Result{}, nil
+		return result, nil
 	}
 
-	mgmtClient, err := metal.NewManagementClient(&s.Spec)
-	if err != nil {
-		return f(false)
+	switch {
+	case s.Status.InUse && s.Status.IsClean:
+		log.Error(fmt.Errorf("server cannot be in use and clean"), "server is in an impossible state", "inUse", s.Status.InUse, "isClean", s.Status.IsClean)
+
+		return f(false, false)
+	case !s.Status.InUse && s.Status.IsClean:
+		return f(true, false)
+	case s.Status.InUse && !s.Status.IsClean:
+		return f(false, false)
+	case !s.Status.InUse && !s.Status.IsClean:
+		mgmtClient, err := metal.NewManagementClient(&s.Spec)
+		if err != nil {
+			log.Error(err, "failed to create management client")
+
+			return f(false, true)
+		}
+
+		_, err = mgmtClient.IsPoweredOn()
+		if err != nil {
+			log.Error(err, "failed to check power state")
+
+			return f(false, true)
+		}
+
+		err = mgmtClient.SetPXE()
+		if err != nil {
+			log.Error(err, "failed to set PXE")
+
+			return f(false, true)
+		}
+
+		err = mgmtClient.PowerCycle()
+		if err != nil {
+			log.Error(err, "failed to power cycle")
+
+			return f(false, true)
+		}
+
+		return f(false, false)
 	}
 
-	_, err = mgmtClient.IsPoweredOn()
-	if err != nil {
-		return f(false)
-	}
-
-	return f(true)
+	return f(false, false)
 }
 
 func (r *ServerReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
