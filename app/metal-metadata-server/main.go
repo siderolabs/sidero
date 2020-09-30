@@ -156,7 +156,7 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the server resource by the UUID that was passed in.
-	// We do this to fetch any configPatches in the server resource that we need to handle.
+	// We do this to fetch serverclass and any configPatches in the server resource that we need to handle.
 	serverObj := &metalv1alpha1.Server{}
 
 	err = m.client.Get(
@@ -181,6 +181,53 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 		)
 
 		return
+	}
+
+	// Given a server object, see if it came from a serverclass (it will have an ownerref)
+	// If so, fetch the serverclass so we can use configPatches from it.
+	serverClassObj := &metalv1alpha1.ServerClass{}
+
+	if len(serverObj.OwnerReferences) > 0 {
+		for _, ownerRef := range serverObj.OwnerReferences {
+			if ownerRef.Kind == "ServerClass" {
+				err = m.client.Get(
+					ctx,
+					types.NamespacedName{
+						Namespace: "",
+						Name:      ownerRef.Name,
+					},
+					serverClassObj,
+				)
+				if err != nil {
+					throwError(
+						w,
+						errorWithCode{
+							http.StatusInternalServerError,
+							fmt.Errorf(
+								"failure fetching serverclass  %s: %s",
+								ownerRef.Name,
+								err,
+							),
+						},
+					)
+
+					return
+				}
+			}
+		}
+	}
+
+	// Handle patches added to serverclass object
+	if serverClassObj != nil && len(serverClassObj.Spec.ConfigPatches) > 0 {
+		decodedData, ewc = patchConfigs(decodedData, serverClassObj.Spec.ConfigPatches)
+		if ewc.errorObj != nil {
+			throwError(
+				w,
+				ewc,
+			)
+
+			return
+		}
 	}
 
 	// Handle patches added to server object

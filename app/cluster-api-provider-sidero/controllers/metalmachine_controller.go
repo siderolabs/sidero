@@ -240,6 +240,14 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 		}
 
 		if err := r.Get(ctx, namespacedName, serverResource); err != nil {
+			// bail early if the server can't be fetch. this likely means we've deleted the server from underneath already.
+			if apierrors.IsNotFound(err) {
+				r.Log.Info("Matching server not found for metalmachine's serverref. Assuming we're orphaned.")
+				controllerutil.RemoveFinalizer(metalMachine, infrav1.MachineFinalizer)
+
+				return ctrl.Result{}, nil
+			}
+
 			return ctrl.Result{}, err
 		}
 

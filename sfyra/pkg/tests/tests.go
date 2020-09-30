@@ -76,6 +76,10 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			TestServerClassDefault(ctx, metalClient, vmSet),
 		},
 		{
+			"TestServerClassPatch",
+			TestServerClassPatch(ctx, metalClient, cluster, capiManager),
+		},
+		{
 			"TestManagementCluster",
 			TestManagementCluster(ctx, metalClient, cluster, vmSet, capiManager),
 		},
