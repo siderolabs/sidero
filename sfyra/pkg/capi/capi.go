@@ -11,21 +11,15 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	cabpt "github.com/talos-systems/cluster-api-bootstrap-provider-talos/api/v1alpha3"
-	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/client-go/kubernetes"
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
-	metal "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
 )
 
@@ -114,29 +108,7 @@ func (clusterAPI *Manager) GetMetalClient(ctx context.Context) (runtimeclient.Cl
 		return nil, err
 	}
 
-	scheme := runtime.NewScheme()
-
-	if err = v1alpha3.AddToScheme(scheme); err != nil {
-		return nil, err
-	}
-
-	if err = cacpt.AddToScheme(scheme); err != nil {
-		return nil, err
-	}
-
-	if err = cabpt.AddToScheme(scheme); err != nil {
-		return nil, err
-	}
-
-	if err = sidero.AddToScheme(scheme); err != nil {
-		return nil, err
-	}
-
-	if err = metal.AddToScheme(scheme); err != nil {
-		return nil, err
-	}
-
-	clusterAPI.runtimeClient, err = runtimeclient.New(config, runtimeclient.Options{Scheme: scheme})
+	clusterAPI.runtimeClient, err = GetMetalClient(config)
 
 	return clusterAPI.runtimeClient, err
 }

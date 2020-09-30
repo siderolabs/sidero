@@ -38,11 +38,10 @@ else
     PREFIX=
 fi
 
-${PREFIX} "${INTEGRATION_TEST}" \
-    -bootstrap-initramfs "${BOOTSTRAP_INITRAMFS}" \
-    -bootstrap-vmlinuz "${BOOTSTRAP_VMLINUZ}" \
-    -bootstrap-installer "${BOOTSTRAP_INSTALLER}" \
-    -talosctl-path "${TALOSCTL}" \
-    -clusterctl-config "${CLUSTERCTL_CONFIG}" \
-    ${REGISTRY_MIRROR_FLAGS} \
-    -test.v
+${PREFIX} "${INTEGRATION_TEST}" test integration \
+    --bootstrap-initramfs "${BOOTSTRAP_INITRAMFS}" \
+    --bootstrap-vmlinuz "${BOOTSTRAP_VMLINUZ}" \
+    --bootstrap-installer "${BOOTSTRAP_INSTALLER}" \
+    --talosctl-path "${TALOSCTL}" \
+    --clusterctl-config "${CLUSTERCTL_CONFIG}" \
+    ${REGISTRY_MIRROR_FLAGS}

@@ -24,6 +24,23 @@ Sequence of steps:
 With `-skip-teardown` flag test leaves the bootstrap cluster running so that next iteration of the test
 can be run without waiting for the boostrap actions to be finished.
 
+## Running manually
+
+Download the Talos artifacts with `make talos-artifacts`.
+Build Sfyra with `make sfyra`.
+
+Run full Sfyra integration test with latest Sidero release (unless overridden in `~/.cluster-api/clusterctl.yaml`):
+
+    sudo -E _out/sfyra test integration
+
+One can also run parts of the test flow:
+
+* setup Talos bootstrap cluster (single node): `sudo -E _out/sfyra bootstrap cluster`
+* install and patch CAPI and providers: `_out/sfyra bootstrap capi`
+* launch a set of VMs ready for PXE booting: `sudo -E _out/sfyra bootstrap servers`
+
+See each command help on how to customize the operations.
+
 ## Running with Talos HEAD
 
 Build the artifacts in Talos:
@@ -32,9 +49,11 @@ Build the artifacts in Talos:
 
 From Sidero directory run:
 
-    (cd ../talos/; sudo -E ../sidero/_out/sfyra -skip-teardown)
+    sudo -E _out/sfyra test integration --skip-teardown --bootstrap-initramfs=../talos/_out/initramfs-amd64.xz --bootstrap-vmlinuz=../talos/_out/vmlinuz-amd64 --talosctl-path=../talos/_out/talosctl-linux-amd64
 
 This command doesn't tear down the cluster after the test run, so it can be re-run any time for quick another round of testing.
+
+## Cleaning up
 
 To destroy Sfyra environment use `talosctl`:
 
