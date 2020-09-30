@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -215,14 +216,14 @@ func (clusterAPI *Manager) patch(ctx context.Context) error {
 	argsPatched = false
 
 	for _, arg := range deployment.Spec.Template.Spec.Containers[1].Args {
-		if arg == "--metrics-addr=127.0.0.1:8080" {
+		if strings.HasPrefix(arg, "--api-endpoint") {
 			argsPatched = true
 		}
 	}
 
 	if !argsPatched {
 		deployment.Spec.Template.Spec.Containers[1].Args = append(deployment.Spec.Template.Spec.Containers[1].Args,
-			fmt.Sprintf("--api-endpoint=%s", clusterAPI.cluster.SideroComponentsIP()), "--metrics-addr=127.0.0.1:8080", "--enable-leader-election")
+			fmt.Sprintf("--api-endpoint=%s", clusterAPI.cluster.SideroComponentsIP()))
 	}
 
 	deployment.Spec.Template.Spec.HostNetwork = true
