@@ -152,7 +152,7 @@ func (cp *ControlPlane) reconcile() error {
 		var metalMachine sidero.MetalMachine
 
 		if err := cp.client.Get(cp.ctx, types.NamespacedName{Namespace: machine.Spec.InfrastructureRef.Namespace, Name: machine.Spec.InfrastructureRef.Name}, &metalMachine); err != nil {
-			return err
+			continue
 		}
 
 		var server metal.Server

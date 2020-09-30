@@ -73,6 +73,22 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			TestMatchServersMetalMachines(ctx, metalClient),
 		},
 		{
+			"TestScaleWorkersUp",
+			TestScaleWorkersUp(ctx, metalClient, vmSet),
+		},
+		{
+			"TestScaleWorkersDown",
+			TestScaleWorkersDown(ctx, metalClient, vmSet),
+		},
+		{
+			"TestScaleControlPlaneUp",
+			TestScaleControlPlaneUp(ctx, metalClient, vmSet),
+		},
+		{
+			"TestScaleControlPlaneDown",
+			TestScaleControlPlaneDown(ctx, metalClient, vmSet),
+		},
+		{
 			"TestServerReset",
 			TestServerReset(ctx, metalClient, vmSet),
 		},

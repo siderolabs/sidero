@@ -256,7 +256,7 @@ func newAgentEnvironment() *metalv1alpha1.Environment {
 		"slab_nomerge",
 		"slub_debug=P",
 		"pti=on",
-		"panic=0",
+		"panic=30",
 		"random.trust_cpu=on",
 		"ima_template=ima-ng",
 		"ima_appraise=fix",

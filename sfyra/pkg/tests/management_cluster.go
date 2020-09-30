@@ -58,8 +58,6 @@ func TestManagementCluster(ctx context.Context, metalClient client.Client, clust
 		lb, err := loadbalancer.NewControlPlane(metalClient, vmSet.BridgeIP(), managementClusterLBPort, "default", managementClusterName, vmSet.Nodes())
 		require.NoError(t, err)
 
-		defer lb.Close()
-
 		os.Setenv("CONTROL_PLANE_ENDPOINT", "localhost")
 		os.Setenv("CONTROL_PLANE_SERVERCLASS", serverClassName)
 		os.Setenv("WORKER_SERVERCLASS", serverClassName)
