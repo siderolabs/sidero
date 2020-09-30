@@ -45,6 +45,20 @@ spec:
           spec:
             description: ServerClassSpec defines the desired state of ServerClass.
             properties:
+              configPatches:
+                items:
+                  properties:
+                    op:
+                      type: string
+                    path:
+                      type: string
+                    value:
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                  - op
+                  - path
+                  type: object
+                type: array
               environmentRef:
                 description: 'ObjectReference contains enough information to let you
                   inspect or modify the referred object. --- New uses of this type

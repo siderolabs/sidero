@@ -19,6 +19,7 @@ type Qualifiers struct {
 type ServerClassSpec struct {
 	EnvironmentRef *corev1.ObjectReference `json:"environmentRef,omitempty"`
 	Qualifiers     Qualifiers              `json:"qualifiers"`
+	ConfigPatches  []ConfigPatches         `json:"configPatches,omitempty"`
 }
 
 // ServerClassStatus defines the observed state of ServerClass.

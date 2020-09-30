@@ -363,8 +363,8 @@ func TestServersDiscoveredIPs(ctx context.Context, metalClient client.Client) Te
 }
 
 // createDummyServers will submit servers with dummy info that are not tied to QEMU VMs.
-// A number of these, based on "count" will be created.
 // These can be targeted by the spec passed in or the label "dummy-server".
+// Dummy servers are patched after creation to ensure they're marked as clean.
 func createDummyServer(ctx context.Context, metalClient client.Client, name string, spec v1alpha1.ServerSpec) (v1alpha1.Server, error) {
 	var server v1alpha1.Server
 
@@ -375,8 +375,32 @@ func createDummyServer(ctx context.Context, metalClient client.Client, name stri
 
 	err := metalClient.Create(ctx, &server)
 	if err != nil {
-		return server, err
+		return server, fmt.Errorf("failed creating dummy server: %w", err)
 	}
 
-	return server, nil
+	return server, retry.Constant(time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+		// refetch dummy server to make sure we're synced up before patching
+		server = v1alpha1.Server{}
+
+		err = metalClient.Get(ctx, types.NamespacedName{Name: name}, &server)
+		if err != nil {
+			return retry.UnexpectedError(fmt.Errorf("failed refetching dummy server: %w", err))
+		}
+
+		patchHelper, err := patch.NewHelper(&server, metalClient)
+		if err != nil {
+			return retry.UnexpectedError(fmt.Errorf("failed creating patch helper for dummy server: %w", err))
+		}
+
+		server.Status.InUse = false
+		server.Status.IsClean = true
+		server.Status.Ready = true
+
+		err = patchHelper.Patch(ctx, &server)
+		if err != nil {
+			return retry.ExpectedError(fmt.Errorf("failed patching dummy server: %w", err))
+		}
+
+		return nil
+	})
 }
