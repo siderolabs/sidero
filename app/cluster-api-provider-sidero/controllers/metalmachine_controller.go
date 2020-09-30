@@ -58,7 +58,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 
 	err = r.Get(ctx, req.NamespacedName, metalMachine)
 	if apierrors.IsNotFound(err) {
-		return ctrl.Result{}, nil
+		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}
 
 	if err != nil {
@@ -67,11 +67,15 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 
 	machine, err := util.GetOwnerMachine(ctx, r.Client, metalMachine.ObjectMeta)
 	if err != nil {
-		return ctrl.Result{}, err
+		r.Log.Error(err, "Failed to get machine")
+
+		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}
 
 	if machine == nil {
-		return ctrl.Result{}, fmt.Errorf("no ownerref for machine %s", metalMachine.ObjectMeta.Name)
+		logger.Info("No ownerref for metalmachine")
+
+		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}
 
 	logger = logger.WithName(fmt.Sprintf("machine=%s", machine.Name))
@@ -84,11 +88,15 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 	logger = logger.WithName(fmt.Sprintf("cluster=%s", cluster.Name))
 
 	if !cluster.Status.InfrastructureReady {
-		return ctrl.Result{}, fmt.Errorf("clusterInfra is not available yet")
+		logger.Error(err, "Cluster infrastructure is not ready", "cluster", cluster.Name)
+
+		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}
 
 	if machine.Spec.Bootstrap.DataSecretName == nil {
-		return ctrl.Result{}, fmt.Errorf("bootstrap secret is not available yet")
+		logger.Info(" Bootstrap secret is not available yet")
+
+		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}
 
 	// Initialize the patch helper
@@ -193,7 +201,9 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 
 	err = r.patchProviderID(ctx, cluster, metalMachine)
 	if err != nil {
-		return ctrl.Result{}, err
+		logger.Info("Failed to set provider ID")
+
+		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}
 
 	metalMachine.Status.Ready = true
@@ -252,7 +262,7 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 	}
 
 	// Fetch server from available list
-	// nb: we added this loop to double check that an available server isn't "in use" because
+	// NB: we added this loop to double check that an available server isn't "in use" because
 	//     we saw raciness between server selection and it being removed from the ServersAvailable list.
 	for _, availServer := range serverClassResource.Status.ServersAvailable {
 		serverObj := &metalv1alpha1.Server{}
@@ -315,10 +325,14 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 		return err
 	}
 
+	label := fmt.Sprintf("metal.sidero.dev/uuid=%s", metalMachine.Spec.ServerRef.Name)
+
+	r.Log.Info("Searching for node", "label", label)
+
 	nodes, err := clientset.CoreV1().Nodes().List(
 		ctx,
 		metav1.ListOptions{
-			LabelSelector: fmt.Sprintf("metal.sidero.dev/uuid=%s", metalMachine.Spec.ServerRef.Name),
+			LabelSelector: label,
 		},
 	)
 	if err != nil {
@@ -334,6 +348,8 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 	}
 
 	providerID := fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name)
+
+	r.Log.Info("Setting provider ID", "id", providerID)
 
 	for _, node := range nodes.Items {
 		node := node

@@ -79,6 +79,8 @@ func TestServerReset(ctx context.Context, metalClient client.Client, vmSet *vm.S
 			return nil
 		})
 
+		// TODO: Wait for machinedeployment to reconcile deleted machine.
+
 		require.NoError(t, err)
 	}
 }

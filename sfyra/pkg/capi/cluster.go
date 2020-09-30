@@ -95,6 +95,14 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 				return nil, err
 			}
 
+			if v1alpha3.MachinePhase(machine.Status.Phase) != v1alpha3.MachinePhaseRunning {
+				continue
+			}
+
+			if metalMachine.Spec.ServerRef == nil {
+				continue
+			}
+
 			nodeUUID := metalMachine.Spec.ServerRef.Name
 
 			for _, node := range vmSet.Nodes() {
@@ -110,6 +118,10 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 	controlPlaneNodes, err := resolveMachinesToIPs(machines)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(controlPlaneNodes) < 1 {
+		return nil, fmt.Errorf("failed to find control plane nodes")
 	}
 
 	if err = metalClient.List(ctx, &machineDeployments, runtimeclient.MatchingLabels{"cluster.x-k8s.io/cluster-name": clusterName}); err != nil {

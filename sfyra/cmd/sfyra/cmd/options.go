@@ -58,7 +58,7 @@ func DefaultOptions() Options {
 
 		TalosKernelURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz-amd64", TalosRelease),
 		TalosInitrdURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs-amd64.xz", TalosRelease),
-		TalosInstaller: fmt.Sprintf("ghcr.io/talos-systems/installer:%s", "v0.7.0-alpha.4-7-gdc6ea74c"), // TODO: revert on new Talos release TalosRelease),
+		TalosInstaller: fmt.Sprintf("ghcr.io/talos-systems/installer:%s", "v0.7.0-alpha.5"),
 
 		BootstrapProviders:      []string{"talos"},
 		InfrastructureProviders: []string{"sidero"},
