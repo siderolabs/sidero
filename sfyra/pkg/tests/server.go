@@ -26,6 +26,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/vm"
 )
 
@@ -195,4 +196,25 @@ func TestServersReady(ctx context.Context, metalClient client.Client) TestFunc {
 			return nil
 		}))
 	}
+}
+
+// createDummyServers will submit servers with dummy info that are not tied to QEMU VMs.
+// A number of these, based on "count" will be created.
+// These can be targeted by the spec passed in or the label "dummy-server".
+
+//nolint: deadcode,unused
+func createDummyServer(ctx context.Context, metalClient client.Client, name string, spec v1alpha1.ServerSpec) (v1alpha1.Server, error) {
+	var server v1alpha1.Server
+
+	server.APIVersion = constants.SideroAPIVersion
+	server.Name = name
+	server.Labels = map[string]string{"dummy-server": ""}
+	server.Spec = spec
+
+	err := metalClient.Create(ctx, &server)
+	if err != nil {
+		return server, err
+	}
+
+	return server, nil
 }
