@@ -31,20 +31,22 @@ import (
 
 // Cluster attaches to the provisioned CAPI cluster and provides talos.Cluster.
 type Cluster struct {
-	name        string
-	endpoints   []string
-	bridgeIP    net.IP
-	client      *talosclient.Client
-	k8sProvider *taloscluster.KubernetesClient
+	name              string
+	controlPlaneNodes []string
+	workerNodes       []string
+	bridgeIP          net.IP
+	client            *talosclient.Client
+	k8sProvider       *taloscluster.KubernetesClient
 }
 
 // NewCluster fetches cluster info from the CAPI state.
 func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterName string, vmSet *vm.Set) (*Cluster, error) {
 	var (
-		cluster      v1alpha3.Cluster
-		controlPlane cacpt.TalosControlPlane
-		machines     v1alpha3.MachineList
-		talosConfig  cabpt.TalosConfig
+		cluster            v1alpha3.Cluster
+		controlPlane       cacpt.TalosControlPlane
+		machines           v1alpha3.MachineList
+		machineDeployments v1alpha3.MachineDeploymentList
+		talosConfig        cabpt.TalosConfig
 	)
 
 	if err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: clusterName}, &cluster); err != nil {
@@ -81,22 +83,59 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 		return nil, err
 	}
 
-	// TODO: endpoints in talosconfig should be filled by Sidero
-	var metalMachine sidero.MetalMachine
+	resolveMachinesToIPs := func(machines v1alpha3.MachineList) ([]string, error) {
+		var endpoints []string
 
-	if err = metalClient.Get(ctx,
-		types.NamespacedName{Namespace: machines.Items[0].Spec.InfrastructureRef.Namespace, Name: machines.Items[0].Spec.InfrastructureRef.Name},
-		&metalMachine); err != nil {
+		for _, machine := range machines.Items {
+			var metalMachine sidero.MetalMachine
+
+			if err = metalClient.Get(ctx,
+				types.NamespacedName{Namespace: machine.Spec.InfrastructureRef.Namespace, Name: machine.Spec.InfrastructureRef.Name},
+				&metalMachine); err != nil {
+				return nil, err
+			}
+
+			nodeUUID := metalMachine.Spec.ServerRef.Name
+
+			for _, node := range vmSet.Nodes() {
+				if node.UUID.String() == nodeUUID {
+					endpoints = append(endpoints, node.PrivateIP.String())
+				}
+			}
+		}
+
+		return endpoints, nil
+	}
+
+	controlPlaneNodes, err := resolveMachinesToIPs(machines)
+	if err != nil {
 		return nil, err
 	}
 
-	nodeUUID := metalMachine.Spec.ServerRef.Name
-
-	for _, node := range vmSet.Nodes() {
-		if node.UUID.String() == nodeUUID {
-			clientConfig.Contexts[clientConfig.Context].Endpoints = append(clientConfig.Contexts[clientConfig.Context].Endpoints, node.PrivateIP.String())
-		}
+	if err = metalClient.List(ctx, &machineDeployments, runtimeclient.MatchingLabels{"cluster.x-k8s.io/cluster-name": clusterName}); err != nil {
+		return nil, err
 	}
+
+	if len(machineDeployments.Items) != 1 {
+		return nil, fmt.Errorf("unexpected number of machine deployments: %d", len(machineDeployments.Items))
+	}
+
+	labelSelector, err = labels.Parse(machineDeployments.Items[0].Status.Selector)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = metalClient.List(ctx, &machines, runtimeclient.MatchingLabelsSelector{Selector: labelSelector}); err != nil {
+		return nil, err
+	}
+
+	workerNodes, err := resolveMachinesToIPs(machines)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: endpoints in talosconfig should be filled by Sidero
+	clientConfig.Contexts[clientConfig.Context].Endpoints = controlPlaneNodes
 
 	var talosClient *talosclient.Client
 
@@ -106,10 +145,11 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 	}
 
 	return &Cluster{
-		name:      clusterName,
-		endpoints: clientConfig.Contexts[clientConfig.Context].Endpoints,
-		bridgeIP:  vmSet.BridgeIP(),
-		client:    talosClient,
+		name:              clusterName,
+		controlPlaneNodes: controlPlaneNodes,
+		workerNodes:       workerNodes,
+		bridgeIP:          vmSet.BridgeIP(),
+		client:            talosClient,
 		k8sProvider: &taloscluster.KubernetesClient{
 			ClientProvider: &taloscluster.ConfigClientProvider{
 				DefaultClient: talosClient,
@@ -120,7 +160,10 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 
 // Health runs the healthcheck for the cluster.
 func (cluster *Cluster) Health(ctx context.Context) error {
-	resp, err := cluster.client.ClusterHealthCheck(talosclient.WithNodes(ctx, cluster.endpoints...), 3*time.Minute, &talosclusterapi.ClusterInfo{})
+	resp, err := cluster.client.ClusterHealthCheck(talosclient.WithNodes(ctx, cluster.controlPlaneNodes[0]), 3*time.Minute, &talosclusterapi.ClusterInfo{
+		ControlPlaneNodes: cluster.controlPlaneNodes,
+		WorkerNodes:       cluster.workerNodes,
+	})
 	if err != nil {
 		return err
 	}
