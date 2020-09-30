@@ -24,6 +24,7 @@ COMMON_ARGS += --build-arg=REGISTRY_AND_USERNAME=$(REGISTRY_AND_USERNAME)
 COMMON_ARGS += --build-arg=TAG=$(TAG)
 COMMON_ARGS += --build-arg=MODULE=$(MODULE)
 COMMON_ARGS += --build-arg=PKGS=$(PKGS)
+COMMON_ARGS += --build-arg=TALOS_RELEASE=$(TALOS_RELEASE)
 
 all: manifests generate cluster-api-provider-sidero metal-controller-manager metal-metadata-server sfyra
 

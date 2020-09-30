@@ -215,7 +215,9 @@ RUN FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -
 
 FROM sfyra-base AS sfyra-build
 WORKDIR /src/sfyra/cmd/sfyra
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /sfyra
+ARG TALOS_RELEASE
+ARG SFYRA_CMD_PKG=github.com/talos-systems/sidero/sfyra/cmd/sfyra/cmd
+RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w -X ${SFYRA_CMD_PKG}.TalosRelease=${TALOS_RELEASE}" -o /sfyra
 RUN chmod +x /sfyra
 
 FROM scratch AS sfyra
