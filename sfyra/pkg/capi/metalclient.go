@@ -8,6 +8,7 @@ import (
 	cabpt "github.com/talos-systems/cluster-api-bootstrap-provider-talos/api/v1alpha3"
 	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
 	"k8s.io/apimachinery/pkg/runtime"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/cluster-api/api/v1alpha3"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
@@ -19,6 +20,10 @@ import (
 // GetMetalClient builds k8s client with schemes required to access all the CAPI/Sidero/Talos components.
 func GetMetalClient(config *rest.Config) (runtimeclient.Client, error) {
 	scheme := runtime.NewScheme()
+
+	if err := clientgoscheme.AddToScheme(scheme); err != nil {
+		return nil, err
+	}
 
 	if err := v1alpha3.AddToScheme(scheme); err != nil {
 		return nil, err

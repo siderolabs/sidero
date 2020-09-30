@@ -18,6 +18,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
 )
 
@@ -40,7 +41,7 @@ func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, clus
 			cmdline.Append("talos.platform", "metal")
 			cmdline.Append("talos.config", fmt.Sprintf("http://%s:9091/configdata?uuid=", cluster.SideroComponentsIP()))
 
-			environment.APIVersion = "metal.sidero.dev/v1alpha1"
+			environment.APIVersion = constants.SideroAPIVersion
 			environment.Name = environmentName
 			environment.Spec.Kernel.URL = kernelURL
 			environment.Spec.Kernel.SHA512 = "" // TODO: add a test

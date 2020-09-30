@@ -19,6 +19,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/vm"
 )
 
@@ -27,21 +28,18 @@ const serverClassName = "default"
 // TestServerClassDefault verifies server class creation.
 func TestServerClassDefault(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
 	return func(t *testing.T) {
-		var serverClass v1alpha1.ServerClass
-
-		if err := metalClient.Get(ctx, types.NamespacedName{Name: serverClassName}, &serverClass); err != nil {
-			if !apierrors.IsNotFound(err) {
-				require.NoError(t, err)
-			}
-
-			serverClass.APIVersion = "metal.sidero.dev/v1alpha1"
-			serverClass.Name = serverClassName
-			serverClass.Spec.Qualifiers.CPU = append(serverClass.Spec.Qualifiers.CPU, v1alpha1.CPUInformation{
-				Manufacturer: "QEMU",
-			})
-
-			require.NoError(t, metalClient.Create(ctx, &serverClass))
+		classSpec := v1alpha1.ServerClassSpec{
+			Qualifiers: v1alpha1.Qualifiers{
+				CPU: []v1alpha1.CPUInformation{
+					{
+						Manufacturer: "QEMU",
+					},
+				},
+			},
 		}
+
+		serverClass, err := createServerClass(ctx, metalClient, serverClassName, classSpec)
+		require.NoError(t, err)
 
 		numNodes := len(vmSet.Nodes())
 
@@ -74,4 +72,25 @@ func TestServerClassDefault(ctx context.Context, metalClient client.Client, vmSe
 
 		assert.Equal(t, expectedUUIDs, actualUUIDs)
 	}
+}
+
+func createServerClass(ctx context.Context, metalClient client.Client, name string, spec v1alpha1.ServerClassSpec) (v1alpha1.ServerClass, error) {
+	var retClass v1alpha1.ServerClass
+
+	if err := metalClient.Get(ctx, types.NamespacedName{Name: name}, &retClass); err != nil {
+		if !apierrors.IsNotFound(err) {
+			return retClass, nil
+		}
+
+		retClass.APIVersion = constants.SideroAPIVersion
+		retClass.Name = name
+		retClass.Spec = spec
+
+		err = metalClient.Create(ctx, &retClass)
+		if err != nil {
+			return retClass, err
+		}
+	}
+
+	return retClass, nil
 }
