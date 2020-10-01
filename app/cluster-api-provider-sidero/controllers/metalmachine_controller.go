@@ -359,14 +359,37 @@ func (r *MetalMachineReconciler) patchServerInUse(ctx context.Context, serverCla
 		return err
 	}
 
-	if serverClass != nil {
-		serverObj.OwnerReferences = []metav1.OwnerReference{
-			*metav1.NewControllerRef(serverClass, metalv1alpha1.GroupVersion.WithKind("ServerClass")),
-		}
+	rollback := func() {
+		// update failed, roll back Status changes
+		serverObj.Status.InUse = false
+
+		r.Status().Update(ctx, serverObj) //nolint: errcheck
 	}
 
-	if err := r.Update(ctx, serverObj); err != nil {
-		return err
+	if serverClass != nil {
+		for {
+			serverObj.OwnerReferences = []metav1.OwnerReference{
+				*metav1.NewControllerRef(serverClass, metalv1alpha1.GroupVersion.WithKind("ServerClass")),
+			}
+
+			err := r.Update(ctx, serverObj)
+			if err == nil {
+				return nil
+			}
+
+			if !apierrors.IsConflict(err) {
+				rollback()
+
+				return err
+			}
+
+			// conflict happened, retry
+			if err = r.Get(ctx, types.NamespacedName{Namespace: serverObj.Namespace, Name: serverObj.Name}, serverObj); err != nil {
+				rollback()
+
+				return err
+			}
+		}
 	}
 
 	return nil
