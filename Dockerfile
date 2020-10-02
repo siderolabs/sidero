@@ -189,7 +189,7 @@ COPY --from=fmt-build /src /
 # The markdownlint target performs linting on Markdown files.
 #
 FROM node:8.16.1-alpine AS lint-markdown
-RUN npm install -g markdownlint-cli
+RUN npm install -g markdownlint-cli@0.23.2
 RUN npm i sentences-per-line
 WORKDIR /src
 COPY --from=base /src .

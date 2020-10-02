@@ -56,9 +56,32 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 		return f(false, false)
 	case !s.Status.InUse && s.Status.IsClean:
+		mgmtClient, err := metal.NewManagementClient(&s.Spec)
+		if err != nil {
+			log.Error(err, "failed to create management client")
+
+			return f(false, true)
+		}
+
+		poweredOn, err := mgmtClient.IsPoweredOn()
+		if err != nil {
+			log.Error(err, "failed to check power state")
+
+			return f(false, true)
+		}
+
+		if poweredOn {
+			err = mgmtClient.PowerOff()
+			if err != nil {
+				log.Error(err, "failed to power off")
+
+				return f(false, true)
+			}
+		}
+
 		return f(true, false)
 	case s.Status.InUse && !s.Status.IsClean:
-		return f(false, false)
+		return f(true, false)
 	case !s.Status.InUse && !s.Status.IsClean:
 		mgmtClient, err := metal.NewManagementClient(&s.Spec)
 		if err != nil {
