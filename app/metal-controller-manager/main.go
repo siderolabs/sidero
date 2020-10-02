@@ -103,6 +103,7 @@ func main() {
 	go func() {
 		if err := tftp.ServeTFTP(); err != nil {
 			setupLog.Error(err, "unable to start TFTP server", "controller", "Environment")
+			os.Exit(1)
 		}
 	}()
 
@@ -114,11 +115,13 @@ func main() {
 				apiEndpoint = endpoint
 			} else {
 				setupLog.Error(fmt.Errorf("no api endpoint found"), "unable to start iPXE server", "controller", "Environment")
+				os.Exit(1)
 			}
 		}
 
 		if err := ipxe.ServeIPXE(apiEndpoint); err != nil {
 			setupLog.Error(err, "unable to start iPXE server", "controller", "Environment")
+			os.Exit(1)
 		}
 	}()
 
@@ -127,6 +130,7 @@ func main() {
 	go func() {
 		if err := server.Serve(); err != nil {
 			setupLog.Error(err, "unable to start API server", "controller", "Environment")
+			os.Exit(1)
 		}
 	}()
 
