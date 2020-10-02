@@ -65,6 +65,10 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			TestManagementCluster(ctx, metalClient, cluster, vmSet, capiManager),
 		},
 		{
+			"TestMatchServersMetalMachines",
+			TestMatchServersMetalMachines(ctx, metalClient),
+		},
+		{
 			"TestServerReset",
 			TestServerReset(ctx, metalClient, vmSet),
 		},
