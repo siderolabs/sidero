@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/talos-systems/go-retry/retry"
 	"k8s.io/apimachinery/pkg/labels"
+	"sigs.k8s.io/cluster-api/util"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	metal "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
@@ -40,7 +41,10 @@ func TestServerReset(ctx context.Context, metalClient client.Client, vmSet *vm.S
 
 			serverNamesToCheck = append(serverNamesToCheck, machines.Items[i].Spec.ServerRef.Name)
 
-			err = metalClient.Delete(ctx, &machines.Items[i])
+			ownerMachine, err := util.GetOwnerMachine(ctx, metalClient, machines.Items[i].ObjectMeta)
+			require.NoError(t, err)
+
+			err = metalClient.Delete(ctx, ownerMachine)
 			require.NoError(t, err)
 		}
 
