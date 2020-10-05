@@ -137,6 +137,9 @@ COPY --from=initramfs-archive /initramfs.xz /initramfs.xz
 FROM scratch AS metal-controller-manager
 COPY --from=docker.io/autonomy/ca-certificates:v0.2.0 / /
 COPY --from=docker.io/autonomy/fhs:v0.2.0 / /
+COPY --from=docker.io/autonomy/musl:ffdacf0 / /
+COPY --from=docker.io/autonomy/libressl:ffdacf0 / /
+COPY --from=docker.io/autonomy/ipmitool:ffdacf0 / /
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe.0
 COPY --from=assets /ipxe.efi /var/lib/sidero/tftp/ipxe.efi
