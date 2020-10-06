@@ -32,9 +32,9 @@ var bootstrapCAPICmd = &cobra.Command{
 
 				RegistryMirrors: options.RegistryMirrors,
 
-				CPUs:   options.CPUs,
-				MemMB:  options.MemMB,
-				DiskGB: options.DiskGB,
+				CPUs:   options.BootstrapCPUs,
+				MemMB:  options.BootstrapMemMB,
+				DiskGB: options.BootstrapDiskGB,
 			})
 			if err != nil {
 				return err

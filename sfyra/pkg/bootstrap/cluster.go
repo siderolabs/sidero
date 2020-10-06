@@ -214,6 +214,7 @@ func (cluster *Cluster) create(ctx context.Context) error {
 				genOptions,
 				generate.WithEndpointList([]string{masterEndpoint}),
 				generate.WithInstallImage(cluster.options.InstallerImage),
+				generate.WithDNSDomain("cluster.local"),
 			),
 		}))
 	if err != nil {

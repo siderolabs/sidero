@@ -31,9 +31,13 @@ type Options struct {
 	ManagementSetName string
 	ManagementNodes   int
 
-	MemMB  int64
-	CPUs   int64
-	DiskGB int64
+	BootstrapMemMB  int64
+	BootstrapCPUs   int64
+	BootstrapDiskGB int64
+
+	ManagementMemMB  int64
+	ManagementCPUs   int64
+	ManagementDiskGB int64
 
 	TalosctlPath string
 }
@@ -47,14 +51,14 @@ var (
 func DefaultOptions() Options {
 	return Options{
 		BootstrapClusterName:    "sfyra",
-		BootstrapTalosVmlinuz:   fmt.Sprintf("_out/%s/vmlinuz", TalosRelease),
-		BootstrapTalosInitramfs: fmt.Sprintf("_out/%s/initramfs.xz", TalosRelease),
-		BootstrapTalosInstaller: fmt.Sprintf("docker.io/autonomy/installer:%s", TalosRelease),
+		BootstrapTalosVmlinuz:   fmt.Sprintf("_out/%s/vmlinuz-amd64", TalosRelease),
+		BootstrapTalosInitramfs: fmt.Sprintf("_out/%s/initramfs-amd64.xz", TalosRelease),
+		BootstrapTalosInstaller: fmt.Sprintf("ghcr.io/talos-systems/installer:%s", TalosRelease),
 		BootstrapCIDR:           "172.24.0.0/24",
 
-		TalosKernelURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz", TalosRelease),
-		TalosInitrdURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs.xz", TalosRelease),
-		TalosInstaller: fmt.Sprintf("docker.io/autonomy/installer:%s", TalosRelease),
+		TalosKernelURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz-amd64", TalosRelease),
+		TalosInitrdURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs-amd64.xz", TalosRelease),
+		TalosInstaller: fmt.Sprintf("ghcr.io/talos-systems/installer:%s", TalosRelease),
 
 		BootstrapProviders:      []string{"talos"},
 		InfrastructureProviders: []string{"sidero"},
@@ -64,9 +68,13 @@ func DefaultOptions() Options {
 		ManagementSetName: "sfyra-management",
 		ManagementNodes:   4,
 
-		MemMB:  2048,
-		CPUs:   2,
-		DiskGB: 4,
+		BootstrapMemMB:  3072,
+		BootstrapCPUs:   2,
+		BootstrapDiskGB: 6,
+
+		ManagementMemMB:  2048,
+		ManagementCPUs:   2,
+		ManagementDiskGB: 6,
 
 		TalosctlPath: fmt.Sprintf("_out/%s/talosctl-linux-amd64", TalosRelease),
 	}
