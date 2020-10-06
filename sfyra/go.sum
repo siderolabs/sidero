@@ -67,6 +67,8 @@ github.com/armon/circbuf v0.0.0-20190214190532-5111143e8da2/go.mod h1:3U/XgcO3hC
 github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6/go.mod h1:grANhF5doyWs3UAsr3K4I6qtAmlQcZDesFNEHPZAzj8=
 github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
 github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
+github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef h1:46PFijGLmAjMPwCCCo7Jf0W6f9slllCkkv7vyc1yOSg=
+github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef/go.mod h1:WaHUgvxTVq04UNunO+XhnAqY/wQc+bxr74GqbsZ/Jqw=
 github.com/aws/aws-sdk-go v1.15.11/go.mod h1:mFuSZ37Z9YOHbQEwBWztmVzqXrEkub65tZoCYDt7FT0=
 github.com/aws/aws-sdk-go v1.15.78/go.mod h1:E3/ieXAlvM0XWO57iftYVDLLvQ824smPP3ATZkfNZeM=
 github.com/beevik/ntp v0.2.0/go.mod h1:hIHWr+l3+/clUnF44zdK+CWW7fO8dR5cIylAQ76NRpg=
@@ -225,6 +227,7 @@ github.com/evanphx/json-patch v4.2.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLi
 github.com/evanphx/json-patch v4.5.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
 github.com/evanphx/json-patch v4.9.0+incompatible h1:kLcOMZeuLAJvL2BPWLMIj5oaZQobrkAqrL+WFZwQses=
 github.com/evanphx/json-patch v4.9.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
+github.com/fatih/color v1.7.0 h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/firecracker-microvm/firecracker-go-sdk v0.20.1-0.20200203221942-7dce86a91e4f/go.mod h1:kW0gxvPpPvMukUxxTO9DrpSlScrtrTDGY3VgjAj/Qwc=
 github.com/firecracker-microvm/firecracker-go-sdk v0.21.0/go.mod h1:zyc9BrKGePpNLbQ5y2ZtdzXEfpMJeHPeFNVpyo0S1WQ=
@@ -515,9 +518,11 @@ github.com/mailru/easyjson v0.7.0/go.mod h1:KAzv3t3aY1NaHWoQz1+4F1ccyAH66Jk7yos7
 github.com/marstr/guid v1.1.0/go.mod h1:74gB1z2wpxxInTG6yaqA7KrtM0NZ+RbrcqDvYHefzho=
 github.com/marten-seemann/qtls v0.2.3/go.mod h1:xzjG7avBwGGbdZ8dTGxlBnLArsVKLvwmjgmPuiQEcYk=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
+github.com/mattn/go-colorable v0.1.2 h1:/bC9yWikZXAL9uJdulbSfyVNIR3n3trXl+v8+1sx8mU=
 github.com/mattn/go-colorable v0.1.2/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
 github.com/mattn/go-isatty v0.0.4/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
 github.com/mattn/go-isatty v0.0.8/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
+github.com/mattn/go-isatty v0.0.12 h1:wuysRhFDzyxgEmMf5xjvJ2M9dZoWAXNNr5LSBS7uHXY=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
 github.com/mattn/go-runewidth v0.0.2/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
 github.com/mattn/go-runewidth v0.0.4/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
@@ -611,8 +616,6 @@ github.com/opencontainers/runtime-spec v1.0.3-0.20200728170252-4d89ac9fbff6/go.m
 github.com/opencontainers/runtime-tools v0.0.0-20181011054405-1d69bd0f9c39/go.mod h1:r3f7wjNzSs2extwzU3Y+6pKfobzPh+kKFJ3ofN+3nfs=
 github.com/opencontainers/selinux v1.6.0/go.mod h1:VVGKuOLlE7v4PJyT6h7mNWvq1rzqiriPsEqVhc+svHE=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
-github.com/particledecay/kconf v1.8.0 h1:DzNwbxaKJ0LW+eOcb1HhyRA9E5ztHn4PSK7uKFEaWp8=
-github.com/particledecay/kconf v1.8.0/go.mod h1:6jID/ajM4EB9aevfPTwKM61xWYu4zE1mYT6MthQscmU=
 github.com/pborman/uuid v0.0.0-20150603214016-ca53cad383ca/go.mod h1:VyrYX9gd7irzKovcSS6BIIEwPRkP2Wm2m9ufcdFSJ34=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
@@ -675,8 +678,6 @@ github.com/rogpeppe/go-charset v0.0.0-20190617161244-0dc95cdf6f31/go.mod h1:qgYe
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.5.0/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
 github.com/rs/xid v1.2.1/go.mod h1:+uKXf+4Djp6Md1KODXJxgGQPKngRmWyn10oCKFzNHOQ=
-github.com/rs/zerolog v1.17.2 h1:RMRHFw2+wF7LO0QqtELQwo8hqSmqISyCJeFeAAuWcRo=
-github.com/rs/zerolog v1.17.2/go.mod h1:9nvC1axdVrAHcu/s9taAVfBuIdTZLVQmKQyvrUjF5+I=
 github.com/russross/blackfriday v0.0.0-20170610170232-067529f716f4/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
@@ -759,6 +760,8 @@ github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.4
 github.com/talos-systems/crypto v0.2.0 h1:UwT8uhJ0eDlklY0vYwo1+LGoFgiqkPqjQnae6j8UNYE=
 github.com/talos-systems/crypto v0.2.0/go.mod h1:KwqG+jANKU1FNQIapmioHQ5fkovY1DJkAqMenjYBGh0=
 github.com/talos-systems/go-blockdevice v0.0.0-20200909151535-b71540f6c398/go.mod h1:z7Wgf5zZUFRiASnjKMoMwYQUr841NK03Pn/RZ4DkF/M=
+github.com/talos-systems/go-blockdevice v0.1.0 h1:KEUqVnsFzLaVSWaLHoilEjJ8HTMG/LZGFMtanxDgHyo=
+github.com/talos-systems/go-blockdevice v0.1.0/go.mod h1:z7Wgf5zZUFRiASnjKMoMwYQUr841NK03Pn/RZ4DkF/M=
 github.com/talos-systems/go-loadbalancer v0.1.0/go.mod h1:D5Qjfz+29WVjONWECZvOkmaLsBb3f5YeWME0u/5HmIc=
 github.com/talos-systems/go-loadbalancer v0.1.1-0.20200918172657-3c8f3471d14e h1:9EwVKo7S/rhB1kINP4xlcB2PtQGehTuPNmslAK6YQtA=
 github.com/talos-systems/go-loadbalancer v0.1.1-0.20200918172657-3c8f3471d14e/go.mod h1:D5Qjfz+29WVjONWECZvOkmaLsBb3f5YeWME0u/5HmIc=
@@ -766,6 +769,8 @@ github.com/talos-systems/go-procfs v0.0.0-20200219015357-57c7311fdd45 h1:FND/Lgz
 github.com/talos-systems/go-procfs v0.0.0-20200219015357-57c7311fdd45/go.mod h1:ATyUGFQIW8OnbnmvqefZWVPgL9g+CAmXHfkgny21xX8=
 github.com/talos-systems/go-retry v0.1.0 h1:O+OeZR54CQ1+ch99p/81Pqi5GqJH6LIu1MTN/N0vd78=
 github.com/talos-systems/go-retry v0.1.0/go.mod h1:HiXQqyVStZ35uSY/MTLWVvQVmC3lIW2MS5VdDaMtoKM=
+github.com/talos-systems/go-retry v0.1.1-0.20200922131245-752f081252cf h1:JzyT28FxRDndO59tFKA1IyGb9uWpJX429PPAfjc0dVQ=
+github.com/talos-systems/go-retry v0.1.1-0.20200922131245-752f081252cf/go.mod h1:HiXQqyVStZ35uSY/MTLWVvQVmC3lIW2MS5VdDaMtoKM=
 github.com/talos-systems/go-smbios v0.0.0-20200219201045-94b8c4e489ee/go.mod h1:HxhrzAoTZ7ed5Z5VvtCvnCIrOxyXDS7V2B5hCetAMW8=
 github.com/talos-systems/grpc-proxy v0.2.0/go.mod h1:sm97Vc/z2cok3pu6ruNeszQej4KDxFrDgfWs4C1mtC4=
 github.com/talos-systems/net v0.1.0/go.mod h1:VreSAyRmxMtqussAHSKMKkJQa1YwBTSVfkmE4Jydam4=
@@ -773,12 +778,12 @@ github.com/talos-systems/net v0.2.0 h1:QJ2ofYboG1Zjew9b+3RAjtLIfL0mIONGuc6/LyO68
 github.com/talos-systems/net v0.2.0/go.mod h1:VreSAyRmxMtqussAHSKMKkJQa1YwBTSVfkmE4Jydam4=
 github.com/talos-systems/talos v0.4.0-alpha.5/go.mod h1:us9WxsoZPKS7R8d2/NIjW6Ot3h2LUUAx6qyenmRy6Ws=
 github.com/talos-systems/talos v0.5.0/go.mod h1:qZ7ygCdmh9SPT1Z+QGN/ZxJw5VJ7KphnJEtlfCwka1Y=
-github.com/talos-systems/talos v0.7.0-alpha.1.0.20200916165852-41ecb826469a h1:RQAWPBAy82azFW71LMAOd7d5V7jd55TXx+7R2ZmKcs0=
-github.com/talos-systems/talos v0.7.0-alpha.1.0.20200916165852-41ecb826469a/go.mod h1:E/Ik6qqjlj5j68PeD3PCrmRyHXseBIPeUNL3WYhbLvU=
+github.com/talos-systems/talos v0.7.0-alpha.4 h1:6etVdl5kQ8qN+3N+uH1GQEUrOe3yAf/FwXhqtbj2uro=
+github.com/talos-systems/talos v0.7.0-alpha.4/go.mod h1:c4qMlVBLA72FQZXkV4IjpvmOM/tl8cLvFhVDZKv7KKU=
 github.com/talos-systems/talos/pkg/machinery v0.0.0-20200817172914-fca19cb8be2e/go.mod h1:Bj+0EE3f8TAzwATsZFzQMxRBiPHDFXwCOCkiYXlum3w=
 github.com/talos-systems/talos/pkg/machinery v0.0.0-20200818212414-6a7cc0264819/go.mod h1:Bj+0EE3f8TAzwATsZFzQMxRBiPHDFXwCOCkiYXlum3w=
-github.com/talos-systems/talos/pkg/machinery v0.0.0-20200916165852-41ecb826469a h1:nVtitb80o7dNmMdDCMAqkiGLnEfEvbd3rLCmAXl90xY=
-github.com/talos-systems/talos/pkg/machinery v0.0.0-20200916165852-41ecb826469a/go.mod h1:Bj+0EE3f8TAzwATsZFzQMxRBiPHDFXwCOCkiYXlum3w=
+github.com/talos-systems/talos/pkg/machinery v0.0.0-20201006184949-3961f835f502 h1:Y62JmL3Ms0gsiAL6/0ug2WEody1czNdZCQ2bnk63Dco=
+github.com/talos-systems/talos/pkg/machinery v0.0.0-20201006184949-3961f835f502/go.mod h1:Oa6kzDfA2SSosSITBXf6XMl/cvSfI330LiceB5wO/Dg=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
@@ -815,7 +820,6 @@ github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yvasiyarov/go-metrics v0.0.0-20140926110328-57bccd1ccd43/go.mod h1:aX5oPXxHm3bOH+xeAttToC8pqch2ScQN/JoXYupl6xs=
 github.com/yvasiyarov/gorelic v0.0.0-20141212073537-a9bba5b9ab50/go.mod h1:NUSPSUX/bi6SeDMUh6brw0nXpxHnc96TguQh0+r/ssA=
 github.com/yvasiyarov/newrelic_platform_go v0.0.0-20140908184405-b21fdbd4370f/go.mod h1:GlGEuHIJweS1mbCqG+7vt2nvWLzLLnRHbXz5JKd/Qbg=
-github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.4/go.mod h1:G5EMThwa9y8QZGBClrRx5EY+Yw9kAhnjy3bSjsnlVTQ=
@@ -1043,7 +1047,6 @@ golang.org/x/tools v0.0.0-20190624190245-7f2218787638/go.mod h1:/rFqwRUd4F7ZHNgw
 golang.org/x/tools v0.0.0-20190624222133-a101b041ded4/go.mod h1:/rFqwRUd4F7ZHNgwSSTFct+R/Kf4OFW1sUzUTQQTgfc=
 golang.org/x/tools v0.0.0-20190628153133-6cdbf07be9d0/go.mod h1:/rFqwRUd4F7ZHNgwSSTFct+R/Kf4OFW1sUzUTQQTgfc=
 golang.org/x/tools v0.0.0-20190816200558-6889da9d5479/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
-golang.org/x/tools v0.0.0-20190828213141-aed303cbaa74/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/tools v0.0.0-20190909214602-067311248421/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/tools v0.0.0-20190911174233-4f2ddba30aff/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/tools v0.0.0-20190920225731-5eefd052ad72/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
@@ -1272,7 +1275,6 @@ k8s.io/kubernetes v1.13.0/go.mod h1:ocZa8+6APFNC2tX1DZASIbocyYT5jHzqFVsY5aoB7Jk=
 k8s.io/utils v0.0.0-20190801114015-581e00157fb1/go.mod h1:sZAwmy6armz5eXlNoLmJcl4F1QuKu7sr+mFQ0byX7Ew=
 k8s.io/utils v0.0.0-20191030222137-2b95a09bc58d/go.mod h1:sZAwmy6armz5eXlNoLmJcl4F1QuKu7sr+mFQ0byX7Ew=
 k8s.io/utils v0.0.0-20191114184206-e782cd3c129f/go.mod h1:sZAwmy6armz5eXlNoLmJcl4F1QuKu7sr+mFQ0byX7Ew=
-k8s.io/utils v0.0.0-20200109141947-94aeca20bf09/go.mod h1:sZAwmy6armz5eXlNoLmJcl4F1QuKu7sr+mFQ0byX7Ew=
 k8s.io/utils v0.0.0-20200229041039-0a110f9eb7ab/go.mod h1:sZAwmy6armz5eXlNoLmJcl4F1QuKu7sr+mFQ0byX7Ew=
 k8s.io/utils v0.0.0-20200324210504-a9aa75ae1b89/go.mod h1:sZAwmy6armz5eXlNoLmJcl4F1QuKu7sr+mFQ0byX7Ew=
 k8s.io/utils v0.0.0-20200414100711-2df71ebbae66/go.mod h1:jPW/WVKK9YHAvNhRxK0md/EJ228hCsBRufyofKtW8HA=

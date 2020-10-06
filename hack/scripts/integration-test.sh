@@ -4,10 +4,6 @@ set -eou pipefail
 
 INTEGRATION_TEST="${ARTIFACTS}/sfyra"
 
-BOOTSTRAP_VMLINUZ="${ARTIFACTS}/${TALOS_RELEASE}/vmlinuz"
-BOOTSTRAP_INITRAMFS="${ARTIFACTS}/${TALOS_RELEASE}/initramfs.xz"
-BOOTSTRAP_INSTALLER="docker.io/autonomy/installer:${TALOS_RELEASE}"
-
 TALOSCTL="${ARTIFACTS}/${TALOS_RELEASE}/talosctl-linux-amd64"
 
 chmod +x "${TALOSCTL}"
@@ -39,9 +35,6 @@ else
 fi
 
 ${PREFIX} "${INTEGRATION_TEST}" test integration \
-    --bootstrap-initramfs "${BOOTSTRAP_INITRAMFS}" \
-    --bootstrap-vmlinuz "${BOOTSTRAP_VMLINUZ}" \
-    --bootstrap-installer "${BOOTSTRAP_INSTALLER}" \
     --talosctl-path "${TALOSCTL}" \
     --clusterctl-config "${CLUSTERCTL_CONFIG}" \
     ${REGISTRY_MIRROR_FLAGS}

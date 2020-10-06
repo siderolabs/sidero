@@ -24,6 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
 )
 
 // EnvironmentReconciler reconciles a Environment object.
@@ -71,17 +72,28 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 	}
 
 	var (
-		assets     = []metalv1alpha1.Asset{env.Spec.Kernel.Asset, env.Spec.Initrd.Asset}
 		conditions = []metalv1alpha1.AssetCondition{}
 		wg         sync.WaitGroup
 		mu         sync.Mutex
 		result     *multierror.Error
 	)
 
-	for _, asset := range assets {
-		asset := asset
+	for _, assetTask := range []struct {
+		BaseName string
+		Asset    metalv1alpha1.Asset
+	}{
+		{
+			BaseName: constants.KernelAsset,
+			Asset:    env.Spec.Kernel.Asset,
+		},
+		{
+			BaseName: constants.InitrdAsset,
+			Asset:    env.Spec.Initrd.Asset,
+		},
+	} {
+		assetTask := assetTask
 
-		file := filepath.Join(envs, filepath.Base(asset.URL))
+		file := filepath.Join(envs, assetTask.BaseName)
 
 		if _, err := os.Stat(file); os.IsNotExist(err) {
 			wg.Add(1)
@@ -89,11 +101,11 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 			go func() {
 				defer wg.Done()
 
-				l.Info("saving asset", "url", asset.URL)
+				l.Info("saving asset", "url", assetTask.Asset.URL)
 
-				if err := save(asset, file); err != nil {
+				if err := save(assetTask.Asset, file); err != nil {
 					condition := metalv1alpha1.AssetCondition{
-						Asset:  asset,
+						Asset:  assetTask.Asset,
 						Status: "False",
 						Type:   "Ready",
 					}
@@ -102,13 +114,13 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 					conditions = append(conditions, condition)
 					mu.Unlock()
 
-					result = multierror.Append(result, fmt.Errorf("error saving %q: %w", asset.URL, err))
+					result = multierror.Append(result, fmt.Errorf("error saving %q: %w", assetTask.Asset.URL, err))
 				}
 
-				l.Info("saved asset", "url", asset.URL)
+				l.Info("saved asset", "url", assetTask.Asset.URL)
 
 				condition := metalv1alpha1.AssetCondition{
-					Asset:  asset,
+					Asset:  assetTask.Asset,
 					Status: "True",
 					Type:   "Ready",
 				}
@@ -129,7 +141,7 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 		ready := false
 
 		for _, condition := range env.Status.Conditions {
-			if asset.URL == condition.URL {
+			if assetTask.Asset.URL == condition.URL {
 				ready = true
 			}
 		}
@@ -138,7 +150,7 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 			l.Info("update not required", "file", file)
 
 			condition := metalv1alpha1.AssetCondition{
-				Asset:  asset,
+				Asset:  assetTask.Asset,
 				Status: "True",
 				Type:   "Ready",
 			}
@@ -158,11 +170,11 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 		go func() {
 			defer wg.Done()
 
-			l.Info("updating asset", "url", asset.URL)
+			l.Info("updating asset", "url", assetTask.Asset.URL)
 
-			if err := save(asset, file); err != nil {
+			if err := save(assetTask.Asset, file); err != nil {
 				condition := metalv1alpha1.AssetCondition{
-					Asset:  asset,
+					Asset:  assetTask.Asset,
 					Status: "False",
 					Type:   "Ready",
 				}
@@ -171,13 +183,13 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 				conditions = append(conditions, condition)
 				mu.Unlock()
 
-				result = multierror.Append(result, fmt.Errorf("error updating %q: %w", asset.URL, err))
+				result = multierror.Append(result, fmt.Errorf("error updating %q: %w", assetTask.Asset.URL, err))
 			}
 
-			l.Info("updated asset", "url", asset.URL)
+			l.Info("updated asset", "url", assetTask.Asset.URL)
 
 			condition := metalv1alpha1.AssetCondition{
-				Asset:  asset,
+				Asset:  assetTask.Asset,
 				Status: "True",
 				Type:   "Ready",
 			}

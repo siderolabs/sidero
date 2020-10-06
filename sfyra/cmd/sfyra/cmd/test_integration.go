@@ -36,9 +36,9 @@ var testIntegrationCmd = &cobra.Command{
 
 				RegistryMirrors: options.RegistryMirrors,
 
-				CPUs:   options.CPUs,
-				MemMB:  options.MemMB,
-				DiskGB: options.DiskGB,
+				CPUs:   options.BootstrapCPUs,
+				MemMB:  options.BootstrapMemMB,
+				DiskGB: options.BootstrapDiskGB,
 			})
 			if err != nil {
 				return err
@@ -60,9 +60,9 @@ var testIntegrationCmd = &cobra.Command{
 
 				TalosctlPath: options.TalosctlPath,
 
-				CPUs:   options.CPUs,
-				MemMB:  options.MemMB,
-				DiskGB: options.DiskGB,
+				CPUs:   options.ManagementCPUs,
+				MemMB:  options.ManagementMemMB,
+				DiskGB: options.ManagementDiskGB,
 			})
 			if err != nil {
 				return err

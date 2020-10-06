@@ -9,7 +9,7 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 PKGS ?= ./...
-TALOS_RELEASE ?= v0.7.0-alpha.2
+TALOS_RELEASE ?= v0.7.0-alpha.4
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
@@ -117,7 +117,7 @@ $(ARTIFACTS)/$(TALOS_RELEASE)/%:
 	@curl -L -o "$(ARTIFACTS)/$(TALOS_RELEASE)/$*" "https://github.com/talos-systems/talos/releases/download/$(TALOS_RELEASE)/$*"
 
 .PHONY: $(ARTIFACTS)/$(TALOS_RELEASE)
-$(ARTIFACTS)/$(TALOS_RELEASE): $(ARTIFACTS)/$(TALOS_RELEASE)/vmlinuz $(ARTIFACTS)/$(TALOS_RELEASE)/initramfs.xz $(ARTIFACTS)/$(TALOS_RELEASE)/talosctl-linux-amd64
+$(ARTIFACTS)/$(TALOS_RELEASE): $(ARTIFACTS)/$(TALOS_RELEASE)/vmlinuz-amd64 $(ARTIFACTS)/$(TALOS_RELEASE)/initramfs-amd64.xz $(ARTIFACTS)/$(TALOS_RELEASE)/talosctl-linux-amd64
 
 .PHONY: talos-artifacts
 talos-artifacts: $(ARTIFACTS)/$(TALOS_RELEASE)

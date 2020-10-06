@@ -36,8 +36,8 @@ chain ipxe?uuid=${uuid}&mac=${mac:hexhyp}&domain=${domain}&hostname=${hostname}&
 `
 
 var ipxeTemplate = template.Must(template.New("iPXE config").Parse(`#!ipxe
-kernel /env/{{ .Env.Name }}/vmlinuz {{range $arg := .Env.Spec.Kernel.Args}} {{$arg}}{{end}}
-initrd /env/{{ .Env.Name }}/initramfs.xz
+kernel /env/{{ .Env.Name }}/{{ .KernelAsset }} {{range $arg := .Env.Spec.Kernel.Args}} {{$arg}}{{end}}
+initrd /env/{{ .Env.Name }}/{{ .InitrdAsset }}
 boot
 `))
 
@@ -115,9 +115,13 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	args := struct {
-		Env *metalv1alpha1.Environment
+		Env         *metalv1alpha1.Environment
+		KernelAsset string
+		InitrdAsset string
 	}{
-		Env: env,
+		Env:         env,
+		KernelAsset: constants.KernelAsset,
+		InitrdAsset: constants.InitrdAsset,
 	}
 
 	var buf bytes.Buffer

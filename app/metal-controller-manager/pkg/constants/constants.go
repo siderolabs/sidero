@@ -7,4 +7,7 @@ package constants
 const (
 	DataDirectory    = "/var/lib/sidero"
 	AgentEndpointArg = "sidero.endpoint"
+
+	KernelAsset = "vmlinuz"
+	InitrdAsset = "initramfs.xz"
 )
