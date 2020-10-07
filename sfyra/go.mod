@@ -5,7 +5,6 @@ go 1.14
 replace github.com/talos-systems/sidero => ../
 
 require (
-	github.com/go-logr/logr v0.2.1-0.20200730175230-ee2de8da5be6 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.6.1
 	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.3
