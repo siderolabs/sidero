@@ -125,6 +125,7 @@ func TestServerPatch(ctx context.Context, metalClient client.Client, talosInstal
 				"console=ttyS0",
 				"reboot=k",
 				"panic=1",
+				"talos.shutdown=halt",
 			},
 		}
 		installPatch := configPatchToJSON(t, &installConfig)
