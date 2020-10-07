@@ -14,8 +14,8 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch"
 	"github.com/ghodss/yaml"
-	"github.com/talos-systems/talos/pkg/config"
-	"github.com/talos-systems/talos/pkg/config/types/v1alpha1"
+	"github.com/talos-systems/talos/pkg/machinery/config/configloader"
+	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -250,14 +250,19 @@ func patchConfigs(decodedData []byte, patches []metalv1alpha1.ConfigPatches) ([]
 // labelNodes is responsible for editing the kubelet extra args such that a given
 // server gets registered with a label containing the UUID of the server resource it's actually running on.
 func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
-	configStruct, err := config.NewFromBytes(decodedData)
+	configProvider, err := configloader.NewFromBytes(decodedData)
 	if err != nil {
 		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure creating config struct: %s", err)}
 	}
 
-	switch config := configStruct.(type) {
-	case *v1alpha1.Config:
-		if _, ok := config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"]; ok {
+	switch configProvider.Version() {
+	case "v1alpha1":
+		config, ok := configProvider.(*v1alpha1.Config)
+		if !ok {
+			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unable to case config")}
+		}
+
+		if _, ok = config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"]; ok {
 			config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] += fmt.Sprintf(",metal.sidero.dev/uuid=%s", serverName)
 		} else {
 			if config.MachineConfig.MachineKubelet.KubeletExtraArgs == nil {
