@@ -64,7 +64,7 @@ var loadbalancerCreateCmd = &cobra.Command{
 				return err
 			}
 
-			lb, err := loadbalancer.NewControlPlane(metalClient, managementSet.BridgeIP(), lbPort, "default", clusterName, managementSet.Nodes())
+			lb, err := loadbalancer.NewControlPlane(metalClient, managementSet.BridgeIP(), lbPort, "default", clusterName, managementSet.Nodes(), true)
 			if err != nil {
 				return err
 			}

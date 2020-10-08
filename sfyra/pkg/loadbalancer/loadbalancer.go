@@ -48,7 +48,7 @@ type ControlPlane struct {
 }
 
 // NewControlPlane initializes new control plane load balancer.
-func NewControlPlane(client client.Client, address net.IP, port int, clusterNamespace, clusterName string, nodes []provision.NodeInfo) (*ControlPlane, error) {
+func NewControlPlane(client client.Client, address net.IP, port int, clusterNamespace, clusterName string, nodes []provision.NodeInfo, verboseLog bool) (*ControlPlane, error) {
 	cp := ControlPlane{
 		client:           client,
 		clusterNamespace: clusterNamespace,
@@ -69,8 +69,10 @@ func NewControlPlane(client client.Client, address net.IP, port int, clusterName
 
 	cp.endpoint = net.JoinHostPort(address.String(), strconv.Itoa(port))
 
-	// send logs to /dev/null
-	cp.lb.Logger = log.New(ioutil.Discard, "", 0)
+	if !verboseLog {
+		// send logs to /dev/null
+		cp.lb.Logger = log.New(ioutil.Discard, "", 0)
+	}
 
 	// create route without any upstreams yet
 	if err := cp.lb.AddRoute(cp.endpoint, nil); err != nil {
