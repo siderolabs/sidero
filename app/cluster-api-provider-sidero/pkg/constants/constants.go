@@ -4,6 +4,9 @@
 
 package constants
 
+import "time"
+
 const (
-	ProviderID = "sidero"
+	ProviderID          = "sidero"
+	DefaultRequeueAfter = time.Second * 20
 )

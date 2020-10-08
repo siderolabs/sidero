@@ -21,6 +21,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	infrav1 "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
+	"github.com/talos-systems/sidero/app/cluster-api-provider-sidero/pkg/constants"
 )
 
 // MetalClusterReconciler reconciles a MetalCluster object.
@@ -62,7 +63,7 @@ func (r *MetalClusterReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 
 	if cluster == nil {
 		log.Info("Cluster Controller has not yet set OwnerRef")
-		return ctrl.Result{}, fmt.Errorf("no ownerref for cluster %s", metalCluster.ObjectMeta.Name)
+		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}
 
 	log = log.WithName(fmt.Sprintf("cluster=%s", cluster.Name))
