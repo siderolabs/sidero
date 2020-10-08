@@ -44,8 +44,11 @@ func newServerFilter(sl *metalv1alpha1.ServerList) serverFilter {
 		items: make(map[string]metalv1alpha1.Server),
 	}
 
+	// Add all servers to serverclass, but only if they've been accepted first
 	for _, server := range sl.Items {
-		newSF.items[server.Name] = server
+		if server.Spec.Accepted {
+			newSF.items[server.Name] = server
+		}
 	}
 
 	return newSF
@@ -155,7 +158,7 @@ func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		return ctrl.Result{}, fmt.Errorf("unable to get serverclass: %w", err)
 	}
 
-	// Create serverResults struct and seed items with all known servers
+	// Create serverResults struct and seed items with all known, accepted servers
 	results := newServerFilter(sl)
 
 	// Filter servers down based on qualifiers

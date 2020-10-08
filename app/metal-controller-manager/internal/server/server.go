@@ -27,6 +27,7 @@ const (
 
 type server struct {
 	api.UnimplementedAgentServer
+	autoAccept bool
 }
 
 // CreateServer implements api.AgentServer.
@@ -71,6 +72,7 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 					Manufacturer: in.GetCpu().GetManufacturer(),
 					Version:      in.GetCpu().GetVersion(),
 				},
+				Accepted: s.autoAccept,
 			},
 		}
 
@@ -83,7 +85,9 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 
 	resp := &api.CreateServerResponse{}
 
-	if !obj.Status.IsClean {
+	// Only return a wipe directive is the server is not clean *AND* it has been accepted.
+	// This avoids the possibility of a random device PXE booting against us, registering, then getting blown away.
+	if !obj.Status.IsClean && obj.Spec.Accepted {
 		log.Printf("Server %q needs wipe", obj.Name)
 
 		resp.Wipe = true
@@ -123,7 +127,7 @@ func (s *server) MarkServerAsWiped(ctx context.Context, in *api.MarkServerAsWipe
 	return resp, nil
 }
 
-func Serve() error {
+func Serve(autoAccept bool) error {
 	lis, err := net.Listen("tcp", ":"+Port)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
@@ -131,7 +135,7 @@ func Serve() error {
 
 	s := grpc.NewServer()
 
-	api.RegisterAgentServer(s, &server{})
+	api.RegisterAgentServer(s, &server{autoAccept: autoAccept})
 
 	if err := s.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)

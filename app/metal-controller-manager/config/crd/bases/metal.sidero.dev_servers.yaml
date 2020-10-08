@@ -17,12 +17,16 @@ spec:
   scope: Cluster
   versions:
   - additionalPrinterColumns:
+    - description: indicates if the server is accepted
+      jsonPath: .spec.accepted
+      name: Accepted
+      type: boolean
     - description: indicates that the server has been allocated
       jsonPath: .status.inUse
       name: Allocated
       type: boolean
     - description: indicates if the server is clean or not
-      jsonPath: .status.isClean,
+      jsonPath: .status.isClean
       name: Clean
       type: boolean
     name: v1alpha1
@@ -45,6 +49,8 @@ spec:
           spec:
             description: ServerSpec defines the desired state of Server.
             properties:
+              accepted:
+                type: boolean
               bmc:
                 description: BMC defines data about how to talk to the node via ipmitool.
                 properties:
@@ -163,6 +169,8 @@ spec:
                   version:
                     type: string
                 type: object
+            required:
+            - accepted
             type: object
           status:
             description: ServerStatus defines the observed state of Server.
