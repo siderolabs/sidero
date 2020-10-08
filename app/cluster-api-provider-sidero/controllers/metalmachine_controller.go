@@ -129,6 +129,11 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 			return ctrl.Result{}, err
 		}
 
+		// Handles the case of users specifying a server ref directly and pointing to a non-accepted server
+		if !serverResource.Spec.Accepted {
+			return ctrl.Result{}, fmt.Errorf("specified serverref is a non-accepted server")
+		}
+
 		// Fetch the serverclass if it exists so we can ensure the server has it as an owner ref.
 		var serverClassResource *metalv1alpha1.ServerClass
 		if metalMachine.Spec.ServerClassRef != nil {

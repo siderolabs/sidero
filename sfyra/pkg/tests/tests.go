@@ -49,6 +49,10 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			TestServerPatch(ctx, metalClient, options.InstallerImage, options.RegistryMirrors),
 		},
 		{
+			"TestServerAcceptance",
+			TestServerAcceptance(ctx, metalClient, vmSet),
+		},
+		{
 			"TestServersReady",
 			TestServersReady(ctx, metalClient),
 		},

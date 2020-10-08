@@ -21,6 +21,7 @@ import (
 	talosconfig "github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1"
 	"gopkg.in/yaml.v3"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -178,6 +179,86 @@ func TestServerPatch(ctx context.Context, metalClient client.Client, talosInstal
 	}
 }
 
+// TestServerAcceptance makes sure the accepted bool works.
+func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+	return func(t *testing.T) {
+		const numDummies = 3
+
+		// create dummy servers to test with
+		dummySpec := v1alpha1.ServerSpec{
+			CPU: &v1alpha1.CPUInformation{
+				Manufacturer: "DummyCPU",
+			},
+		}
+
+		for i := 0; i < numDummies; i++ {
+			serverName := fmt.Sprintf("dummyserver-%s", strconv.Itoa(i))
+			_, err := createDummyServer(ctx, metalClient, serverName, dummySpec)
+			require.NoError(t, err)
+		}
+
+		dummyServers := &v1alpha1.ServerList{}
+
+		labelSelector, err := labels.Parse("dummy-server=")
+		require.NoError(t, err)
+
+		// wait for all the servers to be registered
+		require.NoError(t, retry.Constant(1*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+			err = metalClient.List(ctx, dummyServers, client.MatchingLabelsSelector{Selector: labelSelector})
+			if err != nil {
+				return retry.UnexpectedError(err)
+			}
+
+			if len(dummyServers.Items) != numDummies {
+				return retry.ExpectedError(fmt.Errorf("%d != %d", len(dummyServers.Items), numDummies))
+			}
+
+			return nil
+		}))
+
+		// verify servers originally registered as non-accepted
+		acceptedServers := []v1alpha1.Server{}
+
+		for _, server := range dummyServers.Items {
+			if server.Spec.Accepted {
+				acceptedServers = append(acceptedServers, server)
+			}
+		}
+
+		assert.Len(t, acceptedServers, 0)
+
+		// patch all servers as accepted
+		for _, server := range dummyServers.Items {
+			server := server
+
+			patchHelper, err := patch.NewHelper(&server, metalClient)
+			require.NoError(t, err)
+
+			server.Spec.Accepted = true
+			require.NoError(t, patchHelper.Patch(ctx, &server))
+		}
+
+		// verify all servers are now accepted
+		require.NoError(t, metalClient.List(ctx, dummyServers, client.MatchingLabelsSelector{Selector: labelSelector}))
+
+		acceptedServers = []v1alpha1.Server{}
+
+		for _, server := range dummyServers.Items {
+			if server.Spec.Accepted {
+				acceptedServers = append(acceptedServers, server)
+			}
+		}
+
+		assert.Len(t, acceptedServers, numDummies)
+
+		// clean up dummies
+		for _, server := range dummyServers.Items {
+			server := server
+			require.NoError(t, metalClient.Delete(ctx, &server))
+		}
+	}
+}
+
 // TestServersReady waits for all the servers to be 'Ready'.
 func TestServersReady(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
@@ -202,8 +283,6 @@ func TestServersReady(ctx context.Context, metalClient client.Client) TestFunc {
 // createDummyServers will submit servers with dummy info that are not tied to QEMU VMs.
 // A number of these, based on "count" will be created.
 // These can be targeted by the spec passed in or the label "dummy-server".
-
-//nolint: deadcode,unused
 func createDummyServer(ctx context.Context, metalClient client.Client, name string, spec v1alpha1.ServerSpec) (v1alpha1.Server, error) {
 	var server v1alpha1.Server
 

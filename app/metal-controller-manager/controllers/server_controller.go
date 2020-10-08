@@ -51,6 +51,8 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	switch {
+	case !s.Spec.Accepted:
+		return f(false, false)
 	case s.Status.InUse && s.Status.IsClean:
 		log.Error(fmt.Errorf("server cannot be in use and clean"), "server is in an impossible state", "inUse", s.Status.InUse, "isClean", s.Status.IsClean)
 

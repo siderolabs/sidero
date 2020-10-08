@@ -96,6 +96,7 @@ type ServerSpec struct {
 	BMC               *BMC                    `json:"bmc,omitempty"`
 	ManagementAPI     *ManagementAPI          `json:"managementApi,omitempty"`
 	ConfigPatches     []ConfigPatches         `json:"configPatches,omitempty"`
+	Accepted          bool                    `json:"accepted"`
 }
 
 // ServerStatus defines the observed state of Server.
@@ -108,8 +109,9 @@ type ServerStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster
+// +kubebuilder:printcolumn:name="Accepted",type="boolean",JSONPath=".spec.accepted",description="indicates if the server is accepted"
 // +kubebuilder:printcolumn:name="Allocated",type="boolean",JSONPath=".status.inUse",description="indicates that the server has been allocated"
-// +kubebuilder:printcolumn:name="Clean",type="boolean",JSONPath=".status.isClean,",description="indicates if the server is clean or not"
+// +kubebuilder:printcolumn:name="Clean",type="boolean",JSONPath=".status.isClean",description="indicates if the server is clean or not"
 
 // Server is the Schema for the servers API.
 type Server struct {
