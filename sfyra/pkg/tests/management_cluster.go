@@ -55,7 +55,7 @@ func TestManagementCluster(ctx context.Context, metalClient client.Client, clust
 
 		nodeCount := int64(1)
 
-		lb, err := loadbalancer.NewControlPlane(metalClient, vmSet.BridgeIP(), managementClusterLBPort, "default", managementClusterName, vmSet.Nodes())
+		lb, err := loadbalancer.NewControlPlane(metalClient, vmSet.BridgeIP(), managementClusterLBPort, "default", managementClusterName, vmSet.Nodes(), false)
 		require.NoError(t, err)
 
 		defer lb.Close()
