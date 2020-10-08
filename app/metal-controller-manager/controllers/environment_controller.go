@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/hashicorp/go-multierror"
+	multierror "github.com/hashicorp/go-multierror"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -95,40 +95,43 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 
 		file := filepath.Join(envs, assetTask.BaseName)
 
-		if _, err := os.Stat(file); os.IsNotExist(err) {
+		setReady := func(ready bool) {
+			status := "False"
+			if ready {
+				status = "True"
+			}
+
+			condition := metalv1alpha1.AssetCondition{
+				Asset:  assetTask.Asset,
+				Status: status,
+				Type:   "Ready",
+			}
+
+			mu.Lock()
+			conditions = append(conditions, condition)
+			mu.Unlock()
+		}
+
+		saveAsset := func(file string) {
 			wg.Add(1)
 
 			go func() {
 				defer wg.Done()
 
-				l.Info("saving asset", "url", assetTask.Asset.URL)
-
-				if err := save(assetTask.Asset, file); err != nil {
-					condition := metalv1alpha1.AssetCondition{
-						Asset:  assetTask.Asset,
-						Status: "False",
-						Type:   "Ready",
-					}
-
-					mu.Lock()
-					conditions = append(conditions, condition)
-					mu.Unlock()
+				if err := save(ctx, assetTask.Asset, file); err != nil {
+					setReady(false)
 
 					result = multierror.Append(result, fmt.Errorf("error saving %q: %w", assetTask.Asset.URL, err))
 				}
 
+				setReady(true)
 				l.Info("saved asset", "url", assetTask.Asset.URL)
-
-				condition := metalv1alpha1.AssetCondition{
-					Asset:  assetTask.Asset,
-					Status: "True",
-					Type:   "Ready",
-				}
-
-				mu.Lock()
-				conditions = append(conditions, condition)
-				mu.Unlock()
 			}()
+		}
+
+		if _, err := os.Stat(file); os.IsNotExist(err) {
+			l.Info("saving asset", "url", assetTask.Asset.URL)
+			saveAsset(file)
 
 			continue
 		}
@@ -148,14 +151,7 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 
 		if ready {
 			l.Info("update not required", "file", file)
-
-			condition := metalv1alpha1.AssetCondition{
-				Asset:  assetTask.Asset,
-				Status: "True",
-				Type:   "Ready",
-			}
-
-			conditions = append(conditions, condition)
+			setReady(true)
 
 			continue
 		}
@@ -166,38 +162,8 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 		// need to update the file using the new URL.
 
 		wg.Add(1)
-
-		go func() {
-			defer wg.Done()
-
-			l.Info("updating asset", "url", assetTask.Asset.URL)
-
-			if err := save(assetTask.Asset, file); err != nil {
-				condition := metalv1alpha1.AssetCondition{
-					Asset:  assetTask.Asset,
-					Status: "False",
-					Type:   "Ready",
-				}
-
-				mu.Lock()
-				conditions = append(conditions, condition)
-				mu.Unlock()
-
-				result = multierror.Append(result, fmt.Errorf("error updating %q: %w", assetTask.Asset.URL, err))
-			}
-
-			l.Info("updated asset", "url", assetTask.Asset.URL)
-
-			condition := metalv1alpha1.AssetCondition{
-				Asset:  assetTask.Asset,
-				Status: "True",
-				Type:   "Ready",
-			}
-
-			mu.Lock()
-			conditions = append(conditions, condition)
-			mu.Unlock()
-		}()
+		l.Info("updating asset", "url", assetTask.Asset.URL)
+		saveAsset(file)
 	}
 
 	wg.Wait()
@@ -215,17 +181,17 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 	return ctrl.Result{}, nil
 }
 
-func save(asset metalv1alpha1.Asset, file string) error {
+func save(ctx context.Context, asset metalv1alpha1.Asset, file string) error {
 	url := asset.URL
 
 	if url == "" {
 		return errors.New("missing URL")
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	requestContext, cancel := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(requestContext, http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
