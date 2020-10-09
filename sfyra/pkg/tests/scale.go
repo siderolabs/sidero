@@ -161,7 +161,7 @@ func scale(ctx context.Context, metalClient client.Client, name string, obj runt
 func verifyClusterHealth(ctx context.Context, metalClient client.Reader, vmSet *vm.Set, t *testing.T) error {
 	t.Log("verifying cluster health")
 
-	cluster, err := capi.NewCluster(ctx, metalClient, managementClusterName, vmSet)
+	cluster, err := capi.NewCluster(ctx, metalClient, managementClusterName, vmSet.BridgeIP())
 	if err != nil {
 		return err
 	}

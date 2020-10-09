@@ -18,6 +18,8 @@ import (
 	"github.com/talos-systems/sidero/sfyra/pkg/vm"
 )
 
+var runTestPattern string
+
 var testIntegrationCmd = &cobra.Command{
 	Use:   "integration",
 	Short: "Run integration test against Sidero.",
@@ -99,6 +101,8 @@ var testIntegrationCmd = &cobra.Command{
 				InstallerImage: options.TalosInstaller,
 
 				RegistryMirrors: options.RegistryMirrors,
+
+				RunTestPattern: runTestPattern,
 			}); !ok {
 				return fmt.Errorf("test failure")
 			}
@@ -124,4 +128,5 @@ func init() {
 	testIntegrationCmd.Flags().StringVar(&options.TalosKernelURL, "talos-kernel-url", options.TalosKernelURL, "Talos kernel image URL for Cluster API Environment")
 	testIntegrationCmd.Flags().StringVar(&options.TalosInitrdURL, "talos-initrd-url", options.TalosInitrdURL, "Talos initramfs image URL for Cluster API Environment")
 	testIntegrationCmd.Flags().StringVar(&options.ClusterctlConfigPath, "clusterctl-config", options.ClusterctlConfigPath, "path to the clusterctl config file")
+	testIntegrationCmd.Flags().StringVar(&runTestPattern, "test.run", "", "tests to run (regular expression)")
 }

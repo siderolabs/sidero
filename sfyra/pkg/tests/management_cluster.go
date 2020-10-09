@@ -55,7 +55,7 @@ func TestManagementCluster(ctx context.Context, metalClient client.Client, clust
 
 		nodeCount := int64(1)
 
-		lb, err := loadbalancer.NewControlPlane(metalClient, vmSet.BridgeIP(), managementClusterLBPort, "default", managementClusterName, vmSet.Nodes(), false)
+		lb, err := loadbalancer.NewControlPlane(metalClient, vmSet.BridgeIP(), managementClusterLBPort, "default", managementClusterName, false)
 		require.NoError(t, err)
 
 		os.Setenv("CONTROL_PLANE_ENDPOINT", "localhost")
@@ -156,7 +156,7 @@ func TestManagementCluster(ctx context.Context, metalClient client.Client, clust
 
 		t.Log("verifying cluster health")
 
-		cluster, err := capi.NewCluster(ctx, metalClient, managementClusterName, vmSet)
+		cluster, err := capi.NewCluster(ctx, metalClient, managementClusterName, vmSet.BridgeIP())
 		require.NoError(t, err)
 
 		require.NoError(t, cluster.Health(ctx))

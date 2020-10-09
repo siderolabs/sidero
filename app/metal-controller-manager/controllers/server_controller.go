@@ -9,7 +9,10 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/reference"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -21,12 +24,14 @@ import (
 // ServerReconciler reconciles a Server object.
 type ServerReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	Log      logr.Logger
+	Scheme   *runtime.Scheme
+	Recorder record.EventRecorder
 }
 
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups="",resources=events,verbs=create
 
 func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
@@ -50,6 +55,11 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return result, nil
 	}
 
+	serverRef, err := reference.GetReference(r.Scheme, &s)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	switch {
 	case !s.Spec.Accepted:
 		return f(false, false)
@@ -61,6 +71,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		mgmtClient, err := metal.NewManagementClient(&s.Spec)
 		if err != nil {
 			log.Error(err, "failed to create management client")
+			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to initialize management client: %s.", err))
 
 			return f(false, true)
 		}
@@ -68,6 +79,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		poweredOn, err := mgmtClient.IsPoweredOn()
 		if err != nil {
 			log.Error(err, "failed to check power state")
+			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", err))
 
 			return f(false, true)
 		}
@@ -76,8 +88,13 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			err = mgmtClient.PowerOff()
 			if err != nil {
 				log.Error(err, "failed to power off")
+				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to power off: %s.", err))
 
 				return f(false, true)
+			}
+
+			if !mgmtClient.IsFake() {
+				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", "Server powered off.")
 			}
 		}
 
@@ -88,6 +105,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		mgmtClient, err := metal.NewManagementClient(&s.Spec)
 		if err != nil {
 			log.Error(err, "failed to create management client")
+			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to initialize management client: %s.", err))
 
 			return f(false, true)
 		}
@@ -95,6 +113,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		_, err = mgmtClient.IsPoweredOn()
 		if err != nil {
 			log.Error(err, "failed to check power state")
+			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", err))
 
 			return f(false, true)
 		}
@@ -102,6 +121,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		err = mgmtClient.SetPXE()
 		if err != nil {
 			log.Error(err, "failed to set PXE")
+			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to set to PXE boot once: %s.", err))
 
 			return f(false, true)
 		}
@@ -109,8 +129,13 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		err = mgmtClient.PowerCycle()
 		if err != nil {
 			log.Error(err, "failed to power cycle")
+			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to power cycle: %s.", err))
 
 			return f(false, true)
+		}
+
+		if !mgmtClient.IsFake() {
+			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", "Server power cycled.")
 		}
 
 		return f(false, false)

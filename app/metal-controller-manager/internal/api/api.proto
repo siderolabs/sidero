@@ -8,6 +8,8 @@ service Agent {
   rpc CreateServer(CreateServerRequest) returns (CreateServerResponse);
   rpc MarkServerAsWiped(MarkServerAsWipedRequest)
       returns (MarkServerAsWipedResponse);
+  rpc ReconcileServerAddresses(ReconcileServerAddressesRequest)
+      returns (ReconcileServerAddressesResponse);
 }
 
 message SystemInformation {
@@ -31,8 +33,20 @@ message CreateServerRequest {
   string hostname = 3;
 }
 
+message Address {
+  string type = 1;
+  string address = 2;
+}
+
 message CreateServerResponse { bool wipe = 1; }
 
 message MarkServerAsWipedRequest { string uuid = 1; }
 
 message MarkServerAsWipedResponse {}
+
+message ReconcileServerAddressesRequest {
+  string uuid = 1;
+  repeated Address address = 2;
+}
+
+message ReconcileServerAddressesResponse {}

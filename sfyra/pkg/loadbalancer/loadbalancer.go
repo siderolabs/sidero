@@ -19,7 +19,7 @@ import (
 
 	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
 	"github.com/talos-systems/go-loadbalancer/loadbalancer"
-	"github.com/talos-systems/talos/pkg/provision"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/cluster-api/api/v1alpha3"
@@ -39,7 +39,6 @@ type ControlPlane struct {
 	prevUpstreams []string
 
 	clusterNamespace, clusterName string
-	nodes                         []provision.NodeInfo
 
 	ctx       context.Context
 	ctxCancel context.CancelFunc
@@ -48,12 +47,11 @@ type ControlPlane struct {
 }
 
 // NewControlPlane initializes new control plane load balancer.
-func NewControlPlane(client client.Client, address net.IP, port int, clusterNamespace, clusterName string, nodes []provision.NodeInfo, verboseLog bool) (*ControlPlane, error) {
+func NewControlPlane(client client.Client, address net.IP, port int, clusterNamespace, clusterName string, verboseLog bool) (*ControlPlane, error) {
 	cp := ControlPlane{
 		client:           client,
 		clusterNamespace: clusterNamespace,
 		clusterName:      clusterName,
-		nodes:            nodes,
 	}
 
 	cp.ctx, cp.ctxCancel = context.WithCancel(context.Background())
@@ -167,11 +165,9 @@ func (cp *ControlPlane) reconcile() error {
 			return err
 		}
 
-		for _, node := range cp.nodes {
-			if node.UUID.String() == server.Name {
-				upstreams = append(upstreams, fmt.Sprintf("%s:6443", node.PrivateIP.String()))
-
-				break
+		for _, address := range server.Status.Addresses {
+			if address.Type == corev1.NodeInternalIP {
+				upstreams = append(upstreams, fmt.Sprintf("%s:6443", address.Address))
 			}
 		}
 	}

@@ -9,12 +9,14 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"time"
 
 	"github.com/talos-systems/go-blockdevice/blockdevice/probe"
 	"github.com/talos-systems/go-procfs/procfs"
 	"github.com/talos-systems/go-smbios/smbios"
+	talosnet "github.com/talos-systems/net"
 	"golang.org/x/sys/unix"
 	"google.golang.org/grpc"
 
@@ -140,6 +142,42 @@ func wipe(endpoint string, s *smbios.Smbios) error {
 	return nil
 }
 
+func reconcileIPs(endpoint string, s *smbios.Smbios, ips []net.IP) error {
+	uuid, err := s.SystemInformation().UUID()
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, endpoint, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	c := api.NewAgentClient(conn)
+
+	addresses := make([]*api.Address, len(ips))
+	for i := range addresses {
+		addresses[i] = &api.Address{
+			Type:    "InternalIP",
+			Address: ips[i].String(),
+		}
+	}
+
+	_, err = c.ReconcileServerAddresses(ctx, &api.ReconcileServerAddressesRequest{
+		Uuid:    uuid.String(),
+		Address: addresses,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func main() {
 	if err := setup(); err != nil {
 		log.Fatal(err)
@@ -194,6 +232,17 @@ func main() {
 		}
 
 		log.Println("Wipe complete")
+	}
+
+	ips, err := talosnet.IPAddrs()
+	if err != nil {
+		log.Println("failed to discover IPs")
+	} else {
+		if err := reconcileIPs(*endpoint, s, ips); err != nil {
+			log.Fatal(err)
+		}
+
+		log.Printf("Reconciled IPs")
 	}
 
 	// nolint: errcheck
