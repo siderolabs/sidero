@@ -17,6 +17,10 @@ spec:
   scope: Cluster
   versions:
   - additionalPrinterColumns:
+    - description: server hostname
+      jsonPath: .spec.hostname
+      name: Hostname
+      type: string
     - description: indicates if the server is accepted
       jsonPath: .spec.accepted
       name: Accepted
@@ -145,6 +149,8 @@ spec:
                     description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
                     type: string
                 type: object
+              hostname:
+                type: string
               managementApi:
                 description: ManagementAPI defines data about how to talk to the node
                   via simple HTTP API.
