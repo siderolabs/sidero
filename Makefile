@@ -121,6 +121,7 @@ $(ARTIFACTS)/$(TALOS_RELEASE): $(ARTIFACTS)/$(TALOS_RELEASE)/vmlinuz-amd64 $(ART
 
 .PHONY: talos-artifacts
 talos-artifacts: $(ARTIFACTS)/$(TALOS_RELEASE)
+	cp talosctl-linux-amd64 $(ARTIFACTS)/$(TALOS_RELEASE)/talosctl-linux-amd64
 
 .PHONY: sfyra
 sfyra: ## Build the Sfyra test binary.
