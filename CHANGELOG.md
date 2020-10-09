@@ -1,4 +1,46 @@
 
+<a name="v0.1.0-alpha.3"></a>
+## [v0.1.0-alpha.3](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.2...v0.1.0-alpha.3) (2020-10-08)
+
+### Chore
+
+* refactor `reconcile` method in `environment_controller.go`
+* introduce RequeueAfter in metalcluster controller
+* remove talos dependency from metadata server
+* update Sfyra for the new Talos release
+
+### Feat
+
+* support server acceptance
+* power down servers !InUse && IsClean
+* ensure servers are clean
+* set servers as dirty by default
+
+### Fix
+
+* add ipmitool to metal-controller-manager
+* exit when port conflicts happen
+* delete machine instead of metalmachine in reset test
+* handle conflicts on server update
+
+### Refactor
+
+* break apart metadata server code
+* split 'sfyra' CLI into multiple subcommands
+
+### Test
+
+* add scale test
+* bump talos for halt & healh check fixes
+* apply talos.shutdown=halt kernel argument
+* break serverclass creation into function and allow dummy servers
+* fix patching for sidero-controller-manager
+* provide list of expected control plane/worker nodes
+* extract `capi.Cluster` implementation
+* use dedicated config for the sfyra tests
+* fix nil pointer panic
+
+
 <a name="v0.1.0-alpha.2"></a>
 ## [v0.1.0-alpha.2](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.1...v0.1.0-alpha.2) (2020-09-28)
 
@@ -36,6 +78,10 @@
 ### Refactor
 
 * extract common ManagmentClient interface, add HTTP API
+
+### Release
+
+* **v0.1.0-alpha.2:** prepare release
 
 ### Test
 
