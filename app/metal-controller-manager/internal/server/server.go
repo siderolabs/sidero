@@ -60,6 +60,7 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 				Name: in.GetSystemInformation().GetUuid(),
 			},
 			Spec: metalv1alpha1.ServerSpec{
+				Hostname: in.GetHostname(),
 				SystemInformation: &metalv1alpha1.SystemInformation{
 					Manufacturer: in.GetSystemInformation().GetManufacturer(),
 					ProductName:  in.GetSystemInformation().GetProductName(),

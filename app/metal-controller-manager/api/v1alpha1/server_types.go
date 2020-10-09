@@ -91,6 +91,7 @@ type ConfigPatches struct {
 // ServerSpec defines the desired state of Server.
 type ServerSpec struct {
 	EnvironmentRef    *corev1.ObjectReference `json:"environmentRef,omitempty"`
+	Hostname          string                  `json:"hostname,omitempty"`
 	SystemInformation *SystemInformation      `json:"system,omitempty"`
 	CPU               *CPUInformation         `json:"cpu,omitempty"`
 	BMC               *BMC                    `json:"bmc,omitempty"`
@@ -109,6 +110,7 @@ type ServerStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster
+// +kubebuilder:printcolumn:name="Hostname",type="string",JSONPath=".spec.hostname",description="server hostname"
 // +kubebuilder:printcolumn:name="Accepted",type="boolean",JSONPath=".spec.accepted",description="indicates if the server is accepted"
 // +kubebuilder:printcolumn:name="Allocated",type="boolean",JSONPath=".status.inUse",description="indicates that the server has been allocated"
 // +kubebuilder:printcolumn:name="Clean",type="boolean",JSONPath=".status.isClean",description="indicates if the server is clean or not"
