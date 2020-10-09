@@ -25,3 +25,7 @@ func (fakeClient) SetPXE() error {
 func (fakeClient) IsPoweredOn() (bool, error) {
 	return true, nil
 }
+
+func (fakeClient) IsFake() bool {
+	return true
+}

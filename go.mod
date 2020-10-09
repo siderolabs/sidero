@@ -17,6 +17,7 @@ require (
 	github.com/talos-systems/go-blockdevice v0.1.0
 	github.com/talos-systems/go-procfs v0.0.0-20200219015357-57c7311fdd45
 	github.com/talos-systems/go-smbios v0.0.0-20200219201045-94b8c4e489ee
+	github.com/talos-systems/net v0.2.0
 	github.com/talos-systems/talos v0.7.0-alpha.4
 	github.com/talos-systems/talos/pkg/machinery v0.0.0-20201006184949-3961f835f502
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702

@@ -8,6 +8,7 @@ package tests
 import (
 	"context"
 	"log"
+	"regexp"
 	"testing"
 
 	"github.com/talos-systems/sidero/sfyra/pkg/capi"
@@ -24,6 +25,8 @@ type Options struct {
 	InstallerImage       string
 
 	RegistryMirrors []string
+
+	RunTestPattern string
 }
 
 // Run all the tests.
@@ -35,7 +38,7 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		return false
 	}
 
-	return testing.MainStart(matchStringOnly(func(pat, str string) (bool, error) { return true, nil }), []testing.InternalTest{
+	testList := []testing.InternalTest{
 		{
 			"TestServerRegistration",
 			TestServerRegistration(ctx, metalClient, vmSet),
@@ -55,6 +58,10 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		{
 			"TestServersReady",
 			TestServersReady(ctx, metalClient),
+		},
+		{
+			"TestServersDiscoveredIPs",
+			TestServersDiscoveredIPs(ctx, metalClient),
 		},
 		{
 			"TestEnvironmentDefault",
@@ -92,5 +99,25 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			"TestServerReset",
 			TestServerReset(ctx, metalClient, vmSet),
 		},
-	}, nil, nil).Run() == 0
+	}
+
+	testsToRun := []testing.InternalTest{}
+
+	var re *regexp.Regexp
+
+	if options.RunTestPattern != "" {
+		if re, err = regexp.Compile(options.RunTestPattern); err != nil {
+			log.Printf("run test pattern parse error: %s", err)
+
+			return false
+		}
+	}
+
+	for _, test := range testList {
+		if re == nil || re.MatchString(test.Name) {
+			testsToRun = append(testsToRun, test)
+		}
+	}
+
+	return testing.MainStart(matchStringOnly(func(pat, str string) (bool, error) { return true, nil }), testsToRun, nil, nil).Run() == 0
 }

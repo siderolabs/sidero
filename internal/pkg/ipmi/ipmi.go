@@ -85,3 +85,8 @@ func (c *Client) Status() (*goipmi.ChassisStatusResponse, error) {
 func (c *Client) SetPXE() error {
 	return c.IPMIClient.SetBootDevice(goipmi.BootDevicePxe)
 }
+
+// IsFake returns false.
+func (c *Client) IsFake() bool {
+	return false
+}

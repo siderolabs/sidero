@@ -113,3 +113,8 @@ func (c *Client) IsPoweredOn() (bool, error) {
 
 	return status.PoweredOn, nil
 }
+
+// IsFake returns false.
+func (c *Client) IsFake() bool {
+	return false
+}

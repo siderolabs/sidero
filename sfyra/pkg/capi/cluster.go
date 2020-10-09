@@ -20,13 +20,14 @@ import (
 	clientconfig "github.com/talos-systems/talos/pkg/machinery/client/config"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/cluster-api/api/v1alpha3"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
 	sidero "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
-	"github.com/talos-systems/sidero/sfyra/pkg/vm"
+	metal "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 )
 
 // Cluster attaches to the provisioned CAPI cluster and provides talos.Cluster.
@@ -40,7 +41,7 @@ type Cluster struct {
 }
 
 // NewCluster fetches cluster info from the CAPI state.
-func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterName string, vmSet *vm.Set) (*Cluster, error) {
+func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterName string, bridgeIP net.IP) (*Cluster, error) {
 	var (
 		cluster            v1alpha3.Cluster
 		controlPlane       cacpt.TalosControlPlane
@@ -103,11 +104,15 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 				continue
 			}
 
-			nodeUUID := metalMachine.Spec.ServerRef.Name
+			var server metal.Server
 
-			for _, node := range vmSet.Nodes() {
-				if node.UUID.String() == nodeUUID {
-					endpoints = append(endpoints, node.PrivateIP.String())
+			if err := metalClient.Get(ctx, types.NamespacedName{Namespace: metalMachine.Spec.ServerRef.Namespace, Name: metalMachine.Spec.ServerRef.Name}, &server); err != nil {
+				return nil, err
+			}
+
+			for _, address := range server.Status.Addresses {
+				if address.Type == corev1.NodeInternalIP {
+					endpoints = append(endpoints, address.Address)
 				}
 			}
 		}
@@ -160,7 +165,7 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 		name:              clusterName,
 		controlPlaneNodes: controlPlaneNodes,
 		workerNodes:       workerNodes,
-		bridgeIP:          vmSet.BridgeIP(),
+		bridgeIP:          bridgeIP,
 		client:            talosClient,
 		k8sProvider: &taloscluster.KubernetesClient{
 			ClientProvider: &taloscluster.ConfigClientProvider{

@@ -20,6 +20,7 @@ import (
 	"github.com/talos-systems/go-retry/retry"
 	talosconfig "github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1"
 	"gopkg.in/yaml.v3"
+	corev1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
@@ -272,6 +273,37 @@ func TestServersReady(ctx context.Context, metalClient client.Client) TestFunc {
 			for _, server := range servers.Items {
 				if !server.Status.Ready {
 					return retry.ExpectedError(fmt.Errorf("server %q is not ready", server.Name))
+				}
+			}
+
+			return nil
+		}))
+	}
+}
+
+// TestServersDiscoveredIPs waits for all the servers to have an IP address.
+func TestServersDiscoveredIPs(ctx context.Context, metalClient client.Client) TestFunc {
+	return func(t *testing.T) {
+		require.NoError(t, retry.Constant(time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+			servers := v1alpha1.ServerList{}
+
+			if err := metalClient.List(ctx, &servers); err != nil {
+				return retry.UnexpectedError(err)
+			}
+
+			for _, server := range servers.Items {
+				found := false
+
+				for _, address := range server.Status.Addresses {
+					if address.Type == corev1.NodeInternalIP {
+						found = true
+
+						break
+					}
+				}
+
+				if !found {
+					return retry.ExpectedError(fmt.Errorf("server %q doesn't have an internal IP address", server.Name))
 				}
 			}
 

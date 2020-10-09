@@ -8,8 +8,11 @@ import (
 	"flag"
 	"os"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	cgrecord "k8s.io/client-go/tools/record"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -74,6 +77,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	clientset, err := kubernetes.NewForConfig(mgr.GetConfig())
+	if err != nil {
+		setupLog.Error(err, "unable to create k8s client")
+		os.Exit(1)
+	}
+
+	eventBroadcaster := cgrecord.NewBroadcaster()
+	eventBroadcaster.StartRecordingToSink(
+		&typedcorev1.EventSinkImpl{
+			Interface: clientset.CoreV1().Events(""),
+		})
+
+	recorder := eventBroadcaster.NewRecorder(
+		mgr.GetScheme(),
+		corev1.EventSource{Component: "caps-controller-manager"})
+
 	if webhookPort == 0 {
 		if err = (&controllers.MetalClusterReconciler{
 			Client: mgr.GetClient(),
@@ -85,9 +104,10 @@ func main() {
 		}
 
 		if err = (&controllers.MetalMachineReconciler{
-			Client: mgr.GetClient(),
-			Log:    ctrl.Log.WithName("controllers").WithName("MetalMachine"),
-			Scheme: mgr.GetScheme(),
+			Client:   mgr.GetClient(),
+			Log:      ctrl.Log.WithName("controllers").WithName("MetalMachine"),
+			Scheme:   mgr.GetScheme(),
+			Recorder: recorder,
 		}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: 10}); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "MetalMachine")
 			os.Exit(1)
