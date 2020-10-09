@@ -183,8 +183,8 @@ RUN FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -
 # The fmt target formats the source code.
 #
 FROM base AS fmt-build
-COPY ./sfyra/ ./sfyra/
-RUN gofumports -w .
+ARG MODULE
+RUN gofumports -w -local ${MODULE} .
 #
 FROM scratch AS fmt
 COPY --from=fmt-build /src /
