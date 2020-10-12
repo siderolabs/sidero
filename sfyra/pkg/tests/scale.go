@@ -102,6 +102,10 @@ func scaleWorkers(ctx context.Context, metalClient client.Client, replicas int32
 			return fmt.Errorf("expected %s phase, got %s", v1alpha3.MachineDeploymentPhaseRunning, o.Status.Phase)
 		}
 
+		if o.Status.Replicas != replicas {
+			return fmt.Errorf("expected %d replicas, got %d", replicas, o.Status.Replicas)
+		}
+
 		if o.Status.ReadyReplicas != replicas {
 			return fmt.Errorf("expected %d ready replicas, got %d", replicas, o.Status.ReadyReplicas)
 		}
@@ -123,6 +127,8 @@ func scaleWorkers(ctx context.Context, metalClient client.Client, replicas int32
 }
 
 func scale(ctx context.Context, metalClient client.Client, name string, obj runtime.Object, set, verify ScaleCallBack) error {
+	cleanObj := obj.DeepCopyObject()
+
 	err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: name}, obj)
 	if err != nil {
 		return err
@@ -133,12 +139,16 @@ func scale(ctx context.Context, metalClient client.Client, name string, obj runt
 		return err
 	}
 
-	err = metalClient.Update(ctx, obj)
+	err = metalClient.Update(ctx, obj, &client.UpdateOptions{
+		FieldManager: "sfyra",
+	})
 	if err != nil {
 		return err
 	}
 
 	err = retry.Constant(10*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+		obj = cleanObj.DeepCopyObject()
+
 		err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: name}, obj)
 		if err != nil {
 			return retry.UnexpectedError(err)

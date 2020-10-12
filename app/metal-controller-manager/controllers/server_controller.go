@@ -13,6 +13,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	"sigs.k8s.io/cluster-api/util/conditions"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -31,7 +33,7 @@ type ServerReconciler struct {
 
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups="",resources=events,verbs=create
+// +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
@@ -94,7 +96,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			}
 
 			if !mgmtClient.IsFake() {
-				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", "Server powered off.")
+				r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Management", "Server powered off.")
 			}
 		}
 
@@ -102,6 +104,10 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	case s.Status.InUse && !s.Status.IsClean:
 		return f(true, false)
 	case !s.Status.InUse && !s.Status.IsClean:
+		if conditions.Has(&s, metalv1alpha1.ConditionPowerCycle) && conditions.IsFalse(&s, metalv1alpha1.ConditionPowerCycle) {
+			return f(false, false)
+		}
+
 		mgmtClient, err := metal.NewManagementClient(&s.Spec)
 		if err != nil {
 			log.Error(err, "failed to create management client")
@@ -110,7 +116,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			return f(false, true)
 		}
 
-		_, err = mgmtClient.IsPoweredOn()
+		poweredOn, err := mgmtClient.IsPoweredOn()
 		if err != nil {
 			log.Error(err, "failed to check power state")
 			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", err))
@@ -126,16 +132,32 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			return f(false, true)
 		}
 
-		err = mgmtClient.PowerCycle()
-		if err != nil {
-			log.Error(err, "failed to power cycle")
-			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to power cycle: %s.", err))
+		if poweredOn {
+			err = mgmtClient.PowerCycle()
+			if err != nil {
+				log.Error(err, "failed to power cycle")
+				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to power cycle: %s.", err))
 
-			return f(false, true)
+				return f(false, true)
+			}
+		} else {
+			err = mgmtClient.PowerOn()
+			if err != nil {
+				log.Error(err, "failed to power on")
+				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to power on: %s.", err))
+
+				return f(false, true)
+			}
 		}
 
 		if !mgmtClient.IsFake() {
-			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", "Server power cycled.")
+			if poweredOn {
+				r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Management", "Server power cycled and set to PXE boot once.")
+			} else {
+				r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Management", "Server powered on and set to PXE boot once.")
+			}
+
+			conditions.MarkFalse(&s, metalv1alpha1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, "Server power cycled for wiping.")
 		}
 
 		return f(false, false)

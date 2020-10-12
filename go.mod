@@ -17,6 +17,7 @@ require (
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.4
 	github.com/talos-systems/go-blockdevice v0.1.0
 	github.com/talos-systems/go-procfs v0.0.0-20200219015357-57c7311fdd45
+	github.com/talos-systems/go-retry v0.1.1-0.20200922131245-752f081252cf
 	github.com/talos-systems/go-smbios v0.0.0-20200219201045-94b8c4e489ee
 	github.com/talos-systems/net v0.2.0
 	github.com/talos-systems/talos v0.7.0-alpha.4

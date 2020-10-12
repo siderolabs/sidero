@@ -23,6 +23,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
+	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	controllerclient "sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -123,6 +124,8 @@ func (s *server) MarkServerAsWiped(ctx context.Context, in *api.MarkServerAsWipe
 	}
 
 	obj.Status.IsClean = true
+
+	conditions.MarkTrue(obj, metalv1alpha1.ConditionPowerCycle)
 
 	if err := patchHelper.Patch(ctx, obj); err != nil {
 		return nil, err
