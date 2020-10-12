@@ -178,28 +178,48 @@ func reconcileIPs(endpoint string, s *smbios.Smbios, ips []net.IP) error {
 	return nil
 }
 
+func shutdown(err error) {
+	if err != nil {
+		log.Println(err)
+
+		for i := 10; i >= 0; i-- {
+			log.Printf("rebooting in %d seconds\n", i)
+			time.Sleep(1 * time.Second)
+		}
+	}
+
+	if unix.Reboot(unix.LINUX_REBOOT_CMD_POWER_OFF) == nil {
+		// Wait forever.
+		select {}
+	}
+
+	os.Exit(1)
+}
+
 func main() {
 	if err := setup(); err != nil {
-		log.Fatal(err)
+		shutdown(err)
 	}
 
-	var endpoint *string
-	if endpoint = procfs.ProcCmdline().Get(constants.AgentEndpointArg).First(); endpoint == nil {
-		log.Fatal(fmt.Errorf("no endpoint found"))
+	var endpoint string
+	if found := procfs.ProcCmdline().Get(constants.AgentEndpointArg).First(); found != nil {
+		endpoint = *found
+	} else {
+		shutdown(fmt.Errorf("no endpoint found"))
 	}
 
-	log.Printf("Using %q as API endpoint", *endpoint)
+	log.Printf("Using %q as API endpoint", endpoint)
 
 	log.Println("Reading SMBIOS")
 
 	s, err := smbios.New()
 	if err != nil {
-		log.Fatal(err)
+		shutdown(err)
 	}
 
-	resp, err := create(*endpoint, s)
+	resp, err := create(endpoint, s)
 	if err != nil {
-		log.Fatal(err)
+		shutdown(err)
 	}
 
 	log.Println("Registration complete")
@@ -207,7 +227,7 @@ func main() {
 	if resp.GetWipe() {
 		bds, err := probe.All()
 		if err != nil {
-			log.Fatal(err)
+			shutdown(err)
 		}
 
 		for _, bd := range bds {
@@ -215,20 +235,20 @@ func main() {
 
 			_, err := bd.Device().WriteAt(bytes.Repeat([]byte{0}, 512), 0)
 			if err != nil {
-				log.Fatal(err)
+				shutdown(err)
 			}
 
 			if err := bd.Reset(); err != nil {
-				log.Fatal(err)
+				shutdown(err)
 			}
 
 			if err := bd.Close(); err != nil {
-				log.Fatal(err)
+				shutdown(err)
 			}
 		}
 
-		if err := wipe(*endpoint, s); err != nil {
-			log.Fatal(err)
+		if err := wipe(endpoint, s); err != nil {
+			shutdown(err)
 		}
 
 		log.Println("Wipe complete")
@@ -238,13 +258,12 @@ func main() {
 	if err != nil {
 		log.Println("failed to discover IPs")
 	} else {
-		if err := reconcileIPs(*endpoint, s, ips); err != nil {
-			log.Fatal(err)
+		if err := reconcileIPs(endpoint, s, ips); err != nil {
+			shutdown(err)
 		}
 
 		log.Printf("Reconciled IPs")
 	}
 
-	// nolint: errcheck
-	unix.Reboot(unix.LINUX_REBOOT_CMD_POWER_OFF)
+	shutdown(nil)
 }
