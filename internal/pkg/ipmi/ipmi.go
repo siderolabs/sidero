@@ -5,7 +5,7 @@
 package ipmi
 
 import (
-	goipmi "github.com/vmware/goipmi"
+	goipmi "github.com/pensando/goipmi"
 
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 )
@@ -83,7 +83,7 @@ func (c *Client) Status() (*goipmi.ChassisStatusResponse, error) {
 
 // SetPXE makes sure the node will pxe boot next time.
 func (c *Client) SetPXE() error {
-	return c.IPMIClient.SetBootDevice(goipmi.BootDevicePxe)
+	return c.IPMIClient.SetBootDeviceEFI(goipmi.BootDevicePxe)
 }
 
 // IsFake returns false.
