@@ -11,6 +11,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/onsi/ginkgo v1.12.1
 	github.com/onsi/gomega v1.10.1
+	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.3
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.4
@@ -20,7 +21,6 @@ require (
 	github.com/talos-systems/net v0.2.0
 	github.com/talos-systems/talos v0.7.0-alpha.4
 	github.com/talos-systems/talos/pkg/machinery v0.0.0-20201006184949-3961f835f502
-	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
 	golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a
 	google.golang.org/grpc v1.29.1
 	k8s.io/api v0.19.1
