@@ -100,8 +100,12 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			TestScaleControlPlaneDown(ctx, metalClient, vmSet),
 		},
 		{
+			"TestMachineDeploymentReconcile",
+			TestMachineDeploymentReconcile(ctx, metalClient),
+		},
+		{
 			"TestServerReset",
-			TestServerReset(ctx, metalClient, vmSet),
+			TestServerReset(ctx, metalClient),
 		},
 	}
 

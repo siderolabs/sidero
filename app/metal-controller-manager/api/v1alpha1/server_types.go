@@ -10,6 +10,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -100,12 +101,16 @@ type ServerSpec struct {
 	Accepted          bool                    `json:"accepted"`
 }
 
+// ConditionPowerCycle is used to control the powercycle flow.
+const ConditionPowerCycle clusterv1.ConditionType = "PowerCycle"
+
 // ServerStatus defines the observed state of Server.
 type ServerStatus struct {
-	Ready     bool                 `json:"ready"`
-	InUse     bool                 `json:"inUse"`
-	IsClean   bool                 `json:"isClean"`
-	Addresses []corev1.NodeAddress `json:"addresses,omitempty"`
+	Ready      bool                  `json:"ready"`
+	InUse      bool                  `json:"inUse"`
+	IsClean    bool                  `json:"isClean"`
+	Conditions []clusterv1.Condition `json:"conditions,omitempty"`
+	Addresses  []corev1.NodeAddress  `json:"addresses,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -123,6 +128,14 @@ type Server struct {
 
 	Spec   ServerSpec   `json:"spec,omitempty"`
 	Status ServerStatus `json:"status,omitempty"`
+}
+
+func (s *Server) GetConditions() clusterv1.Conditions {
+	return s.Status.Conditions
+}
+
+func (s *Server) SetConditions(conditions clusterv1.Conditions) {
+	s.Status.Conditions = conditions
 }
 
 // +kubebuilder:object:root=true

@@ -49,7 +49,7 @@ type MetalMachineReconciler struct {
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
-// +kubebuilder:rbac:groups="",resources=events,verbs=create
+// +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err error) {
 	ctx := context.Background()
@@ -211,7 +211,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 		}
 
 		if !mgmtClient.IsFake() {
-			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", "Server powered on.")
+			r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Management", "Server powered on.")
 		}
 	}
 
@@ -260,7 +260,7 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 			return ctrl.Result{}, err
 		}
 
-		r.Recorder.Event(ref, corev1.EventTypeNormal, "Server Allocation", "Server marked as unallocated")
+		r.Recorder.Event(ref, corev1.EventTypeNormal, "Server Allocation", "Server marked as unallocated.")
 	}
 
 	// Machine is deleted so remove the finalizer.
@@ -397,52 +397,36 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 
 // patchServerInUse updates a server to mark it as "in use".
 func (r *MetalMachineReconciler) patchServerInUse(ctx context.Context, serverClass *metalv1alpha1.ServerClass, serverObj *metalv1alpha1.Server, metalMachine *infrav1.MetalMachine) error {
-	ref, err := reference.GetReference(r.Scheme, serverObj)
-	if err != nil {
-		return err
-	}
+	if !serverObj.Status.InUse || serverObj.Status.IsClean {
+		ref, err := reference.GetReference(r.Scheme, serverObj)
+		if err != nil {
+			return err
+		}
 
-	serverObj.Status.InUse = true
-	serverObj.Status.IsClean = false
+		serverObj.Status.InUse = true
+		serverObj.Status.IsClean = false
 
-	// nb: we update status and then update the object separately b/c statuses don't seem to get
-	// updated when doing the whole object below.
-	if err := r.Status().Update(ctx, serverObj); err != nil {
-		return err
-	}
+		// nb: we update status and then update the object separately b/c statuses don't seem to get
+		// updated when doing the whole object below.
+		if err := r.Status().Update(ctx, serverObj); err != nil {
+			return err
+		}
 
-	r.Recorder.Event(ref, corev1.EventTypeNormal, "Server Allocation", fmt.Sprintf("Server marked as allocated for metalMachine %q", metalMachine.Name))
-
-	rollback := func() {
-		// update failed, roll back Status changes
-		serverObj.Status.InUse = false
-
-		r.Status().Update(ctx, serverObj) //nolint: errcheck
+		r.Recorder.Event(ref, corev1.EventTypeNormal, "Server Allocation", fmt.Sprintf("Server marked as allocated for metalMachine %q", metalMachine.Name))
 	}
 
 	if serverClass != nil {
-		for {
-			serverObj.OwnerReferences = []metav1.OwnerReference{
-				*metav1.NewControllerRef(serverClass, metalv1alpha1.GroupVersion.WithKind("ServerClass")),
-			}
+		patchHelper, err := patch.NewHelper(serverObj, r)
+		if err != nil {
+			return err
+		}
 
-			err := r.Update(ctx, serverObj)
-			if err == nil {
-				return nil
-			}
+		serverObj.OwnerReferences = []metav1.OwnerReference{
+			*metav1.NewControllerRef(serverClass, metalv1alpha1.GroupVersion.WithKind("ServerClass")),
+		}
 
-			if !apierrors.IsConflict(err) {
-				rollback()
-
-				return err
-			}
-
-			// conflict happened, retry
-			if err = r.Get(ctx, types.NamespacedName{Namespace: serverObj.Namespace, Name: serverObj.Name}, serverObj); err != nil {
-				rollback()
-
-				return err
-			}
+		if err := patchHelper.Patch(ctx, serverObj); err != nil {
+			return err
 		}
 	}
 

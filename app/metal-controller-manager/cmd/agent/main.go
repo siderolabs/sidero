@@ -15,6 +15,7 @@ import (
 
 	"github.com/talos-systems/go-blockdevice/blockdevice/probe"
 	"github.com/talos-systems/go-procfs/procfs"
+	"github.com/talos-systems/go-retry/retry"
 	"github.com/talos-systems/go-smbios/smbios"
 	talosnet "github.com/talos-systems/net"
 	"golang.org/x/sys/unix"
@@ -69,18 +70,7 @@ func setup() error {
 	return nil
 }
 
-func create(endpoint string, s *smbios.Smbios) (*api.CreateServerResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	conn, err := grpc.DialContext(ctx, endpoint, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-
-	c := api.NewAgentClient(conn)
-
+func create(ctx context.Context, client api.AgentClient, s *smbios.Smbios) (*api.CreateServerResponse, error) {
 	uuid, err := s.SystemInformation().UUID()
 	if err != nil {
 		return nil, err
@@ -109,55 +99,47 @@ func create(endpoint string, s *smbios.Smbios) (*api.CreateServerResponse, error
 		req.Hostname = hostname
 	}
 
-	resp, err := c.CreateServer(ctx, req)
-	if err != nil {
-		return nil, err
-	}
+	var resp *api.CreateServerResponse
 
-	return resp, nil
+	err = retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second)).Retry(func() error {
+		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
+
+		resp, err = client.CreateServer(ctx, req)
+		if err != nil {
+			return retry.ExpectedError(err)
+		}
+
+		return nil
+	})
+
+	return resp, err
 }
 
-func wipe(endpoint string, s *smbios.Smbios) error {
+func wipe(ctx context.Context, client api.AgentClient, s *smbios.Smbios) error {
 	uuid, err := s.SystemInformation().UUID()
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
+	return retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second)).Retry(func() error {
+		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
 
-	conn, err := grpc.DialContext(ctx, endpoint, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
+		_, err = client.MarkServerAsWiped(ctx, &api.MarkServerAsWipedRequest{Uuid: uuid.String()})
+		if err != nil {
+			return retry.ExpectedError(err)
+		}
 
-	c := api.NewAgentClient(conn)
-
-	_, err = c.MarkServerAsWiped(ctx, &api.MarkServerAsWipedRequest{Uuid: uuid.String()})
-	if err != nil {
-		return err
-	}
-
-	return nil
+		return nil
+	})
 }
 
-func reconcileIPs(endpoint string, s *smbios.Smbios, ips []net.IP) error {
+func reconcileIPs(ctx context.Context, client api.AgentClient, s *smbios.Smbios, ips []net.IP) error {
 	uuid, err := s.SystemInformation().UUID()
 	if err != nil {
 		return err
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	conn, err := grpc.DialContext(ctx, endpoint, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	c := api.NewAgentClient(conn)
 
 	addresses := make([]*api.Address, len(ips))
 	for i := range addresses {
@@ -167,15 +149,20 @@ func reconcileIPs(endpoint string, s *smbios.Smbios, ips []net.IP) error {
 		}
 	}
 
-	_, err = c.ReconcileServerAddresses(ctx, &api.ReconcileServerAddressesRequest{
-		Uuid:    uuid.String(),
-		Address: addresses,
-	})
-	if err != nil {
-		return err
-	}
+	return retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second)).Retry(func() error {
+		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
 
-	return nil
+		_, err = client.ReconcileServerAddresses(ctx, &api.ReconcileServerAddressesRequest{
+			Uuid:    uuid.String(),
+			Address: addresses,
+		})
+		if err != nil {
+			return retry.ExpectedError(err)
+		}
+
+		return nil
+	})
 }
 
 func shutdown(err error) {
@@ -186,6 +173,12 @@ func shutdown(err error) {
 			log.Printf("rebooting in %d seconds\n", i)
 			time.Sleep(1 * time.Second)
 		}
+
+		if unix.Reboot(unix.LINUX_REBOOT_CMD_RESTART) == nil {
+			select {}
+		}
+
+		os.Exit(1)
 	}
 
 	if unix.Reboot(unix.LINUX_REBOOT_CMD_POWER_OFF) == nil {
@@ -196,35 +189,65 @@ func shutdown(err error) {
 	os.Exit(1)
 }
 
-func main() {
+func connect(ctx context.Context, endpoint string) (*grpc.ClientConn, error) {
+	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	return grpc.DialContext(ctx, endpoint, grpc.WithInsecure())
+}
+
+func mainFunc() error {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	if err := setup(); err != nil {
-		shutdown(err)
+		return err
 	}
 
 	var endpoint string
 	if found := procfs.ProcCmdline().Get(constants.AgentEndpointArg).First(); found != nil {
 		endpoint = *found
 	} else {
-		shutdown(fmt.Errorf("no endpoint found"))
+		return fmt.Errorf("no endpoint found")
 	}
 
 	log.Printf("Using %q as API endpoint", endpoint)
+
+	conn, err := connect(ctx, endpoint)
+	if err != nil {
+		return err
+	}
+
+	defer conn.Close()
+
+	client := api.NewAgentClient(conn)
 
 	log.Println("Reading SMBIOS")
 
 	s, err := smbios.New()
 	if err != nil {
-		shutdown(err)
+		return err
 	}
 
-	resp, err := create(endpoint, s)
+	createResp, err := create(ctx, client, s)
 	if err != nil {
-		shutdown(err)
+		return err
 	}
 
 	log.Println("Registration complete")
 
-	if resp.GetWipe() {
+	ips, err := talosnet.IPAddrs()
+	if err != nil {
+		log.Println("failed to discover IPs")
+	} else {
+		if err = reconcileIPs(ctx, client, s, ips); err != nil {
+			shutdown(err)
+		}
+
+		log.Printf("Reconciled IPs")
+	}
+
+	if createResp.GetWipe() {
 		bds, err := probe.All()
 		if err != nil {
 			shutdown(err)
@@ -247,23 +270,16 @@ func main() {
 			}
 		}
 
-		if err := wipe(endpoint, s); err != nil {
+		if err := wipe(ctx, client, s); err != nil {
 			shutdown(err)
 		}
 
 		log.Println("Wipe complete")
 	}
 
-	ips, err := talosnet.IPAddrs()
-	if err != nil {
-		log.Println("failed to discover IPs")
-	} else {
-		if err := reconcileIPs(endpoint, s, ips); err != nil {
-			shutdown(err)
-		}
+	return nil
+}
 
-		log.Printf("Reconciled IPs")
-	}
-
-	shutdown(nil)
+func main() {
+	shutdown(mainFunc())
 }

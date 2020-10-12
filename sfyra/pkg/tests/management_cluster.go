@@ -116,7 +116,9 @@ func TestManagementCluster(ctx context.Context, metalClient client.Client, clust
 
 			obj := obj
 
-			_, err = dr.Create(ctx, &obj, metav1.CreateOptions{})
+			_, err = dr.Create(ctx, &obj, metav1.CreateOptions{
+				FieldManager: "sfyra",
+			})
 			if err != nil {
 				if apierrors.IsAlreadyExists(err) {
 					_, err = dr.Patch(ctx, obj.GetName(), types.ApplyPatchType, data, metav1.PatchOptions{
