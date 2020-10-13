@@ -48,7 +48,7 @@ func TestServerReset(ctx context.Context, metalClient client.Client, vmSet *vm.S
 			require.NoError(t, err)
 		}
 
-		err = retry.Constant(10*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+		err = retry.Constant(5*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
 			var servers sidero.ServerList
 
 			err = metalClient.List(ctx, &servers)

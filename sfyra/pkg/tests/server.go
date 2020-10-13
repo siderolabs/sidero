@@ -260,6 +260,56 @@ func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet 
 	}
 }
 
+// TestServerResetOnAcceptance tests that servers are reset when accepted.
+func TestServerResetOnAcceptance(ctx context.Context, metalClient client.Client) TestFunc {
+	return func(t *testing.T) {
+		serverList := &v1alpha1.ServerList{}
+
+		err := metalClient.List(ctx, serverList)
+		require.NoError(t, err)
+
+		servers := []v1alpha1.Server{}
+
+		for _, server := range serverList.Items {
+			server := server
+
+			if !server.Spec.Accepted {
+				patchHelper, err := patch.NewHelper(&server, metalClient)
+				require.NoError(t, err)
+
+				server.Spec.Accepted = true
+				require.NoError(t, patchHelper.Patch(ctx, &server))
+
+				servers = append(servers, server)
+			}
+		}
+
+		t.Logf("Found %d dirty servers", len(servers))
+
+		if len(servers) == 0 {
+			return
+		}
+
+		require.NoError(t, retry.Constant(5*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+			for _, server := range servers {
+				var s v1alpha1.Server
+
+				if err := metalClient.Get(ctx, types.NamespacedName{Name: server.Name, Namespace: server.Namespace}, &s); err != nil {
+					return retry.UnexpectedError(err)
+				}
+
+				if !s.Status.IsClean {
+					return retry.ExpectedError(fmt.Errorf("server %q is not clean", s.Name))
+				}
+
+				t.Logf("Server %q is clean", s.Name)
+			}
+
+			return nil
+		}))
+	}
+}
+
 // TestServersReady waits for all the servers to be 'Ready'.
 func TestServersReady(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {

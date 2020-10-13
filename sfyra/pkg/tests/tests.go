@@ -56,6 +56,10 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			TestServerAcceptance(ctx, metalClient, vmSet),
 		},
 		{
+			"TestServerResetOnAcceptance",
+			TestServerResetOnAcceptance(ctx, metalClient),
+		},
+		{
 			"TestServersReady",
 			TestServersReady(ctx, metalClient),
 		},

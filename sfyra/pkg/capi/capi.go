@@ -214,15 +214,10 @@ func (clusterAPI *Manager) patch(ctx context.Context) error {
 	}
 
 	apiPatch := false
-	autoAcceptPatch := false
 
 	for _, arg := range deployment.Spec.Template.Spec.Containers[1].Args {
 		if strings.HasPrefix(arg, "--api-endpoint") {
 			apiPatch = true
-		}
-
-		if strings.HasPrefix(arg, "--auto-accept-servers") {
-			autoAcceptPatch = true
 		}
 	}
 
@@ -230,13 +225,6 @@ func (clusterAPI *Manager) patch(ctx context.Context) error {
 		deployment.Spec.Template.Spec.Containers[1].Args = append(
 			deployment.Spec.Template.Spec.Containers[1].Args,
 			fmt.Sprintf("--api-endpoint=%s", clusterAPI.cluster.SideroComponentsIP()),
-		)
-	}
-
-	if !autoAcceptPatch {
-		deployment.Spec.Template.Spec.Containers[1].Args = append(
-			deployment.Spec.Template.Spec.Containers[1].Args,
-			"--auto-accept-servers=true",
 		)
 	}
 
