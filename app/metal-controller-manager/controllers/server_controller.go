@@ -26,9 +26,10 @@ import (
 // ServerReconciler reconciles a Server object.
 type ServerReconciler struct {
 	client.Client
-	Log      logr.Logger
-	Scheme   *runtime.Scheme
-	Recorder record.EventRecorder
+	APIReader client.Reader
+	Log       logr.Logger
+	Scheme    *runtime.Scheme
+	Recorder  record.EventRecorder
 }
 
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
@@ -41,7 +42,8 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	s := metalv1alpha1.Server{}
 
-	if err := r.Get(ctx, req.NamespacedName, &s); err != nil {
+	// Refresh the object from the API, as we rely a lot on the Status to be up to date in this controller.
+	if err := r.APIReader.Get(ctx, req.NamespacedName, &s); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
