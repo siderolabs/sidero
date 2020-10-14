@@ -18,6 +18,7 @@ kind: Server
 metadata:
   name: 00000000-0000-0000-0000-d05099d333e0
 spec:
+  accepted: false
   configPatches:
     - op: replace
       path: /cluster/network/cni
@@ -36,3 +37,8 @@ spec:
     skuNumber: Unknown
     version: Unknown
 ```
+
+## Server Acceptance
+
+In order for a server to be eligible for consideration, it _must_ be `accepted`.
+Once accepted, a server will be reset (all disks wiped) and then made available to Sidero.
