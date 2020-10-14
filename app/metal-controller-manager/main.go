@@ -102,10 +102,11 @@ func main() {
 	}
 
 	if err = (&controllers.ServerReconciler{
-		Client:   mgr.GetClient(),
-		Log:      ctrl.Log.WithName("controllers").WithName("Server"),
-		Scheme:   mgr.GetScheme(),
-		Recorder: recorder,
+		Client:    mgr.GetClient(),
+		APIReader: mgr.GetAPIReader(),
+		Log:       ctrl.Log.WithName("controllers").WithName("Server"),
+		Scheme:    mgr.GetScheme(),
+		Recorder:  recorder,
 	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Server")
 		os.Exit(1)
