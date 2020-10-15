@@ -54,6 +54,10 @@ func NewControlPlane(client client.Client, address net.IP, port int, clusterName
 		clusterName:      clusterName,
 	}
 
+	cp.lb.DialTimeout = 5 * time.Second
+	cp.lb.KeepAlivePeriod = time.Second
+	cp.lb.TCPUserTimeout = 5 * time.Second
+
 	cp.ctx, cp.ctxCancel = context.WithCancel(context.Background())
 
 	var err error
