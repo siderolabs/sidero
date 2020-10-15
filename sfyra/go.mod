@@ -4,12 +4,15 @@ go 1.14
 
 replace github.com/talos-systems/sidero => ../
 
+// See https://github.com/talos-systems/go-loadbalancer/pull/4
+replace inet.af/tcpproxy => github.com/smira/tcpproxy v0.0.0-20201015133617-de5f7797b95b
+
 require (
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.6.1
 	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.3
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.4
-	github.com/talos-systems/go-loadbalancer v0.1.1-0.20200918172657-3c8f3471d14e
+	github.com/talos-systems/go-loadbalancer v0.1.1-0.20201015151439-a4457024d518
 	github.com/talos-systems/go-procfs v0.0.0-20200219015357-57c7311fdd45
 	github.com/talos-systems/go-retry v0.1.1-0.20200922131245-752f081252cf
 	github.com/talos-systems/net v0.2.0
