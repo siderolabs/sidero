@@ -38,8 +38,6 @@ func TestScaleControlPlaneUp(ctx context.Context, metalClient client.Client, vmS
 // TestScaleControlPlaneDown verifies that the control plane can scale down.
 func TestScaleControlPlaneDown(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
 	return func(t *testing.T) {
-		t.Skip()
-
 		err := scaleControlPlane(ctx, metalClient, 1)
 		require.NoError(t, err)
 
@@ -73,6 +71,10 @@ func TestScaleWorkersDown(ctx context.Context, metalClient client.Client, vmSet 
 func scaleControlPlane(ctx context.Context, metalClient client.Client, replicas int32) error {
 	verify := func(obj runtime.Object) error {
 		o := obj.(*capbt.TalosControlPlane)
+
+		if o.Status.Replicas != replicas {
+			return fmt.Errorf("expected %d replicas, got %d", replicas, o.Status.ReadyReplicas)
+		}
 
 		if o.Status.ReadyReplicas != replicas {
 			return fmt.Errorf("expected %d ready replicas, got %d", replicas, o.Status.ReadyReplicas)
