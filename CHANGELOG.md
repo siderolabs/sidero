@@ -1,6 +1,39 @@
 
+<a name="v0.1.0-alpha.4"></a>
+## [v0.1.0-alpha.4](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.3...v0.1.0-alpha.4) (2020-10-15)
+
+### Chore
+
+* fix formatting
+
+### Docs
+
+* add server acceptance note
+
+### Feat
+
+* support config patches at the serverclass level
+* discover server IPs on registration, emit server events
+* add hostname to the server spec
+
+### Fix
+
+* use APIReader in server controller to avoid caching issues
+* proper event patching, powercycle vs. poweron
+* handle agent errors gracefully
+* use efiboot option
+
+### Test
+
+* pull in the new version of go-loadbalancer
+* check if servers are reset on acceptance
+* add flags for modifying workload cluster installer image
+* bump Talos to 0.7.0-alpha.6 for Sfyra
+* enable verbose logs for CLI version of loadbalancer
+
+
 <a name="v0.1.0-alpha.3"></a>
-## [v0.1.0-alpha.3](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.2...v0.1.0-alpha.3) (2020-10-08)
+## [v0.1.0-alpha.3](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.2...v0.1.0-alpha.3) (2020-10-09)
 
 ### Chore
 
@@ -27,6 +60,10 @@
 
 * break apart metadata server code
 * split 'sfyra' CLI into multiple subcommands
+
+### Release
+
+* **v0.1.0-alpha.3:** prepare release
 
 ### Test
 
