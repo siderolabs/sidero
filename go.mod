@@ -13,8 +13,8 @@ require (
 	github.com/onsi/gomega v1.10.1
 	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
-	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.3
-	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.4
+	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.6
+	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.8
 	github.com/talos-systems/go-blockdevice v0.1.1-0.20201009184237-ff3a8210be99
 	github.com/talos-systems/go-procfs v0.0.0-20200219015357-57c7311fdd45
 	github.com/talos-systems/go-retry v0.1.1-0.20200922131245-752f081252cf
