@@ -11,6 +11,8 @@ import (
 	"log"
 	"net"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/talos-systems/go-blockdevice/blockdevice/probe"
@@ -254,6 +256,14 @@ func mainFunc() error {
 		}
 
 		for _, bd := range bds {
+			for _, prefix := range []string{"sg", "sr"} {
+				if strings.HasPrefix(filepath.Base(bd.Path), prefix) {
+					log.Printf("Skipping reset of %s", bd.Path)
+
+					continue
+				}
+			}
+
 			log.Printf("Resetting %s", bd.Path)
 
 			_, err := bd.Device().WriteAt(bytes.Repeat([]byte{0}, 512), 0)
