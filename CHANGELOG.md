@@ -1,6 +1,14 @@
 
+<a name="v0.1.0-alpha.6"></a>
+## [v0.1.0-alpha.6](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.5...v0.1.0-alpha.6) (2020-10-21)
+
+### Feat
+
+* add support for control plane port
+
+
 <a name="v0.1.0-alpha.5"></a>
-## [v0.1.0-alpha.5](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.4...v0.1.0-alpha.5) (2020-10-20)
+## [v0.1.0-alpha.5](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.4...v0.1.0-alpha.5) (2020-10-21)
 
 ### Chore
 
@@ -14,9 +22,13 @@
 
 * don't reset read only disks
 
+### Release
+
+* **v0.1.0-alpha.5:** prepare release
+
 
 <a name="v0.1.0-alpha.4"></a>
-## [v0.1.0-alpha.4](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.3...v0.1.0-alpha.4) (2020-10-19)
+## [v0.1.0-alpha.4](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.3...v0.1.0-alpha.4) (2020-10-15)
 
 ### Chore
 
@@ -39,10 +51,6 @@
 * handle agent errors gracefully
 * use efiboot option
 
-### Release
-
-* **v0.1.0-alpha.4:** prepare release
-
 ### Test
 
 * pull in the new version of go-loadbalancer
@@ -51,6 +59,9 @@
 * bump Talos to 0.7.0-alpha.6 for Sfyra
 * enable verbose logs for CLI version of loadbalancer
 
+### Release
+
+* **v0.1.0-alpha.4:** prepare release
 
 <a name="v0.1.0-alpha.3"></a>
 ## [v0.1.0-alpha.3](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.2...v0.1.0-alpha.3) (2020-10-09)
