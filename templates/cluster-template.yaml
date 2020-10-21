@@ -26,7 +26,7 @@ metadata:
 spec:
   controlPlaneEndpoint:
     host: ${CONTROL_PLANE_ENDPOINT}
-    port: 6443
+    port: ${CONTROL_PLANE_PORT}
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: MetalMachineTemplate

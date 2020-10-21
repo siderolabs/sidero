@@ -150,6 +150,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 		nodeCountWorker := int64(0)
 
 		os.Setenv("CONTROL_PLANE_ENDPOINT", "localhost")
+		os.Setenv("CONTROL_PLANE_PORT", "11111")
 		os.Setenv("CONTROL_PLANE_SERVERCLASS", "dummyservers")
 		os.Setenv("WORKER_SERVERCLASS", "dummyservers")
 		// TODO: make it configurable
