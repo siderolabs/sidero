@@ -1,6 +1,22 @@
 
+<a name="v0.1.0-alpha.5"></a>
+## [v0.1.0-alpha.5](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.4...v0.1.0-alpha.5) (2020-10-20)
+
+### Chore
+
+* update talos version
+
+### Feat
+
+* update CAPI providers
+
+### Fix
+
+* don't reset read only disks
+
+
 <a name="v0.1.0-alpha.4"></a>
-## [v0.1.0-alpha.4](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.3...v0.1.0-alpha.4) (2020-10-15)
+## [v0.1.0-alpha.4](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.3...v0.1.0-alpha.4) (2020-10-19)
 
 ### Chore
 
@@ -22,6 +38,10 @@
 * proper event patching, powercycle vs. poweron
 * handle agent errors gracefully
 * use efiboot option
+
+### Release
+
+* **v0.1.0-alpha.4:** prepare release
 
 ### Test
 
