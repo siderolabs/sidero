@@ -7,7 +7,6 @@ package tests
 import (
 	"context"
 	"fmt"
-	"net"
 	"os"
 	"strconv"
 	"testing"
@@ -19,7 +18,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/discovery/cached/memory"
@@ -55,10 +53,11 @@ func TestManagementCluster(ctx context.Context, metalClient client.Client, clust
 
 		nodeCount := int64(1)
 
-		lb, err := loadbalancer.NewControlPlane(metalClient, vmSet.BridgeIP(), managementClusterLBPort, "default", managementClusterName, false)
+		_, err = loadbalancer.NewControlPlane(metalClient, vmSet.BridgeIP(), managementClusterLBPort, "default", managementClusterName, false)
 		require.NoError(t, err)
 
-		os.Setenv("CONTROL_PLANE_ENDPOINT", "localhost")
+		os.Setenv("CONTROL_PLANE_ENDPOINT", vmSet.BridgeIP().String())
+		os.Setenv("CONTROL_PLANE_PORT", strconv.Itoa(managementClusterLBPort))
 		os.Setenv("CONTROL_PLANE_SERVERCLASS", serverClassName)
 		os.Setenv("WORKER_SERVERCLASS", serverClassName)
 		// TODO: make it configurable
@@ -95,16 +94,6 @@ func TestManagementCluster(ctx context.Context, metalClient client.Client, clust
 			} else {
 				// for cluster-wide resources
 				dr = dyn.Resource(mapping.Resource)
-			}
-
-			if obj.GroupVersionKind().Kind == "MetalCluster" {
-				host, portStr, _ := net.SplitHostPort(lb.GetEndpoint())
-				port, _ := strconv.Atoi(portStr)
-
-				require.NoError(t, unstructured.SetNestedMap(obj.Object, map[string]interface{}{
-					"host": host,
-					"port": float64(port),
-				}, "spec", "controlPlaneEndpoint"))
 			}
 
 			var data []byte
