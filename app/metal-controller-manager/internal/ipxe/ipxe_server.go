@@ -264,6 +264,7 @@ func newAgentEnvironment() *metalv1alpha1.Environment {
 		"ip=dhcp",
 		"console=tty0",
 		"console=ttyS0",
+		"printk.devkmsg=on",
 		fmt.Sprintf("%s=%s:%s", constants.AgentEndpointArg, apiEndpoint, server.Port),
 	}
 

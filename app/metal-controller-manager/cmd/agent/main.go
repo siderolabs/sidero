@@ -5,9 +5,9 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/talos-systems/go-blockdevice/blockdevice/probe"
+	"github.com/talos-systems/go-blockdevice/blockdevice"
 	"github.com/talos-systems/go-procfs/procfs"
 	"github.com/talos-systems/go-retry/retry"
 	"github.com/talos-systems/go-smbios/smbios"
@@ -250,30 +250,45 @@ func mainFunc() error {
 	}
 
 	if createResp.GetWipe() {
-		bds, err := probe.All()
+		devices, err := ioutil.ReadDir("/sys/block")
 		if err != nil {
 			shutdown(err)
 		}
 
-		for _, bd := range bds {
-			for _, prefix := range []string{"sg", "sr"} {
-				if strings.HasPrefix(filepath.Base(bd.Path), prefix) {
-					log.Printf("Skipping reset of %s", bd.Path)
+		for _, dev := range devices {
+			skip := false
 
-					continue
+			for _, prefix := range []string{"sg", "sr", "loop", "md", "dm-"} {
+				if strings.HasPrefix(filepath.Base(dev.Name()), prefix) {
+					skip = true
+
+					break
 				}
 			}
 
-			log.Printf("Resetting %s", bd.Path)
+			if skip {
+				log.Printf("Skipping reset of %s", dev.Name())
 
-			_, err := bd.Device().WriteAt(bytes.Repeat([]byte{0}, 512), 0)
+				continue
+			}
+
+			path := filepath.Join("/dev", dev.Name())
+
+			log.Printf("Resetting %s", path)
+
+			bd, err := blockdevice.Open(path)
+			if err != nil {
+				log.Printf("Skipping %s: %s", path, err)
+
+				continue
+			}
+
+			method, err := bd.Wipe()
 			if err != nil {
 				shutdown(err)
 			}
 
-			if err := bd.Reset(); err != nil {
-				shutdown(err)
-			}
+			log.Printf("Wiped %s with %s", path, method)
 
 			if err := bd.Close(); err != nil {
 				shutdown(err)
