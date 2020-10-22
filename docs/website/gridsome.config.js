@@ -12,52 +12,47 @@ module.exports = {
   },
   siteUrl: process.env.SITE_URL ? process.env.SITE_URL : "https://example.com",
   settings: {
+    title: "Bare metal Kubernetes",
+    description:
+      "A bare metal provisioning system for managing Kubernetes clusters",
     web: process.env.URL_WEB || false,
     twitter: "https://twitter.com/talossystems",
     github: "https://github.com/talos-systems/sidero",
     nav: {
       links: [
-        { path: "/docs/", title: "Docs" },
+        { path: "/docs/v0.1/", title: "Docs" },
         { path: "/releases/", title: "Releases" },
       ],
     },
-    sidebar: [
+    dropdownOptions: [
       {
-        name: "docs",
-        sections: [
-          {
-            title: "Getting Started",
-            items: [
-              "/docs/",
-              "/docs/installation/",
-              "/docs/architecture/",
-              "/docs/concepts/",
-            ],
-          },
-          {
-            title: "Configuration",
-            items: [
-              "/docs/environments/",
-              "/docs/servers/",
-              "/docs/serverclasses/",
-              "/docs/metadata/",
-            ],
-          },
-          {
-            title: "Guides",
-            items: ["/docs/bootstrapping/", "/docs/first-cluster/","/docs/patching/"],
-          },
-        ],
+        version: "v0.1",
+        url: "/docs/v0.1/",
+        latest: true,
+        prerelease: true,
       },
     ],
   },
+
+  // Allow '.' in slugs (e.g. /docs/v0.1).
+  permalinks: {
+    slugify: {
+      use: "slugify",
+      options: { lower: true },
+    },
+  },
+
   plugins: [
     {
-      use: "@gridsome/source-filesystem",
+      use: "gridsome-source-docs",
       options: {
-        baseDir: "./content",
+        baseDir: "./content/docs",
         path: "**/*.md",
         typeName: "MarkdownPage",
+        pathPrefix: "/docs",
+        sidebarOrder: {
+          "v0.1": ["Getting Started", "Configuration", "Guides"],
+        },
         remark: {
           externalLinksTarget: "_blank",
           externalLinksRel: ["noopener", "noreferrer"],

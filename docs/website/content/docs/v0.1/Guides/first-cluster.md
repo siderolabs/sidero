@@ -1,8 +1,6 @@
 ---
 description: "A guide for creating your first cluster with the Sidero management plane"
-sidebar: "docs"
-prev: "/docs/bootstrapping/"
-next: "/docs/patching/"
+weight: 2
 ---
 
 # Creating Your First Cluster

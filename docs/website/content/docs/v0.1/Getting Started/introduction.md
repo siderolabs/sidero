@@ -1,7 +1,6 @@
 ---
 description: ""
-sidebar: "docs"
-next: "/docs/installation/"
+weight: 1
 ---
 
 # Introduction

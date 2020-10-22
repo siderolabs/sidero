@@ -1,8 +1,6 @@
 ---
 description: ""
-sidebar: "docs"
-prev: "/docs/concepts/"
-next: "/docs/servers/"
+weight: 1
 ---
 
 # Environments
