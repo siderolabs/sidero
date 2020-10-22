@@ -1,8 +1,6 @@
 ---
 description: ""
-sidebar: "docs"
-prev: "/docs/environments/"
-next: "/docs/serverclasses/"
+weight: 2
 ---
 
 # Servers

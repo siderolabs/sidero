@@ -1,8 +1,6 @@
 ---
 description: ""
-sidebar: "docs"
-prev: "/docs/installation/"
-next: "/docs/concepts/"
+weight: 3
 ---
 
 # Architecture

@@ -8,14 +8,16 @@
   },
   "dependencies": {
     "@gridsome/source-graphql": "^0.1.0",
-    "gridsome": "^0.7.0"
+    "gridsome": "^0.7.0",
+    "gridsome-source-docs": "^0.1.0",
+    "slugify": "^1.4.5"
   },
   "devDependencies": {
     "@gridsome/plugin-google-analytics": "^0.1.0",
     "@gridsome/plugin-sitemap": "^0.2.3",
     "@gridsome/remark-prismjs": "^0.3.0",
     "@gridsome/source-filesystem": "^0.6.2",
-    "@gridsome/transformer-remark": "^0.5.0",
+    "@gridsome/transformer-remark": "^0.6.3",
     "fuse.js": "^3.4.6",
     "gridsome-plugin-tailwindcss": "^2.2.36",
     "node-sass": "^4.13.1",

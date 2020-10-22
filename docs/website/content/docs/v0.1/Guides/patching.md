@@ -1,7 +1,6 @@
 ---
 description: "A guide describing patching"
-sidebar: "docs"
-prev: "/docs/first-cluster/"
+weight: 3
 ---
 
 # Patching
@@ -20,23 +19,19 @@ kind: Server
 metadata:
   name: 00000000-0000-0000-0000-d05099d33360
 spec:
-...
-...
-  configPatches:
-    - op: replace
-      path: /machine/install
-      value:
-        disk: /dev/sda
-        image: docker.io/autonomy/installer:v0.6.0-beta.0
-        bootloader: true
-        wipe: false
-        force: false
-    - op: replace
-      path: /cluster/network/cni
-      value:
-        name: "custom"
-        urls:
-          - "http://192.168.1.199/assets/cilium.yaml"
-...
-...
+configPatches:
+  - op: replace
+    path: /machine/install
+    value:
+      disk: /dev/sda
+      image: docker.io/autonomy/installer:v0.6.0-beta.0
+      bootloader: true
+      wipe: false
+      force: false
+  - op: replace
+    path: /cluster/network/cni
+    value:
+      name: "custom"
+      urls:
+        - "http://192.168.1.199/assets/cilium.yaml"
 ```

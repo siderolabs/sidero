@@ -1,8 +1,6 @@
 ---
 description: ""
-sidebar: "docs"
-prev: "/docs/servers/"
-next: "/docs/metadata/"
+weight: 3
 ---
 
 # Server Classes
@@ -27,9 +25,9 @@ spec:
       - manufacturer: Intel(R) Corporation
         version: Intel(R) Atom(TM) CPU C3558 @ 2.20GHz
       - manufacturer: Advanced Micro Devices, Inc.
-        version:  AMD Ryzen 7 2700X Eight-Core Processor
+        version: AMD Ryzen 7 2700X Eight-Core Processor
     labelSelectors:
       - "my-server-label": "true"
 ```
 
-Servers would only be added to the above class if they had *EITHER* CPU info, *AND* the label associated with the server resource.
+Servers would only be added to the above class if they had _EITHER_ CPU info, _AND_ the label associated with the server resource.

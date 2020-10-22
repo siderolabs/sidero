@@ -1,8 +1,6 @@
 ---
 description: ""
-sidebar: "docs"
-prev: "/docs/"
-next: "/docs/architecture/"
+weight: 2
 ---
 
 # Installation

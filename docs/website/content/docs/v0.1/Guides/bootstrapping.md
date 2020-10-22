@@ -1,8 +1,6 @@
 ---
 description: "A guide for bootstrapping Sidero management plane"
-sidebar: "docs"
-prev: "/docs/installation/"
-next: "/docs/first-cluster/"
+weight: 1
 ---
 
 # Bootstrapping
@@ -20,7 +18,7 @@ Talos Systems and the Cluster API community have created tools to help make this
 
 There are two big prerequisites involved with bootstrapping Sidero: routing and DHCP setup.
 
-From the routing side, the laptop from which you are bootstrapping *must* be accessible by the bare metal machines that we will be booting.
+From the routing side, the laptop from which you are bootstrapping _must_ be accessible by the bare metal machines that we will be booting.
 In the datacenter scenario described above, the easiest way to achieve this is probably to hook the laptop onto the server rack's subnet by plugging it into the top-of-rack switch.
 This is needed for TFTP, PXE booting, and for the ability to register machines with the bootstrap plane.
 

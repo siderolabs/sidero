@@ -11,13 +11,11 @@
         <h1 class="text-4xl text-center lg:text-5xl">
           Bare Metal Lifecycle Management.
         </h1>
-        <p class="text-xl font-medium text-center">
-          Automated. Secure.
-        </p>
+        <p class="text-xl font-medium text-center">Automated. Secure.</p>
 
         <div class="flex justify-center mt-8">
           <g-link
-            to="/docs/"
+            :to="latestDocs()"
             class="flex items-center px-6 py-4 ml-auto text-2xl font-bold leading-none text-white border rounded-lg shadow-lg bg-ui-primary border-ui-primary transition-all duration-200 ease-out transform hover:shadow-xl hover:-translate-y-1"
           >
             Get started
@@ -71,6 +69,21 @@
   </Layout>
 </template>
 
+<static-query>
+query Settings {
+  metadata {
+    settings {
+      title
+      description
+      dropdownOptions {
+        url
+        latest
+      }
+    }
+  }
+}
+</static-query>
+
 <script>
 import Logo from "@/components/Logo";
 import {
@@ -92,9 +105,8 @@ export default {
   },
 
   metaInfo() {
-    const title = "Great Documentation starts here";
-    const description =
-      "DOCC is a starter theme with instant search and dark mode for writing great technical documentation. Based on Gridsome!";
+    const title = this.$static.metadata.settings.title;
+    const description = this.$static.metadata.settings.description;
 
     return {
       title: title,
@@ -125,6 +137,18 @@ export default {
         },
       ],
     };
+  },
+
+  methods: {
+    latestDocs() {
+      let options = this.$static.metadata.settings.dropdownOptions.find(
+        (o) => o.latest === true
+      );
+
+      if (options) {
+        return options.url;
+      }
+    },
   },
 };
 </script>

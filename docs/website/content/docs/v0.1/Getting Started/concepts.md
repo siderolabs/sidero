@@ -1,8 +1,6 @@
 ---
 description: ""
-sidebar: "docs"
-prev: "/docs/architecture/"
-next: "/docs/environments/"
+weight: 4
 ---
 
 # Concepts
