@@ -24,7 +24,9 @@ Sidero also needs these co-requisites in order to be useful:
 - [Cluster API Control Plane Provider Talos](https://github.com/talos-systems/cluster-api-control-plane-provider-talos)
 - [Cluster API Bootstrap Provider Talos](https://github.com/talos-systems/cluster-api-bootstrap-provider-talos)
 
-These components and Sidero are all installed using Cluster API's `clusterctl` tool.
-Since Sidero is built on top of Cluster API, an existing Kuberntes cluster is required for a "management plane".
-This cluster does not have to be based on Talos.
-However, if you would like to use Talos as the OS of choice for the Sidero management plane, you can find a number of ways to deploy Talos in the [documentation](https://www.talos.dev/docs/v0.6/en/guides/getting-started/intro).
+All componenets mentioned above can be installed using Cluster API's `clusterctl` tool.
+
+Because of the design of Cluster API, there is inherently a "chicken and egg" problem with needing an existing Kubernetes cluster in order to provision the management plane.
+Talos Systems and the Cluster API community have created tools to help make this transition easier.
+That being said, the management plane cluster does not have to be based on Talos.
+If you would, however, like to use Talos as the OS of choice for the Sidero management plane, you can find a number of ways to deploy Talos in the [documentation](https://www.talos.dev).
