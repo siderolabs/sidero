@@ -20,6 +20,7 @@ import (
 	"github.com/talos-systems/go-retry/retry"
 	"github.com/talos-systems/go-smbios/smbios"
 	talosnet "github.com/talos-systems/net"
+	"golang.org/x/sync/errgroup"
 	"golang.org/x/sys/unix"
 	"google.golang.org/grpc"
 
@@ -255,6 +256,8 @@ func mainFunc() error {
 			shutdown(err)
 		}
 
+		var eg errgroup.Group
+
 		for _, dev := range devices {
 			skip := false
 
@@ -274,25 +277,29 @@ func mainFunc() error {
 
 			path := filepath.Join("/dev", dev.Name())
 
-			log.Printf("Resetting %s", path)
+			eg.Go(func() error {
+				log.Printf("Resetting %s", path)
 
-			bd, err := blockdevice.Open(path)
-			if err != nil {
-				log.Printf("Skipping %s: %s", path, err)
+				bd, err := blockdevice.Open(path)
+				if err != nil {
+					log.Printf("Skipping %s: %s", path, err)
 
-				continue
-			}
+					return nil
+				}
 
-			method, err := bd.Wipe()
-			if err != nil {
-				shutdown(err)
-			}
+				method, err := bd.Wipe()
+				if err != nil {
+					return fmt.Errorf("failed wiping %q: %w", path, err)
+				}
 
-			log.Printf("Wiped %s with %s", path, method)
+				log.Printf("Wiped %s with %s", path, method)
 
-			if err := bd.Close(); err != nil {
-				shutdown(err)
-			}
+				return bd.Close()
+			})
+		}
+
+		if err := eg.Wait(); err != nil {
+			shutdown(err)
 		}
 
 		if err := wipe(ctx, client, s); err != nil {

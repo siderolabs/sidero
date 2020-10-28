@@ -22,6 +22,7 @@ require (
 	github.com/talos-systems/net v0.2.0
 	github.com/talos-systems/talos v0.7.0-alpha.7
 	github.com/talos-systems/talos/pkg/machinery v0.0.0-20201020161939-d2583e228288
+	golang.org/x/sync v0.0.0-20201008141435-b3e1573b7520
 	golang.org/x/sys v0.0.0-20201018230417-eeed37f84f13
 	google.golang.org/grpc v1.29.1
 	k8s.io/api v0.19.2
