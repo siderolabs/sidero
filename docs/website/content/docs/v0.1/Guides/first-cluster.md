@@ -56,7 +56,13 @@ next-server 192.168.254.2;
 if exists user-class and option user-class = "iPXE" {
   filename "http://192.168.254.2:8081/boot.ipxe";
 } else {
-  filename "ipxe.efi";
+  if substring (option vendor-class-identifier, 15, 5) = "00000" {
+    # BIOS
+    filename "undionly.kpxe";
+  } else {
+    # UEFI
+    filename "ipxe.efi";
+  }
 }
 
 host talos-mgmt-0 {
