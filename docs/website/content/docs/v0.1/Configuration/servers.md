@@ -39,4 +39,20 @@ spec:
 ## Server Acceptance
 
 In order for a server to be eligible for consideration, it _must_ be `accepted`.
+This is an important separation point which all `Server`s must pass.
+Before a `Server` is accepted, no write action will be performed against it.
+Thus, it is safe for a computer to be added to a network on which Sidero is operating.
+Sidero will never write to or wipe any disk on a computer which is not marked as `accepted`.
+
+This can be tedious for systems in which all attached computers should be considered to be under the control of Sidero.
+Thus, you may also choose to automatically accept any machine into Sidero on its discovery.
+Please keep in mind that this means that any newly-connected computer **WILL BE WIPED** automatically.
+You can enable auto-acceptance by pasing the `--auto-accept-servers=true` flag to `sidero-controller-manager`.
+
 Once accepted, a server will be reset (all disks wiped) and then made available to Sidero.
+
+You should never change an accepted `Server` to be _not_ accepted while it is in use.
+Because servers which are not accepted will not be modified, if a server which
+_was_ accepted is changed to _not_ accepted, the disk will _not_ be wiped upon
+its exit.
+
