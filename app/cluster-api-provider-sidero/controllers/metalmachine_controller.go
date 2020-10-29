@@ -220,7 +220,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 
 	err = r.patchProviderID(ctx, cluster, metalMachine)
 	if err != nil {
-		logger.Info("Failed to set provider ID")
+		logger.Info("Failed to set provider ID", "error", err)
 
 		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}
