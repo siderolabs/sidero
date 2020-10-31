@@ -10,7 +10,7 @@ module.exports = {
     favicon: "./src/assets/favicon.png",
     touchicon: "./src/assets/favicon.png",
   },
-  siteUrl: process.env.SITE_URL ? process.env.SITE_URL : "https://example.com",
+  siteUrl: process.env.SITE_URL ? process.env.SITE_URL : "https://sidero.dev",
   settings: {
     title: "Bare metal Kubernetes",
     description:
