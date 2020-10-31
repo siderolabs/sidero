@@ -39,7 +39,8 @@ const (
 type server struct {
 	api.UnimplementedAgentServer
 
-	autoAccept bool
+	autoAccept   bool
+	insecureWipe bool
 
 	c         controllerclient.Client
 	clientset *kubernetes.Clientset
@@ -105,6 +106,7 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 		log.Printf("Server %q needs wipe", obj.Name)
 
 		resp.Wipe = true
+		resp.InsecureWipe = s.insecureWipe
 	}
 
 	return resp, nil
@@ -229,7 +231,7 @@ func (s *server) ReconcileServerAddresses(ctx context.Context, in *api.Reconcile
 	return resp, nil
 }
 
-func Serve(autoAccept bool) error {
+func Serve(autoAccept, insecureWipe bool) error {
 	lis, err := net.Listen("tcp", ":"+Port)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
@@ -269,11 +271,12 @@ func Serve(autoAccept bool) error {
 	}
 
 	api.RegisterAgentServer(s, &server{
-		autoAccept:  autoAccept,
-		c:           c,
-		clientset:   clientset,
-		recorder:    recorder,
-		metalScheme: scheme,
+		autoAccept:   autoAccept,
+		insecureWipe: insecureWipe,
+		c:            c,
+		clientset:    clientset,
+		recorder:     recorder,
+		metalScheme:  scheme,
 	})
 
 	if err := s.Serve(lis); err != nil {

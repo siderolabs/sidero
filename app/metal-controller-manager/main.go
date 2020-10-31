@@ -51,12 +51,14 @@ func main() {
 		apiEndpoint          string
 		enableLeaderElection bool
 		autoAcceptServers    bool
+		insecureWipe         bool
 	)
 
 	flag.StringVar(&apiEndpoint, "api-endpoint", "", "The endpoint used by the discovery environment.")
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8081", "The address the metric endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&autoAcceptServers, "auto-accept-servers", false, "Add servers as 'accepted' when they register with Sidero API.")
+	flag.BoolVar(&insecureWipe, "insecure-wipe", false, "Do not wipe the entire disk.")
 
 	flag.Parse()
 
@@ -152,7 +154,7 @@ func main() {
 	setupLog.Info("starting internal API server")
 
 	go func() {
-		if err := server.Serve(autoAcceptServers); err != nil {
+		if err := server.Serve(autoAcceptServers, insecureWipe); err != nil {
 			setupLog.Error(err, "unable to start API server", "controller", "Environment")
 			os.Exit(1)
 		}
