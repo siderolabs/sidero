@@ -2,14 +2,15 @@ syntax = "proto3";
 
 package api;
 
-option go_package = "github.com/talos-systems/sidero/app/metal-controller-manager/internal/api";
+option go_package =
+    "github.com/talos-systems/sidero/app/metal-controller-manager/internal/api";
 
 service Agent {
-  rpc CreateServer(CreateServerRequest) returns (CreateServerResponse);
+  rpc CreateServer(CreateServerRequest) returns(CreateServerResponse);
   rpc MarkServerAsWiped(MarkServerAsWipedRequest)
-      returns (MarkServerAsWipedResponse);
+      returns(MarkServerAsWipedResponse);
   rpc ReconcileServerAddresses(ReconcileServerAddressesRequest)
-      returns (ReconcileServerAddressesResponse);
+      returns(ReconcileServerAddressesResponse);
 }
 
 message SystemInformation {
@@ -38,7 +39,10 @@ message Address {
   string address = 2;
 }
 
-message CreateServerResponse { bool wipe = 1; }
+message CreateServerResponse {
+  bool wipe = 1;
+  bool insecure_wipe = 2;
+}
 
 message MarkServerAsWipedRequest { string uuid = 1; }
 

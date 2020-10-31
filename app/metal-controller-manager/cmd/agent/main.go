@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -287,12 +288,23 @@ func mainFunc() error {
 					return nil
 				}
 
-				method, err := bd.Wipe()
-				if err != nil {
-					return fmt.Errorf("failed wiping %q: %w", path, err)
-				}
+				if createResp.GetInsecureWipe() {
+					_, err := bd.Device().WriteAt(bytes.Repeat([]byte{0}, 512), 0)
+					if err != nil {
+						shutdown(err)
+					}
 
-				log.Printf("Wiped %s with %s", path, method)
+					if err := bd.Reset(); err != nil {
+						shutdown(err)
+					}
+				} else {
+					method, err := bd.Wipe()
+					if err != nil {
+						return fmt.Errorf("failed wiping %q: %w", path, err)
+					}
+
+					log.Printf("Wiped %s with %s", path, method)
+				}
 
 				return bd.Close()
 			})
