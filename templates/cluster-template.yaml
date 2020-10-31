@@ -6,10 +6,10 @@ spec:
   clusterNetwork:
     pods:
       cidrBlocks:
-        - 10.97.0.0/16
+        - 10.244.0.0/16
     services:
       cidrBlocks:
-        - 10.98.0.0/16
+        - 10.96.0.0/12
   infrastructureRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     kind: MetalCluster
@@ -31,7 +31,7 @@ spec:
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: MetalMachineTemplate
 metadata:
-    name: ${CLUSTER_NAME}-cp
+  name: ${CLUSTER_NAME}-cp
 spec:
   template:
     spec:
@@ -43,7 +43,7 @@ spec:
 apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
 kind: TalosControlPlane
 metadata:
-    name: ${CLUSTER_NAME}-cp
+  name: ${CLUSTER_NAME}-cp
 spec:
   version: ${KUBERNETES_VERSION}
   replicas: ${CONTROL_PLANE_MACHINE_COUNT}
@@ -53,23 +53,23 @@ spec:
     name: ${CLUSTER_NAME}-cp
   controlPlaneConfig:
     init:
-        generateType: init
+      generateType: init
     controlplane:
-        generateType: controlplane
+      generateType: controlplane
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
 kind: TalosConfigTemplate
 metadata:
-    name: ${CLUSTER_NAME}-workers
+  name: ${CLUSTER_NAME}-workers
 spec:
   template:
     spec:
-        generateType: join
+      generateType: join
 ---
 apiVersion: cluster.x-k8s.io/v1alpha3
 kind: MachineDeployment
 metadata:
-    name: ${CLUSTER_NAME}-workers
+  name: ${CLUSTER_NAME}-workers
 spec:
   clusterName: ${CLUSTER_NAME}
   replicas: ${WORKER_MACHINE_COUNT}
@@ -91,7 +91,7 @@ spec:
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: MetalMachineTemplate
 metadata:
-    name: ${CLUSTER_NAME}-workers
+  name: ${CLUSTER_NAME}-workers
 spec:
   template:
     spec:
