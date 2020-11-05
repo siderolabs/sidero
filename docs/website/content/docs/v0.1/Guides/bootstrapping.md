@@ -151,10 +151,23 @@ To register a server with Sidero, simply turn it on and Sidero will do the rest.
 Once the registration is complete, you should see the servers registered with `kubectl get servers`:
 
 ```bash
-$ kubectl get servers
-NAME                                   AGE
-00000000-0000-0000-0000-d05099d33360   3m14s
+$ kubectl get servers -o wide
+NAME                                   HOSTNAME        ACCEPTED   ALLOCATED   CLEAN
+00000000-0000-0000-0000-d05099d33360   192.168.254.2   false      false       false
 ```
+
+## Accept the Servers
+
+Note in the output above that the newly registered servers are not `accepted`.
+In order for a server to be eligible for consideration, it _must_ be marked as `accepted`.
+Before a `Server` is accepted, no write action will be performed against it.
+Servers can be accepted by issuing a patch command like:
+
+```bash
+kubectl patch server 00000000-0000-0000-0000-d05099d33360 --type='json' -p='[{"op": "replace", "path": "/spec/accepted", "value": true}]'
+```
+
+For more information on server acceptance, see the [serer docs](/docs/v0.1/Configuration/servers.md).
 
 ## Create the Default Environment
 
@@ -202,7 +215,7 @@ EOF
 We must now create a server class to wrap our servers we registered.
 This is necessary for using the Talos control plane provider for Cluster API.
 The qualifiers needed for your server class will differ based on the data provided by your registration flow.
-See the [server class docs](/docs/serverclasses/) for more info on how these work.
+See the [server class docs](/docs/v0.1/Configuration/serverclasses.md) for more info on how these work.
 
 Here is an example of how to apply the server class once you have the proper info:
 
