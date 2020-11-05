@@ -167,7 +167,7 @@ Servers can be accepted by issuing a patch command like:
 kubectl patch server 00000000-0000-0000-0000-d05099d33360 --type='json' -p='[{"op": "replace", "path": "/spec/accepted", "value": true}]'
 ```
 
-For more information on server acceptance, see the [serer docs](/docs/v0.1/Configuration/servers.md).
+For more information on server acceptance, see the [serer docs](/docs/v0.1/configuration/servers).
 
 ## Create the Default Environment
 
@@ -215,7 +215,7 @@ EOF
 We must now create a server class to wrap our servers we registered.
 This is necessary for using the Talos control plane provider for Cluster API.
 The qualifiers needed for your server class will differ based on the data provided by your registration flow.
-See the [server class docs](/docs/v0.1/Configuration/serverclasses.md) for more info on how these work.
+See the [server class docs](/docs/v0.1/configuration/serverclasses) for more info on how these work.
 
 Here is an example of how to apply the server class once you have the proper info:
 
