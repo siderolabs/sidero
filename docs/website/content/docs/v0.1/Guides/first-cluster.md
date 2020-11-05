@@ -94,7 +94,7 @@ Servers can be accepted by issuing a patch command like:
 kubectl patch server 00000000-0000-0000-0000-d05099d33360 --type='json' -p='[{"op": "replace", "path": "/spec/accepted", "value": true}]'
 ```
 
-For more information on server acceptance, see the [serer docs](/docs/v0.1/Configuration/servers.md).
+For more information on server acceptance, see the [serer docs](/docs/v0.1/configuration/servers).
 
 
 ## Create the Cluster
