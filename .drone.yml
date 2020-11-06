@@ -85,7 +85,7 @@ steps:
       GHCR_PASSWORD:
         from_secret: ghcr_token
     commands:
-      - docker login --username "$${GHCR_USERNAME}" --password "$${GHCR_PASSWORD}"
+      - docker login --username "$${GHCR_USERNAME}" --password "$${GHCR_PASSWORD}" ghcr.io
       - make PUSH=true
     when:
       event:
@@ -185,4 +185,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: 6f5d28e7681196d45877703fce1d8b9ada67955a2cd2205ad01b27d64bd04004
+hmac: 0391f0a57e8f4ca67a8bc0f3d646da52adf0ee8e1d2138d4b65cf5859db33d77
+
+...
