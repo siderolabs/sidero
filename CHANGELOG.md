@@ -1,6 +1,25 @@
 
+<a name="v0.1.0-alpha.8"></a>
+## [v0.1.0-alpha.8](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.7...v0.1.0-alpha.8) (2020-11-06)
+
+### Chore
+
+* fix docker login
+* move to ghcr.io
+
+### Docs
+
+* fix typos in bootstrap guides
+* update bootstrap docs links
+* add note around server acceptance
+
+### Feat
+
+* add option for insecure wipe
+
+
 <a name="v0.1.0-alpha.7"></a>
-## [v0.1.0-alpha.7](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.6...v0.1.0-alpha.7) (2020-10-30)
+## [v0.1.0-alpha.7](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.6...v0.1.0-alpha.7) (2020-10-31)
 
 ### Docs
 
@@ -20,6 +39,10 @@
 
 * log error with error log
 * wipe disk fully in the agent
+
+### Release
+
+* **v0.1.0-alpha.7:** prepare release
 
 
 <a name="v0.1.0-alpha.6"></a>
