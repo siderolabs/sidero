@@ -24,10 +24,6 @@ configPatches:
     path: /machine/install
     value:
       disk: /dev/sda
-      image: docker.io/autonomy/installer:v0.6.0-beta.0
-      bootloader: true
-      wipe: false
-      force: false
   - op: replace
     path: /cluster/network/cni
     value:

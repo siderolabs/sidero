@@ -80,12 +80,12 @@ steps:
     image: autonomy/build-container:latest
     pull: always
     environment:
-      DOCKER_USERNAME:
-        from_secret: docker_username
-      DOCKER_PASSWORD:
-        from_secret: docker_password
+      GHCR_USERNAME:
+        from_secret: ghcr_username
+      GHCR_PASSWORD:
+        from_secret: ghcr_token
     commands:
-      - docker login --username "$${DOCKER_USERNAME}" --password "$${DOCKER_PASSWORD}"
+      - docker login --username "$${GHCR_USERNAME}" --password "$${GHCR_PASSWORD}"
       - make PUSH=true
     when:
       event:
@@ -186,5 +186,3 @@ depends_on:
 ---
 kind: signature
 hmac: 6f5d28e7681196d45877703fce1d8b9ada67955a2cd2205ad01b27d64bd04004
-
-...

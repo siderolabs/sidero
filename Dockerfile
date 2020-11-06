@@ -92,13 +92,13 @@ FROM base AS build-cluster-api-provider-sidero
 RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /manager ./app/cluster-api-provider-sidero
 RUN chmod +x /manager
 
-## TODO(rsmitty): make bmc pkg and move to autonomy image
+## TODO(rsmitty): make bmc pkg and move to talos-systems image
 FROM scratch AS cluster-api-provider-sidero
-COPY --from=docker.io/autonomy/ca-certificates:ffdacf0 / /
-COPY --from=docker.io/autonomy/fhs:ffdacf0 / /
-COPY --from=docker.io/autonomy/musl:ffdacf0 / /
-COPY --from=docker.io/autonomy/libressl:ffdacf0 / /
-COPY --from=docker.io/autonomy/ipmitool:ffdacf0 / /
+COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/musl:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/libressl:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/ipmitool:v0.3.0-23-gfe414af / /
 COPY --from=build-cluster-api-provider-sidero /manager /manager
 ENTRYPOINT [ "/manager" ]
 
@@ -116,30 +116,30 @@ RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags
 RUN chmod +x /agent
 
 FROM scratch AS agent
-COPY --from=docker.io/autonomy/ca-certificates:v0.2.0 / /
-COPY --from=docker.io/autonomy/fhs:v0.2.0 / /
+COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-23-gfe414af / /
 COPY --from=agent-build /agent /agent
 ENTRYPOINT [ "/agent" ]
 
-FROM autonomy/tools:v0.2.0 AS initramfs-archive
+FROM ghcr.io/talos-systems/tools:v0.3.0-7-g08245ac AS initramfs-archive
 ENV PATH /toolchain/bin
 RUN [ "/toolchain/bin/mkdir", "/bin" ]
 RUN [ "ln", "-s", "/toolchain/bin/bash", "/bin/sh" ]
 WORKDIR /initramfs
 COPY --from=agent /agent ./init
-COPY --from=docker.io/autonomy/linux-firmware:v0.2.0 /lib/firmware/bnx2 ./lib/firmware/bnx2
-COPY --from=docker.io/autonomy/linux-firmware:v0.2.0 /lib/firmware/bnx2x ./lib/firmware/bnx2x
+COPY --from=ghcr.io/talos-systems/linux-firmware:v0.3.0-23-gfe414af /lib/firmware/bnx2 ./lib/firmware/bnx2
+COPY --from=ghcr.io/talos-systems/linux-firmware:v0.3.0-23-gfe414af /lib/firmware/bnx2x ./lib/firmware/bnx2x
 RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 
 FROM scratch AS initramfs
 COPY --from=initramfs-archive /initramfs.xz /initramfs.xz
 
 FROM scratch AS metal-controller-manager
-COPY --from=docker.io/autonomy/ca-certificates:v0.2.0 / /
-COPY --from=docker.io/autonomy/fhs:v0.2.0 / /
-COPY --from=docker.io/autonomy/musl:ffdacf0 / /
-COPY --from=docker.io/autonomy/libressl:ffdacf0 / /
-COPY --from=docker.io/autonomy/ipmitool:ffdacf0 / /
+COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/musl:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/libressl:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/ipmitool:v0.3.0-23-gfe414af / /
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe.0
 COPY --from=assets /ipxe.efi /var/lib/sidero/tftp/ipxe.efi
@@ -153,8 +153,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags
 RUN chmod +x /metal-metadata-server
 
 FROM scratch AS metal-metadata-server
-COPY --from=docker.io/autonomy/ca-certificates:v0.1.0 / /
-COPY --from=docker.io/autonomy/fhs:v0.1.0 / /
+COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-23-gfe414af / /
 COPY --from=build-metal-metadata-server /metal-metadata-server /metal-metadata-server
 ENTRYPOINT [ "/metal-metadata-server" ]
 
