@@ -94,11 +94,11 @@ RUN chmod +x /manager
 
 ## TODO(rsmitty): make bmc pkg and move to talos-systems image
 FROM scratch AS cluster-api-provider-sidero
-COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-23-gfe414af / /
-COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-23-gfe414af / /
-COPY --from=ghcr.io/talos-systems/musl:v0.3.0-23-gfe414af / /
-COPY --from=ghcr.io/talos-systems/libressl:v0.3.0-23-gfe414af / /
-COPY --from=ghcr.io/talos-systems/ipmitool:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-24-g8e63786 / /
+COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-24-g8e63786 / /
+COPY --from=ghcr.io/talos-systems/musl:v0.3.0-24-g8e63786 / /
+COPY --from=ghcr.io/talos-systems/libressl:v0.3.0-24-g8e63786 / /
+COPY --from=ghcr.io/talos-systems/ipmitool:v0.3.0-24-g8e63786 / /
 COPY --from=build-cluster-api-provider-sidero /manager /manager
 ENTRYPOINT [ "/manager" ]
 
@@ -116,8 +116,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags
 RUN chmod +x /agent
 
 FROM scratch AS agent
-COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-23-gfe414af / /
-COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-24-g8e63786 / /
+COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-24-g8e63786 / /
 COPY --from=agent-build /agent /agent
 ENTRYPOINT [ "/agent" ]
 
@@ -127,24 +127,24 @@ RUN [ "/toolchain/bin/mkdir", "/bin" ]
 RUN [ "ln", "-s", "/toolchain/bin/bash", "/bin/sh" ]
 WORKDIR /initramfs
 COPY --from=agent /agent ./init
-COPY --from=ghcr.io/talos-systems/linux-firmware:v0.3.0-23-gfe414af /lib/firmware/bnx2 ./lib/firmware/bnx2
-COPY --from=ghcr.io/talos-systems/linux-firmware:v0.3.0-23-gfe414af /lib/firmware/bnx2x ./lib/firmware/bnx2x
+COPY --from=ghcr.io/talos-systems/linux-firmware:v0.3.0-24-g8e63786 /lib/firmware/bnx2 ./lib/firmware/bnx2
+COPY --from=ghcr.io/talos-systems/linux-firmware:v0.3.0-24-g8e63786 /lib/firmware/bnx2x ./lib/firmware/bnx2x
 RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 
 FROM scratch AS initramfs
 COPY --from=initramfs-archive /initramfs.xz /initramfs.xz
 
 FROM scratch AS metal-controller-manager
-COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-23-gfe414af / /
-COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-23-gfe414af / /
-COPY --from=ghcr.io/talos-systems/musl:v0.3.0-23-gfe414af / /
-COPY --from=ghcr.io/talos-systems/libressl:v0.3.0-23-gfe414af / /
-COPY --from=ghcr.io/talos-systems/ipmitool:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-24-g8e63786 / /
+COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-24-g8e63786 / /
+COPY --from=ghcr.io/talos-systems/musl:v0.3.0-24-g8e63786 / /
+COPY --from=ghcr.io/talos-systems/libressl:v0.3.0-24-g8e63786 / /
+COPY --from=ghcr.io/talos-systems/ipmitool:v0.3.0-24-g8e63786 / /
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe.0
 COPY --from=assets /ipxe.efi /var/lib/sidero/tftp/ipxe.efi
 COPY --from=initramfs /initramfs.xz /var/lib/sidero/env/agent/initramfs.xz
-ADD https://github.com/talos-systems/talos/releases/download/v0.4.1/vmlinuz /var/lib/sidero/env/agent/vmlinuz
+COPY --from=ghcr.io/talos-systems/kernel:v0.3.0-24-g8e63786 /boot/vmlinuz /var/lib/sidero/env/agent/vmlinuz
 COPY --from=build-metal-controller-manager /manager /manager
 ENTRYPOINT [ "/manager" ]
 
@@ -153,8 +153,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags
 RUN chmod +x /metal-metadata-server
 
 FROM scratch AS metal-metadata-server
-COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-23-gfe414af / /
-COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-23-gfe414af / /
+COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-24-g8e63786 / /
+COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-24-g8e63786 / /
 COPY --from=build-metal-metadata-server /metal-metadata-server /metal-metadata-server
 ENTRYPOINT [ "/metal-metadata-server" ]
 
