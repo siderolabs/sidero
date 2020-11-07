@@ -7,6 +7,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -295,7 +296,9 @@ func mainFunc() error {
 					}
 
 					if err := bd.Reset(); err != nil {
-						shutdown(err)
+						if !errors.Is(err, blockdevice.ErrMissingPartitionTable) {
+							shutdown(err)
+						}
 					}
 				} else {
 					method, err := bd.Wipe()
