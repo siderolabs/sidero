@@ -4,10 +4,14 @@
 
 package constants
 
+import "time"
+
 const (
 	DataDirectory    = "/var/lib/sidero"
 	AgentEndpointArg = "sidero.endpoint"
 
 	KernelAsset = "vmlinuz"
 	InitrdAsset = "initramfs.xz"
+
+	DefaultRequeueAfter = time.Second * 20
 )
