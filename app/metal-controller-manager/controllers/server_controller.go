@@ -20,6 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
 	"github.com/talos-systems/sidero/internal/pkg/metal"
 )
 
@@ -47,7 +48,31 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
+	serverRef, err := reference.GetReference(r.Scheme, &s)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	mgmtClient, err := metal.NewManagementClient(&s.Spec)
+	if err != nil {
+		log.Error(err, "failed to create management client")
+		r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to initialize management client: %s.", err))
+
+		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, err
+	}
+
 	f := func(ready, requeue bool) (ctrl.Result, error) {
+		s.Status.Power = "off"
+
+		poweredOn, err := mgmtClient.IsPoweredOn()
+		if err != nil {
+			s.Status.Power = "unknown"
+		}
+
+		if poweredOn {
+			s.Status.Power = "on"
+		}
+
 		s.Status.Ready = ready
 
 		result := ctrl.Result{Requeue: requeue}
@@ -59,11 +84,6 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return result, nil
 	}
 
-	serverRef, err := reference.GetReference(r.Scheme, &s)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
 	switch {
 	case !s.Spec.Accepted:
 		return f(false, false)
@@ -72,14 +92,6 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 		return f(false, false)
 	case !s.Status.InUse && s.Status.IsClean:
-		mgmtClient, err := metal.NewManagementClient(&s.Spec)
-		if err != nil {
-			log.Error(err, "failed to create management client")
-			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to initialize management client: %s.", err))
-
-			return f(false, true)
-		}
-
 		poweredOn, err := mgmtClient.IsPoweredOn()
 		if err != nil {
 			log.Error(err, "failed to check power state")

@@ -101,6 +101,7 @@ type ServerStatus struct {
 	IsClean    bool                  `json:"isClean"`
 	Conditions []clusterv1.Condition `json:"conditions,omitempty"`
 	Addresses  []corev1.NodeAddress  `json:"addresses,omitempty"`
+	Power      string                `json:"power,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -110,6 +111,7 @@ type ServerStatus struct {
 // +kubebuilder:printcolumn:name="Accepted",type="boolean",JSONPath=".spec.accepted",description="indicates if the server is accepted"
 // +kubebuilder:printcolumn:name="Allocated",type="boolean",JSONPath=".status.inUse",description="indicates that the server has been allocated"
 // +kubebuilder:printcolumn:name="Clean",type="boolean",JSONPath=".status.isClean",description="indicates if the server is clean or not"
+// +kubebuilder:printcolumn:name="Power",type="string",JSONPath=".status.power",description="display the current power status"
 
 // Server is the Schema for the servers API.
 type Server struct {
