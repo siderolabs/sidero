@@ -9,12 +9,14 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/cluster-api/util/conditions"
+	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -48,6 +50,11 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
+	patchHelper, err := patch.NewHelper(&s, r)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	serverRef, err := reference.GetReference(r.Scheme, &s)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -61,24 +68,26 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, err
 	}
 
+	s.Status.Power = "off"
+
+	poweredOn, powerErr := mgmtClient.IsPoweredOn()
+	if powerErr != nil {
+		s.Status.Power = "unknown"
+	}
+
+	if poweredOn {
+		s.Status.Power = "on"
+	}
+
 	f := func(ready, requeue bool) (ctrl.Result, error) {
-		s.Status.Power = "off"
-
-		poweredOn, err := mgmtClient.IsPoweredOn()
-		if err != nil {
-			s.Status.Power = "unknown"
-		}
-
-		if poweredOn {
-			s.Status.Power = "on"
-		}
-
 		s.Status.Ready = ready
 
 		result := ctrl.Result{Requeue: requeue}
 
-		if err := r.Status().Update(ctx, &s); err != nil {
-			return result, err
+		if err := patchHelper.Patch(ctx, &s, patch.WithOwnedConditions{
+			Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPowerCycle},
+		}); err != nil {
+			return result, errors.WithStack(err)
 		}
 
 		return result, nil
@@ -92,10 +101,9 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 		return f(false, false)
 	case !s.Status.InUse && s.Status.IsClean:
-		poweredOn, err := mgmtClient.IsPoweredOn()
-		if err != nil {
-			log.Error(err, "failed to check power state")
-			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", err))
+		if powerErr != nil {
+			log.Error(powerErr, "failed to check power state")
+			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", powerErr))
 
 			return f(false, true)
 		}
@@ -122,18 +130,9 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			return f(false, false)
 		}
 
-		mgmtClient, err := metal.NewManagementClient(&s.Spec)
-		if err != nil {
-			log.Error(err, "failed to create management client")
-			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to initialize management client: %s.", err))
-
-			return f(false, true)
-		}
-
-		poweredOn, err := mgmtClient.IsPoweredOn()
-		if err != nil {
-			log.Error(err, "failed to check power state")
-			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", err))
+		if powerErr != nil {
+			log.Error(powerErr, "failed to check power state")
+			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", powerErr))
 
 			return f(false, true)
 		}

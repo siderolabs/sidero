@@ -21,6 +21,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	"sigs.k8s.io/cluster-api/util/conditions"
+	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
@@ -29,7 +32,10 @@ import (
 	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
 )
 
-var ErrNotInUse = errors.New("server not in use")
+var (
+	ErrNotInUse     = errors.New("server not in use")
+	ErrBootFromDisk = errors.New("boot from disk")
+)
 
 const bootFile = `#!ipxe
 chain ipxe?uuid=${uuid}&mac=${mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}
@@ -41,6 +47,10 @@ initrd /env/{{ .Env.Name }}/{{ .InitrdAsset }}
 boot
 `))
 
+const ipxeBootFromDisk = `#!ipxe
+exit
+`
+
 var (
 	apiEndpoint          string
 	extraAgentKernelArgs []string
@@ -48,6 +58,11 @@ var (
 
 func bootFileHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, bootFile)
+}
+
+//nolint: unparam
+func bootFromDiskHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, ipxeBootFromDisk)
 }
 
 func ipxeHandler(w http.ResponseWriter, r *http.Request) {
@@ -91,6 +106,13 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 
 	env, err := newEnvironment(c, obj)
 	if err != nil {
+		if errors.Is(err, ErrBootFromDisk) {
+			log.Printf("Server %q booting from disk", uuid)
+			bootFromDiskHandler(w, r)
+
+			return
+		}
+
 		if apierrors.IsNotFound(err) {
 			log.Printf("Environment not found: %v", err)
 			w.WriteHeader(http.StatusNotFound)
@@ -140,6 +162,14 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	if _, err := buf.WriteTo(w); err != nil {
 		log.Printf("error writing to response: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
+
+		return
+	}
+
+	if env.ObjectMeta.Name != "agent" {
+		if err = markAsPXEBooted(c, obj); err != nil {
+			log.Printf("error marking server as PXE booted: %s", err)
+		}
 	}
 }
 
@@ -227,6 +257,8 @@ func newEnvironment(c client.Client, server *metalv1alpha1.Server) (env *metalv1
 		return newAgentEnvironment(), nil
 	case !server.Status.InUse:
 		return nil, ErrNotInUse
+	case conditions.Has(server, metalv1alpha1.ConditionPXEBooted) && !server.Spec.PXEBootAlways:
+		return nil, ErrBootFromDisk
 	case server.Spec.EnvironmentRef != nil:
 		env, err = newEnvironmentFromServer(c, server)
 		if err != nil {
@@ -330,4 +362,17 @@ func newEnvironmentFromServerClass(c client.Client, server *metalv1alpha1.Server
 	}
 
 	return env, nil
+}
+
+func markAsPXEBooted(c client.Client, server *metalv1alpha1.Server) error {
+	patchHelper, err := patch.NewHelper(server, c)
+	if err != nil {
+		return err
+	}
+
+	conditions.MarkTrue(server, metalv1alpha1.ConditionPXEBooted)
+
+	return patchHelper.Patch(context.Background(), server, patch.WithOwnedConditions{
+		Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPXEBooted},
+	})
 }

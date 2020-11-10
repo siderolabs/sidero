@@ -89,19 +89,38 @@ type ServerSpec struct {
 	ManagementAPI     *ManagementAPI          `json:"managementApi,omitempty"`
 	ConfigPatches     []ConfigPatches         `json:"configPatches,omitempty"`
 	Accepted          bool                    `json:"accepted"`
+	PXEBootAlways     bool                    `json:"pxeBootAlways,omitempty"`
 }
 
-// ConditionPowerCycle is used to control the powercycle flow.
-const ConditionPowerCycle clusterv1.ConditionType = "PowerCycle"
+const (
+	// ConditionPowerCycle is used to control the powercycle flow.
+	ConditionPowerCycle clusterv1.ConditionType = "PowerCycle"
+	// ConditionPXEBooted is used to record the fact that server got PXE booted.
+	ConditionPXEBooted clusterv1.ConditionType = "PXEBooted"
+)
 
 // ServerStatus defines the observed state of Server.
 type ServerStatus struct {
-	Ready      bool                  `json:"ready"`
-	InUse      bool                  `json:"inUse"`
-	IsClean    bool                  `json:"isClean"`
+	// Ready is true when server is accepted and in use.
+	// +optional
+	Ready bool `json:"ready"`
+
+	// InUse is true when server is assigned to some MetalMachine.
+	// +optional
+	InUse bool `json:"inUse"`
+
+	// IsClean is true when server disks are wiped.
+	// +optional
+	IsClean bool `json:"isClean"`
+
+	// Conditions defines current service state of the Server.
 	Conditions []clusterv1.Condition `json:"conditions,omitempty"`
-	Addresses  []corev1.NodeAddress  `json:"addresses,omitempty"`
-	Power      string                `json:"power,omitempty"`
+
+	// Addresses lists discovered node IPs.
+	Addresses []corev1.NodeAddress `json:"addresses,omitempty"`
+
+	// Power is the current power state of the server: "on", "off" or "unknown".
+	Power string `json:"power,omitempty"`
 }
 
 // +kubebuilder:object:root=true

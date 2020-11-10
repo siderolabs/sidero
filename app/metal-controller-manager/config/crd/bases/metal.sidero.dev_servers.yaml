@@ -164,6 +164,8 @@ spec:
                 required:
                 - endpoint
                 type: object
+              pxeBootAlways:
+                type: boolean
               system:
                 properties:
                   family:
@@ -186,6 +188,7 @@ spec:
             description: ServerStatus defines the observed state of Server.
             properties:
               addresses:
+                description: Addresses lists discovered node IPs.
                 items:
                   description: NodeAddress contains information for the node's address.
                   properties:
@@ -202,6 +205,7 @@ spec:
                   type: object
                 type: array
               conditions:
+                description: Conditions defines current service state of the Server.
                 items:
                   description: Condition defines an observation of a Cluster API resource
                     operational state.
@@ -245,17 +249,18 @@ spec:
                   type: object
                 type: array
               inUse:
+                description: InUse is true when server is assigned to some MetalMachine.
                 type: boolean
               isClean:
+                description: IsClean is true when server disks are wiped.
                 type: boolean
               power:
+                description: 'Power is the current power state of the server: "on",
+                  "off" or "unknown".'
                 type: string
               ready:
+                description: Ready is true when server is accepted and in use.
                 type: boolean
-            required:
-            - inUse
-            - isClean
-            - ready
             type: object
         type: object
     served: true
