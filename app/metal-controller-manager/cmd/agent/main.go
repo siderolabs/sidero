@@ -5,9 +5,7 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -290,16 +288,11 @@ func mainFunc() error {
 				}
 
 				if createResp.GetInsecureWipe() {
-					_, err := bd.Device().WriteAt(bytes.Repeat([]byte{0}, 512), 0)
-					if err != nil {
-						shutdown(err)
+					if err = bd.FastWipe(); err != nil {
+						return fmt.Errorf("failed wiping %q: %w", path, err)
 					}
 
-					if err := bd.Reset(); err != nil {
-						if !errors.Is(err, blockdevice.ErrMissingPartitionTable) {
-							shutdown(err)
-						}
-					}
+					log.Printf("Fast wiped %s", path)
 				} else {
 					method, err := bd.Wipe()
 					if err != nil {
