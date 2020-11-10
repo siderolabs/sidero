@@ -22,6 +22,7 @@ import (
 	"k8s.io/utils/pointer"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/cluster-api/util"
+	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -275,6 +276,8 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 
 		serverResource.Status.InUse = false
 		serverResource.OwnerReferences = []metav1.OwnerReference{}
+
+		conditions.Delete(serverResource, metalv1alpha1.ConditionPXEBooted)
 
 		if err := patchHelper.Patch(ctx, serverResource); err != nil {
 			return ctrl.Result{}, err

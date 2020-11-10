@@ -23,6 +23,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	controllerclient "sigs.k8s.io/controller-runtime/pkg/client"
@@ -129,7 +130,9 @@ func (s *server) MarkServerAsWiped(ctx context.Context, in *api.MarkServerAsWipe
 
 	conditions.MarkTrue(obj, metalv1alpha1.ConditionPowerCycle)
 
-	if err := patchHelper.Patch(ctx, obj); err != nil {
+	if err := patchHelper.Patch(ctx, obj, patch.WithOwnedConditions{
+		Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPowerCycle},
+	}); err != nil {
 		return nil, err
 	}
 

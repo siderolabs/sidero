@@ -11,6 +11,7 @@ import (
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -152,6 +153,11 @@ func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
+	patchHelper, err := patch.NewHelper(&sc, r)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	sl := &metalv1alpha1.ServerList{}
 
 	if err := r.List(ctx, sl); err != nil {
@@ -181,7 +187,7 @@ func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 	sc.Status.ServersAvailable = avail
 	sc.Status.ServersInUse = used
 
-	if err := r.Status().Update(ctx, &sc); err != nil {
+	if err := patchHelper.Patch(ctx, &sc); err != nil {
 		return ctrl.Result{}, err
 	}
 
