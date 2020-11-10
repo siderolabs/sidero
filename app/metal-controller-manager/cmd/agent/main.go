@@ -171,21 +171,14 @@ func reconcileIPs(ctx context.Context, client api.AgentClient, s *smbios.Smbios,
 func shutdown(err error) {
 	if err != nil {
 		log.Println(err)
-
-		for i := 10; i >= 0; i-- {
-			log.Printf("rebooting in %d seconds\n", i)
-			time.Sleep(1 * time.Second)
-		}
-
-		if unix.Reboot(unix.LINUX_REBOOT_CMD_RESTART) == nil {
-			select {}
-		}
-
-		os.Exit(1)
 	}
 
-	if unix.Reboot(unix.LINUX_REBOOT_CMD_POWER_OFF) == nil {
-		// Wait forever.
+	for i := 10; i >= 0; i-- {
+		log.Printf("rebooting in %d seconds\n", i)
+		time.Sleep(1 * time.Second)
+	}
+
+	if unix.Reboot(unix.LINUX_REBOOT_CMD_RESTART) == nil {
 		select {}
 	}
 
