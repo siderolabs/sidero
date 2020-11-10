@@ -1,6 +1,15 @@
 
+<a name="v0.1.0-alpha.9"></a>
+## [v0.1.0-alpha.9](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.8...v0.1.0-alpha.9) (2020-11-10)
+
+### Fix
+
+* update pkgs
+* ignore missing partition error
+
+
 <a name="v0.1.0-alpha.8"></a>
-## [v0.1.0-alpha.8](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.7...v0.1.0-alpha.8) (2020-11-06)
+## [v0.1.0-alpha.8](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.7...v0.1.0-alpha.8) (2020-11-07)
 
 ### Chore
 
@@ -16,6 +25,10 @@
 ### Feat
 
 * add option for insecure wipe
+
+### Release
+
+* **v0.1.0-alpha.8:** prepare release
 
 
 <a name="v0.1.0-alpha.7"></a>
