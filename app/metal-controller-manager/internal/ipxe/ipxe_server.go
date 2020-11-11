@@ -41,7 +41,10 @@ initrd /env/{{ .Env.Name }}/{{ .InitrdAsset }}
 boot
 `))
 
-var apiEndpoint string
+var (
+	apiEndpoint          string
+	extraAgentKernelArgs []string
+)
 
 func bootFileHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, bootFile)
@@ -140,8 +143,9 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ServeIPXE(endpoint string) error {
+func ServeIPXE(endpoint string, args []string) error {
 	apiEndpoint = endpoint
+	extraAgentKernelArgs = args
 
 	mux := http.NewServeMux()
 
@@ -267,6 +271,8 @@ func newAgentEnvironment() *metalv1alpha1.Environment {
 		"printk.devkmsg=on",
 		fmt.Sprintf("%s=%s:%s", constants.AgentEndpointArg, apiEndpoint, server.Port),
 	}
+
+	args = append(args, extraAgentKernelArgs...)
 
 	env := &metalv1alpha1.Environment{
 		ObjectMeta: metav1.ObjectMeta{
