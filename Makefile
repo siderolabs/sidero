@@ -9,7 +9,7 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 PKGS ?= ./...
-TALOS_RELEASE ?= v0.7.0-alpha.7
+TALOS_RELEASE ?= v0.7.0-beta.1
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
@@ -121,6 +121,7 @@ $(ARTIFACTS)/$(TALOS_RELEASE): $(ARTIFACTS)/$(TALOS_RELEASE)/vmlinuz-amd64 $(ART
 
 .PHONY: talos-artifacts
 talos-artifacts: $(ARTIFACTS)/$(TALOS_RELEASE)
+	@chmod +x $(ARTIFACTS)/$(TALOS_RELEASE)/talosctl-linux-amd64
 
 .PHONY: sfyra
 sfyra: ## Build the Sfyra test binary.
