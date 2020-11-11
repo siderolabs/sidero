@@ -12,6 +12,7 @@ import (
 
 	talosnet "github.com/talos-systems/net"
 	clientconfig "github.com/talos-systems/talos/pkg/machinery/client/config"
+	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1/machine"
 	"github.com/talos-systems/talos/pkg/provision"
 	"github.com/talos-systems/talos/pkg/provision/providers/qemu"
 
@@ -143,11 +144,16 @@ func (set *Set) create(ctx context.Context) error {
 	for i := 0; i < set.options.Nodes; i++ {
 		request.Nodes = append(request.Nodes,
 			provision.NodeRequest{
-				Name:             fmt.Sprintf("pxe-%d", i),
-				IP:               ips[i+1],
-				Memory:           set.options.MemMB * 1024 * 1024,
-				NanoCPUs:         set.options.CPUs * 1000 * 1000 * 1000,
-				DiskSize:         set.options.DiskGB * 1024 * 1024 * 1024,
+				Name:     fmt.Sprintf("pxe-%d", i),
+				Type:     machine.TypeUnknown,
+				IP:       ips[i+1],
+				Memory:   set.options.MemMB * 1024 * 1024,
+				NanoCPUs: set.options.CPUs * 1000 * 1000 * 1000,
+				Disks: []*provision.Disk{
+					{
+						Size: uint64(set.options.DiskGB) * 1024 * 1024 * 1024,
+					},
+				},
 				PXEBooted:        true,
 				TFTPServer:       set.options.BootSource.String(),
 				IPXEBootFilename: fmt.Sprintf("http://%s:8081/boot.ipxe", set.options.BootSource),

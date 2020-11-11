@@ -20,6 +20,7 @@ import (
 	clientconfig "github.com/talos-systems/talos/pkg/machinery/client/config"
 	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1/bundle"
 	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1/generate"
+	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1/machine"
 	"github.com/talos-systems/talos/pkg/provision"
 	"github.com/talos-systems/talos/pkg/provision/access"
 	"github.com/talos-systems/talos/pkg/provision/providers/qemu"
@@ -224,11 +225,16 @@ func (cluster *Cluster) create(ctx context.Context) error {
 	request.Nodes = append(request.Nodes,
 		provision.NodeRequest{
 			Name:     constants.BootstrapMaster,
+			Type:     machine.TypeControlPlane,
 			IP:       cluster.masterIP,
 			Memory:   cluster.options.MemMB * 1024 * 1024,
 			NanoCPUs: cluster.options.CPUs * 1000 * 1000 * 1000,
-			DiskSize: cluster.options.DiskGB * 1024 * 1024 * 1024,
-			Config:   configBundle.ControlPlane(),
+			Disks: []*provision.Disk{
+				{
+					Size: uint64(cluster.options.DiskGB) * 1024 * 1024 * 1024,
+				},
+			},
+			Config: configBundle.ControlPlane(),
 		})
 
 	cluster.cluster, err = cluster.provisioner.Create(ctx, request,
