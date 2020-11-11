@@ -6,6 +6,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/go-logr/logr"
@@ -32,6 +33,8 @@ import (
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/internal/pkg/metal"
 )
+
+var ErrNoServersInServerClass = errors.New("no servers available in serverclass")
 
 // MetalMachineReconciler reconciles a MetalMachine object.
 type MetalMachineReconciler struct {
@@ -149,6 +152,10 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 		if metalMachine.Spec.ServerClassRef != nil {
 			serverClassResource, err = r.fetchServerClass(ctx, metalMachine.Spec.ServerClassRef)
 			if err != nil {
+				if errors.Is(err, ErrNoServersInServerClass) {
+					return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
+				}
+
 				return ctrl.Result{}, err
 			}
 		}
@@ -165,6 +172,10 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 
 		serverResource, err = r.fetchServerFromClass(ctx, metalMachine.Spec.ServerClassRef, metalMachine)
 		if err != nil {
+			if errors.Is(err, ErrNoServersInServerClass) {
+				return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
+			}
+
 			return ctrl.Result{}, err
 		}
 
@@ -292,7 +303,7 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 	}
 
 	if len(serverClassResource.Status.ServersAvailable) == 0 {
-		return nil, fmt.Errorf("no servers available in serverclass")
+		return nil, ErrNoServersInServerClass
 	}
 
 	// Fetch server from available list
@@ -332,7 +343,7 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 		return serverObj, nil
 	}
 
-	return nil, fmt.Errorf("no servers available in serverclass")
+	return nil, ErrNoServersInServerClass
 }
 
 func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *capiv1.Cluster, metalMachine *infrav1.MetalMachine) error {
