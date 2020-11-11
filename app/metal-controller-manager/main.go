@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -49,6 +50,7 @@ func main() {
 	var (
 		metricsAddr          string
 		apiEndpoint          string
+		extraAgentKernelArgs string
 		enableLeaderElection bool
 		autoAcceptServers    bool
 		insecureWipe         bool
@@ -56,6 +58,7 @@ func main() {
 
 	flag.StringVar(&apiEndpoint, "api-endpoint", "", "The endpoint used by the discovery environment.")
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8081", "The address the metric endpoint binds to.")
+	flag.StringVar(&extraAgentKernelArgs, "extra-agent-kernel-args", "", "A comma delimited list of key-value pairs to be added to the agent environment kernel parameters.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&autoAcceptServers, "auto-accept-servers", false, "Add servers as 'accepted' when they register with Sidero API.")
 	flag.BoolVar(&insecureWipe, "insecure-wipe", true, "Wipe head of the disk only (if false, wipe whole disk).")
@@ -145,7 +148,9 @@ func main() {
 			}
 		}
 
-		if err := ipxe.ServeIPXE(apiEndpoint); err != nil {
+		args := strings.Split(extraAgentKernelArgs, ",")
+
+		if err := ipxe.ServeIPXE(apiEndpoint, args); err != nil {
 			setupLog.Error(err, "unable to start iPXE server", "controller", "Environment")
 			os.Exit(1)
 		}
