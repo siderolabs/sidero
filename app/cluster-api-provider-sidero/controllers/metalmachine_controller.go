@@ -153,6 +153,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 			serverClassResource, err = r.fetchServerClass(ctx, metalMachine.Spec.ServerClassRef)
 			if err != nil {
 				if errors.Is(err, ErrNoServersInServerClass) {
+					r.Log.Info("No servers available in serverclass", "serverclass", metalMachine.Spec.ServerClassRef.Name)
 					return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 				}
 
