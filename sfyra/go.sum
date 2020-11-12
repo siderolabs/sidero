@@ -796,8 +796,8 @@ github.com/talos-systems/crypto v0.2.0/go.mod h1:KwqG+jANKU1FNQIapmioHQ5fkovY1DJ
 github.com/talos-systems/crypto v0.2.1-0.20201028152949-d0c3eef149ec h1:qO6KZJ1XbXQmkTcaonJYsTduNrKWGFfp9Tykc63raA4=
 github.com/talos-systems/crypto v0.2.1-0.20201028152949-d0c3eef149ec/go.mod h1:KwqG+jANKU1FNQIapmioHQ5fkovY1DJkAqMenjYBGh0=
 github.com/talos-systems/go-blockdevice v0.1.1-0.20201030204209-b4e67d73d70d/go.mod h1:efEE9wjtgxiovqsZAV39xlOd/AOI/0sLuZqb5jEgeqo=
-github.com/talos-systems/go-blockdevice v0.1.1-0.20201110185542-c4b583363d63 h1:5ei+XHQX0qRd4j2aOhSJWQYw7nr5vH3Ng7874wLN3cY=
-github.com/talos-systems/go-blockdevice v0.1.1-0.20201110185542-c4b583363d63/go.mod h1:efEE9wjtgxiovqsZAV39xlOd/AOI/0sLuZqb5jEgeqo=
+github.com/talos-systems/go-blockdevice v0.1.1-0.20201111103554-874213371a3f h1:DiWsa6+uyi9fuxWBs9NpLYDCs3OIg+HwEvSlVjkAm0U=
+github.com/talos-systems/go-blockdevice v0.1.1-0.20201111103554-874213371a3f/go.mod h1:efEE9wjtgxiovqsZAV39xlOd/AOI/0sLuZqb5jEgeqo=
 github.com/talos-systems/go-loadbalancer v0.1.0/go.mod h1:D5Qjfz+29WVjONWECZvOkmaLsBb3f5YeWME0u/5HmIc=
 github.com/talos-systems/go-loadbalancer v0.1.1-0.20201015151439-a4457024d518 h1:3i0Dui7k71VZtfe78h+WfqNA0XO2fRdKlOuIwtpLH7A=
 github.com/talos-systems/go-loadbalancer v0.1.1-0.20201015151439-a4457024d518/go.mod h1:L0uLhCBUQVkdBqtnxqbrw+wzopQyoeluPos8okqdxLo=
