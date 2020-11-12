@@ -7,15 +7,13 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/talos-systems/go-blockdevice/blockdevice"
+	"github.com/talos-systems/go-blockdevice/blockdevice/util"
 	"github.com/talos-systems/go-procfs/procfs"
 	"github.com/talos-systems/go-retry/retry"
 	"github.com/talos-systems/go-smbios/smbios"
@@ -244,59 +242,43 @@ func mainFunc() error {
 	}
 
 	if createResp.GetWipe() {
-		devices, err := ioutil.ReadDir("/sys/block")
+		disks, err := util.GetDisks()
 		if err != nil {
 			shutdown(err)
 		}
 
 		var eg errgroup.Group
 
-		for _, dev := range devices {
-			skip := false
+		for _, disk := range disks {
+			func(path string) {
+				eg.Go(func() error {
+					log.Printf("Resetting %s", path)
 
-			for _, prefix := range []string{"sg", "sr", "loop", "md", "dm-"} {
-				if strings.HasPrefix(filepath.Base(dev.Name()), prefix) {
-					skip = true
-
-					break
-				}
-			}
-
-			if skip {
-				log.Printf("Skipping reset of %s", dev.Name())
-
-				continue
-			}
-
-			path := filepath.Join("/dev", dev.Name())
-
-			eg.Go(func() error {
-				log.Printf("Resetting %s", path)
-
-				bd, err := blockdevice.Open(path)
-				if err != nil {
-					log.Printf("Skipping %s: %s", path, err)
-
-					return nil
-				}
-
-				if createResp.GetInsecureWipe() {
-					if err = bd.FastWipe(); err != nil {
-						return fmt.Errorf("failed wiping %q: %w", path, err)
-					}
-
-					log.Printf("Fast wiped %s", path)
-				} else {
-					method, err := bd.Wipe()
+					bd, err := blockdevice.Open(path)
 					if err != nil {
-						return fmt.Errorf("failed wiping %q: %w", path, err)
+						log.Printf("Skipping %s: %s", path, err)
+
+						return nil
 					}
 
-					log.Printf("Wiped %s with %s", path, method)
-				}
+					if createResp.GetInsecureWipe() {
+						if err = bd.FastWipe(); err != nil {
+							return fmt.Errorf("failed wiping %q: %w", path, err)
+						}
 
-				return bd.Close()
-			})
+						log.Printf("Fast wiped %s", path)
+					} else {
+						method, err := bd.Wipe()
+						if err != nil {
+							return fmt.Errorf("failed wiping %q: %w", path, err)
+						}
+
+						log.Printf("Wiped %s with %s", path, method)
+					}
+
+					return bd.Close()
+				})
+			}(disk.DeviceName)
 		}
 
 		if err := eg.Wait(); err != nil {
