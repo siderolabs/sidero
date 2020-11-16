@@ -1,4 +1,29 @@
 
+<a name="v0.1.0-alpha.10"></a>
+## [v0.1.0-alpha.10](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.9...v0.1.0-alpha.10) (2020-11-16)
+
+### Chore
+
+* bump Talos package dependency to 0.7-beta.1
+
+### Feat
+
+* boot servers via PXE only once by default
+* allow for extra kernel args in agent environment
+* add power status to servers
+* don't power off the server in discovery agent
+* make "insecure-wipe" default, use new fast wipe method
+
+### Fix
+
+* add info log when no servers in serverclass
+
+### Refactor
+
+* use GetDisks from blockdevice library
+* add ErrNoServersInServerClass
+
+
 <a name="v0.1.0-alpha.9"></a>
 ## [v0.1.0-alpha.9](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.8...v0.1.0-alpha.9) (2020-11-10)
 
@@ -6,6 +31,10 @@
 
 * update pkgs
 * ignore missing partition error
+
+### Release
+
+* **v0.1.0-alpha.9:** prepare release
 
 
 <a name="v0.1.0-alpha.8"></a>
