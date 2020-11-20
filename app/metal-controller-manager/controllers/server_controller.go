@@ -7,6 +7,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
@@ -79,10 +80,8 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		s.Status.Power = "on"
 	}
 
-	f := func(ready, requeue bool) (ctrl.Result, error) {
+	f := func(ready bool, result ctrl.Result) (ctrl.Result, error) {
 		s.Status.Ready = ready
-
-		result := ctrl.Result{Requeue: requeue}
 
 		if err := patchHelper.Patch(ctx, &s, patch.WithOwnedConditions{
 			Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPowerCycle},
@@ -95,17 +94,17 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	switch {
 	case !s.Spec.Accepted:
-		return f(false, false)
+		return f(false, ctrl.Result{})
 	case s.Status.InUse && s.Status.IsClean:
 		log.Error(fmt.Errorf("server cannot be in use and clean"), "server is in an impossible state", "inUse", s.Status.InUse, "isClean", s.Status.IsClean)
 
-		return f(false, false)
+		return f(false, ctrl.Result{})
 	case !s.Status.InUse && s.Status.IsClean:
 		if powerErr != nil {
 			log.Error(powerErr, "failed to check power state")
 			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", powerErr))
 
-			return f(false, true)
+			return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
 		}
 
 		if poweredOn {
@@ -114,7 +113,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				log.Error(err, "failed to power off")
 				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to power off: %s.", err))
 
-				return f(false, true)
+				return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
 			}
 
 			if !mgmtClient.IsFake() {
@@ -122,19 +121,27 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			}
 		}
 
-		return f(true, false)
+		return f(true, ctrl.Result{})
 	case s.Status.InUse && !s.Status.IsClean:
-		return f(true, false)
+		return f(true, ctrl.Result{})
 	case !s.Status.InUse && !s.Status.IsClean:
-		if conditions.Has(&s, metalv1alpha1.ConditionPowerCycle) && conditions.IsFalse(&s, metalv1alpha1.ConditionPowerCycle) {
-			return f(false, false)
+		// when server is set to PXE boot to be wiped, ConditionPowerCycle is set to mark server
+		// as power cycled to avoid duplicate reboot attempts from subsequent Reconciles
+		//
+		// we check LastTransitionTime to see if the server is in the wiping state for too long and
+		// it's time to retry the IPMI sequence
+		if conditions.Has(&s, metalv1alpha1.ConditionPowerCycle) &&
+			conditions.IsFalse(&s, metalv1alpha1.ConditionPowerCycle) &&
+			time.Since(conditions.GetLastTransitionTime(&s, metalv1alpha1.ConditionPowerCycle).Time) < constants.WipeTimeout {
+			// already powercycled, timeout not elapsed, wait more
+			return f(false, ctrl.Result{RequeueAfter: constants.WipeTimeout / 5})
 		}
 
 		if powerErr != nil {
 			log.Error(powerErr, "failed to check power state")
 			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", powerErr))
 
-			return f(false, true)
+			return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
 		}
 
 		err = mgmtClient.SetPXE()
@@ -142,7 +149,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			log.Error(err, "failed to set PXE")
 			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to set to PXE boot once: %s.", err))
 
-			return f(false, true)
+			return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
 		}
 
 		if poweredOn {
@@ -151,7 +158,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				log.Error(err, "failed to power cycle")
 				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to power cycle: %s.", err))
 
-				return f(false, true)
+				return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
 			}
 		} else {
 			err = mgmtClient.PowerOn()
@@ -159,7 +166,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				log.Error(err, "failed to power on")
 				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to power on: %s.", err))
 
-				return f(false, true)
+				return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
 			}
 		}
 
@@ -170,13 +177,16 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Management", "Server powered on and set to PXE boot once.")
 			}
 
+			// remove the condition in case it was already set to make sure LastTransitionTime will be updated
+			conditions.Delete(&s, metalv1alpha1.ConditionPowerCycle)
 			conditions.MarkFalse(&s, metalv1alpha1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, "Server power cycled for wiping.")
 		}
 
-		return f(false, false)
+		// requeue to check for wipe timeout
+		return f(false, ctrl.Result{RequeueAfter: constants.WipeTimeout / 5})
 	}
 
-	return f(false, false)
+	return f(false, ctrl.Result{})
 }
 
 func (r *ServerReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {

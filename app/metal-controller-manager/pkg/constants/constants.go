@@ -14,4 +14,6 @@ const (
 	InitrdAsset = "initramfs.xz"
 
 	DefaultRequeueAfter = time.Second * 20
+
+	WipeTimeout = time.Hour
 )

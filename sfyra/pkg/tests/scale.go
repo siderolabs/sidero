@@ -165,6 +165,13 @@ func scale(ctx context.Context, metalClient client.Client, name string, obj runt
 		return err
 	}
 
+	err = retry.Constant(time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+		return capi.CheckClusterReady(ctx, metalClient, managementClusterName)
+	})
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
