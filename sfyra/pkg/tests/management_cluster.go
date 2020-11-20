@@ -6,7 +6,6 @@ package tests
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 	"testing"
@@ -14,7 +13,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/talos-systems/go-retry/retry"
-	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,7 +21,6 @@ import (
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/restmapper"
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
 	capiclient "sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -122,27 +119,7 @@ func TestManagementCluster(ctx context.Context, metalClient client.Client, clust
 		t.Log("waiting for the cluster to be provisioned")
 
 		require.NoError(t, retry.Constant(10*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
-			var cluster v1alpha3.Cluster
-
-			if err = metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: managementClusterName}, &cluster); err != nil {
-				return retry.UnexpectedError(err)
-			}
-
-			ready := false
-
-			for _, cond := range cluster.Status.Conditions {
-				if cond.Type == v1alpha3.ReadyCondition && cond.Status == corev1.ConditionTrue {
-					ready = true
-
-					break
-				}
-			}
-
-			if !ready {
-				return retry.ExpectedError(fmt.Errorf("cluster is not ready"))
-			}
-
-			return nil
+			return capi.CheckClusterReady(ctx, metalClient, managementClusterName)
 		}))
 
 		t.Log("verifying cluster health")

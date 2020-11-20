@@ -9,7 +9,7 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 PKGS ?= ./...
-TALOS_RELEASE ?= v0.7.0-beta.1
+TALOS_RELEASE ?= v0.7.0
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
