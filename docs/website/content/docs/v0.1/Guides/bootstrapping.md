@@ -185,7 +185,7 @@ metadata:
   name: default
 spec:
   kernel:
-    url: "https://github.com/talos-systems/talos/releases/latest/download/vmlinuz"
+    url: "https://github.com/talos-systems/talos/releases/latest/download/vmlinuz-amd64"
     sha512: ""
     args:
       - initrd=initramfs.xz
@@ -205,7 +205,7 @@ spec:
       - talos.platform=metal
       - talos.config=http://$PUBLIC_IP:9091/configdata?uuid=
   initrd:
-    url: "https://github.com/talos-systems/talos/releases/latest/download/initramfs.xz"
+    url: "https://github.com/talos-systems/talos/releases/latest/download/initramfs-amd64.xz"
     sha512: ""
 EOF
 ```
