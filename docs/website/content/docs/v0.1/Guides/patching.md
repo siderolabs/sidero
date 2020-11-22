@@ -19,15 +19,15 @@ kind: Server
 metadata:
   name: 00000000-0000-0000-0000-d05099d33360
 spec:
-configPatches:
-  - op: replace
-    path: /machine/install
-    value:
-      disk: /dev/sda
-  - op: replace
-    path: /cluster/network/cni
-    value:
-      name: "custom"
-      urls:
-        - "http://192.168.1.199/assets/cilium.yaml"
+  configPatches:
+    - op: replace
+      path: /machine/install
+      value:
+        disk: /dev/sda
+    - op: replace
+      path: /cluster/network/cni
+      value:
+        name: "custom"
+        urls:
+          - "http://192.168.1.199/assets/cilium.yaml"
 ```
