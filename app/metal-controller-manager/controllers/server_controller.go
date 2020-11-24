@@ -94,6 +94,9 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	switch {
 	case !s.Spec.Accepted:
+		// if server is not accepted, Sidero doesn't control server lifecycle, so we can't assume that server is (still) clean
+		s.Status.IsClean = false
+
 		return f(false, ctrl.Result{})
 	case s.Status.InUse && s.Status.IsClean:
 		log.Error(fmt.Errorf("server cannot be in use and clean"), "server is in an impossible state", "inUse", s.Status.InUse, "isClean", s.Status.IsClean)
@@ -123,6 +126,36 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 		return f(true, ctrl.Result{})
 	case s.Status.InUse && !s.Status.IsClean:
+		if powerErr != nil {
+			log.Error(powerErr, "failed to check power state")
+			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", powerErr))
+
+			return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
+		}
+
+		if !poweredOn {
+			// it's safe to set server to PXE boot even if it's already installed, as PXE server makes sure server is PXE booted only once
+			err = mgmtClient.SetPXE()
+			if err != nil {
+				log.Error(err, "failed to set PXE")
+				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to set to PXE boot once: %s.", err))
+
+				return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
+			}
+
+			err = mgmtClient.PowerOn()
+			if err != nil {
+				log.Error(err, "failed to power on")
+				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to power on: %s.", err))
+
+				return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
+			}
+
+			if !mgmtClient.IsFake() {
+				r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Management", "Server powered on and set PXE boot once into the environment.")
+			}
+		}
+
 		return f(true, ctrl.Result{})
 	case !s.Status.InUse && !s.Status.IsClean:
 		// when server is set to PXE boot to be wiped, ConditionPowerCycle is set to mark server

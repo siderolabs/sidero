@@ -32,7 +32,6 @@ import (
 	infrav1 "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
 	"github.com/talos-systems/sidero/app/cluster-api-provider-sidero/pkg/constants"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/internal/pkg/metal"
 )
 
 var ErrNoServersInServerClass = errors.New("no servers available in serverclass")
@@ -184,47 +183,6 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 		metalMachine.Spec.ServerRef = &corev1.ObjectReference{
 			Kind: serverResource.Kind,
 			Name: serverResource.Name,
-		}
-	}
-
-	serverRef, err := reference.GetReference(r.Scheme, serverResource)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	mgmtClient, err := metal.NewManagementClient(&serverResource.Spec)
-	if err != nil {
-		r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to initialize management client: %s.", err))
-
-		return ctrl.Result{}, err
-	}
-
-	poweredOn, err := mgmtClient.IsPoweredOn()
-	if err != nil {
-		r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to determine power status: %s.", err))
-
-		return ctrl.Result{}, err
-	}
-
-	// Only take action if server is turned off
-	// otherwise IPMI library gets angry
-	if !poweredOn {
-		err = mgmtClient.SetPXE()
-		if err != nil {
-			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to set to PXE boot once: %s.", err))
-
-			return ctrl.Result{}, err
-		}
-
-		err = mgmtClient.PowerOn()
-		if err != nil {
-			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to power on: %s.", err))
-
-			return ctrl.Result{}, err
-		}
-
-		if !mgmtClient.IsFake() {
-			r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Management", "Server powered on.")
 		}
 	}
 
