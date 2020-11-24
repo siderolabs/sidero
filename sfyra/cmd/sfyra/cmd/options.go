@@ -40,6 +40,9 @@ type Options struct {
 	ManagementDiskGB int64
 
 	TalosctlPath string
+
+	PowerSimulatedExplicitFailureProb float64
+	PowerSimulatedSilentFailureProb   float64
 }
 
 // TalosRelease is set as build argument.

@@ -7,8 +7,8 @@ package metal
 
 import (
 	"github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/internal/pkg/api"
-	"github.com/talos-systems/sidero/internal/pkg/ipmi"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/power/api"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/power/ipmi"
 )
 
 // ManagementClient control power and boot order of metal machine.

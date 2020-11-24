@@ -31,8 +31,8 @@ import (
 
 	infrav1 "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/power/metal"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
-	"github.com/talos-systems/sidero/internal/pkg/metal"
 )
 
 // ServerReconciler reconciles a Server object.
@@ -42,6 +42,8 @@ type ServerReconciler struct {
 	Scheme    *runtime.Scheme
 	APIReader client.Reader
 	Recorder  record.EventRecorder
+
+	WipeTimeout time.Duration
 }
 
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
@@ -200,9 +202,9 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		// it's time to retry the IPMI sequence
 		if conditions.Has(&s, metalv1alpha1.ConditionPowerCycle) &&
 			conditions.IsFalse(&s, metalv1alpha1.ConditionPowerCycle) &&
-			time.Since(conditions.GetLastTransitionTime(&s, metalv1alpha1.ConditionPowerCycle).Time) < constants.WipeTimeout {
+			time.Since(conditions.GetLastTransitionTime(&s, metalv1alpha1.ConditionPowerCycle).Time) < r.WipeTimeout {
 			// already powercycled, timeout not elapsed, wait more
-			return f(false, ctrl.Result{RequeueAfter: constants.WipeTimeout / 5})
+			return f(false, ctrl.Result{RequeueAfter: r.WipeTimeout / 5})
 		}
 
 		if powerErr != nil {
@@ -251,7 +253,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 
 		// requeue to check for wipe timeout
-		return f(false, ctrl.Result{RequeueAfter: constants.WipeTimeout / 5})
+		return f(false, ctrl.Result{RequeueAfter: r.WipeTimeout / 5})
 	}
 
 	return f(false, ctrl.Result{})
