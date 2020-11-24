@@ -83,6 +83,9 @@ var testIntegrationCmd = &cobra.Command{
 				BootstrapProviders:      options.BootstrapProviders,
 				InfrastructureProviders: options.InfrastructureProviders,
 				ControlPlaneProviders:   options.ControlPlaneProviders,
+
+				PowerSimulatedExplicitFailureProb: options.PowerSimulatedExplicitFailureProb,
+				PowerSimulatedSilentFailureProb:   options.PowerSimulatedSilentFailureProb,
 			})
 			if err != nil {
 				return err
@@ -129,5 +132,7 @@ func init() {
 	testIntegrationCmd.Flags().StringVar(&options.TalosKernelURL, "talos-kernel-url", options.TalosKernelURL, "Talos kernel image URL for Cluster API Environment")
 	testIntegrationCmd.Flags().StringVar(&options.TalosInitrdURL, "talos-initrd-url", options.TalosInitrdURL, "Talos initramfs image URL for Cluster API Environment")
 	testIntegrationCmd.Flags().StringVar(&options.ClusterctlConfigPath, "clusterctl-config", options.ClusterctlConfigPath, "path to the clusterctl config file")
+	testIntegrationCmd.Flags().Float64Var(&options.PowerSimulatedExplicitFailureProb, "power-simulated-explicit-failure-prob", options.PowerSimulatedExplicitFailureProb, "simulated power management explicit failure probability")
+	testIntegrationCmd.Flags().Float64Var(&options.PowerSimulatedSilentFailureProb, "power-simulated-silent-failure-prob", options.PowerSimulatedSilentFailureProb, "simulated power management silent failure probability")
 	testIntegrationCmd.Flags().StringVar(&runTestPattern, "test.run", "", "tests to run (regular expression)")
 }

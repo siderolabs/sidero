@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -42,6 +43,9 @@ type Options struct {
 	BootstrapProviders      []string
 	InfrastructureProviders []string
 	ControlPlaneProviders   []string
+
+	PowerSimulatedExplicitFailureProb float64
+	PowerSimulatedSilentFailureProb   float64
 }
 
 // NewManager creates new Manager object.
@@ -225,6 +229,9 @@ func (clusterAPI *Manager) patch(ctx context.Context) error {
 		deployment.Spec.Template.Spec.Containers[1].Args = append(
 			deployment.Spec.Template.Spec.Containers[1].Args,
 			fmt.Sprintf("--api-endpoint=%s", clusterAPI.cluster.SideroComponentsIP()),
+			fmt.Sprintf("--wipe-timeout=%s", 30*time.Second), // wiping is fast in the test environment
+			fmt.Sprintf("--test-power-simulated-explicit-failure-prob=%f", clusterAPI.options.PowerSimulatedExplicitFailureProb),
+			fmt.Sprintf("--test-power-simulated-silent-failure-prob=%f", clusterAPI.options.PowerSimulatedSilentFailureProb),
 		)
 	}
 

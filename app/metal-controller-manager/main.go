@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -25,8 +26,10 @@ import (
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/controllers"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/ipxe"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/power/api"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/server"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/tftp"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -56,6 +59,10 @@ func main() {
 		enableLeaderElection bool
 		autoAcceptServers    bool
 		insecureWipe         bool
+		wipeTimeout          time.Duration
+
+		testPowerSimulatedExplicitFailureProb float64
+		testPowerSimulatedSilentFailureProb   float64
 	)
 
 	flag.StringVar(&apiEndpoint, "api-endpoint", "", "The endpoint used by the discovery environment.")
@@ -64,8 +71,14 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&autoAcceptServers, "auto-accept-servers", false, "Add servers as 'accepted' when they register with Sidero API.")
 	flag.BoolVar(&insecureWipe, "insecure-wipe", true, "Wipe head of the disk only (if false, wipe whole disk).")
+	flag.DurationVar(&wipeTimeout, "wipe-timeout", constants.DefaultWipeTimeout, "Timeout to wait for the server wipe to be complete before rebooting a server.")
+	flag.Float64Var(&testPowerSimulatedExplicitFailureProb, "test-power-simulated-explicit-failure-prob", 0, "Test failure simulation setting.")
+	flag.Float64Var(&testPowerSimulatedSilentFailureProb, "test-power-simulated-silent-failure-prob", 0, "Test failure simulation setting.")
 
 	flag.Parse()
+
+	// only for testing, doesn't affect production, default values simulate no failures
+	api.DefaultDice = api.NewFailureDice(testPowerSimulatedExplicitFailureProb, testPowerSimulatedSilentFailureProb)
 
 	ctrl.SetLogger(zap.New(func(o *zap.Options) {
 		o.Development = true
@@ -109,11 +122,12 @@ func main() {
 	}
 
 	if err = (&controllers.ServerReconciler{
-		Client:    mgr.GetClient(),
-		Log:       ctrl.Log.WithName("controllers").WithName("Server"),
-		Scheme:    mgr.GetScheme(),
-		APIReader: mgr.GetAPIReader(),
-		Recorder:  recorder,
+		Client:      mgr.GetClient(),
+		Log:         ctrl.Log.WithName("controllers").WithName("Server"),
+		Scheme:      mgr.GetScheme(),
+		APIReader:   mgr.GetAPIReader(),
+		Recorder:    recorder,
+		WipeTimeout: wipeTimeout,
 	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Server")
 		os.Exit(1)
