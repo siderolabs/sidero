@@ -12,7 +12,11 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
@@ -21,7 +25,11 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
+	infrav1 "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
 	"github.com/talos-systems/sidero/internal/pkg/metal"
@@ -30,14 +38,18 @@ import (
 // ServerReconciler reconciles a Server object.
 type ServerReconciler struct {
 	client.Client
-	APIReader client.Reader
 	Log       logr.Logger
 	Scheme    *runtime.Scheme
+	APIReader client.Reader
 	Recorder  record.EventRecorder
 }
 
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=serverbindings,verbs=get;list;watch
+// +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=serverbindings/status,verbs=get
+// +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=metalmachines,verbs=get;list;watch
+// +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=metalmachines/status,verbs=get
 // +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
@@ -46,7 +58,6 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	s := metalv1alpha1.Server{}
 
-	// Refresh the object from the API, as we rely a lot on the Status to be up to date in this controller.
 	if err := r.APIReader.Get(ctx, req.NamespacedName, &s); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
@@ -84,12 +95,36 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		s.Status.Ready = ready
 
 		if err := patchHelper.Patch(ctx, &s, patch.WithOwnedConditions{
-			Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPowerCycle},
+			Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPowerCycle, metalv1alpha1.ConditionPXEBooted},
 		}); err != nil {
 			return result, errors.WithStack(err)
 		}
 
 		return result, nil
+	}
+
+	allocated, serverBindingPresent, err := r.checkBinding(ctx, req)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	if !allocated {
+		if s.Status.InUse {
+			// transitioning to false
+			r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Allocation", "Server marked as unallocated.")
+		}
+
+		s.Status.InUse = false
+
+		conditions.Delete(&s, metalv1alpha1.ConditionPXEBooted)
+	} else {
+		s.Status.InUse = true
+		s.Status.IsClean = false
+
+		if serverBindingPresent {
+			// clear any leftover ownerreferences, they were transferred by serverbinding controller
+			s.OwnerReferences = []v1.OwnerReference{}
+		}
 	}
 
 	switch {
@@ -222,9 +257,74 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return f(false, ctrl.Result{})
 }
 
+func (r *ServerReconciler) checkBinding(ctx context.Context, req ctrl.Request) (allocated, serverBindingPresent bool, err error) {
+	var serverBinding infrav1.ServerBinding
+
+	err = r.Get(ctx, req.NamespacedName, &serverBinding)
+	if err == nil {
+		return true, true, nil
+	}
+
+	if err != nil && !apierrors.IsNotFound(err) {
+		return false, false, err
+	}
+
+	// double-check metalmachines to make sure we don't have a missing serverbinding
+	var metalMachineList infrav1.MetalMachineList
+
+	if err := r.List(ctx, &metalMachineList, client.MatchingFields(fields.Set{infrav1.MetalMachineServerRefField: req.Name})); err != nil {
+		return false, false, err
+	}
+
+	for _, metalMachine := range metalMachineList.Items {
+		if !metalMachine.DeletionTimestamp.IsZero() {
+			continue
+		}
+
+		if metalMachine.Spec.ServerRef != nil {
+			if metalMachine.Spec.ServerRef.Namespace == req.Namespace && metalMachine.Spec.ServerRef.Name == req.Name {
+				return true, false, nil
+			}
+		}
+	}
+
+	return false, false, nil
+}
+
 func (r *ServerReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
+	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &infrav1.MetalMachine{}, infrav1.MetalMachineServerRefField, func(rawObj runtime.Object) []string {
+		metalMachine := rawObj.(*infrav1.MetalMachine)
+
+		if metalMachine.Spec.ServerRef == nil {
+			return nil
+		}
+
+		return []string{metalMachine.Spec.ServerRef.Name}
+	}); err != nil {
+		return err
+	}
+
+	mapRequests := handler.ToRequestsFunc(
+		func(a handler.MapObject) []reconcile.Request {
+			// servers and serverbindings always have matching names
+			return []reconcile.Request{
+				{
+					NamespacedName: types.NamespacedName{
+						Name:      a.Meta.GetName(),
+						Namespace: a.Meta.GetNamespace(),
+					},
+				},
+			}
+		})
+
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(options).
 		For(&metalv1alpha1.Server{}).
+		Watches(
+			&source.Kind{Type: &infrav1.ServerBinding{}},
+			&handler.EnqueueRequestsFromMapFunc{
+				ToRequests: mapRequests,
+			},
+		).
 		Complete(r)
 }

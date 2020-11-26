@@ -89,9 +89,8 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("received metadata request for uuid: %s", uuid)
 
-	// Find all MetalMachine resources that have this UUID as a ServerRef in their spec.
-	// It's an error if 0 or more than 1 result is found.
-	matchingMetalMachine, ewc := m.matchingMetalMachine(ctx, uuid)
+	// Find serverBinding and metalMachine by server UUID.
+	metalMachine, serverBinding, ewc := m.findMetalMachineServerBinding(ctx, uuid)
 	if ewc.errorObj != nil {
 		throwError(
 			w,
@@ -102,7 +101,7 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Given the MetalMachine, find the Machine resource that owns it
-	ownerMachine, err := util.GetOwnerMachine(ctx, m.client, matchingMetalMachine.ObjectMeta)
+	ownerMachine, err := util.GetOwnerMachine(ctx, m.client, metalMachine.ObjectMeta)
 	if err != nil {
 		throwError(
 			w,
@@ -110,8 +109,8 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 				http.StatusInternalServerError,
 				fmt.Errorf(
 					"failure fetching owner machine from metal machine %s/%s: %s",
-					matchingMetalMachine.GetNamespace(),
-					matchingMetalMachine.GetName(),
+					metalMachine.GetNamespace(),
+					metalMachine.GetName(),
 					err,
 				),
 			},
@@ -187,33 +186,29 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 	// If so, fetch the serverclass so we can use configPatches from it.
 	serverClassObj := &metalv1alpha1.ServerClass{}
 
-	if len(serverObj.OwnerReferences) > 0 {
-		for _, ownerRef := range serverObj.OwnerReferences {
-			if ownerRef.Kind == "ServerClass" {
-				err = m.client.Get(
-					ctx,
-					types.NamespacedName{
-						Namespace: "",
-						Name:      ownerRef.Name,
-					},
-					serverClassObj,
-				)
-				if err != nil {
-					throwError(
-						w,
-						errorWithCode{
-							http.StatusInternalServerError,
-							fmt.Errorf(
-								"failure fetching serverclass  %s: %s",
-								ownerRef.Name,
-								err,
-							),
-						},
-					)
+	if serverBinding.Spec.ServerClassRef != nil {
+		err = m.client.Get(
+			ctx,
+			types.NamespacedName{
+				Namespace: serverBinding.Spec.ServerClassRef.Namespace,
+				Name:      serverBinding.Spec.ServerClassRef.Name,
+			},
+			serverClassObj,
+		)
+		if err != nil {
+			throwError(
+				w,
+				errorWithCode{
+					http.StatusInternalServerError,
+					fmt.Errorf(
+						"failure fetching serverclass %s: %s",
+						serverBinding.Spec.ServerClassRef.Name,
+						err,
+					),
+				},
+			)
 
-					return
-				}
-			}
+			return
 		}
 	}
 
@@ -329,43 +324,30 @@ func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
 	return decodedData, errorWithCode{}
 }
 
-// matchingMetalMachine is responsible for looking up MetalMachines that contain a ServerRef with the UUID that requested metadata.
-func (m *metadataConfigs) matchingMetalMachine(ctx context.Context, serverName string) (v1alpha3.MetalMachine, errorWithCode) {
-	metalMachineList := &v1alpha3.MetalMachineList{}
+// findMetalMachineServerBinding is responsible for looking up ServerBinding and MetalMachine.
+func (m *metadataConfigs) findMetalMachineServerBinding(ctx context.Context, serverName string) (v1alpha3.MetalMachine, v1alpha3.ServerBinding, errorWithCode) {
+	var serverBinding v1alpha3.ServerBinding
 
-	err := m.client.List(ctx, metalMachineList)
+	err := m.client.Get(ctx, types.NamespacedName{Name: serverName}, &serverBinding)
 	if err != nil {
-		return v1alpha3.MetalMachine{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure listing metal machines: %w", err)}
-	}
-
-	numMatchingMachines := 0
-
-	var matchingMetalMachine v1alpha3.MetalMachine
-
-	// range through all metalmachines and find all that match our server string
-	for _, metalMachine := range metalMachineList.Items {
-		// handle metalmachines where serverref hasn't been updated yet
-		if metalMachine.Spec.ServerRef == nil {
-			continue
+		if apierrors.IsNotFound(err) {
+			return v1alpha3.MetalMachine{}, v1alpha3.ServerBinding{}, errorWithCode{http.StatusNotFound, fmt.Errorf("server is not allocated (missing serverbinding): %w", err)}
 		}
 
-		if metalMachine.Spec.ServerRef.Name == serverName {
-			numMatchingMachines++
-
-			matchingMetalMachine = metalMachine
-		}
+		return v1alpha3.MetalMachine{}, v1alpha3.ServerBinding{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure getting server binding: %w", err)}
 	}
 
-	// bail early if we have multiple matches or no matches
-	switch {
-	case numMatchingMachines > 1:
-		return v1alpha3.MetalMachine{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("multiple matching metal machines for uuid %q, possible orphaned cluster", serverName)}
+	var metalMachine v1alpha3.MetalMachine
 
-	case numMatchingMachines == 0:
-		return v1alpha3.MetalMachine{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure finding matching metal machine for uuid: %q", serverName)}
+	if err = m.client.Get(ctx, types.NamespacedName{
+		// XXX: where is the namespace in owner refs?
+		Namespace: serverBinding.Spec.MetalMachineRef.Namespace,
+		Name:      serverBinding.Spec.MetalMachineRef.Name,
+	}, &metalMachine); err != nil {
+		return v1alpha3.MetalMachine{}, v1alpha3.ServerBinding{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure getting metalmachine: %w", err)}
 	}
 
-	return matchingMetalMachine, errorWithCode{}
+	return metalMachine, serverBinding, errorWithCode{}
 }
 
 // fetchBootstrapSecret is responsible for fetching a secret that contains the bootstrap data created by our bootstrap provider.

@@ -13,6 +13,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
@@ -22,7 +23,6 @@ import (
 	"k8s.io/utils/pointer"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/cluster-api/util"
-	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -63,7 +63,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 
 	err = r.Get(ctx, req.NamespacedName, metalMachine)
 	if apierrors.IsNotFound(err) {
-		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
+		return ctrl.Result{}, nil
 	}
 
 	if err != nil {
@@ -121,57 +121,23 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 		}
 	}()
 
-	controllerutil.AddFinalizer(metalMachine, infrav1.MachineFinalizer)
-
 	// Handle deleted machines
 	if !metalMachine.ObjectMeta.DeletionTimestamp.IsZero() {
-		logger.Info("deleting machine")
+		logger.Info("deleting metalmachine")
+
 		return r.reconcileDelete(ctx, metalMachine)
 	}
 
-	serverResource := &metalv1alpha1.Server{}
+	controllerutil.AddFinalizer(metalMachine, infrav1.MachineFinalizer)
 
-	// Use server ref if already provided
-	if metalMachine.Spec.ServerRef != nil {
-		namespacedName := types.NamespacedName{
-			Namespace: "",
-			Name:      metalMachine.Spec.ServerRef.Name,
-		}
-
-		if err = r.Get(ctx, namespacedName, serverResource); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		// Handles the case of users specifying a server ref directly and pointing to a non-accepted server
-		if !serverResource.Spec.Accepted {
-			return ctrl.Result{}, fmt.Errorf("specified serverref is a non-accepted server")
-		}
-
-		// Fetch the serverclass if it exists so we can ensure the server has it as an owner ref.
-		var serverClassResource *metalv1alpha1.ServerClass
-		if metalMachine.Spec.ServerClassRef != nil {
-			serverClassResource, err = r.fetchServerClass(ctx, metalMachine.Spec.ServerClassRef)
-			if err != nil {
-				if errors.Is(err, ErrNoServersInServerClass) {
-					r.Log.Info("No servers available in serverclass", "serverclass", metalMachine.Spec.ServerClassRef.Name)
-					return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
-				}
-
-				return ctrl.Result{}, err
-			}
-		}
-
-		// double check server is already marked in use
-		// this is especially needed after pivoting the cluster from bootstrap -> mgmt plane
-		if err = r.patchServerInUse(ctx, serverClassResource, serverResource, metalMachine); err != nil {
-			return ctrl.Result{}, err
-		}
-	} else {
+	// If server ref is already provided, server binding controller is going to reconcile matching server binding
+	// if server binding is missing, need to pick up a server
+	if metalMachine.Spec.ServerRef == nil {
 		if metalMachine.Spec.ServerClassRef == nil {
 			return ctrl.Result{}, fmt.Errorf("either a server or serverclass ref must be supplied")
 		}
 
-		serverResource, err = r.fetchServerFromClass(ctx, metalMachine.Spec.ServerClassRef, metalMachine)
+		serverResource, err := r.fetchServerFromClass(ctx, logger, metalMachine.Spec.ServerClassRef, metalMachine)
 		if err != nil {
 			if errors.Is(err, ErrNoServersInServerClass) {
 				return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
@@ -187,7 +153,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 	}
 
 	// Set the providerID, as its required in upstream capi for machine lifecycle
-	metalMachine.Spec.ProviderID = pointer.StringPtr(fmt.Sprintf("%s://%s", constants.ProviderID, serverResource.Name))
+	metalMachine.Spec.ProviderID = pointer.StringPtr(fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name))
 
 	err = r.patchProviderID(ctx, cluster, metalMachine)
 	if err != nil {
@@ -202,62 +168,64 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 }
 
 func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachine *infrav1.MetalMachine) (ctrl.Result, error) {
-	serverResource := &metalv1alpha1.Server{}
-
 	if metalMachine.Spec.ServerRef != nil {
-		namespacedName := types.NamespacedName{
-			Namespace: "",
-			Name:      metalMachine.Spec.ServerRef.Name,
+		var serverBinding infrav1.ServerBinding
+
+		err := r.Get(ctx, types.NamespacedName{Namespace: metalMachine.Spec.ServerRef.Namespace, Name: metalMachine.Spec.ServerRef.Name}, &serverBinding)
+		if err == nil {
+			return ctrl.Result{Requeue: true}, r.Delete(ctx, &serverBinding)
 		}
 
-		if err := r.Get(ctx, namespacedName, serverResource); err != nil {
-			// bail early if the server can't be fetch. this likely means we've deleted the server from underneath already.
-			if apierrors.IsNotFound(err) {
-				r.Log.Info("Matching server not found for metalmachine's serverref. Assuming we're orphaned.")
-				controllerutil.RemoveFinalizer(metalMachine, infrav1.MachineFinalizer)
-
-				return ctrl.Result{}, nil
-			}
-
+		if !apierrors.IsNotFound(err) {
 			return ctrl.Result{}, err
 		}
-
-		ref, err := reference.GetReference(r.Scheme, serverResource)
-		if err != nil {
-			return ctrl.Result{}, err
-		}
-
-		patchHelper, err := patch.NewHelper(serverResource, r)
-		if err != nil {
-			return ctrl.Result{}, err
-		}
-
-		serverResource.Status.InUse = false
-		serverResource.OwnerReferences = []metav1.OwnerReference{}
-
-		conditions.Delete(serverResource, metalv1alpha1.ConditionPXEBooted)
-
-		if err := patchHelper.Patch(ctx, serverResource); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		r.Recorder.Event(ref, corev1.EventTypeNormal, "Server Allocation", "Server marked as unallocated.")
 	}
 
-	// Machine is deleted so remove the finalizer.
+	metalMachine.Spec.ServerRef = nil
+
 	controllerutil.RemoveFinalizer(metalMachine, infrav1.MachineFinalizer)
 
 	return ctrl.Result{}, nil
 }
 
 func (r *MetalMachineReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
+	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &infrav1.ServerBinding{}, infrav1.ServerBindingMetalMachineRefField, func(rawObj runtime.Object) []string {
+		serverBinding := rawObj.(*infrav1.ServerBinding)
+
+		return []string{serverBinding.Spec.MetalMachineRef.Name}
+	}); err != nil {
+		return err
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(options).
 		For(&infrav1.MetalMachine{}).
 		Complete(r)
 }
 
-func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, classRef *corev1.ObjectReference, metalMachine *infrav1.MetalMachine) (*metalv1alpha1.Server, error) {
+func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, logger logr.Logger, classRef *corev1.ObjectReference, metalMachine *infrav1.MetalMachine) (*metalv1alpha1.Server, error) {
+	// First, check if there is already existing serverBinding for this metalmachine
+	var serverBindingList infrav1.ServerBindingList
+
+	if err := r.List(ctx, &serverBindingList, client.MatchingFields(fields.Set{infrav1.ServerBindingMetalMachineRefField: metalMachine.Name})); err != nil {
+		return nil, err
+	}
+
+	for _, serverBinding := range serverBindingList.Items {
+		if serverBinding.Spec.MetalMachineRef.Namespace == metalMachine.Namespace && serverBinding.Spec.MetalMachineRef.Name == metalMachine.Name {
+			// found existing serverBinding for this metalMachine
+			var server metalv1alpha1.Server
+
+			if err := r.Get(ctx, types.NamespacedName{Namespace: serverBinding.Namespace, Name: serverBinding.Name}, &server); err != nil {
+				return nil, err
+			}
+
+			logger.Info("reconciled missing server ref", "metalmachine", metalMachine.Name, "server", server.Name)
+
+			return &server, nil
+		}
+	}
+
 	// Grab server class and validate that we have nodes available
 	serverClassResource, err := r.fetchServerClass(ctx, classRef)
 	if err != nil {
@@ -291,16 +259,17 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, class
 			continue
 		}
 
-		// patch server with in use bool
-		if err := r.patchServerInUse(ctx, serverClassResource, serverObj, metalMachine); err != nil {
+		if err := r.createServerBinding(ctx, serverClassResource, serverObj, metalMachine); err != nil {
 			// the server we picked was updated by another metalmachine before we finished.
 			// move on to the next one.
-			if apierrors.IsConflict(err) {
+			if apierrors.IsAlreadyExists(err) {
 				continue
 			}
 
 			return nil, err
 		}
+
+		logger.Info("allocated new server", "metalmachine", metalMachine.Name, "server", serverObj.Name, "serverclass", serverClassResource.Name)
 
 		return serverObj, nil
 	}
@@ -376,42 +345,42 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 	return nil
 }
 
-// patchServerInUse updates a server to mark it as "in use".
-func (r *MetalMachineReconciler) patchServerInUse(ctx context.Context, serverClass *metalv1alpha1.ServerClass, serverObj *metalv1alpha1.Server, metalMachine *infrav1.MetalMachine) error {
-	if !serverObj.Status.InUse || serverObj.Status.IsClean {
-		ref, err := reference.GetReference(r.Scheme, serverObj)
-		if err != nil {
-			return err
-		}
+// createServerBinding updates a server to mark it as "in use" via ServerBinding resource.
+func (r *MetalMachineReconciler) createServerBinding(ctx context.Context, serverClass *metalv1alpha1.ServerClass, serverObj *metalv1alpha1.Server, metalMachine *infrav1.MetalMachine) error {
+	serverRef, err := reference.GetReference(r.Scheme, serverObj)
+	if err != nil {
+		return err
+	}
 
-		serverObj.Status.InUse = true
-		serverObj.Status.IsClean = false
+	var serverBinding infrav1.ServerBinding
 
-		// nb: we update status and then update the object separately b/c statuses don't seem to get
-		// updated when doing the whole object below.
-		if err := r.Status().Update(ctx, serverObj); err != nil {
-			return err
-		}
-
-		r.Recorder.Event(ref, corev1.EventTypeNormal, "Server Allocation", fmt.Sprintf("Server marked as allocated for metalMachine %q", metalMachine.Name))
+	serverBinding.Namespace = serverObj.Namespace
+	serverBinding.Name = serverObj.Name
+	serverBinding.Labels = make(map[string]string)
+	serverBinding.Spec.MetalMachineRef = corev1.ObjectReference{
+		Kind:      metalMachine.Kind,
+		UID:       metalMachine.UID,
+		Namespace: metalMachine.Namespace,
+		Name:      metalMachine.Name,
 	}
 
 	if serverClass != nil {
-		patchHelper, err := patch.NewHelper(serverObj, r)
-		if err != nil {
-			return err
-		}
-
-		serverObj.OwnerReferences = []metav1.OwnerReference{
-			*metav1.NewControllerRef(serverClass, metalv1alpha1.GroupVersion.WithKind("ServerClass")),
-		}
-
-		if err := patchHelper.Patch(ctx, serverObj); err != nil {
-			return err
+		serverBinding.Spec.ServerClassRef = &corev1.ObjectReference{
+			Kind: serverClass.Kind,
+			Name: serverClass.Name,
 		}
 	}
 
-	return nil
+	for label, value := range metalMachine.Labels {
+		serverBinding.Labels[label] = value
+	}
+
+	err = r.Create(ctx, &serverBinding)
+	if err == nil {
+		r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Allocation", fmt.Sprintf("Server as allocated via serverclass %q for metal machine %q.", serverClass.Name, metalMachine.Name))
+	}
+
+	return err
 }
 
 func (r *MetalMachineReconciler) fetchServerClass(ctx context.Context, classRef *corev1.ObjectReference) (*metalv1alpha1.ServerClass, error) {

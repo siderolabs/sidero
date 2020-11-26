@@ -21,6 +21,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	infrav1 "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/controllers"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/ipxe"
@@ -43,6 +44,7 @@ func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
 
 	_ = metalv1alpha1.AddToScheme(scheme)
+	_ = infrav1.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
 }
 
@@ -108,9 +110,9 @@ func main() {
 
 	if err = (&controllers.ServerReconciler{
 		Client:    mgr.GetClient(),
-		APIReader: mgr.GetAPIReader(),
 		Log:       ctrl.Log.WithName("controllers").WithName("Server"),
 		Scheme:    mgr.GetScheme(),
+		APIReader: mgr.GetAPIReader(),
 		Recorder:  recorder,
 	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Server")
@@ -150,7 +152,7 @@ func main() {
 
 		args := strings.Split(extraAgentKernelArgs, ",")
 
-		if err := ipxe.ServeIPXE(apiEndpoint, args); err != nil {
+		if err := ipxe.ServeIPXE(apiEndpoint, args, mgr.GetClient()); err != nil {
 			setupLog.Error(err, "unable to start iPXE server", "controller", "Environment")
 			os.Exit(1)
 		}
@@ -159,7 +161,11 @@ func main() {
 	setupLog.Info("starting internal API server")
 
 	go func() {
-		if err := server.Serve(autoAcceptServers, insecureWipe); err != nil {
+		recorder := eventBroadcaster.NewRecorder(
+			mgr.GetScheme(),
+			corev1.EventSource{Component: "sidero-server"})
+
+		if err := server.Serve(mgr.GetClient(), recorder, mgr.GetScheme(), autoAcceptServers, insecureWipe); err != nil {
 			setupLog.Error(err, "unable to start API server", "controller", "Environment")
 			os.Exit(1)
 		}

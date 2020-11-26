@@ -25,3 +25,9 @@ patchesJson6902:
       kind: CustomResourceDefinition
       name: metalmachinetemplates.infrastructure.cluster.x-k8s.io
     path: patch_crd_webhook_namespace.yaml
+  - target:
+      group: apiextensions.k8s.io
+      version: v1
+      kind: CustomResourceDefinition
+      name: serverbindings.infrastructure.cluster.x-k8s.io
+    path: patch_crd_webhook_namespace.yaml

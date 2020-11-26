@@ -77,6 +77,28 @@ rules:
   - metalmachines/status
   verbs:
   - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - infrastructure.cluster.x-k8s.io
+  resources:
+  - serverbindings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - infrastructure.cluster.x-k8s.io
+  resources:
+  - serverbindings/status
+  verbs:
+  - get
   - patch
   - update
 - apiGroups:
@@ -109,5 +131,7 @@ rules:
   - servers/status
   verbs:
   - get
+  - list
   - patch
   - update
+  - watch

@@ -13,6 +13,8 @@ import (
 const (
 	// MachineFinalizer allows ReconcileMetalMachine to clean up resources before removing it from the apiserver.
 	MachineFinalizer = "metalmachine.infrastructure.cluster.x-k8s.io"
+	// MetalMachineServerRefField is used to index MetalMachines on server ref it is bound to.
+	MetalMachineServerRefField = "spec.serverRef.name"
 )
 
 // MetalMachineSpec defines the desired state of MetalMachine.
