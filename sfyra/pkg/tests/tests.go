@@ -119,6 +119,10 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			"TestServerReset",
 			TestServerReset(ctx, metalClient),
 		},
+		{
+			"TestWorkloadCluster",
+			TestWorkloadCluster(ctx, metalClient, cluster, vmSet, capiManager),
+		},
 	}
 
 	testsToRun := []testing.InternalTest{}
