@@ -1,0 +1,31 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+package tests
+
+import (
+	"context"
+	"testing"
+
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/talos-systems/sidero/sfyra/pkg/capi"
+	"github.com/talos-systems/sidero/sfyra/pkg/talos"
+	"github.com/talos-systems/sidero/sfyra/pkg/vm"
+)
+
+const (
+	workloadClusterName   = "workload-cluster"
+	workloadClusterLBPort = 20000
+)
+
+// TestWorkloadCluster deploys and destroys the workload cluster via CAPI.
+func TestWorkloadCluster(ctx context.Context, metalClient client.Client, cluster talos.Cluster, vmSet *vm.Set, capiManager *capi.Manager) TestFunc {
+	return func(t *testing.T) {
+		loadbalancer, _ := deployCluster(ctx, t, metalClient, cluster, vmSet, capiManager, workloadClusterName, workloadServerClassName, workloadClusterLBPort, 1, 0)
+		defer loadbalancer.Close()
+
+		deleteCluster(ctx, t, metalClient, workloadClusterName)
+	}
+}

@@ -14,6 +14,7 @@ import (
 
 	cabpt "github.com/talos-systems/cluster-api-bootstrap-provider-talos/api/v1alpha3"
 	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
+	"github.com/talos-systems/go-retry/retry"
 	taloscluster "github.com/talos-systems/talos/pkg/cluster"
 	talosclusterapi "github.com/talos-systems/talos/pkg/machinery/api/cluster"
 	talosclient "github.com/talos-systems/talos/pkg/machinery/client"
@@ -104,6 +105,10 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 				continue
 			}
 
+			if !metalMachine.DeletionTimestamp.IsZero() {
+				continue
+			}
+
 			var server metal.Server
 
 			if err := metalClient.Get(ctx, types.NamespacedName{Namespace: metalMachine.Spec.ServerRef.Namespace, Name: metalMachine.Spec.ServerRef.Name}, &server); err != nil {
@@ -177,6 +182,13 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 
 // Health runs the healthcheck for the cluster.
 func (cluster *Cluster) Health(ctx context.Context) error {
+	return retry.Constant(5*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+		// retry health checks as sometimes bootstrap bootkube issues break the check
+		return retry.ExpectedError(cluster.health(ctx))
+	})
+}
+
+func (cluster *Cluster) health(ctx context.Context) error {
 	resp, err := cluster.client.ClusterHealthCheck(talosclient.WithNodes(ctx, cluster.controlPlaneNodes[0]), 3*time.Minute, &talosclusterapi.ClusterInfo{
 		ControlPlaneNodes: cluster.controlPlaneNodes,
 		WorkerNodes:       cluster.workerNodes,

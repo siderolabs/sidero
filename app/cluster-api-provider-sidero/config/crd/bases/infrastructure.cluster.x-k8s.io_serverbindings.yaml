@@ -21,24 +21,24 @@ spec:
       jsonPath: .status.ready
       name: Ready
       type: string
-    - description: Metal Machine
-      jsonPath: .spec.metalMachineRef.name
-      name: MetalMachine
-      priority: 1
-      type: string
     - description: Server ID
       jsonPath: .metadata.name
       name: Server
       priority: 1
       type: string
-    - description: Cluster to which this ServerBinding belongs
-      jsonPath: .metadata.labels.cluster\.x-k8s\.io/cluster-name
-      name: Cluster
-      priority: 1
-      type: string
     - description: Server Class
       jsonPath: .spec.serverClassRef.name
       name: ServerClass
+      priority: 1
+      type: string
+    - description: Metal Machine
+      jsonPath: .spec.metalMachineRef.name
+      name: MetalMachine
+      priority: 1
+      type: string
+    - description: Cluster to which this ServerBinding belongs
+      jsonPath: .metadata.labels.cluster\.x-k8s\.io/cluster-name
+      name: Cluster
       priority: 1
       type: string
     name: v1alpha3

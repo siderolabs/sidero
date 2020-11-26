@@ -38,7 +38,10 @@ import (
 	"github.com/talos-systems/sidero/sfyra/pkg/vm"
 )
 
-const serverClassName = "default"
+const (
+	defaultServerClassName  = "default"
+	workloadServerClassName = "workload"
+)
 
 // TestServerClassDefault verifies server class creation.
 func TestServerClassDefault(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
@@ -53,14 +56,14 @@ func TestServerClassDefault(ctx context.Context, metalClient client.Client, vmSe
 			},
 		}
 
-		serverClass, err := createServerClass(ctx, metalClient, serverClassName, classSpec)
+		serverClass, err := createServerClass(ctx, metalClient, defaultServerClassName, classSpec)
 		require.NoError(t, err)
 
 		numNodes := len(vmSet.Nodes())
 
 		// wait for the server class to gather all nodes (all nodes should match)
 		require.NoError(t, retry.Constant(2*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
-			if err := metalClient.Get(ctx, types.NamespacedName{Name: serverClassName}, &serverClass); err != nil {
+			if err := metalClient.Get(ctx, types.NamespacedName{Name: defaultServerClassName}, &serverClass); err != nil {
 				return retry.UnexpectedError(err)
 			}
 
@@ -86,6 +89,9 @@ func TestServerClassDefault(ctx context.Context, metalClient client.Client, vmSe
 		sort.Strings(actualUUIDs)
 
 		assert.Equal(t, expectedUUIDs, actualUUIDs)
+
+		_, err = createServerClass(ctx, metalClient, workloadServerClassName, classSpec)
+		require.NoError(t, err)
 	}
 }
 
