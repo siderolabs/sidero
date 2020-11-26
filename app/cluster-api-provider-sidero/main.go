@@ -112,6 +112,16 @@ func main() {
 			setupLog.Error(err, "unable to create controller", "controller", "MetalMachine")
 			os.Exit(1)
 		}
+
+		if err = (&controllers.ServerBindingReconciler{
+			Client:   mgr.GetClient(),
+			Log:      ctrl.Log.WithName("controllers").WithName("ServerBinding"),
+			Scheme:   mgr.GetScheme(),
+			Recorder: recorder,
+		}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: 10}); err != nil {
+			setupLog.Error(err, "unable to create controller", "controller", "ServerBinding")
+			os.Exit(1)
+		}
 	} else {
 		if err = (&infrav1alpha3.MetalCluster{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "MetalCluster")
@@ -125,6 +135,11 @@ func main() {
 
 		if err = (&infrav1alpha3.MetalMachineTemplate{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "MetalMachineTemplate")
+			os.Exit(1)
+		}
+
+		if err = (&infrav1alpha3.ServerBinding{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "ServerBinding")
 			os.Exit(1)
 		}
 	}

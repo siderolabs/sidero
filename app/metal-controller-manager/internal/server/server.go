@@ -17,10 +17,6 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/kubernetes/scheme"
-	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
@@ -30,7 +26,6 @@ import (
 
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/api"
-	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/client"
 )
 
 const (
@@ -43,11 +38,9 @@ type server struct {
 	autoAccept   bool
 	insecureWipe bool
 
-	c         controllerclient.Client
-	clientset *kubernetes.Clientset
-
-	metalScheme *runtime.Scheme
-	recorder    record.EventRecorder
+	c        controllerclient.Client
+	scheme   *runtime.Scheme
+	recorder record.EventRecorder
 }
 
 // CreateServer implements api.AgentServer.
@@ -89,7 +82,7 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 			return nil, err
 		}
 
-		ref, err := reference.GetReference(s.metalScheme, obj)
+		ref, err := reference.GetReference(s.scheme, obj)
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +129,7 @@ func (s *server) MarkServerAsWiped(ctx context.Context, in *api.MarkServerAsWipe
 		return nil, err
 	}
 
-	ref, err := reference.GetReference(s.metalScheme, obj)
+	ref, err := reference.GetReference(s.scheme, obj)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +227,7 @@ func (s *server) ReconcileServerAddresses(ctx context.Context, in *api.Reconcile
 	return resp, nil
 }
 
-func Serve(autoAccept, insecureWipe bool) error {
+func Serve(c controllerclient.Client, recorder record.EventRecorder, scheme *runtime.Scheme, autoAccept, insecureWipe bool) error {
 	lis, err := net.Listen("tcp", ":"+Port)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
@@ -242,44 +235,12 @@ func Serve(autoAccept, insecureWipe bool) error {
 
 	s := grpc.NewServer()
 
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return err
-	}
-
-	c, err := client.NewClient(config)
-	if err != nil {
-		return err
-	}
-
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return err
-	}
-
-	eventBroadcaster := record.NewBroadcaster()
-	eventBroadcaster.StartRecordingToSink(
-		&typedcorev1.EventSinkImpl{
-			Interface: clientset.CoreV1().Events(""),
-		})
-
-	recorder := eventBroadcaster.NewRecorder(
-		scheme.Scheme,
-		corev1.EventSource{Component: "sidero-server"})
-
-	scheme := runtime.NewScheme()
-
-	if err := metalv1alpha1.AddToScheme(scheme); err != nil {
-		return err
-	}
-
 	api.RegisterAgentServer(s, &server{
 		autoAccept:   autoAccept,
 		insecureWipe: insecureWipe,
 		c:            c,
-		clientset:    clientset,
+		scheme:       scheme,
 		recorder:     recorder,
-		metalScheme:  scheme,
 	})
 
 	if err := s.Serve(lis); err != nil {
