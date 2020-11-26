@@ -79,9 +79,9 @@ spec:
                   fieldPath: status.hostIP
           resources:
             limits:
-              cpu: 250m
-              memory: 100Mi
+              cpu: 1000m
+              memory: 512Mi
             requests:
-              cpu: 100m
-              memory: 20Mi
+              cpu: 500m
+              memory: 256Mi
       terminationGracePeriodSeconds: 10
