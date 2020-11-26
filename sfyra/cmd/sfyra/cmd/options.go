@@ -69,7 +69,7 @@ func DefaultOptions() Options {
 		ManagementNodes:   4,
 
 		BootstrapMemMB:  3072,
-		BootstrapCPUs:   2,
+		BootstrapCPUs:   4,
 		BootstrapDiskGB: 6,
 
 		ManagementMemMB:  2048,
