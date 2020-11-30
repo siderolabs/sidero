@@ -1,6 +1,25 @@
 
+<a name="v0.1.0-alpha.11"></a>
+## [v0.1.0-alpha.11](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.10...v0.1.0-alpha.11) (2020-11-30)
+
+### Docs
+
+* fix typo in asset URLs
+* fix patching example
+
+### Fix
+
+* bump resource limits for the sidero pods
+* add timeout to retry wipe IPMI commands (PXE + powercycle)
+
+### Refactor
+
+* unify power management under ServerController
+* remove dependency on talos Go module
+
+
 <a name="v0.1.0-alpha.10"></a>
-## [v0.1.0-alpha.10](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.9...v0.1.0-alpha.10) (2020-11-16)
+## [v0.1.0-alpha.10](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.9...v0.1.0-alpha.10) (2020-11-17)
 
 ### Chore
 
@@ -22,6 +41,10 @@
 
 * use GetDisks from blockdevice library
 * add ErrNoServersInServerClass
+
+### Release
+
+* **v0.1.0-alpha.10:** prepare release
 
 
 <a name="v0.1.0-alpha.9"></a>
