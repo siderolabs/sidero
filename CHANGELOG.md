@@ -1,4 +1,12 @@
 
+<a name="v0.1.0-alpha.12"></a>
+## [v0.1.0-alpha.12](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.11...v0.1.0-alpha.12) (2020-12-02)
+
+### Feat
+
+* rework binding between Servers and MetalMachines
+
+
 <a name="v0.1.0-alpha.11"></a>
 ## [v0.1.0-alpha.11](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.10...v0.1.0-alpha.11) (2020-11-30)
 
@@ -16,6 +24,10 @@
 
 * unify power management under ServerController
 * remove dependency on talos Go module
+
+### Release
+
+* **v0.1.0-alpha.11:** prepare release
 
 
 <a name="v0.1.0-alpha.10"></a>
