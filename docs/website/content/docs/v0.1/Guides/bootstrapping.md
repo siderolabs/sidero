@@ -265,13 +265,16 @@ kubectl apply -f management-plane.yaml
 
 **NOTE: The templated manifest above is meant to act as a starting point. If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.**
 
-Once the management plane is setup, you can fetch the talosconfig with a command like:
+Once the management plane is setup, you can fetch the talosconfig by using the cluster label.
+Be sure to update the cluster name and issue the following command:
 
 ```bash
-kubectl get talosconfig -o yaml management-plane-cp-xxx -o jsonpath='{.status.talosConfig}' > management-plane-talosconfig.yaml
+kubectl get talosconfig \
+  -l cluster.x-k8s.io/cluster-name=<CLUSTER NAME> \
+  -o yaml -o jsonpath='{.items[0].status.talosConfig}' > management-plane-talosconfig.yaml
 ```
 
-Then the management plane's kubeconfig can be fetched with `talosctl --talosconfig management-plane-talosconfig.yaml kubeconfig /desired/path`
+With the talosconfig in hand, the management plane's kubeconfig can be fetched with `talosctl --talosconfig management-plane-talosconfig.yaml kubeconfig`
 
 ## Pivoting
 
