@@ -85,9 +85,11 @@ module.exports = {
     },
 
     {
-      use: "@gridsome/plugin-google-analytics",
+      use: "gridsome-plugin-gtm",
       options: {
-        id: process.env.GA_ID ? process.env.GA_ID : "XX-999999999-9",
+        id: process.env.GTM_ID ? process.env.GTM_ID : "XX-999999999-9",
+        enabled: true,
+        debug: false,
       },
     },
 
