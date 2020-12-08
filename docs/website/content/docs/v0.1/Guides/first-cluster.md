@@ -96,7 +96,6 @@ kubectl patch server 00000000-0000-0000-0000-d05099d33360 --type='json' -p='[{"o
 
 For more information on server acceptance, see the [server docs](/docs/v0.1/configuration/servers).
 
-
 ## Create the Cluster
 
 The cluster creation process should be identical to what was detailed in the previous guide.
@@ -109,10 +108,15 @@ clusterctl config cluster workload-cluster -i sidero > workload-cluster.yaml
 
 Note that there are several variables that should be set in order for the templating to work properly:
 
-- CONTROL_PLANE_ENDPOINT
-- CONTROL_PLANE_SERVERCLASS
-- WORKER_SERVERCLASS
-- KUBERNETES_VERSION
+- `CONTROL_PLANE_ENDPOINT`: The endpoint used for the Kubernetes API server (e.g. `https://1.2.3.4:6443`).
+  This is the equivalent of the `endpoint` you would specify in `talosctl gen config`.
+  There are a variety of ways to configure a control plane endpoint.
+  Some common ways for an HA setup are to use DNS, a load balancer, or BGP.
+  A simpler method is to use the IP of a single node.
+  This has the disadvantage of being a single point of failure, but it can be a simple way to get running.
+- `CONTROL_PLANE_SERVERCLASS`: The server class to use for control plane nodes.
+- `WORKER_SERVERCLASS`: The server class to use for worker nodes.
+- `KUBERNETES_VERSION`: The version of Kubernetes to deploy (e.g. `v1.19.4`).
 
 Now that we have the manifest, we can simply apply it:
 
