@@ -7,7 +7,7 @@ weight: 3
 
 Server classes are a way to group distinct server resources.
 The "qualifiers" key allows the administrator to specify criteria upon which to group these servers.
-There are currently three keys: cpu, systemInformation, and labelSelectors.
+There are currently three keys: `cpu`, `systemInformation`, and l`abelSelectors`.
 Each of these keys accepts a list of entries.
 The top level keys are a "logical AND", while the lists under each key are a "logical OR".
 Qualifiers that are not specified are not evaluated.
