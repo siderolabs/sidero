@@ -9,14 +9,14 @@ Environments are a custom resource provided by the Metal Controller Manager.
 An environment is a codified description of what should be returned by the PXE server when a physical server attempts to PXE boot.
 
 Especially important in the environment types are the kernel args.
-From here, one can tweak the IP to the metadata server as well as various other kernel options that [Talos](https://www.talos.dev/docs/v0.6/en/guides/metal/overview#kernel-parameters) and/or the Linux kernel supports.
+From here, one can tweak the IP to the metadata server as well as various other kernel options that [Talos](https://www.talos.dev/docs/v0.8/introduction/getting-started/#kernel-parameters) and/or the Linux kernel supports.
 
 Environments can be supplied to a given server either at the Server or the ServerClass level.
-The heirarchy from most to least respected is:
+The hierarchy from most to least respected is:
 
-- Environment Ref provided at Server level
-- Environment Ref provided at ServerClass level
-- "default" Environment created by administrator
+- `.spec.environmentRef` provided at `Server` level
+- `.spec.environmentRef` provided at `ServerClass` level
+- `"default"` `Environment` created by administrator
 
 A sample environment definition looks like this:
 
@@ -27,7 +27,7 @@ metadata:
   name: default
 spec:
   kernel:
-    url: "https://github.com/talos-systems/talos/releases/download/v0.6.0-beta.0/vmlinuz"
+    url: "https://github.com/talos-systems/talos/releases/download/v0.7.1/vmlinuz"
     sha512: ""
     args:
       - initrd=initramfs.xz
@@ -47,6 +47,32 @@ spec:
       - talos.platform=metal
       - talos.config=http://$PUBLIC_IP:9091/configdata?uuid=
   initrd:
-    url: "https://github.com/talos-systems/talos/releases/download/v0.6.0-beta.0/initramfs.xz"
+    url: "https://github.com/talos-systems/talos/releases/download/v0.7.1/initramfs.xz"
     sha512: ""
+```
+
+Example of overriding `"default"` `Environment` at the `Server` level:
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: Server
+...
+spec:
+  environmentRef:
+    namespace: default
+    name: boot
+  ...
+```
+
+Example of overriding `"default"` `Environment` at the `ServerClass` level:
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: ServerClass
+...
+spec:
+  environmentRef:
+    namespace: default
+    name: boot
+  ...
 ```
