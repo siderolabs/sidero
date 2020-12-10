@@ -15,5 +15,5 @@ const (
 
 	DefaultRequeueAfter = time.Second * 20
 
-	DefaultWipeTimeout = time.Hour
+	DefaultServerRebootTimeout = time.Minute * 20
 )

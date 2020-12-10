@@ -59,7 +59,7 @@ func main() {
 		enableLeaderElection bool
 		autoAcceptServers    bool
 		insecureWipe         bool
-		wipeTimeout          time.Duration
+		serverRebootTimeout  time.Duration
 
 		testPowerSimulatedExplicitFailureProb float64
 		testPowerSimulatedSilentFailureProb   float64
@@ -71,7 +71,7 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&autoAcceptServers, "auto-accept-servers", false, "Add servers as 'accepted' when they register with Sidero API.")
 	flag.BoolVar(&insecureWipe, "insecure-wipe", true, "Wipe head of the disk only (if false, wipe whole disk).")
-	flag.DurationVar(&wipeTimeout, "wipe-timeout", constants.DefaultWipeTimeout, "Timeout to wait for the server wipe to be complete before rebooting a server.")
+	flag.DurationVar(&serverRebootTimeout, "server-reboot-timeout", constants.DefaultServerRebootTimeout, "Timeout to wait for the server to restart and start wipe.")
 	flag.Float64Var(&testPowerSimulatedExplicitFailureProb, "test-power-simulated-explicit-failure-prob", 0, "Test failure simulation setting.")
 	flag.Float64Var(&testPowerSimulatedSilentFailureProb, "test-power-simulated-silent-failure-prob", 0, "Test failure simulation setting.")
 
@@ -122,12 +122,12 @@ func main() {
 	}
 
 	if err = (&controllers.ServerReconciler{
-		Client:      mgr.GetClient(),
-		Log:         ctrl.Log.WithName("controllers").WithName("Server"),
-		Scheme:      mgr.GetScheme(),
-		APIReader:   mgr.GetAPIReader(),
-		Recorder:    recorder,
-		WipeTimeout: wipeTimeout,
+		Client:        mgr.GetClient(),
+		Log:           ctrl.Log.WithName("controllers").WithName("Server"),
+		Scheme:        mgr.GetScheme(),
+		APIReader:     mgr.GetAPIReader(),
+		Recorder:      recorder,
+		RebootTimeout: serverRebootTimeout,
 	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Server")
 		os.Exit(1)
@@ -179,7 +179,7 @@ func main() {
 			mgr.GetScheme(),
 			corev1.EventSource{Component: "sidero-server"})
 
-		if err := server.Serve(mgr.GetClient(), recorder, mgr.GetScheme(), autoAcceptServers, insecureWipe); err != nil {
+		if err := server.Serve(mgr.GetClient(), recorder, mgr.GetScheme(), autoAcceptServers, insecureWipe, serverRebootTimeout); err != nil {
 			setupLog.Error(err, "unable to start API server", "controller", "Environment")
 			os.Exit(1)
 		}

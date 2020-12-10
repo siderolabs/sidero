@@ -11,6 +11,7 @@ service Agent {
       returns(MarkServerAsWipedResponse);
   rpc ReconcileServerAddresses(ReconcileServerAddressesRequest)
       returns(ReconcileServerAddressesResponse);
+  rpc Heartbeat(HeartbeatRequest) returns(HeartbeatResponse);
 }
 
 message SystemInformation {
@@ -42,11 +43,14 @@ message Address {
 message CreateServerResponse {
   bool wipe = 1;
   bool insecure_wipe = 2;
+  double reboot_timeout = 3;
 }
 
 message MarkServerAsWipedRequest { string uuid = 1; }
+message HeartbeatRequest { string uuid = 1; }
 
 message MarkServerAsWipedResponse {}
+message HeartbeatResponse {}
 
 message ReconcileServerAddressesRequest {
   string uuid = 1;
