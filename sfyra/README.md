@@ -6,11 +6,11 @@ Integration test for Sidero/Arges.
 
 Build the test binary and Sidero, push images:
 
-    make USERNAME=<username> PUSH=true
+    make USERNAME=<username> TAG=v0.1.0 PUSH=true
 
 Run the test (this will trigger `make release`):
 
-    make run-sfyra USERNAME=<username>
+    make run-sfyra USERNAME=<username> TAG=v0.1.0
 
 Test uses CIDRs `172.24.0.0/24`, `172.25.0.0/24` by default.
 
@@ -21,17 +21,28 @@ Sequence of steps:
 * install Cluster API, Sidero and Talos providers
 * run the unit-tests
 
+It's also possible to run Sfyra manually to avoid tearing down and recreating whole environment
+each time. After `make USERNAME=<username> TAG=v0.1.0 PUSH=true` run:
+
+    make talos-artifacts # need to run it only once per Talos release change
+    make clusterctl-release USERNAME=<username> TAG=v0.1.0 PUSH=true
+
+Then launch Sfyra manually with desired flags:
+
+    sudo -E _out/sfyra test integration --registry-mirrors docker.io=http://172.24.0.1:5000,k8s.gcr.io=http://172.24.0.1:5001,quay.io=http://172.24.0.1:5002,gcr.io=http://172.24.0.1:5003,ghcr.io=http://172.24.0.1:5004,127.0.0.1:5005=http://172.24.0.1:5005 --skip-teardown --clusterctl-config ~/.cluster-api/clusterctl.sfyra.yaml
+
 With `-skip-teardown` flag test leaves the bootstrap cluster running so that next iteration of the test
-can be run without waiting for the boostrap actions to be finished.
+can be run without waiting for the boostrap actions to be finished. It's possible to run Sfyra tests once
+again without bringing down the test environment, but make sure that all the clusters are deleted with
+`kubectl delete clusters --all`.
 
-## Running manually
+Flag `--registry-mirrors` is optional, but it speeds up provisioning significantly, see Talos guides on setting up registry
+pull-through caches.
 
-Download the Talos artifacts with `make talos-artifacts`.
-Build Sfyra with `make sfyra`.
+Kubernetes config can be pulled with `talosconfig -n 172.24.0.2 kubeconfig --force`.
 
-Run full Sfyra integration test with latest Sidero release (unless overridden in `~/.cluster-api/clusterctl.yaml`):
-
-    sudo -E _out/sfyra test integration
+When `sfyra` is not running, loadbalancer for `management-cluster` control plane is also down, it can be restarted for manual
+testing with `_out/sfyra loadbalancer create --kubeconfig=$HOME/.kube/config --load-balancer-port 10000`.
 
 One can also run parts of the test flow:
 
