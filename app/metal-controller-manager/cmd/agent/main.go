@@ -10,6 +10,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/talos-systems/go-blockdevice/blockdevice"
@@ -247,7 +248,49 @@ func mainFunc() error {
 			shutdown(err)
 		}
 
-		var eg errgroup.Group
+		uuid, err := s.SystemInformation().UUID()
+		if err != nil {
+			shutdown(err)
+		}
+
+		var (
+			eg errgroup.Group
+			wg sync.WaitGroup
+		)
+
+		heartbeatCtx, stopHeartbeat := context.WithCancel(ctx)
+
+		heartbeatInterval := (time.Duration(createResp.RebootTimeout) * time.Second) / 3
+
+		ticker := time.NewTicker(heartbeatInterval)
+
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			for {
+				callCtx, cancel := context.WithTimeout(ctx, heartbeatInterval)
+
+				if _, err := client.Heartbeat(callCtx, &api.HeartbeatRequest{Uuid: uuid.String()}); err != nil {
+					log.Printf("Failed to send wipe heartbeat %s", err)
+				}
+
+				cancel()
+
+				select {
+				case <-ticker.C:
+				case <-heartbeatCtx.Done():
+					return
+				}
+			}
+		}()
+
+		defer func() {
+			ticker.Stop()
+			stopHeartbeat()
+			wg.Wait()
+		}()
 
 		for _, disk := range disks {
 			func(path string) {

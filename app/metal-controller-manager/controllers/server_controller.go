@@ -43,7 +43,7 @@ type ServerReconciler struct {
 	APIReader client.Reader
 	Recorder  record.EventRecorder
 
-	WipeTimeout time.Duration
+	RebootTimeout time.Duration
 }
 
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
@@ -202,9 +202,9 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		// it's time to retry the IPMI sequence
 		if conditions.Has(&s, metalv1alpha1.ConditionPowerCycle) &&
 			conditions.IsFalse(&s, metalv1alpha1.ConditionPowerCycle) &&
-			time.Since(conditions.GetLastTransitionTime(&s, metalv1alpha1.ConditionPowerCycle).Time) < r.WipeTimeout {
-			// already powercycled, timeout not elapsed, wait more
-			return f(false, ctrl.Result{RequeueAfter: r.WipeTimeout / 5})
+			time.Since(conditions.GetLastTransitionTime(&s, metalv1alpha1.ConditionPowerCycle).Time) < r.RebootTimeout {
+			// already powercycled, reboot/heartbeat timeout not elapsed, wait more
+			return f(false, ctrl.Result{RequeueAfter: r.RebootTimeout / 3})
 		}
 
 		if powerErr != nil {
@@ -253,7 +253,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 
 		// requeue to check for wipe timeout
-		return f(false, ctrl.Result{RequeueAfter: r.WipeTimeout / 5})
+		return f(false, ctrl.Result{RequeueAfter: r.RebootTimeout / 3})
 	}
 
 	return f(false, ctrl.Result{})

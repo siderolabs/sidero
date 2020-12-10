@@ -229,7 +229,7 @@ func (clusterAPI *Manager) patch(ctx context.Context) error {
 		deployment.Spec.Template.Spec.Containers[1].Args = append(
 			deployment.Spec.Template.Spec.Containers[1].Args,
 			fmt.Sprintf("--api-endpoint=%s", clusterAPI.cluster.SideroComponentsIP()),
-			fmt.Sprintf("--wipe-timeout=%s", 30*time.Second), // wiping is fast in the test environment
+			fmt.Sprintf("--server-reboot-timeout=%s", 30*time.Second), // wiping/reboot is fast in the test environment
 			fmt.Sprintf("--test-power-simulated-explicit-failure-prob=%f", clusterAPI.options.PowerSimulatedExplicitFailureProb),
 			fmt.Sprintf("--test-power-simulated-silent-failure-prob=%f", clusterAPI.options.PowerSimulatedSilentFailureProb),
 		)

@@ -10,6 +10,7 @@ import (
 	"log"
 	"net"
 	"reflect"
+	"time"
 
 	"google.golang.org/grpc"
 	corev1 "k8s.io/api/core/v1"
@@ -38,9 +39,10 @@ type server struct {
 	autoAccept   bool
 	insecureWipe bool
 
-	c        controllerclient.Client
-	scheme   *runtime.Scheme
-	recorder record.EventRecorder
+	c             controllerclient.Client
+	scheme        *runtime.Scheme
+	recorder      record.EventRecorder
+	rebootTimeout time.Duration
 }
 
 // CreateServer implements api.AgentServer.
@@ -101,6 +103,7 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 
 		resp.Wipe = true
 		resp.InsecureWipe = s.insecureWipe
+		resp.RebootTimeout = s.rebootTimeout.Seconds()
 	}
 
 	return resp, nil
@@ -227,7 +230,35 @@ func (s *server) ReconcileServerAddresses(ctx context.Context, in *api.Reconcile
 	return resp, nil
 }
 
-func Serve(c controllerclient.Client, recorder record.EventRecorder, scheme *runtime.Scheme, autoAccept, insecureWipe bool) error {
+// Heartbeat implements api.AgentServer.
+func (s *server) Heartbeat(ctx context.Context, in *api.HeartbeatRequest) (*api.HeartbeatResponse, error) {
+	obj := &metalv1alpha1.Server{}
+
+	if err := s.c.Get(ctx, types.NamespacedName{Name: in.GetUuid()}, obj); err != nil {
+		return nil, err
+	}
+
+	patchHelper, err := patch.NewHelper(obj, s.c)
+	if err != nil {
+		return nil, err
+	}
+
+	// remove the condition in case it was already set to make sure LastTransitionTime will be updated
+	conditions.Delete(obj, metalv1alpha1.ConditionPowerCycle)
+	conditions.MarkFalse(obj, metalv1alpha1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, "Server wipe in progress.")
+
+	if err := patchHelper.Patch(ctx, obj, patch.WithOwnedConditions{
+		Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPowerCycle},
+	}); err != nil {
+		return nil, err
+	}
+
+	resp := &api.HeartbeatResponse{}
+
+	return resp, nil
+}
+
+func Serve(c controllerclient.Client, recorder record.EventRecorder, scheme *runtime.Scheme, autoAccept, insecureWipe bool, rebootTimeout time.Duration) error {
 	lis, err := net.Listen("tcp", ":"+Port)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
@@ -236,11 +267,12 @@ func Serve(c controllerclient.Client, recorder record.EventRecorder, scheme *run
 	s := grpc.NewServer()
 
 	api.RegisterAgentServer(s, &server{
-		autoAccept:   autoAccept,
-		insecureWipe: insecureWipe,
-		c:            c,
-		scheme:       scheme,
-		recorder:     recorder,
+		autoAccept:    autoAccept,
+		insecureWipe:  insecureWipe,
+		c:             c,
+		scheme:        scheme,
+		recorder:      recorder,
+		rebootTimeout: rebootTimeout,
 	})
 
 	if err := s.Serve(lis); err != nil {
