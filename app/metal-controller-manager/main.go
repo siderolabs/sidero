@@ -8,7 +8,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -164,9 +163,7 @@ func main() {
 			}
 		}
 
-		args := strings.Split(extraAgentKernelArgs, ",")
-
-		if err := ipxe.ServeIPXE(apiEndpoint, args, mgr.GetClient()); err != nil {
+		if err := ipxe.ServeIPXE(apiEndpoint, extraAgentKernelArgs, mgr.GetClient()); err != nil {
 			setupLog.Error(err, "unable to start iPXE server", "controller", "Environment")
 			os.Exit(1)
 		}

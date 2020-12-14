@@ -18,9 +18,6 @@ function build_registry_mirrors {
 
       REGISTRY_MIRROR_FLAGS="${REGISTRY_MIRROR_FLAGS} --registry-mirrors ${registry}=http://${addr}:5000"
     done
-
-    local addr=`python3 -c "import socket; print(socket.gethostbyname('registry.ci.svc'))"`
-    REGISTRY_MIRROR_FLAGS="${REGISTRY_MIRROR_FLAGS} --registry-mirrors registry.ci.svc:5000=http://${addr}:5000"
   else
     REGISTRY_MIRROR_FLAGS=${REGISTRY_MIRROR_FLAGS:-}
   fi
@@ -38,5 +35,5 @@ ${PREFIX} "${INTEGRATION_TEST}" test integration \
     --talosctl-path "${TALOSCTL}" \
     --clusterctl-config "${CLUSTERCTL_CONFIG}" \
     --power-simulated-explicit-failure-prob=0.1 \
-    --power-simulated-silent-failure-prob=0.1 \
+    --power-simulated-silent-failure-prob=0.0 \
     ${REGISTRY_MIRROR_FLAGS}

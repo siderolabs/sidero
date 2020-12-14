@@ -21,13 +21,12 @@ require (
 	github.com/prometheus/procfs v0.2.0 // indirect
 	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.6
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.8
-	github.com/talos-systems/crypto v0.2.1-0.20201028152949-d0c3eef149ec // indirect
 	github.com/talos-systems/go-blockdevice v0.1.1-0.20201111103554-874213371a3f
-	github.com/talos-systems/go-procfs v0.0.0-20200219015357-57c7311fdd45
+	github.com/talos-systems/go-procfs v0.0.0-20201215195843-16ce2ef52acd
 	github.com/talos-systems/go-retry v0.1.1-0.20200922131245-752f081252cf
 	github.com/talos-systems/go-smbios v0.0.0-20200807005123-80196199691e
 	github.com/talos-systems/net v0.2.0
-	github.com/talos-systems/talos/pkg/machinery v0.0.0-20201116215021-c16c1c88f95d
+	github.com/talos-systems/talos/pkg/machinery v0.0.0-20201215150852-17830b91527e
 	go.uber.org/zap v1.14.1 // indirect
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
 	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect
