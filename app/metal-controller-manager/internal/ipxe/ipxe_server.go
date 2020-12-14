@@ -23,6 +23,8 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/talos-systems/go-procfs/procfs"
+
 	infrav1 "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/server"
@@ -50,7 +52,7 @@ exit
 
 var (
 	apiEndpoint          string
-	extraAgentKernelArgs []string
+	extraAgentKernelArgs string
 	c                    client.Client
 )
 
@@ -147,7 +149,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ServeIPXE(endpoint string, args []string, mgrClient client.Client) error {
+func ServeIPXE(endpoint, args string, mgrClient client.Client) error {
 	apiEndpoint = endpoint
 	extraAgentKernelArgs = args
 	c = mgrClient
@@ -289,7 +291,13 @@ func newAgentEnvironment() *metalv1alpha1.Environment {
 		fmt.Sprintf("%s=%s:%s", constants.AgentEndpointArg, apiEndpoint, server.Port),
 	}
 
-	args = append(args, extraAgentKernelArgs...)
+	cmdline := procfs.NewCmdline(strings.Join(args, " "))
+	extra := procfs.NewCmdline(extraAgentKernelArgs)
+
+	// override defaults with extra kernel agent params
+	for _, p := range extra.Parameters {
+		cmdline.Set(p.Key(), p)
+	}
 
 	env := &metalv1alpha1.Environment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -297,7 +305,7 @@ func newAgentEnvironment() *metalv1alpha1.Environment {
 		},
 		Spec: metalv1alpha1.EnvironmentSpec{
 			Kernel: metalv1alpha1.Kernel{
-				Args: args,
+				Args: cmdline.Strings(),
 			},
 		},
 	}
