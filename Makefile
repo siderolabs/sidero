@@ -8,8 +8,11 @@ IMAGE := $(REGISTRY_AND_USERNAME)/$(NAME)
 MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
-PKGS ?= ./...
+TEST_PKGS ?= ./...
 TALOS_RELEASE ?= v0.8.0-alpha.3
+
+TOOLS ?= ghcr.io/talos-systems/tools:v0.3.0-13-g05b7372
+PKGS ?= v0.3.0-59-g3f7a335
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
@@ -23,7 +26,9 @@ COMMON_ARGS += --platform=$(PLATFORM)
 COMMON_ARGS += --build-arg=REGISTRY_AND_USERNAME=$(REGISTRY_AND_USERNAME)
 COMMON_ARGS += --build-arg=TAG=$(TAG)
 COMMON_ARGS += --build-arg=MODULE=$(MODULE)
+COMMON_ARGS += --build-arg=TEST_PKGS=$(TEST_PKGS)
 COMMON_ARGS += --build-arg=PKGS=$(PKGS)
+COMMON_ARGS += --build-arg=TOOLS=$(TOOLS)
 COMMON_ARGS += --build-arg=TALOS_RELEASE=$(TALOS_RELEASE)
 
 all: manifests generate cluster-api-provider-sidero metal-controller-manager metal-metadata-server sfyra
