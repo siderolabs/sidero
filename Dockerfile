@@ -1,4 +1,19 @@
-# syntax = docker/dockerfile-upstream:1.1.4-experimental
+# syntax = docker/dockerfile-upstream:1.2.0-labs
+
+# Meta args applied to stage base names.
+
+ARG TOOLS
+ARG PKGS
+
+# Resolve package images using ${PKGS} to be used later in COPY --from=.
+
+FROM ghcr.io/talos-systems/ca-certificates:${PKGS} AS pkg-ca-certificates
+FROM ghcr.io/talos-systems/fhs:${PKGS} AS pkg-fhs
+FROM ghcr.io/talos-systems/ipmitool:${PKGS} AS pkg-ipmitool
+FROM ghcr.io/talos-systems/libressl:${PKGS} AS pkg-libressl
+FROM ghcr.io/talos-systems/linux-firmware:${PKGS} AS pkg-linux-firmware
+FROM ghcr.io/talos-systems/musl:${PKGS} AS pkg-musl
+FROM ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel
 
 # The base target provides the base for running various tasks against the source
 # code
@@ -93,11 +108,11 @@ RUN chmod +x /manager
 
 ## TODO(rsmitty): make bmc pkg and move to talos-systems image
 FROM scratch AS cluster-api-provider-sidero
-COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-24-g8e63786 / /
-COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-24-g8e63786 / /
-COPY --from=ghcr.io/talos-systems/musl:v0.3.0-24-g8e63786 / /
-COPY --from=ghcr.io/talos-systems/libressl:v0.3.0-24-g8e63786 / /
-COPY --from=ghcr.io/talos-systems/ipmitool:v0.3.0-24-g8e63786 / /
+COPY --from=pkg-ca-certificates / /
+COPY --from=pkg-fhs / /
+COPY --from=pkg-musl / /
+COPY --from=pkg-libressl / /
+COPY --from=pkg-ipmitool / /
 COPY --from=build-cluster-api-provider-sidero /manager /manager
 ENTRYPOINT [ "/manager" ]
 
@@ -115,35 +130,35 @@ RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags
 RUN chmod +x /agent
 
 FROM scratch AS agent
-COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-24-g8e63786 / /
-COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-24-g8e63786 / /
+COPY --from=pkg-ca-certificates / /
+COPY --from=pkg-fhs / /
 COPY --from=agent-build /agent /agent
 ENTRYPOINT [ "/agent" ]
 
-FROM ghcr.io/talos-systems/tools:v0.3.0-7-g08245ac AS initramfs-archive
+FROM ${TOOLS} AS initramfs-archive
 ENV PATH /toolchain/bin
 RUN [ "/toolchain/bin/mkdir", "/bin" ]
 RUN [ "ln", "-s", "/toolchain/bin/bash", "/bin/sh" ]
 WORKDIR /initramfs
 COPY --from=agent /agent ./init
-COPY --from=ghcr.io/talos-systems/linux-firmware:v0.3.0-24-g8e63786 /lib/firmware/bnx2 ./lib/firmware/bnx2
-COPY --from=ghcr.io/talos-systems/linux-firmware:v0.3.0-24-g8e63786 /lib/firmware/bnx2x ./lib/firmware/bnx2x
+COPY --from=pkg-linux-firmware /lib/firmware/bnx2 ./lib/firmware/bnx2
+COPY --from=pkg-linux-firmware /lib/firmware/bnx2x ./lib/firmware/bnx2x
 RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 
 FROM scratch AS initramfs
 COPY --from=initramfs-archive /initramfs.xz /initramfs.xz
 
 FROM scratch AS metal-controller-manager
-COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-24-g8e63786 / /
-COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-24-g8e63786 / /
-COPY --from=ghcr.io/talos-systems/musl:v0.3.0-24-g8e63786 / /
-COPY --from=ghcr.io/talos-systems/libressl:v0.3.0-24-g8e63786 / /
-COPY --from=ghcr.io/talos-systems/ipmitool:v0.3.0-24-g8e63786 / /
+COPY --from=pkg-ca-certificates / /
+COPY --from=pkg-fhs / /
+COPY --from=pkg-musl / /
+COPY --from=pkg-libressl / /
+COPY --from=pkg-ipmitool / /
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe.0
 COPY --from=assets /ipxe.efi /var/lib/sidero/tftp/ipxe.efi
 COPY --from=initramfs /initramfs.xz /var/lib/sidero/env/agent/initramfs.xz
-COPY --from=ghcr.io/talos-systems/kernel:v0.3.0-24-g8e63786 /boot/vmlinuz /var/lib/sidero/env/agent/vmlinuz
+COPY --from=pkg-kernel /boot/vmlinuz /var/lib/sidero/env/agent/vmlinuz
 COPY --from=build-metal-controller-manager /manager /manager
 ENTRYPOINT [ "/manager" ]
 
@@ -152,14 +167,14 @@ RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags
 RUN chmod +x /metal-metadata-server
 
 FROM scratch AS metal-metadata-server
-COPY --from=ghcr.io/talos-systems/ca-certificates:v0.3.0-24-g8e63786 / /
-COPY --from=ghcr.io/talos-systems/fhs:v0.3.0-24-g8e63786 / /
+COPY --from=pkg-ca-certificates / /
+COPY --from=pkg-fhs / /
 COPY --from=build-metal-metadata-server /metal-metadata-server /metal-metadata-server
 ENTRYPOINT [ "/metal-metadata-server" ]
 
 FROM base AS unit-tests-runner
-ARG PKGS
-RUN --mount=type=cache,id=testspace,target=/tmp --mount=type=cache,target=/root/.cache/go-build go test -v -covermode=atomic -coverprofile=coverage.txt -count 1 ${PKGS}
+ARG TEST_PKGS
+RUN --mount=type=cache,id=testspace,target=/tmp --mount=type=cache,target=/root/.cache/go-build go test -v -covermode=atomic -coverprofile=coverage.txt -count 1 ${TEST_PKGS}
 #
 FROM scratch AS unit-tests
 COPY --from=unit-tests-runner /src/coverage.txt /coverage.txt
@@ -168,8 +183,8 @@ COPY --from=unit-tests-runner /src/coverage.txt /coverage.txt
 #
 FROM base AS unit-tests-race
 ENV CGO_ENABLED 1
-ARG PKGS
-RUN --mount=type=cache,target=/root/.cache/go-build go test -v -count 1 -race ${PKGS}
+ARG TEST_PKGS
+RUN --mount=type=cache,target=/root/.cache/go-build go test -v -count 1 -race ${TEST_PKGS}
 #
 # The lint target performs linting on the source code.
 #
