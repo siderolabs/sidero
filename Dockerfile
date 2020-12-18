@@ -143,7 +143,7 @@ COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe
 COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe.0
 COPY --from=assets /ipxe.efi /var/lib/sidero/tftp/ipxe.efi
 COPY --from=initramfs /initramfs.xz /var/lib/sidero/env/agent/initramfs.xz
-COPY --from=ghcr.io/talos-systems/kernel:v0.3.0-24-g8e63786 /boot/vmlinuz /var/lib/sidero/env/agent/vmlinuz
+COPY --from=ghcr.io/talos-systems/kernel:v0.3.0-59-g3f7a335 /boot/vmlinuz /var/lib/sidero/env/agent/vmlinuz
 COPY --from=build-metal-controller-manager /manager /manager
 ENTRYPOINT [ "/manager" ]
 
