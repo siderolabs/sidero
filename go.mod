@@ -26,7 +26,7 @@ require (
 	github.com/talos-systems/go-retry v0.1.1-0.20200922131245-752f081252cf
 	github.com/talos-systems/go-smbios v0.0.0-20200807005123-80196199691e
 	github.com/talos-systems/net v0.2.0
-	github.com/talos-systems/talos/pkg/machinery v0.0.0-20201215150852-17830b91527e
+	github.com/talos-systems/talos/pkg/machinery v0.0.0-20201218234035-9aa0d3414f7a
 	go.uber.org/zap v1.14.1 // indirect
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
 	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect

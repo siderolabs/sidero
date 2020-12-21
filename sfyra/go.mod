@@ -17,8 +17,8 @@ require (
 	github.com/talos-systems/go-retry v0.1.1-0.20201113203059-8c63d290a688
 	github.com/talos-systems/net v0.2.0
 	github.com/talos-systems/sidero v0.1.0-alpha.1.0.20200915181156-11a0a80e3d8b
-	github.com/talos-systems/talos v0.0.0-20201215150852-17830b91527e
-	github.com/talos-systems/talos/pkg/machinery v0.0.0-20201215150852-17830b91527e
+	github.com/talos-systems/talos v0.8.0-beta.0
+	github.com/talos-systems/talos/pkg/machinery v0.0.0-20201218234035-9aa0d3414f7a
 	google.golang.org/grpc v1.29.1
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 	k8s.io/api v0.20.0
