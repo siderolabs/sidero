@@ -1,10 +1,48 @@
 
+<a name="v0.1.0-beta.0"></a>
+## [v0.1.0-beta.0](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.12...v0.1.0-beta.0) (2020-12-21)
+
+### Chore
+
+* bump versions of packages used in the build
+* fix analytics
+* bump google analytics plugin
+
+### Docs
+
+* update local Sfyra docs
+* improve docs on metadata and environments
+* add flow charts for PXE and installation
+* add CRD documentation
+* clarify cluster template environment variables
+* clarify process of fetching talosconfig
+
+### Feat
+
+* bump Talos to 0.8.0-beta.0
+* send heartbeat from agent while wipe is in progress
+* align default subnets with Talos
+
+### Fix
+
+* overwrite kernel args from --extra-agent-kernel-args
+
+### Test
+
+* add simulated power management failures in testing mode
+* add a test to deploy and destroy workload cluster
+
+
 <a name="v0.1.0-alpha.12"></a>
 ## [v0.1.0-alpha.12](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.11...v0.1.0-alpha.12) (2020-12-02)
 
 ### Feat
 
 * rework binding between Servers and MetalMachines
+
+### Release
+
+* **v0.1.0-alpha.12:** prepare release
 
 
 <a name="v0.1.0-alpha.11"></a>
@@ -310,7 +348,6 @@
 ### Release
 
 * **v0.1.0-alpha.1:** prepare release
-
 
 <a name="v0.1.0-alpha.0"></a>
 ## v0.1.0-alpha.0 (2020-08-17)
