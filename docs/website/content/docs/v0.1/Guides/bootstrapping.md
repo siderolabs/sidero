@@ -16,7 +16,16 @@ Talos Systems and the Cluster API community have created tools to help make this
 
 ## Prerequisites
 
-There are two big prerequisites involved with bootstrapping Sidero: routing and DHCP setup.
+First, you need to install the latest `talosctl` by running the following script:
+
+```bash
+curl -Lo /usr/local/bin/talosctl https://github.com/talos-systems/talos/releases/latest/download/talosctl-$(uname -s | tr "[:upper:]" "[:lower:]")-amd64
+chmod +x /usr/local/bin/talosctl
+```
+
+You can read more about Talos and `talosctl` at [talos.dev](https://www.talos.dev/docs/latest).
+
+Next, there are two big prerequisites involved with bootstrapping Sidero: routing and DHCP setup.
 
 From the routing side, the laptop from which you are bootstrapping _must_ be accessible by the bare metal machines that we will be booting.
 In the datacenter scenario described above, the easiest way to achieve this is probably to hook the laptop onto the server rack's subnet by plugging it into the top-of-rack switch.
