@@ -159,6 +159,7 @@ func ServeIPXE(endpoint, args string, mgrClient client.Client) error {
 	mux.Handle("/boot.ipxe", logRequest(http.HandlerFunc(bootFileHandler)))
 	mux.Handle("/ipxe", logRequest(http.HandlerFunc(ipxeHandler)))
 	mux.Handle("/env/", logRequest(http.StripPrefix("/env/", http.FileServer(http.Dir("/var/lib/sidero/env")))))
+	mux.Handle("/tftp/", logRequest(http.StripPrefix("/tftp/", http.FileServer(http.Dir("/var/lib/sidero/tftp")))))
 
 	log.Println("Listening...")
 
