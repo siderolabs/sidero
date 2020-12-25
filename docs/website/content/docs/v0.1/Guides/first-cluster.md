@@ -58,10 +58,20 @@ if exists user-class and option user-class = "iPXE" {
 } else {
   if substring (option vendor-class-identifier, 15, 5) = "00000" {
     # BIOS
-    filename "undionly.kpxe";
+    if substring (option vendor-class-identifier, 0, 10) = "HTTPClient" {
+      option vendor-class-identifier "HTTPClient";
+      filename "http://192.168.254.2:8081/tftp/undionly.kpxe";
+    } else {
+      filename "undionly.kpxe";
+    }
   } else {
     # UEFI
-    filename "ipxe.efi";
+    if substring (option vendor-class-identifier, 0, 10) = "HTTPClient" {
+      option vendor-class-identifier "HTTPClient";
+      filename "http://192.168.254.2:8081/tftp/ipxe.efi";
+    } else {
+      filename "ipxe.efi";
+    }
   }
 }
 
