@@ -234,6 +234,17 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 		configProvider, err := configloader.NewFromBytes(metadataBytes)
 		require.NoError(t, err)
 
+		// try deleting dummy server before deleting the cluster
+		// it shouldn't break the cluster
+		require.NoError(t, metalClient.Delete(ctx, &dummyServer))
+
+		time.Sleep(time.Second * 10)
+
+		response := &v1alpha1.Server{}
+
+		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: dummyServer.Name}, response))
+		require.Greater(t, len(response.Finalizers), 0)
+
 		switch configProvider.Version() {
 		case "v1alpha1":
 			config, ok := configProvider.(*talosconfig.Config)

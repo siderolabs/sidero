@@ -25,6 +25,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
@@ -33,6 +34,10 @@ import (
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/power/metal"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
+)
+
+const (
+	serverBindingFinalizer = "storage.finalizers.server.k8s.io"
 )
 
 // ServerReconciler reconciles a Server object.
@@ -126,6 +131,23 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		if serverBindingPresent {
 			// clear any leftover ownerreferences, they were transferred by serverbinding controller
 			s.OwnerReferences = []v1.OwnerReference{}
+		}
+	}
+
+	hasFinalizer := controllerutil.ContainsFinalizer(&s, serverBindingFinalizer)
+
+	if s.ObjectMeta.DeletionTimestamp.IsZero() {
+		if !hasFinalizer {
+			controllerutil.AddFinalizer(&s, serverBindingFinalizer)
+
+			if err := patchHelper.Patch(ctx, &s); err != nil {
+				return ctrl.Result{}, errors.WithStack(err)
+			}
+		}
+	} else {
+		// remove the finalizer from the server if it is not allocated
+		if hasFinalizer && !allocated {
+			controllerutil.RemoveFinalizer(&s, serverBindingFinalizer)
 		}
 	}
 
