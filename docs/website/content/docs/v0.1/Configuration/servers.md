@@ -36,6 +36,36 @@ spec:
     version: Unknown
 ```
 
+## Installation Disk
+
+A an installation disk is required by Talos on bare metal.
+This can be specified in a `configPatch`:
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: Server
+...
+spec:
+  accepted: false
+  configPatches:
+    - op: replace
+      path: /machine/install/disk
+      value: /dev/sda1
+```
+
+The install disk patch can also be set on the `ServerClass`:
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: ServerClass
+...
+spec:
+  configPatches:
+    - op: replace
+      path: /machine/install/disk
+      value: /dev/sda1
+```
+
 ## Server Acceptance
 
 In order for a server to be eligible for consideration, it _must_ be `accepted`.
@@ -55,4 +85,3 @@ You should never change an accepted `Server` to be _not_ accepted while it is in
 Because servers which are not accepted will not be modified, if a server which
 _was_ accepted is changed to _not_ accepted, the disk will _not_ be wiped upon
 its exit.
-
