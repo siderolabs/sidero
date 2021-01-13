@@ -85,3 +85,27 @@ You should never change an accepted `Server` to be _not_ accepted while it is in
 Because servers which are not accepted will not be modified, if a server which
 _was_ accepted is changed to _not_ accepted, the disk will _not_ be wiped upon
 its exit.
+
+## IPMI
+
+Sidero can use IPMI information to control `Server` power state, reboot servers and set boot order.
+
+IMPI connection information can be set in the `Server` spec after initial registration:
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: Server
+...
+spec:
+  bmc:
+    endpoint: 10.0.0.25
+    user: admin
+    pass: password
+```
+
+If IPMI information is set, server boot order might be set to boot from disk, then network, Sidero will switch servers
+to PXE boot once that is required.
+
+Without IPMI info, Sidero can still register servers, wipe them and provision clusters, but Sidero won't be able to
+reboot servers once they are removed from the cluster. If IPMI info is not set, servers should be configured to boo first from network,
+then from disk.

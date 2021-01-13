@@ -27,14 +27,14 @@ metadata:
   name: default
 spec:
   kernel:
-    url: "https://github.com/talos-systems/talos/releases/download/v0.7.1/vmlinuz"
+    url: "https://github.com/talos-systems/talos/releases/download/v0.8.1/vmlinuz-amd64"
     sha512: ""
     args:
-      - initrd=initramfs.xz
-      - page_poison=1
+      - init_on_alloc=1
+      - init_on_free=1
       - slab_nomerge
-      - slub_debug=P
       - pti=on
+      - consoleblank=0
       - random.trust_cpu=on
       - ima_template=ima-ng
       - ima_appraise=fix
@@ -47,7 +47,7 @@ spec:
       - talos.platform=metal
       - talos.config=http://$PUBLIC_IP:9091/configdata?uuid=
   initrd:
-    url: "https://github.com/talos-systems/talos/releases/download/v0.7.1/initramfs.xz"
+    url: "https://github.com/talos-systems/talos/releases/download/v0.8.1/initramfs-amd64.xz"
     sha512: ""
 ```
 
