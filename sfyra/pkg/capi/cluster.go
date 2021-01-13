@@ -89,16 +89,20 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 		var endpoints []string
 
 		for _, machine := range machines.Items {
+			if !machine.DeletionTimestamp.IsZero() {
+				continue
+			}
+
+			if v1alpha3.MachinePhase(machine.Status.Phase) != v1alpha3.MachinePhaseRunning {
+				continue
+			}
+
 			var metalMachine sidero.MetalMachine
 
 			if err = metalClient.Get(ctx,
 				types.NamespacedName{Namespace: machine.Spec.InfrastructureRef.Namespace, Name: machine.Spec.InfrastructureRef.Name},
 				&metalMachine); err != nil {
 				return nil, err
-			}
-
-			if v1alpha3.MachinePhase(machine.Status.Phase) != v1alpha3.MachinePhaseRunning {
-				continue
 			}
 
 			if metalMachine.Spec.ServerRef == nil {
