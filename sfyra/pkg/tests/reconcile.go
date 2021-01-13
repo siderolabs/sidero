@@ -68,7 +68,7 @@ func TestMachineDeploymentReconcile(ctx context.Context, metalClient client.Clie
 		require.NoError(t, err)
 
 		// next, check that replicas get reconciled
-		err = retry.Constant(5*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+		err = retry.Constant(10*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
 			err = metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: machineDeploymentName}, &machineDeployment)
 			if err != nil {
 				return retry.UnexpectedError(err)
