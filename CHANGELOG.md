@@ -1,6 +1,18 @@
 
+<a name="v0.1.0"></a>
+## [v0.1.0](https://github.com/talos-systems/talos/compare/v0.1.0-beta.0...v0.1.0) (2021-01-13)
+
+### Fix
+
+* prevent server orphaning
+
+### Test
+
+* fix test flakiness on workers scale down test
+
+
 <a name="v0.1.0-beta.0"></a>
-## [v0.1.0-beta.0](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.12...v0.1.0-beta.0) (2020-12-21)
+## [v0.1.0-beta.0](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.12...v0.1.0-beta.0) (2020-12-23)
 
 ### Chore
 
@@ -27,6 +39,10 @@
 
 * overwrite kernel args from --extra-agent-kernel-args
 
+### Release
+
+* **v0.1.0-beta.0:** prepare release
+
 ### Test
 
 * add simulated power management failures in testing mode
@@ -42,6 +58,7 @@
 
 ### Release
 
+* **v0.1.0-alpha.11:** prepare release
 * **v0.1.0-alpha.12:** prepare release
 
 
@@ -62,10 +79,6 @@
 
 * unify power management under ServerController
 * remove dependency on talos Go module
-
-### Release
-
-* **v0.1.0-alpha.11:** prepare release
 
 
 <a name="v0.1.0-alpha.10"></a>
@@ -348,6 +361,7 @@
 ### Release
 
 * **v0.1.0-alpha.1:** prepare release
+
 
 <a name="v0.1.0-alpha.0"></a>
 ## v0.1.0-alpha.0 (2020-08-17)
