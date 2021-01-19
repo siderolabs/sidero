@@ -29,7 +29,7 @@ module.exports = {
         version: "v0.1",
         url: "/docs/v0.1/",
         latest: true,
-        prerelease: true,
+        prerelease: false,
       },
     ],
   },
@@ -88,11 +88,9 @@ module.exports = {
     },
 
     {
-      use: "gridsome-plugin-gtm",
+      use: "@gridsome/plugin-google-analytics",
       options: {
-        id: process.env.GTM_ID ? process.env.GTM_ID : "XX-999999999-9",
-        enabled: true,
-        debug: false,
+        id: process.env.GA_ID ? process.env.GA_ID : "XX-999999999-9",
       },
     },
 
