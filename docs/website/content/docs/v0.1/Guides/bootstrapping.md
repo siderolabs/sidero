@@ -241,6 +241,13 @@ spec:
         version: Intel(R) Atom(TM) CPU C3558 @ 2.20GHz
 EOF
 ```
+In order to fetch hardware information, you can use
+
+```bash
+kubectl get server -o yaml
+```
+
+Note that for bare-metal setup, you would need to specify an installation disk. See the [Installation Disk](/docs/v0.1/configuration/servers/#installation-disk)
 
 Once created, you should see the servers that make up your server class appear as "available":
 
@@ -270,6 +277,25 @@ Note that there are several variables that should be set in order for the templa
 - `CONTROL_PLANE_SERVERCLASS`: The server class to use for control plane nodes.
 - `WORKER_SERVERCLASS`: The server class to use for worker nodes.
 - `KUBERNETES_VERSION`: The version of Kubernetes to deploy (e.g. `v1.19.4`).
+- `CONTROL_PLANE_PORT`: The port used for the Kubernetes API server (port 6443)
+
+For instance:
+```bash
+export CONTROL_PLANE_SERVERCLASS=master
+export WORKER_SERVERCLASS=worker
+export KUBERNETES_VERSION=v1.20.1
+export CONTROL_PLANE_PORT=6443
+export CONTROL_PLANE_ENDPOINT=1.2.3.4
+clusterctl config cluster management-plane -i sidero > management-plane.yaml
+```
+
+In addition, you can specify the replicas for control-plane & worker nodes in management-plane.yaml manifest for TalosControlPlane and MachineDeployment objects. Also, they can be scaled if needed:
+
+```bash
+kubectl get taloscontrolplane
+kubectl get machinedeployment
+kubectl scale taloscontrolplane management-plane-cp --replicas=3
+```
 
 Now that we have the manifest, we can simply apply it:
 
