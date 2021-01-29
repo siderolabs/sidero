@@ -77,6 +77,7 @@ spec:
     matchLabels: null
   template:
     spec:
+      version: ${KUBERNETES_VERSION}
       bootstrap:
         configRef:
           apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
