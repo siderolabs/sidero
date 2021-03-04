@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/talos-systems/go-procfs/procfs"
 	"github.com/talos-systems/go-retry/retry"
+	"github.com/talos-systems/talos/pkg/machinery/kernel"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -34,7 +35,8 @@ func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, clus
 				require.NoError(t, err)
 			}
 
-			cmdline := procfs.NewDefaultCmdline()
+			cmdline := procfs.NewCmdline("")
+			cmdline.AppendAll(kernel.DefaultArgs)
 			cmdline.Append("console", "ttyS0")
 			cmdline.Append("reboot", "k")
 			cmdline.Append("panic", "1")
