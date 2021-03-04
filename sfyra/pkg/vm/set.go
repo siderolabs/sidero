@@ -125,11 +125,11 @@ func (set *Set) create(ctx context.Context) error {
 		Name: set.options.Name,
 
 		Network: provision.NetworkRequest{
-			Name:        set.options.Name,
-			CIDR:        *cidr,
-			GatewayAddr: set.bridgeIP,
-			MTU:         constants.MTU,
-			Nameservers: constants.Nameservers,
+			Name:         set.options.Name,
+			CIDRs:        []net.IPNet{*cidr},
+			GatewayAddrs: []net.IP{set.bridgeIP},
+			MTU:          constants.MTU,
+			Nameservers:  constants.Nameservers,
 			CNI: provision.CNIConfig{
 				BinPath:  constants.CNIBinPath,
 				ConfDir:  constants.CNIConfDir,
@@ -146,7 +146,7 @@ func (set *Set) create(ctx context.Context) error {
 			provision.NodeRequest{
 				Name:     fmt.Sprintf("pxe-%d", i),
 				Type:     machine.TypeUnknown,
-				IP:       ips[i+1],
+				IPs:      []net.IP{ips[i+1]},
 				Memory:   set.options.MemMB * 1024 * 1024,
 				NanoCPUs: set.options.CPUs * 1000 * 1000 * 1000,
 				Disks: []*provision.Disk{
@@ -154,9 +154,10 @@ func (set *Set) create(ctx context.Context) error {
 						Size: uint64(set.options.DiskGB) * 1024 * 1024 * 1024,
 					},
 				},
-				PXEBooted:        true,
-				TFTPServer:       set.options.BootSource.String(),
-				IPXEBootFilename: fmt.Sprintf("http://%s:8081/boot.ipxe", set.options.BootSource),
+				PXEBooted:           true,
+				TFTPServer:          set.options.BootSource.String(),
+				IPXEBootFilename:    fmt.Sprintf("http://%s:8081/boot.ipxe", set.options.BootSource),
+				SkipInjectingConfig: true,
 			})
 	}
 

@@ -173,11 +173,11 @@ func (cluster *Cluster) create(ctx context.Context) error {
 		Name: cluster.options.Name,
 
 		Network: provision.NetworkRequest{
-			Name:        cluster.options.Name,
-			CIDR:        *cidr,
-			GatewayAddr: cluster.bridgeIP,
-			MTU:         constants.MTU,
-			Nameservers: constants.Nameservers,
+			Name:         cluster.options.Name,
+			CIDRs:        []net.IPNet{*cidr},
+			GatewayAddrs: []net.IP{cluster.bridgeIP},
+			MTU:          constants.MTU,
+			Nameservers:  constants.Nameservers,
 			CNI: provision.CNIConfig{
 				BinPath:  constants.CNIBinPath,
 				ConfDir:  constants.CNIConfDir,
@@ -226,7 +226,7 @@ func (cluster *Cluster) create(ctx context.Context) error {
 		provision.NodeRequest{
 			Name:     constants.BootstrapMaster,
 			Type:     machine.TypeControlPlane,
-			IP:       cluster.masterIP,
+			IPs:      []net.IP{cluster.masterIP},
 			Memory:   cluster.options.MemMB * 1024 * 1024,
 			NanoCPUs: cluster.options.CPUs * 1000 * 1000 * 1000,
 			Disks: []*provision.Disk{
