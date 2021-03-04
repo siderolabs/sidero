@@ -52,7 +52,8 @@ func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 	os.Setenv("CONTROL_PLANE_SERVERCLASS", serverClassName)
 	os.Setenv("WORKER_SERVERCLASS", serverClassName)
 	// TODO: make it configurable
-	os.Setenv("KUBERNETES_VERSION", "v1.19.4")
+	os.Setenv("KUBERNETES_VERSION", "v1.20.4")
+	os.Setenv("TALOS_VERSION", "v0.9")
 
 	templateOptions := capiclient.GetClusterTemplateOptions{
 		Kubeconfig:               kubeconfig,
