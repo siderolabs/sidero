@@ -103,7 +103,7 @@ func create(ctx context.Context, client api.AgentClient, s *smbios.Smbios) (*api
 
 	var resp *api.CreateServerResponse
 
-	err = retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second)).Retry(func() error {
+	err = retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second), retry.WithErrorLogging(true)).Retry(func() error {
 		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 		defer cancel()
 
@@ -124,7 +124,7 @@ func wipe(ctx context.Context, client api.AgentClient, s *smbios.Smbios) error {
 		return err
 	}
 
-	return retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second)).Retry(func() error {
+	return retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second), retry.WithErrorLogging(true)).Retry(func() error {
 		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 		defer cancel()
 
