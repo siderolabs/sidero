@@ -28,6 +28,10 @@ import (
 )
 
 func setup() error {
+	if err := os.MkdirAll("/etc", 0o777); err != nil {
+		return err
+	}
+
 	if err := os.MkdirAll("/dev", 0o777); err != nil {
 		return err
 	}
@@ -57,6 +61,10 @@ func setup() error {
 	}
 
 	if err := unix.Mount("tmpfs", "/tmp", "tmpfs", 0, ""); err != nil {
+		return err
+	}
+
+	if err := unix.Symlink("/proc/net/pnp", "/etc/resolv.conf"); err != nil {
 		return err
 	}
 
