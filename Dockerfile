@@ -18,7 +18,7 @@ FROM ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel
 # The base target provides the base for running various tasks against the source
 # code
 
-FROM golang:1.15 AS base
+FROM golang:1.16 AS base
 ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
@@ -114,6 +114,7 @@ COPY --from=pkg-musl / /
 COPY --from=pkg-libressl / /
 COPY --from=pkg-ipmitool / /
 COPY --from=build-cluster-api-provider-sidero /manager /manager
+LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-controller-manager
@@ -133,6 +134,7 @@ FROM scratch AS agent
 COPY --from=pkg-ca-certificates / /
 COPY --from=pkg-fhs / /
 COPY --from=agent-build /agent /agent
+LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/agent" ]
 
 FROM ${TOOLS} AS initramfs-archive
@@ -160,6 +162,7 @@ COPY --from=assets /ipxe.efi /var/lib/sidero/tftp/ipxe.efi
 COPY --from=initramfs /initramfs.xz /var/lib/sidero/env/agent/initramfs.xz
 COPY --from=pkg-kernel /boot/vmlinuz /var/lib/sidero/env/agent/vmlinuz
 COPY --from=build-metal-controller-manager /manager /manager
+LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-metadata-server
@@ -170,6 +173,7 @@ FROM scratch AS metal-metadata-server
 COPY --from=pkg-ca-certificates / /
 COPY --from=pkg-fhs / /
 COPY --from=build-metal-metadata-server /metal-metadata-server /metal-metadata-server
+LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/metal-metadata-server" ]
 
 FROM base AS unit-tests-runner

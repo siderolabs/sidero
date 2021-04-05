@@ -14,6 +14,7 @@ type Options struct {
 	BootstrapTalosVmlinuz   string
 	BootstrapTalosInitramfs string
 	BootstrapTalosInstaller string
+	BootstrapCNIBundleURL   string
 	BootstrapCIDR           string
 
 	TalosKernelURL string
@@ -57,6 +58,7 @@ func DefaultOptions() Options {
 		BootstrapTalosVmlinuz:   fmt.Sprintf("_out/%s/vmlinuz-amd64", TalosRelease),
 		BootstrapTalosInitramfs: fmt.Sprintf("_out/%s/initramfs-amd64.xz", TalosRelease),
 		BootstrapTalosInstaller: fmt.Sprintf("ghcr.io/talos-systems/installer:%s", TalosRelease),
+		BootstrapCNIBundleURL:   fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/talosctl-cni-bundle-%s.tar.gz", TalosRelease, "amd64"),
 		BootstrapCIDR:           "172.24.0.0/24",
 
 		TalosKernelURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz-amd64", TalosRelease),
@@ -71,8 +73,8 @@ func DefaultOptions() Options {
 		ManagementSetName: "sfyra-management",
 		ManagementNodes:   4,
 
-		BootstrapMemMB:  3072,
-		BootstrapCPUs:   4,
+		BootstrapMemMB:  4096,
+		BootstrapCPUs:   5,
 		BootstrapDiskGB: 6,
 
 		ManagementMemMB:  2048,

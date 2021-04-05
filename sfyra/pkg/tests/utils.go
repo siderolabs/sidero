@@ -26,3 +26,5 @@ func (f matchStringOnly) ImportPath() string { return "" }
 func (f matchStringOnly) StartTestLog(io.Writer) {}
 
 func (f matchStringOnly) StopTestLog() error { return errMain }
+
+func (f matchStringOnly) SetPanicOnExit0(bool) {}

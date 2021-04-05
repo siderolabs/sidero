@@ -9,10 +9,10 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 TEST_PKGS ?= ./...
-TALOS_RELEASE ?= v0.9.0-alpha.5
+TALOS_RELEASE ?= v0.9.1
 
-TOOLS ?= ghcr.io/talos-systems/tools:v0.3.0-13-g05b7372
-PKGS ?= v0.3.0-59-g3f7a335
+TOOLS ?= ghcr.io/talos-systems/tools:v0.5.0-alpha.0-3-g41b8073
+PKGS ?= v0.5.0-alpha.0-4-g60ce626
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 

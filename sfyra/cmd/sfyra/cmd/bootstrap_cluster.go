@@ -26,6 +26,7 @@ var bootstrapClusterCmd = &cobra.Command{
 				Vmlinuz:        options.BootstrapTalosVmlinuz,
 				Initramfs:      options.BootstrapTalosInitramfs,
 				InstallerImage: options.BootstrapTalosInstaller,
+				CNIBundleURL:   options.BootstrapCNIBundleURL,
 
 				TalosctlPath: options.TalosctlPath,
 
