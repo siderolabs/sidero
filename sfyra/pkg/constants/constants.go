@@ -7,17 +7,8 @@ package constants
 
 import "net"
 
-// Default network parameters.
-var (
-	Nameservers = []net.IP{net.ParseIP("8.8.8.8"), net.ParseIP("1.1.1.1")}
-	CNIBinPath  = []string{"/opt/cni/bin"}
-)
-
-// Default CNI paths.
-const (
-	CNIConfDir  = "/etc/cni/conf.d"
-	CNICacheDir = "/var/lib/cni"
-)
+// Nameservers are defaults to use in bootstrap cluster.
+var Nameservers = []net.IP{net.ParseIP("8.8.8.8"), net.ParseIP("1.1.1.1")}
 
 // MTU default setting.
 const MTU = 1500

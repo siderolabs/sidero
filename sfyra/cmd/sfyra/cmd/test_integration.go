@@ -33,6 +33,7 @@ var testIntegrationCmd = &cobra.Command{
 				Vmlinuz:        options.BootstrapTalosVmlinuz,
 				Initramfs:      options.BootstrapTalosInitramfs,
 				InstallerImage: options.BootstrapTalosInstaller,
+				CNIBundleURL:   options.BootstrapCNIBundleURL,
 
 				TalosctlPath: options.TalosctlPath,
 
@@ -60,6 +61,7 @@ var testIntegrationCmd = &cobra.Command{
 				BootSource: bootstrapCluster.SideroComponentsIP(),
 				CIDR:       options.ManagementCIDR,
 
+				CNIBundleURL: options.BootstrapCNIBundleURL,
 				TalosctlPath: options.TalosctlPath,
 
 				CPUs:   options.ManagementCPUs,

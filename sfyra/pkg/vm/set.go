@@ -25,6 +25,7 @@ type Set struct {
 	cluster     provision.Cluster
 	options     Options
 	stateDir    string
+	cniDir      string
 	bridgeIP    net.IP
 }
 
@@ -36,6 +37,7 @@ type Options struct {
 	CIDR       string
 
 	TalosctlPath string
+	CNIBundleURL string
 
 	MemMB  int64
 	CPUs   int64
@@ -68,6 +70,7 @@ func (set *Set) Setup(ctx context.Context) error {
 	}
 
 	set.stateDir = filepath.Join(defaultStateDir, "clusters")
+	set.cniDir = filepath.Join(defaultStateDir, "cni")
 
 	fmt.Printf("VM set state directory: %s, name: %s\n", set.stateDir, set.options.Name)
 
@@ -131,9 +134,11 @@ func (set *Set) create(ctx context.Context) error {
 			MTU:          constants.MTU,
 			Nameservers:  constants.Nameservers,
 			CNI: provision.CNIConfig{
-				BinPath:  constants.CNIBinPath,
-				ConfDir:  constants.CNIConfDir,
-				CacheDir: constants.CNICacheDir,
+				BinPath:  []string{filepath.Join(set.cniDir, "bin")},
+				ConfDir:  filepath.Join(set.cniDir, "conf.d"),
+				CacheDir: filepath.Join(set.cniDir, "cache"),
+
+				BundleURL: set.options.CNIBundleURL,
 			},
 		},
 

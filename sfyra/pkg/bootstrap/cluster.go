@@ -44,6 +44,7 @@ type Cluster struct {
 	masterIP net.IP
 
 	stateDir   string
+	cniDir     string
 	configPath string
 }
 
@@ -54,6 +55,7 @@ type Options struct {
 
 	Vmlinuz, Initramfs string
 	InstallerImage     string
+	CNIBundleURL       string
 
 	TalosctlPath string
 
@@ -95,6 +97,7 @@ func (cluster *Cluster) Setup(ctx context.Context) error {
 	}
 
 	cluster.stateDir = filepath.Join(defaultStateDir, "clusters")
+	cluster.cniDir = filepath.Join(defaultStateDir, "cni")
 
 	fmt.Printf("bootstrap cluster state directory: %s, name: %s\n", cluster.stateDir, cluster.options.Name)
 
@@ -179,9 +182,11 @@ func (cluster *Cluster) create(ctx context.Context) error {
 			MTU:          constants.MTU,
 			Nameservers:  constants.Nameservers,
 			CNI: provision.CNIConfig{
-				BinPath:  constants.CNIBinPath,
-				ConfDir:  constants.CNIConfDir,
-				CacheDir: constants.CNICacheDir,
+				BinPath:  []string{filepath.Join(cluster.cniDir, "bin")},
+				ConfDir:  filepath.Join(cluster.cniDir, "conf.d"),
+				CacheDir: filepath.Join(cluster.cniDir, "cache"),
+
+				BundleURL: cluster.options.CNIBundleURL,
 			},
 		},
 
