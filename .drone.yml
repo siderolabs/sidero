@@ -7,10 +7,7 @@ steps:
   - name: setup-ci
     image: autonomy/build-container:latest
     commands:
-      - git fetch --tags
-      - apk add coreutils
-      - docker buildx create --driver docker-container --platform linux/amd64 --name build-sidero --use unix:///var/outer-run/docker.sock
-      - docker buildx inspect --bootstrap
+      - setup-ci
     privileged: true
     resources:
       requests:
@@ -185,6 +182,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: 0391f0a57e8f4ca67a8bc0f3d646da52adf0ee8e1d2138d4b65cf5859db33d77
+hmac: 6e8280c06e511ffeb8fb07e94c0920ffaa13ecaadba0dcba1b432b1351cc4d0a
 
 ...
