@@ -1,6 +1,10 @@
 
+<a name="v0.2.0-alpha.1"></a>
+## [v0.2.0-alpha.1](https://github.com/talos-systems/talos/compare/v0.2.0-alpha.0...v0.2.0-alpha.1) (2021-04-06)
+
+
 <a name="v0.2.0-alpha.0"></a>
-## [v0.2.0-alpha.0](https://github.com/talos-systems/talos/compare/v0.1.0...v0.2.0-alpha.0) (2021-03-31)
+## [v0.2.0-alpha.0](https://github.com/talos-systems/talos/compare/v0.1.0...v0.2.0-alpha.0) (2021-04-06)
 
 ### Docs
 
@@ -23,6 +27,10 @@
 * log retry errors
 * add kubernetes version to cluster template
 * prevent server orphaning
+
+### Release
+
+* **v0.2.0-alpha.0:** prepare release
 
 ### Test
 

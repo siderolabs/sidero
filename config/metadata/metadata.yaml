@@ -4,3 +4,6 @@ releaseSeries:
   - major: 0
     minor: 1
     contract: v1alpha3
+  - major: 0
+    minor: 2
+    contract: v1alpha3
