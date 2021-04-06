@@ -6,7 +6,7 @@ function changelog {
   if [ "$#" -eq 1 ]; then
     git-chglog --output CHANGELOG.md -c ./hack/chglog/config.yml --tag-filter-pattern "^${1}" "${1}.0-alpha.0.."
   elif [ "$#" -eq 0 ]; then
-    git-chglog --output CHANGELOG.md -c ./hack/chglog/config.yml
+    git-chglog --output CHANGELOG.md -c ./hack/chglog/config.yml --sort=semver
   else
     echo 1>&2 "Usage: $0 changelog [tag]"
     exit 1
