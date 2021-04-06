@@ -24,6 +24,7 @@ policies:
           - release
         scopes:
           - ^v0.1
+          - ^v0.2
   - type: license
     spec:
       skipPaths:

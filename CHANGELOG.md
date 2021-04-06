@@ -1,10 +1,98 @@
 
+<a name="v0.2.0-alpha.0"></a>
+## [v0.2.0-alpha.0](https://github.com/talos-systems/talos/compare/v0.1.0...v0.2.0-alpha.0) (2021-03-31)
+
+### Docs
+
+* update bootstrapping guide
+* setup google analytics
+* add IPMI info, fix links, update environment
+* add note on installation disk
+* fix typo on Server Classes page
+* describe the command to install talosctl in the bootstrap guide
+
+### Feat
+
+* update Talos and machinery to 0.9.1
+* update sidero to use newer talos
+* serve assets from TFTP folder in IPXE HTTP server
+* bump talos to 0.8.0 release
+
+### Fix
+
+* log retry errors
+* add kubernetes version to cluster template
+* prevent server orphaning
+
+### Test
+
+* enable control plane scale down test
+
+
+<a name="v0.1.0"></a>
+## [v0.1.0](https://github.com/talos-systems/talos/compare/v0.1.0-beta.0...v0.1.0) (2021-01-15)
+
+### Fix
+
+* prevent server orphaning
+
+### Release
+
+* **v0.1.0:** prepare release
+
+### Test
+
+* fix test flakiness on workers scale down test
+
+
+<a name="v0.1.0-beta.0"></a>
+## [v0.1.0-beta.0](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.12...v0.1.0-beta.0) (2020-12-23)
+
+### Chore
+
+* bump versions of packages used in the build
+* fix analytics
+* bump google analytics plugin
+
+### Docs
+
+* update local Sfyra docs
+* improve docs on metadata and environments
+* add flow charts for PXE and installation
+* add CRD documentation
+* clarify cluster template environment variables
+* clarify process of fetching talosconfig
+
+### Feat
+
+* bump Talos to 0.8.0-beta.0
+* send heartbeat from agent while wipe is in progress
+* align default subnets with Talos
+
+### Fix
+
+* overwrite kernel args from --extra-agent-kernel-args
+
+### Release
+
+* **v0.1.0-beta.0:** prepare release
+
+### Test
+
+* add simulated power management failures in testing mode
+* add a test to deploy and destroy workload cluster
+
+
 <a name="v0.1.0-alpha.12"></a>
 ## [v0.1.0-alpha.12](https://github.com/talos-systems/talos/compare/v0.1.0-alpha.11...v0.1.0-alpha.12) (2020-12-02)
 
 ### Feat
 
 * rework binding between Servers and MetalMachines
+
+### Release
+
+* **v0.1.0-alpha.12:** prepare release
 
 
 <a name="v0.1.0-alpha.11"></a>
