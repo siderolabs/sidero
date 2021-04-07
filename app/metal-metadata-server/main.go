@@ -304,24 +304,34 @@ func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
 			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unable to case config")}
 		}
 
-		if _, ok = config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"]; ok {
-			config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] += fmt.Sprintf(",metal.sidero.dev/uuid=%s", serverName)
-		} else {
-			if config.MachineConfig.MachineKubelet.KubeletExtraArgs == nil {
-				config.MachineConfig.MachineKubelet.KubeletExtraArgs = make(map[string]string)
-			}
-			config.MachineConfig.MachineKubelet.KubeletExtraArgs["node-labels"] = fmt.Sprintf("metal.sidero.dev/uuid=%s", serverName)
+		patch := metalv1alpha1.ConfigPatches{
+			Path: "/machine/kubelet/extraArgs",
+			Op:   "replace",
 		}
 
-		decodedData, err = config.Bytes()
-		if err != nil {
-			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure converting config to bytes: %s", err)}
+		kubeletExtraArgs := config.MachineConfig.MachineKubelet.KubeletExtraArgs
+		if kubeletExtraArgs == nil {
+			patch.Op = "add"
+			kubeletExtraArgs = make(map[string]string)
 		}
+
+		if _, ok = kubeletExtraArgs["node-labels"]; ok {
+			kubeletExtraArgs["node-labels"] += fmt.Sprintf(",metal.sidero.dev/uuid=%s", serverName)
+		} else {
+			kubeletExtraArgs["node-labels"] = fmt.Sprintf("metal.sidero.dev/uuid=%s", serverName)
+		}
+
+		value, err := json.Marshal(kubeletExtraArgs)
+		if err != nil {
+			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure marshaling kubelet.extraArgs: %s", err)}
+		}
+
+		patch.Value.Raw = value
+
+		return patchConfigs(decodedData, []metalv1alpha1.ConfigPatches{patch})
 	default:
 		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unknown config type")}
 	}
-
-	return decodedData, errorWithCode{}
 }
 
 // findMetalMachineServerBinding is responsible for looking up ServerBinding and MetalMachine.
