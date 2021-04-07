@@ -113,7 +113,7 @@ func TestServerMgmtAPI(ctx context.Context, metalClient client.Client, vmSet *vm
 }
 
 // TestServerPatch patches all the servers for the config.
-func TestServerPatch(ctx context.Context, metalClient client.Client, talosInstaller string, registryMirrors []string) TestFunc {
+func TestServerPatch(ctx context.Context, metalClient client.Client, registryMirrors []string) TestFunc {
 	return func(t *testing.T) {
 		servers := &v1alpha1.ServerList{}
 
@@ -122,7 +122,6 @@ func TestServerPatch(ctx context.Context, metalClient client.Client, talosInstal
 		installConfig := talosconfig.InstallConfig{
 			InstallDisk:       "/dev/vda",
 			InstallBootloader: true,
-			InstallImage:      talosInstaller,
 			InstallExtraKernelArgs: []string{
 				"console=ttyS0",
 				"reboot=k",

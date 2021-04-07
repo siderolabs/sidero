@@ -19,7 +19,6 @@ type Options struct {
 
 	TalosKernelURL string
 	TalosInitrdURL string
-	TalosInstaller string
 
 	ClusterctlConfigPath    string
 	BootstrapProviders      []string
@@ -63,7 +62,6 @@ func DefaultOptions() Options {
 
 		TalosKernelURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz-amd64", TalosRelease),
 		TalosInitrdURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs-amd64.xz", TalosRelease),
-		TalosInstaller: fmt.Sprintf("ghcr.io/talos-systems/installer:%s", TalosRelease),
 
 		BootstrapProviders:      []string{"talos"},
 		InfrastructureProviders: []string{"sidero"},
