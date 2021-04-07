@@ -22,7 +22,6 @@ type TestFunc func(t *testing.T)
 // Options for the test.
 type Options struct {
 	KernelURL, InitrdURL string
-	InstallerImage       string
 
 	RegistryMirrors []string
 
@@ -49,7 +48,7 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		},
 		{
 			"TestServerPatch",
-			TestServerPatch(ctx, metalClient, options.InstallerImage, options.RegistryMirrors),
+			TestServerPatch(ctx, metalClient, options.RegistryMirrors),
 		},
 		{
 			"TestServerAcceptance",
