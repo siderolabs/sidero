@@ -1,6 +1,31 @@
 
+<a name="v0.2.0-beta.0"></a>
+## [v0.2.0-beta.0](https://github.com/talos-systems/talos/compare/v0.2.0-alpha.1...v0.2.0-beta.0) (2021-04-08)
+
+### Chore
+
+* use common 'setup-ci' function
+
+### Feat
+
+* add support for DNS resolution in the agent
+
+### Fix
+
+* break the potential endless reconcile loop of ServerClasses
+* don't marshal the machine configuration via machinery package
+
+### Test
+
+* drop installer image from the server patch
+
+
 <a name="v0.2.0-alpha.1"></a>
 ## [v0.2.0-alpha.1](https://github.com/talos-systems/talos/compare/v0.2.0-alpha.0...v0.2.0-alpha.1) (2021-04-06)
+
+### Release
+
+* **v0.2.0-alpha.1:** prepare release
 
 
 <a name="v0.2.0-alpha.0"></a>
