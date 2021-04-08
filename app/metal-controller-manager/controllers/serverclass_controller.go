@@ -7,6 +7,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -183,6 +184,10 @@ func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 
 		avail = append(avail, server.Name)
 	}
+
+	// sort lists to avoid spurious updates due to `map` key ordering
+	sort.Strings(avail)
+	sort.Strings(used)
 
 	sc.Status.ServersAvailable = avail
 	sc.Status.ServersInUse = used
