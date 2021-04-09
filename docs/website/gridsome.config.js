@@ -20,7 +20,7 @@ module.exports = {
     github: "https://github.com/talos-systems/sidero",
     nav: {
       links: [
-        { path: "/docs/v0.1/", title: "Docs" },
+        { path: "/docs/v0.2/", title: "Docs" },
         { path: "/releases/", title: "Releases" },
       ],
     },
@@ -28,6 +28,12 @@ module.exports = {
       {
         version: "v0.1",
         url: "/docs/v0.1/",
+        latest: false,
+        prerelease: false,
+      },
+      {
+        version: "v0.2",
+        url: "/docs/v0.2/",
         latest: true,
         prerelease: false,
       },
@@ -52,6 +58,7 @@ module.exports = {
         pathPrefix: "/docs",
         sidebarOrder: {
           "v0.1": ["Getting Started", "Configuration", "Guides"],
+          "v0.2": ["Getting Started", "Configuration", "Guides"],
         },
         remark: {
           externalLinksTarget: "_blank",
