@@ -1,4 +1,8 @@
 
+<a name="v0.2.0"></a>
+## [v0.2.0](https://github.com/talos-systems/talos/compare/v0.2.0-beta.0...v0.2.0) (2021-04-08)
+
+
 <a name="v0.2.0-beta.0"></a>
 ## [v0.2.0-beta.0](https://github.com/talos-systems/talos/compare/v0.2.0-alpha.1...v0.2.0-beta.0) (2021-04-08)
 
@@ -14,6 +18,10 @@
 
 * break the potential endless reconcile loop of ServerClasses
 * don't marshal the machine configuration via machinery package
+
+### Release
+
+* **v0.2.0-beta.0:** prepare release
 
 ### Test
 
