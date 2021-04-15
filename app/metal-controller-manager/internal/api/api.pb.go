@@ -713,8 +713,7 @@ type AgentServer interface {
 }
 
 // UnimplementedAgentServer can be embedded to have forward compatible implementations.
-type UnimplementedAgentServer struct {
-}
+type UnimplementedAgentServer struct{}
 
 func (*UnimplementedAgentServer) CreateServer(ctx context.Context, req *CreateServerRequest) (*CreateServerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateServer not implemented")

@@ -22,36 +22,35 @@ FROM golang:1.16 AS base
 ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
+ENV GOCACHE /.cache/go-build
+ENV GOMODCACHE /.cache/mod
 WORKDIR /tmp
 RUN apt-get update \
   && apt-get install -y unzip \
   && curl -L https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-linux-x86_64.zip -o /tmp/protoc.zip \
   && unzip -o /tmp/protoc.zip -d /usr/local bin/protoc \
-  && unzip -o /tmp/protoc.zip -d /usr/local 'include/*' \
-  && go get github.com/golang/protobuf/protoc-gen-go@v1.3
-RUN go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.3.0
-RUN go get k8s.io/code-generator/cmd/conversion-gen@v0.18.2
+  && unzip -o /tmp/protoc.zip -d /usr/local 'include/*'
+RUN --mount=type=cache,target=/.cache go install github.com/golang/protobuf/protoc-gen-go@v1.3
+RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.5.0
+RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.21.0
+RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
 RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /usr/local/bin v1.28.0
-RUN cd $(mktemp -d) \
-  && go mod init tmp \
-  && go get mvdan.cc/gofumpt/gofumports@abc0db2c416aca0f60ea33c23c76665f6e7ba0b6 \
-  && mv /go/bin/gofumports /usr/local/bin/gofumports
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
-RUN go mod download
-RUN go mod verify
+RUN --mount=type=cache,target=/.cache go mod download
+RUN --mount=type=cache,target=/.cache go mod verify
 COPY ./app/ ./app/
 COPY ./hack/ ./hack/
-RUN go list -mod=readonly all >/dev/null
-RUN ! go mod tidy -v 2>&1 | grep .
+RUN --mount=type=cache,target=/.cache go list -mod=readonly all >/dev/null
+RUN --mount=type=cache,target=/.cache ! go mod tidy -v 2>&1 | grep .
 
 FROM base AS manifests-build
-RUN controller-gen \
+RUN --mount=type=cache,target=/.cache controller-gen \
   crd:crdVersions=v1 paths="./app/cluster-api-provider-sidero/api/..." output:crd:dir="./app/cluster-api-provider-sidero/config/crd/bases" \
   rbac:roleName=manager-role paths="./app/cluster-api-provider-sidero/controllers/..." output:rbac:dir="./app/cluster-api-provider-sidero/config/rbac" \
   webhook output:webhook:dir="./app/cluster-api-provider-sidero/config/webhook"
-RUN controller-gen \
+RUN --mount=type=cache,target=/.cache controller-gen \
   crd:crdVersions=v1 paths="./app/metal-controller-manager/api/..." output:crd:dir="./app/metal-controller-manager/config/crd/bases" \
   rbac:roleName=manager-role paths="./app/metal-controller-manager/controllers/..." output:rbac:dir="./app/metal-controller-manager/config/rbac" \
   webhook output:webhook:dir="./app/metal-controller-manager/config/webhook"
@@ -66,19 +65,19 @@ COPY ./app/metal-controller-manager/internal/api/api.proto \
 RUN protoc -I/src/app/metal-controller-manager/internal/api \
   --go_out=plugins=grpc,paths=source_relative:/src/app/metal-controller-manager/internal/api \
   api.proto
-RUN controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
-RUN	conversion-gen --input-dirs="./app/cluster-api-provider-sidero/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
+RUN --mount=type=cache,target=/.cache controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
+RUN --mount=type=cache,target=/.cache	conversion-gen --input-dirs="./app/cluster-api-provider-sidero/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
+ARG MODULE
+RUN --mount=type=cache,target=/.cache gofumports -w -local ${MODULE} .
+
 FROM scratch AS generate
 COPY --from=generate-build /src/app/cluster-api-provider-sidero/api ./app/cluster-api-provider-sidero/api
 COPY --from=generate-build /src/app/metal-controller-manager/api ./app/metal-controller-manager/api
 COPY --from=generate-build /src/app/metal-controller-manager/internal/api ./app/metal-controller-manager/internal/api
 
-FROM k8s.gcr.io/hyperkube:v1.17.0 AS release-build
-RUN apt update -y \
-  && apt install -y curl \
-  && curl -LO https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv3.5.4/kustomize_v3.5.4_linux_amd64.tar.gz \
-  && tar -xf kustomize_v3.5.4_linux_amd64.tar.gz -C /usr/local/bin \
-  && rm kustomize_v3.5.4_linux_amd64.tar.gz
+FROM alpine:3.13 AS release-build
+ADD https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.1.0/kustomize_v4.1.0_linux_amd64.tar.gz .
+RUN  tar -xf kustomize_v4.1.0_linux_amd64.tar.gz -C /usr/local/bin && rm kustomize_v4.1.0_linux_amd64.tar.gz
 COPY ./config ./config
 COPY ./templates ./templates
 COPY ./app/cluster-api-provider-sidero/config ./app/cluster-api-provider-sidero/config
@@ -103,7 +102,7 @@ COPY --from=release-build /metadata.yaml /infrastructure-sidero/${TAG}/metadata.
 COPY --from=release-build /cluster-template.yaml /infrastructure-sidero/${TAG}/cluster-template.yaml
 
 FROM base AS build-cluster-api-provider-sidero
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /manager ./app/cluster-api-provider-sidero
+RUN --mount=type=cache,target=/.cache GOOS=linux go build -ldflags "-s -w" -o /manager ./app/cluster-api-provider-sidero
 RUN chmod +x /manager
 
 ## TODO(rsmitty): make bmc pkg and move to talos-systems image
@@ -118,16 +117,15 @@ LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-controller-manager
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /manager ./app/metal-controller-manager
+RUN --mount=type=cache,target=/.cache GOOS=linux go build -ldflags "-s -w" -o /manager ./app/metal-controller-manager
 RUN chmod +x /manager
 
-FROM alpine:3.11 AS assets
-RUN apk add --no-cache curl
-RUN curl -s -o /undionly.kpxe http://boot.ipxe.org/undionly.kpxe
-RUN curl -s -o /ipxe.efi http://boot.ipxe.org/ipxe.efi
+FROM scratch AS assets
+ADD http://boot.ipxe.org/undionly.kpxe /undionly.kpxe
+ADD http://boot.ipxe.org/ipxe.efi /ipxe.efi
 
 FROM base AS agent-build
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
+RUN --mount=type=cache,target=/.cache GOOS=linux go build -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
 RUN chmod +x /agent
 
 FROM scratch AS agent
@@ -166,7 +164,7 @@ LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-metadata-server
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w" -o /metal-metadata-server ./app/metal-metadata-server
+RUN --mount=type=cache,target=/.cache GOOS=linux go build -ldflags "-s -w" -o /metal-metadata-server ./app/metal-metadata-server
 RUN chmod +x /metal-metadata-server
 
 FROM scratch AS metal-metadata-server
@@ -178,7 +176,7 @@ ENTRYPOINT [ "/metal-metadata-server" ]
 
 FROM base AS unit-tests-runner
 ARG TEST_PKGS
-RUN --mount=type=cache,id=testspace,target=/tmp --mount=type=cache,target=/root/.cache/go-build go test -v -covermode=atomic -coverprofile=coverage.txt -count 1 ${TEST_PKGS}
+RUN --mount=type=cache,target=/.cache --mount=type=cache,id=testspace,target=/tmp --mount=type=cache,target=/root/.cache/go-build go test -v -covermode=atomic -coverprofile=coverage.txt -count 1 ${TEST_PKGS}
 #
 FROM scratch AS unit-tests
 COPY --from=unit-tests-runner /src/coverage.txt /coverage.txt
@@ -188,21 +186,22 @@ COPY --from=unit-tests-runner /src/coverage.txt /coverage.txt
 FROM base AS unit-tests-race
 ENV CGO_ENABLED 1
 ARG TEST_PKGS
-RUN --mount=type=cache,target=/root/.cache/go-build go test -v -count 1 -race ${TEST_PKGS}
+RUN --mount=type=cache,target=/.cache --mount=type=cache,target=/root/.cache/go-build go test -v -count 1 -race ${TEST_PKGS}
 #
 # The lint target performs linting on the source code.
 #
 FROM base AS lint-go
 ENV GOGC=50
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/.cache/golangci-lint /usr/local/bin/golangci-lint run --enable-all --disable gochecknoglobals,gochecknoinits,lll,goerr113,funlen,nestif,maligned,gomnd,gocognit,gocyclo
+ENV GOLANGCI_LINT_CACHE /.cache/lint
+RUN --mount=type=cache,target=/.cache /usr/local/bin/golangci-lint run --enable-all --disable gochecknoglobals,gochecknoinits,lll,goerr113,funlen,nestif,maligned,gomnd,gocognit,gocyclo
 ARG MODULE
-RUN FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)
+RUN --mount=type=cache,target=/.cache FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)
 #
 # The fmt target formats the source code.
 #
 FROM base AS fmt-build
 ARG MODULE
-RUN gofumports -w -local ${MODULE} .
+RUN --mount=type=cache,target=/.cache gofumports -w -local ${MODULE} .
 #
 FROM scratch AS fmt
 COPY --from=fmt-build /src /
@@ -222,23 +221,24 @@ FROM base AS sfyra-base
 WORKDIR /src/sfyra
 COPY ./sfyra/go.mod ./
 COPY ./sfyra/go.sum ./
-RUN go mod download
-RUN go mod verify
+RUN --mount=type=cache,target=/.cache go mod download
+RUN --mount=type=cache,target=/.cache go mod verify
 COPY ./sfyra/ ./
-RUN go list -mod=readonly all >/dev/null
-RUN ! go mod tidy -v 2>&1 | grep .
+RUN --mount=type=cache,target=/.cache go list -mod=readonly all >/dev/null
+RUN --mount=type=cache,target=/.cache ! go mod tidy -v 2>&1 | grep .
 
 FROM sfyra-base AS lint-sfyra
 ENV GOGC=50
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/.cache/golangci-lint /usr/local/bin/golangci-lint run --enable-all --disable gochecknoglobals,gochecknoinits,lll,goerr113,funlen,nestif,maligned,gomnd,gocognit,gocyclo,godox
+ENV GOLANGCI_LINT_CACHE /.cache/lint
+RUN --mount=type=cache,target=/.cache /usr/local/bin/golangci-lint run --enable-all --disable gochecknoglobals,gochecknoinits,lll,goerr113,funlen,nestif,maligned,gomnd,gocognit,gocyclo,godox
 ARG MODULE
-RUN FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)
+RUN --mount=type=cache,target=/.cache FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)
 
 FROM sfyra-base AS sfyra-build
 WORKDIR /src/sfyra/cmd/sfyra
 ARG TALOS_RELEASE
 ARG SFYRA_CMD_PKG=github.com/talos-systems/sidero/sfyra/cmd/sfyra/cmd
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=linux go build -ldflags "-s -w -X ${SFYRA_CMD_PKG}.TalosRelease=${TALOS_RELEASE}" -o /sfyra
+RUN --mount=type=cache,target=/.cache GOOS=linux go build -ldflags "-s -w -X ${SFYRA_CMD_PKG}.TalosRelease=${TALOS_RELEASE}" -o /sfyra
 RUN chmod +x /sfyra
 
 FROM scratch AS sfyra

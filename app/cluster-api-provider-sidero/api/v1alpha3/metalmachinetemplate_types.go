@@ -17,8 +17,7 @@ type MetalMachineTemplateSpec struct {
 }
 
 // MetalMachineTemplateStatus defines the observed state of MetalMachineTemplate.
-type MetalMachineTemplateStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
+type MetalMachineTemplateStatus struct { // INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
