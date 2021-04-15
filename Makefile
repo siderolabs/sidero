@@ -11,8 +11,8 @@ ARTIFACTS := _out
 TEST_PKGS ?= ./...
 TALOS_RELEASE ?= v0.9.1
 
-TOOLS ?= ghcr.io/talos-systems/tools:v0.5.0-alpha.0-3-g41b8073
-PKGS ?= v0.5.0-alpha.0-4-g60ce626
+TOOLS ?= ghcr.io/talos-systems/tools:v0.5.0
+PKGS ?= v0.5.0
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
@@ -91,7 +91,6 @@ docker-%: ## Builds the specified target defined in the Dockerfile using the doc
 .PHONY: generate
 generate: ## Generate source code.
 	@$(MAKE) local-$@ DEST=./
-	@$(MAKE) fmt
 
 .PHONY: manifests
 manifests: ## Generate manifests (e.g. CRD, RBAC, etc.).
