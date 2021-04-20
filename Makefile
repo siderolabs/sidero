@@ -90,11 +90,11 @@ docker-%: ## Builds the specified target defined in the Dockerfile using the doc
 
 .PHONY: generate
 generate: ## Generate source code.
-	@$(MAKE) local-$@ DEST=./
+	@$(MAKE) local-$@ DEST=./ PLATFORM=linux/amd64
 
 .PHONY: manifests
 manifests: ## Generate manifests (e.g. CRD, RBAC, etc.).
-	@$(MAKE) local-$@ DEST=./
+	@$(MAKE) local-$@ DEST=./ PLATFORM=linux/amd64
 
 # Artifacts
 
@@ -129,7 +129,7 @@ talos-artifacts: $(ARTIFACTS)/$(TALOS_RELEASE)
 
 .PHONY: sfyra
 sfyra: ## Build the Sfyra test binary.
-	@$(MAKE) local-$@ DEST=./$(ARTIFACTS)
+	@$(MAKE) local-$@ DEST=./$(ARTIFACTS) PLATFORM=linux/amd64
 
 .PHONY: clusterctl-release
 clusterctl-release: release
@@ -171,10 +171,10 @@ run: install ## Run the controller locally. This is for testing purposes only.
 
 .PHONY: fmt
 fmt: ## Formats the source code.
-	@$(MAKE) local-fmt DEST=./
+	@$(MAKE) local-fmt DEST=./ PLATFORM=linux/amd64
 
 lint-%: ## Runs the specified linter. Valid options are go, protobuf, and markdown (e.g. lint-go).
-	@$(MAKE) target-lint-$*
+	@$(MAKE) target-lint-$* PLATFORM=linux/amd64
 
 lint: ## Runs linters on go, protobuf, and markdown file types.
 	@$(MAKE) lint-go lint-markdown lint-sfyra
@@ -183,11 +183,11 @@ lint: ## Runs linters on go, protobuf, and markdown file types.
 
 .PHONY: unit-tests
 unit-tests: ## Performs unit tests.
-	@$(MAKE) local-$@ DEST=$(ARTIFACTS)
+	@$(MAKE) local-$@ DEST=$(ARTIFACTS) PLATFORM=linux/amd64
 
 .PHONY: unit-tests-race
 unit-tests-race: ## Performs unit tests with race detection enabled.
-	@$(MAKE) target-$@
+	@$(MAKE) target-$@ PLATFORM=linux/amd64
 
 # Utilities
 

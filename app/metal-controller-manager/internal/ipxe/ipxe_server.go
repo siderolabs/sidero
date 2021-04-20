@@ -37,7 +37,7 @@ var (
 )
 
 const bootFile = `#!ipxe
-chain ipxe?uuid=${uuid}&mac=${mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}
+chain ipxe?uuid=${uuid}&mac=${mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}&arch=${buildarch}
 `
 
 var ipxeTemplate = template.Must(template.New("iPXE config").Parse(`#!ipxe
@@ -72,6 +72,15 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 
 	uuid := labels["uuid"]
 
+	var arch string
+
+	switch labels["arch"] {
+	case "arm64":
+		arch = "arm64"
+	default:
+		arch = "amd64"
+	}
+
 	server, serverBinding, err := lookupServer(uuid)
 	if err != nil {
 		log.Printf("Error looking up server: %v", err)
@@ -80,7 +89,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	env, err := newEnvironment(server, serverBinding)
+	env, err := newEnvironment(server, serverBinding, arch)
 	if err != nil {
 		if errors.Is(err, ErrBootFromDisk) {
 			log.Printf("Server %q booting from disk", uuid)
@@ -235,14 +244,14 @@ func lookupServer(uuid string) (*metalv1alpha1.Server, *infrav1.ServerBinding, e
 
 // newEnvironment handles which env CRD we'll respect for a given server.
 // specied in the server spec overrides everything, specified in the server class overrides default, default is default :).
-func newEnvironment(server *metalv1alpha1.Server, serverBinding *infrav1.ServerBinding) (env *metalv1alpha1.Environment, err error) {
+func newEnvironment(server *metalv1alpha1.Server, serverBinding *infrav1.ServerBinding, arch string) (env *metalv1alpha1.Environment, err error) {
 	// NB: The order of this switch statement is important. It defines the
 	// precedence of which environment to boot.
 	switch {
 	case server == nil:
-		return newAgentEnvironment(), nil
+		return newAgentEnvironment(arch), nil
 	case serverBinding == nil && !server.Status.IsClean:
-		return newAgentEnvironment(), nil
+		return newAgentEnvironment(arch), nil
 	case serverBinding == nil:
 		return nil, ErrNotInUse
 	case conditions.Has(server, metalv1alpha1.ConditionPXEBooted) && !server.Spec.PXEBootAlways:
@@ -273,7 +282,7 @@ func newEnvironment(server *metalv1alpha1.Server, serverBinding *infrav1.ServerB
 	return env, nil
 }
 
-func newAgentEnvironment() *metalv1alpha1.Environment {
+func newAgentEnvironment(arch string) *metalv1alpha1.Environment {
 	args := []string{
 		"initrd=initramfs.xz",
 		"page_poison=1",
@@ -302,7 +311,7 @@ func newAgentEnvironment() *metalv1alpha1.Environment {
 
 	env := &metalv1alpha1.Environment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "agent",
+			Name: fmt.Sprintf("agent-%s", arch),
 		},
 		Spec: metalv1alpha1.EnvironmentSpec{
 			Kernel: metalv1alpha1.Kernel{

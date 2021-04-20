@@ -41,6 +41,8 @@ steps:
   - name: build-pull-request
     image: autonomy/build-container:latest
     pull: always
+    environment:
+      PLATFORM: linux/amd64,linux/arm64
     commands:
       - make REGISTRY=registry.dev.talos-systems.io PUSH=true
     when:
@@ -81,6 +83,7 @@ steps:
         from_secret: ghcr_username
       GHCR_PASSWORD:
         from_secret: ghcr_token
+      PLATFORM: linux/amd64,linux/arm64
     commands:
       - docker login --username "$${GHCR_USERNAME}" --password "$${GHCR_PASSWORD}" ghcr.io
       - make PUSH=true
@@ -182,6 +185,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: 6e8280c06e511ffeb8fb07e94c0920ffaa13ecaadba0dcba1b432b1351cc4d0a
+hmac: 201f40ae8975352489a50a2bda0c9480b3aa191772a1501a62dca5decd1f2aa4
 
 ...
