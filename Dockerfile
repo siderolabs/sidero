@@ -11,26 +11,26 @@ FROM ghcr.io/talos-systems/ca-certificates:${PKGS} AS pkg-ca-certificates
 FROM ghcr.io/talos-systems/fhs:${PKGS} AS pkg-fhs
 FROM ghcr.io/talos-systems/ipmitool:${PKGS} AS pkg-ipmitool
 FROM ghcr.io/talos-systems/libressl:${PKGS} AS pkg-libressl
-FROM ghcr.io/talos-systems/linux-firmware:${PKGS} AS pkg-linux-firmware
+FROM --platform=amd64 ghcr.io/talos-systems/linux-firmware:${PKGS} AS pkg-linux-firmware-amd64
+FROM --platform=arm64 ghcr.io/talos-systems/linux-firmware:${PKGS} AS pkg-linux-firmware-arm64
 FROM ghcr.io/talos-systems/musl:${PKGS} AS pkg-musl
-FROM ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel
+FROM --platform=amd64 ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel-amd64
+FROM --platform=arm64 ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel-arm64
 
 # The base target provides the base for running various tasks against the source
 # code
 
-FROM golang:1.16 AS base
+FROM --platform=${BUILDPLATFORM} ${TOOLS} AS base
+SHELL ["/toolchain/bin/bash", "-c"]
+ENV PATH /toolchain/bin:/toolchain/go/bin:/go/bin
+RUN ["/toolchain/bin/mkdir", "/bin", "/tmp"]
+RUN ["/toolchain/bin/ln", "-svf", "/toolchain/bin/bash", "/bin/sh"]
+RUN ["/toolchain/bin/ln", "-svf", "/toolchain/etc/ssl", "/etc/ssl"]
 ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
 ENV CGO_ENABLED 0
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
-WORKDIR /tmp
-RUN apt-get update \
-  && apt-get install -y unzip \
-  && curl -L https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-linux-x86_64.zip -o /tmp/protoc.zip \
-  && unzip -o /tmp/protoc.zip -d /usr/local bin/protoc \
-  && unzip -o /tmp/protoc.zip -d /usr/local 'include/*'
-RUN --mount=type=cache,target=/.cache go install github.com/golang/protobuf/protoc-gen-go@v1.3
 RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.5.0
 RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.21.0
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
@@ -63,7 +63,7 @@ FROM base AS generate-build
 COPY ./app/metal-controller-manager/internal/api/api.proto \
   /src/app/metal-controller-manager/internal/api/api.proto
 RUN protoc -I/src/app/metal-controller-manager/internal/api \
-  --go_out=plugins=grpc,paths=source_relative:/src/app/metal-controller-manager/internal/api \
+  --go_out=paths=source_relative:/src/app/metal-controller-manager/internal/api --go-grpc_out=paths=source_relative:/src/app/metal-controller-manager/internal/api \
   api.proto
 RUN --mount=type=cache,target=/.cache controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
 RUN --mount=type=cache,target=/.cache	conversion-gen --input-dirs="./app/cluster-api-provider-sidero/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
@@ -75,7 +75,7 @@ COPY --from=generate-build /src/app/cluster-api-provider-sidero/api ./app/cluste
 COPY --from=generate-build /src/app/metal-controller-manager/api ./app/metal-controller-manager/api
 COPY --from=generate-build /src/app/metal-controller-manager/internal/api ./app/metal-controller-manager/internal/api
 
-FROM alpine:3.13 AS release-build
+FROM --platform=${BUILDPLATFORM} alpine:3.13 AS release-build
 ADD https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.1.0/kustomize_v4.1.0_linux_amd64.tar.gz .
 RUN  tar -xf kustomize_v4.1.0_linux_amd64.tar.gz -C /usr/local/bin && rm kustomize_v4.1.0_linux_amd64.tar.gz
 COPY ./config ./config
@@ -102,7 +102,8 @@ COPY --from=release-build /metadata.yaml /infrastructure-sidero/${TAG}/metadata.
 COPY --from=release-build /cluster-template.yaml /infrastructure-sidero/${TAG}/cluster-template.yaml
 
 FROM base AS build-cluster-api-provider-sidero
-RUN --mount=type=cache,target=/.cache GOOS=linux go build -ldflags "-s -w" -o /manager ./app/cluster-api-provider-sidero
+ARG TARGETARCH
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build -ldflags "-s -w" -o /manager ./app/cluster-api-provider-sidero
 RUN chmod +x /manager
 
 ## TODO(rsmitty): make bmc pkg and move to talos-systems image
@@ -117,36 +118,36 @@ LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-controller-manager
-RUN --mount=type=cache,target=/.cache GOOS=linux go build -ldflags "-s -w" -o /manager ./app/metal-controller-manager
+ARG TARGETARCH
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build -ldflags "-s -w" -o /manager ./app/metal-controller-manager
 RUN chmod +x /manager
 
 FROM scratch AS assets
-ADD http://boot.ipxe.org/undionly.kpxe /undionly.kpxe
-ADD http://boot.ipxe.org/ipxe.efi /ipxe.efi
+ADD http://boot.ipxe.org/undionly.kpxe /amd64/undionly.kpxe
+ADD http://boot.ipxe.org/ipxe.efi /amd64/ipxe.efi
+ADD http://boot.ipxe.org/arm64-efi/ipxe.efi /arm64/ipxe.efi
 
-FROM base AS agent-build
-RUN --mount=type=cache,target=/.cache GOOS=linux go build -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
+FROM base AS agent-build-amd64
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
 RUN chmod +x /agent
 
-FROM scratch AS agent
-COPY --from=pkg-ca-certificates / /
-COPY --from=pkg-fhs / /
-COPY --from=agent-build /agent /agent
-LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
-ENTRYPOINT [ "/agent" ]
+FROM base AS agent-build-arm64
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=arm64 go build -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
+RUN chmod +x /agent
 
-FROM ${TOOLS} AS initramfs-archive
-ENV PATH /toolchain/bin
-RUN [ "/toolchain/bin/mkdir", "/bin" ]
-RUN [ "ln", "-s", "/toolchain/bin/bash", "/bin/sh" ]
+FROM base AS initramfs-archive-amd64
 WORKDIR /initramfs
-COPY --from=agent /agent ./init
-COPY --from=pkg-linux-firmware /lib/firmware/bnx2 ./lib/firmware/bnx2
-COPY --from=pkg-linux-firmware /lib/firmware/bnx2x ./lib/firmware/bnx2x
+COPY --from=agent-build-amd64 /agent ./init
+COPY --from=pkg-linux-firmware-amd64 /lib/firmware/bnx2 ./lib/firmware/bnx2
+COPY --from=pkg-linux-firmware-amd64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
 RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 
-FROM scratch AS initramfs
-COPY --from=initramfs-archive /initramfs.xz /initramfs.xz
+FROM base AS initramfs-archive-arm64
+WORKDIR /initramfs
+COPY --from=agent-build-arm64 /agent ./init
+COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2 ./lib/firmware/bnx2
+COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
+RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 
 FROM scratch AS metal-controller-manager
 COPY --from=pkg-ca-certificates / /
@@ -154,17 +155,21 @@ COPY --from=pkg-fhs / /
 COPY --from=pkg-musl / /
 COPY --from=pkg-libressl / /
 COPY --from=pkg-ipmitool / /
-COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe
-COPY --from=assets /undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe.0
-COPY --from=assets /ipxe.efi /var/lib/sidero/tftp/ipxe.efi
-COPY --from=initramfs /initramfs.xz /var/lib/sidero/env/agent/initramfs.xz
-COPY --from=pkg-kernel /boot/vmlinuz /var/lib/sidero/env/agent/vmlinuz
+COPY --from=assets /amd64/undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe
+COPY --from=assets /amd64/undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe.0
+COPY --from=assets /amd64/ipxe.efi /var/lib/sidero/tftp/ipxe.efi
+COPY --from=assets /arm64/ipxe.efi /var/lib/sidero/tftp/ipxe-arm64.efi
+COPY --from=initramfs-archive-amd64 /initramfs.xz /var/lib/sidero/env/agent-amd64/initramfs.xz
+COPY --from=initramfs-archive-arm64 /initramfs.xz /var/lib/sidero/env/agent-arm64/initramfs.xz
+COPY --from=pkg-kernel-amd64 /boot/vmlinuz /var/lib/sidero/env/agent-amd64/vmlinuz
+COPY --from=pkg-kernel-arm64 /boot/vmlinuz /var/lib/sidero/env/agent-arm64/vmlinuz
 COPY --from=build-metal-controller-manager /manager /manager
 LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-metadata-server
-RUN --mount=type=cache,target=/.cache GOOS=linux go build -ldflags "-s -w" -o /metal-metadata-server ./app/metal-metadata-server
+ARG TARGETARCH
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build -ldflags "-s -w" -o /metal-metadata-server ./app/metal-metadata-server
 RUN chmod +x /metal-metadata-server
 
 FROM scratch AS metal-metadata-server
