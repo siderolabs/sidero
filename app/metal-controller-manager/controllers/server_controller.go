@@ -79,7 +79,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
-	mgmtClient, err := metal.NewManagementClient(&s.Spec)
+	mgmtClient, err := metal.NewManagementClient(ctx, r.Client, &s.Spec)
 	if err != nil {
 		log.Error(err, "failed to create management client")
 		r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to initialize management client: %s.", err))

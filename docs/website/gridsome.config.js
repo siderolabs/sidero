@@ -37,6 +37,12 @@ module.exports = {
         latest: true,
         prerelease: false,
       },
+      {
+        version: "v0.3",
+        url: "/docs/v0.3/",
+        latest: false,
+        prerelease: true,
+      },
     ],
   },
 
@@ -59,6 +65,7 @@ module.exports = {
         sidebarOrder: {
           "v0.1": ["Getting Started", "Configuration", "Guides"],
           "v0.2": ["Getting Started", "Configuration", "Guides"],
+          "v0.3": ["Getting Started", "Configuration", "Guides"],
         },
         remark: {
           externalLinksTarget: "_blank",
