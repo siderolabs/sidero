@@ -6,6 +6,10 @@
 package metal
 
 import (
+	"context"
+
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	"github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/power/api"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/power/ipmi"
@@ -22,10 +26,28 @@ type ManagementClient interface {
 }
 
 // NewManagementClient builds ManagementClient from the server spec.
-func NewManagementClient(spec *v1alpha1.ServerSpec) (ManagementClient, error) {
+func NewManagementClient(ctx context.Context, client client.Client, spec *v1alpha1.ServerSpec) (ManagementClient, error) {
 	switch {
 	case spec.BMC != nil:
-		return ipmi.NewClient(*spec.BMC)
+		var err error
+
+		bmcSpec := *spec.BMC
+
+		if bmcSpec.User == "" {
+			bmcSpec.User, err = bmcSpec.UserFrom.Resolve(ctx, client)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if bmcSpec.Pass == "" {
+			bmcSpec.Pass, err = bmcSpec.PassFrom.Resolve(ctx, client)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		return ipmi.NewClient(bmcSpec)
 	case spec.ManagementAPI != nil:
 		return api.NewClient(*spec.ManagementAPI)
 	default:

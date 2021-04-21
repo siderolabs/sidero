@@ -59,15 +59,54 @@ spec:
                 description: BMC defines data about how to talk to the node via ipmitool.
                 properties:
                   endpoint:
+                    description: BMC endpoint.
                     type: string
                   pass:
+                    description: BMC password value.
                     type: string
+                  passFrom:
+                    description: Source for the password value. Cannot be used if Pass is not empty.
+                    properties:
+                      secretKeyRef:
+                        description: Selects a key of a secret in the cluster namespace
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                    type: object
                   user:
+                    description: BMC user value.
                     type: string
+                  userFrom:
+                    description: Source for the user value. Cannot be used if User is not empty.
+                    properties:
+                      secretKeyRef:
+                        description: Selects a key of a secret in the cluster namespace
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                    type: object
                 required:
                 - endpoint
-                - pass
-                - user
                 type: object
               configPatches:
                 items:

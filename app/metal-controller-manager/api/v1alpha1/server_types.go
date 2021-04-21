@@ -5,11 +5,14 @@
 package v1alpha1
 
 import (
+	"context"
+	"fmt"
 	"reflect"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -17,9 +20,51 @@ import (
 
 // BMC defines data about how to talk to the node via ipmitool.
 type BMC struct {
+	// BMC endpoint.
 	Endpoint string `json:"endpoint"`
-	User     string `json:"user"`
-	Pass     string `json:"pass"`
+	// BMC user value.
+	// +optional
+	User string `json:"user,omitempty"`
+	// Source for the user value. Cannot be used if User is not empty.
+	// +optional
+	UserFrom *CredentialSource `json:"userFrom,omitempty"`
+	// BMC password value.
+	// +optional
+	Pass string `json:"pass,omitempty"`
+	// Source for the password value. Cannot be used if Pass is not empty.
+	// +optional
+	PassFrom *CredentialSource `json:"passFrom,omitempty"`
+}
+
+// CredentialSource defines a reference to the credential value.
+type CredentialSource struct {
+	// Selects a key of a secret in the cluster namespace
+	// +optional
+	SecretKeyRef *corev1.SecretKeySelector `json:"secretKeyRef,omitempty"`
+}
+
+// Resolve the value using the references.
+func (source *CredentialSource) Resolve(ctx context.Context, reader client.Client) (string, error) {
+	if source == nil {
+		return "", nil
+	}
+
+	if source.SecretKeyRef == nil {
+		return "", fmt.Errorf("missing secretKeyRef")
+	}
+
+	var secrets corev1.Secret
+
+	if err := reader.Get(ctx, client.ObjectKey{Namespace: corev1.NamespaceDefault, Name: source.SecretKeyRef.Name}, &secrets); err != nil {
+		return "", fmt.Errorf("error getting secret %q: %w", source.SecretKeyRef.Name, err)
+	}
+
+	rawValue, ok := secrets.Data[source.SecretKeyRef.Key]
+	if !ok {
+		return "", fmt.Errorf("secret key %q is missing in secret %q", source.SecretKeyRef.Key, source.SecretKeyRef.Name)
+	}
+
+	return string(rawValue), nil
 }
 
 // ManagementAPI defines data about how to talk to the node via simple HTTP API.
