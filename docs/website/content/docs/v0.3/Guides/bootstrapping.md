@@ -123,38 +123,14 @@ As of Cluster API version 0.3.9, Sidero is included as a default infrastructure 
 To install Sidero and the other Talos providers, simply issue:
 
 ```bash
-clusterctl init -b talos -c talos -i sidero
+SIDERO_METADATA_SERVER_HOST_NETWORK=true \
+  SIDERO_METADATA_SERVER_PORT=9091 \
+  SIDERO_CONTROLLER_MANAGER_HOST_NETWORK=true \
+  SIDERO_CONTROLLER_MANAGER_API_ENDPOINT=$PUBLIC_IP \
+  clusterctl init -b talos -c talos -i sidero
 ```
-
-## Patch Components
-
 We will now want to ensure that the Sidero services that got created are publicly accessible across our subnet.
-This will allow the metal machines to speak to these services later.
-
-### Patch the Metadata Server
-
-Update the metadata server component with the following patches:
-
-```bash
-## Update args to use 9091 for port
-kubectl patch deploy -n sidero-system sidero-metadata-server --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args", "value": ["--port=9091"]}]'
-
-## Tweak container port to match
-kubectl patch deploy -n sidero-system sidero-metadata-server --type='json' -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/ports", "value": [{"containerPort": 9091,"name": "http"}]}]'
-
-## Use host networking
-kubectl patch deploy -n sidero-system sidero-metadata-server --type='json' -p='[{"op": "add", "path": "/spec/template/spec/hostNetwork", "value": true}]'
-```
-
-### Patch the Metal Controller Manager
-
-```bash
-## Update args to specify the api endpoint to use for registration
-kubectl patch deploy -n sidero-system sidero-controller-manager --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/1/args", "value": ["--api-endpoint='$PUBLIC_IP'","--metrics-addr=127.0.0.1:8080","--enable-leader-election"]}]'
-
-## Use host networking
-kubectl patch deploy -n sidero-system sidero-controller-manager --type='json' -p='[{"op": "add", "path": "/spec/template/spec/hostNetwork", "value": true}]'
-```
+These variables above will allow the metal machines to speak to these services later.
 
 ## Register the Servers
 
@@ -179,7 +155,7 @@ Servers can be accepted by issuing a patch command like:
 kubectl patch server 00000000-0000-0000-0000-d05099d33360 --type='json' -p='[{"op": "replace", "path": "/spec/accepted", "value": true}]'
 ```
 
-For more information on server acceptance, see the [server docs](/docs/v0.1/configuration/servers).
+For more information on server acceptance, see the [server docs](/docs/v0.3/configuration/servers).
 
 ## Create the Default Environment
 
@@ -227,7 +203,7 @@ EOF
 We must now create a server class to wrap our servers we registered.
 This is necessary for using the Talos control plane provider for Cluster API.
 The qualifiers needed for your server class will differ based on the data provided by your registration flow.
-See the [server class docs](/docs/v0.1/configuration/serverclasses) for more info on how these work.
+See the [server class docs](/docs/v0.3/configuration/serverclasses) for more info on how these work.
 
 Here is an example of how to apply the server class once you have the proper info:
 
@@ -250,7 +226,7 @@ In order to fetch hardware information, you can use
 kubectl get server -o yaml
 ```
 
-Note that for bare-metal setup, you would need to specify an installation disk. See the [Installation Disk](/docs/v0.1/configuration/servers/#installation-disk)
+Note that for bare-metal setup, you would need to specify an installation disk. See the [Installation Disk](/docs/v0.3/configuration/servers/#installation-disk)
 
 Once created, you should see the servers that make up your server class appear as "available":
 
