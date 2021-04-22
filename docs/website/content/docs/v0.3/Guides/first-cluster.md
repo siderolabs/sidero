@@ -17,7 +17,7 @@ There will be two main steps in this guide: reconfiguring the Sidero components 
 In this guide, we will convert the metadata service to a NodePort service and the other services to use host networking.
 This is also necessary because some protocols like TFTP don't allow for port configuration.
 Along with some nodeSelectors and a scale up of the metal controller manager deployment, creating the services this way allows for the creation of DNS names that point to all management plane nodes and provide an HA experience if desired.
-It should also be noted, however, that there are many options for acheiving this functionality.
+It should also be noted, however, that there are many options for achieving this functionality.
 Users can look into projects like MetalLB or KubeRouter with BGP and ECMP if they desire something else.
 
 Metal Controller Manager:
@@ -104,7 +104,7 @@ Servers can be accepted by issuing a patch command like:
 kubectl patch server 00000000-0000-0000-0000-d05099d33360 --type='json' -p='[{"op": "replace", "path": "/spec/accepted", "value": true}]'
 ```
 
-For more information on server acceptance, see the [server docs](/docs/v0.1/configuration/servers).
+For more information on server acceptance, see the [server docs](/docs/v0.3/configuration/servers).
 
 ## Create the Cluster
 

@@ -7,17 +7,11 @@ package capi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"strings"
-	"time"
+	"os"
 
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/strategicpatch"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
@@ -125,6 +119,16 @@ func (clusterAPI *Manager) Install(ctx context.Context) error {
 		return err
 	}
 
+	// set template environment variables
+	os.Setenv("SIDERO_METADATA_SERVER_PORT", "9091")
+	os.Setenv("SIDERO_METADATA_SERVER_HOST_NETWORK", "true")
+
+	os.Setenv("SIDERO_CONTROLLER_MANAGER_HOST_NETWORK", "true")
+	os.Setenv("SIDERO_CONTROLLER_MANAGER_API_ENDPOINT", clusterAPI.cluster.SideroComponentsIP().String())
+	os.Setenv("SIDERO_CONTROLLER_MANAGER_SERVER_REBOOT_TIMEOUT", "30s") // wiping/reboot is fast in the test environment
+	os.Setenv("SIDERO_CONTROLLER_MANAGER_TEST_POWER_EXPLICIT_FAILURE", fmt.Sprintf("%f", clusterAPI.options.PowerSimulatedExplicitFailureProb))
+	os.Setenv("SIDERO_CONTROLLER_MANAGER_TEST_POWER_SILENT_FAILURE", fmt.Sprintf("%f", clusterAPI.options.PowerSimulatedSilentFailureProb))
+
 	options := client.InitOptions{
 		Kubeconfig:              kubeconfig,
 		CoreProvider:            "",
@@ -139,120 +143,6 @@ func (clusterAPI *Manager) Install(ctx context.Context) error {
 	_, err = clusterAPI.clientset.CoreV1().Namespaces().Get(ctx, "sidero-system", metav1.GetOptions{})
 	if err != nil {
 		_, err = clusterAPI.client.Init(options)
-		if err != nil {
-			return err
-		}
-	}
-
-	return clusterAPI.patch(ctx)
-}
-
-func (clusterAPI *Manager) patch(ctx context.Context) error {
-	const (
-		sideroNamespace         = "sidero-system"
-		sideroMetadataServer    = "sidero-metadata-server"
-		sideroControllerManager = "sidero-controller-manager"
-	)
-
-	// sidero-metadata-server
-	deployment, err := clusterAPI.clientset.AppsV1().Deployments(sideroNamespace).Get(ctx, sideroMetadataServer, metav1.GetOptions{})
-	if err != nil {
-		return err
-	}
-
-	oldDeployment, err := json.Marshal(deployment)
-	if err != nil {
-		return err
-	}
-
-	argsPatched := false
-
-	for _, arg := range deployment.Spec.Template.Spec.Containers[0].Args {
-		if arg == "--port=9091" {
-			argsPatched = true
-		}
-	}
-
-	if !argsPatched {
-		deployment.Spec.Template.Spec.Containers[0].Args = append(deployment.Spec.Template.Spec.Containers[0].Args, "--port=9091")
-	}
-
-	deployment.Spec.Template.Spec.Containers[0].Ports = []corev1.ContainerPort{
-		{
-			ContainerPort: 9091,
-			HostPort:      9091,
-			Name:          "http",
-			Protocol:      corev1.ProtocolTCP,
-		},
-	}
-	deployment.Spec.Template.Spec.HostNetwork = true
-	deployment.Spec.Strategy.RollingUpdate = nil
-	deployment.Spec.Strategy.Type = appsv1.RecreateDeploymentStrategyType
-
-	newDeployment, err := json.Marshal(deployment)
-	if err != nil {
-		return err
-	}
-
-	patchBytes, err := strategicpatch.CreateTwoWayMergePatch(oldDeployment, newDeployment, appsv1.Deployment{})
-	if err != nil {
-		return fmt.Errorf("failed to create two way merge patch: %w", err)
-	}
-
-	_, err = clusterAPI.clientset.AppsV1().Deployments(sideroNamespace).Patch(ctx, deployment.Name, types.StrategicMergePatchType, patchBytes, metav1.PatchOptions{
-		FieldManager: "sfyra",
-	})
-	if err != nil {
-		return err
-	}
-
-	// sidero-controller-manager
-	deployment, err = clusterAPI.clientset.AppsV1().Deployments(sideroNamespace).Get(ctx, sideroControllerManager, metav1.GetOptions{})
-	if err != nil {
-		return err
-	}
-
-	oldDeployment, err = json.Marshal(deployment)
-	if err != nil {
-		return err
-	}
-
-	apiPatch := false
-
-	for _, arg := range deployment.Spec.Template.Spec.Containers[1].Args {
-		if strings.HasPrefix(arg, "--api-endpoint") {
-			apiPatch = true
-		}
-	}
-
-	if !apiPatch {
-		deployment.Spec.Template.Spec.Containers[1].Args = append(
-			deployment.Spec.Template.Spec.Containers[1].Args,
-			fmt.Sprintf("--api-endpoint=%s", clusterAPI.cluster.SideroComponentsIP()),
-			fmt.Sprintf("--server-reboot-timeout=%s", 30*time.Second), // wiping/reboot is fast in the test environment
-			fmt.Sprintf("--test-power-simulated-explicit-failure-prob=%f", clusterAPI.options.PowerSimulatedExplicitFailureProb),
-			fmt.Sprintf("--test-power-simulated-silent-failure-prob=%f", clusterAPI.options.PowerSimulatedSilentFailureProb),
-		)
-	}
-
-	deployment.Spec.Template.Spec.HostNetwork = true
-	deployment.Spec.Strategy.RollingUpdate = nil
-	deployment.Spec.Strategy.Type = appsv1.RecreateDeploymentStrategyType
-
-	newDeployment, err = json.Marshal(deployment)
-	if err != nil {
-		return err
-	}
-
-	patchBytes, err = strategicpatch.CreateTwoWayMergePatch(oldDeployment, newDeployment, appsv1.Deployment{})
-	if err != nil {
-		return fmt.Errorf("failed to create two way merge patch: %w", err)
-	}
-
-	_, err = clusterAPI.clientset.AppsV1().Deployments(sideroNamespace).Patch(ctx, deployment.Name, types.StrategicMergePatchType, patchBytes, metav1.PatchOptions{
-		FieldManager: "sfyra",
-	})
-	if err != nil {
 		return err
 	}
 
