@@ -20,7 +20,7 @@ require (
 	github.com/talos-systems/go-blockdevice v0.1.1-0.20201218174450-f2728a581972
 	github.com/talos-systems/go-procfs v0.0.0-20201223150035-a82654edcec1
 	github.com/talos-systems/go-retry v0.2.0
-	github.com/talos-systems/go-smbios v0.0.0-20200807005123-80196199691e
+	github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a
 	github.com/talos-systems/net v0.2.1-0.20210212213224-05190541b0fa
 	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210401163915-1d8e9674a91b
 	go.uber.org/zap v1.14.1 // indirect
