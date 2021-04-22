@@ -271,7 +271,8 @@ clusterctl config cluster management-plane -i sidero > management-plane.yaml
 
 Note that there are several variables that should be set in order for the templating to work properly:
 
-- `CONTROL_PLANE_ENDPOINT`: The endpoint used for the Kubernetes API server (e.g. `https://1.2.3.4:6443`).
+- `CONTROL_PLANE_ENDPOINT` and `CONTROL_PLANE_PORT`: The endpoint (IP address or hostname) and the port used for the Kubernetes API server
+  (e.g. for `https://1.2.3.4:6443`: `CONTROL_PLANE_ENDPOINT=1.2.3.4` and `CONTROL_PLANE_PORT=6443`).
   This is the equivalent of the `endpoint` you would specify in `talosctl gen config`.
   There are a variety of ways to configure a control plane endpoint.
   Some common ways for an HA setup are to use DNS, a load balancer, or BGP.
