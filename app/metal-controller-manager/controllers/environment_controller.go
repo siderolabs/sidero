@@ -161,7 +161,6 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 		// At this point the file exists, but the URL for the file has changed. We
 		// need to update the file using the new URL.
 
-		wg.Add(1)
 		l.Info("updating asset", "url", assetTask.Asset.URL)
 		saveAsset(file)
 	}
