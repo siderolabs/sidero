@@ -36,6 +36,6 @@ require (
 	k8s.io/apiserver v0.19.3 // indirect
 	k8s.io/client-go v0.19.3
 	k8s.io/utils v0.0.0-20201110183641-67b214c5f920
-	sigs.k8s.io/cluster-api v0.3.12
+	sigs.k8s.io/cluster-api v0.3.16
 	sigs.k8s.io/controller-runtime v0.6.3
 )
