@@ -27,7 +27,7 @@ require (
 	golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	golang.org/x/sys v0.0.0-20210112080510-489259a85091
-	google.golang.org/grpc v1.36.0
+	google.golang.org/grpc v1.37.0
 	google.golang.org/protobuf v1.25.0
 	k8s.io/api v0.19.3
 	k8s.io/apiextensions-apiserver v0.19.1
