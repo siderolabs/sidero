@@ -134,8 +134,6 @@ func (cluster *Cluster) findExisting(ctx context.Context) error {
 		return err
 	}
 
-	config.Context = cluster.options.Name
-
 	_, cidr, err := net.ParseCIDR(cluster.options.CIDR)
 	if err != nil {
 		return err

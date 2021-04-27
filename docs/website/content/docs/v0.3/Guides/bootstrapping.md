@@ -61,14 +61,7 @@ allow bootp;
 allow booting;
 
 next-server 192.168.1.150;
-if exists user-class and option user-class = "iPXE" {
-  filename "http://192.168.1.150:8081/boot.ipxe";
-} elsif substring (option vendor-class-identifier, 0, 10) = "HTTPClient" {
-  option vendor-class-identifier "HTTPClient";
-  filename "http://192.168.1.150:8081/tftp/ipxe.efi";
-} else {
-  filename "ipxe.efi";
-}
+filename "ipxe.efi";
 
 host talos-mgmt-0 {
     fixed-address 192.168.254.2;

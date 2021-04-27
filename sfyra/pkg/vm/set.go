@@ -161,7 +161,7 @@ func (set *Set) create(ctx context.Context) error {
 				},
 				PXEBooted:           true,
 				TFTPServer:          set.options.BootSource.String(),
-				IPXEBootFilename:    fmt.Sprintf("http://%s:8081/boot.ipxe", set.options.BootSource),
+				IPXEBootFilename:    "undionly.kpxe",
 				SkipInjectingConfig: true,
 			})
 	}
