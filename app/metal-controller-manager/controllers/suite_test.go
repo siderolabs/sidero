@@ -33,6 +33,8 @@ var (
 )
 
 func TestAPIs(t *testing.T) {
+	t.Skip("Fix or remove: https://github.com/talos-systems/sidero/issues/47")
+
 	RegisterFailHandler(Fail)
 
 	RunSpecsWithDefaultAndCustomReporters(t,
