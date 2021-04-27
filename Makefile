@@ -70,7 +70,7 @@ export HELP_MENU_HEADER
 
 help: ## This help menu.
 	@echo "$$HELP_MENU_HEADER"
-	@grep -E '^[a-zA-Z%_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z0-9%_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 # Build Abstractions
 
@@ -138,7 +138,7 @@ clusterctl-release: release
 		./hack/scripts/generate-clusterctl-config.sh
 
 .PHONY: run-sfyra
-run-sfyra: talos-artifacts clusterctl-release
+run-sfyra: talos-artifacts clusterctl-release ## Run Sfyra integration test.
 	@ARTIFACTS=$(ARTIFACTS) \
 		CLUSTERCTL_CONFIG=$(SFYRA_CLUSTERCTL_CONFIG) \
 		TALOS_RELEASE=$(TALOS_RELEASE) \
