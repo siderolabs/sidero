@@ -16,6 +16,10 @@ FROM --platform=arm64 ghcr.io/talos-systems/linux-firmware:${PKGS} AS pkg-linux-
 FROM ghcr.io/talos-systems/musl:${PKGS} AS pkg-musl
 FROM --platform=amd64 ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel-amd64
 FROM --platform=arm64 ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel-arm64
+FROM ghcr.io/talos-systems/liblzma:${PKGS} AS pkg-liblzma
+FROM ghcr.io/talos-systems/ipxe:${PKGS} AS pkg-ipxe
+FROM --platform=amd64 ghcr.io/talos-systems/ipxe:${PKGS} AS pkg-ipxe-amd64
+FROM --platform=arm64 ghcr.io/talos-systems/ipxe:${PKGS} AS pkg-ipxe-arm64
 
 # The base target provides the base for running various tasks against the source
 # code
@@ -122,11 +126,6 @@ ARG TARGETARCH
 RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build -ldflags "-s -w" -o /manager ./app/metal-controller-manager
 RUN chmod +x /manager
 
-FROM scratch AS assets
-ADD http://boot.ipxe.org/undionly.kpxe /amd64/undionly.kpxe
-ADD http://boot.ipxe.org/ipxe.efi /amd64/ipxe.efi
-ADD http://boot.ipxe.org/arm64-efi/ipxe.efi /arm64/ipxe.efi
-
 FROM base AS agent-build-amd64
 RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
 RUN chmod +x /agent
@@ -149,21 +148,23 @@ COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2 ./lib/firmware/bnx2
 COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
 RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 
-FROM scratch AS metal-controller-manager
+FROM scratch AS metal-controller-manager-image
 COPY --from=pkg-ca-certificates / /
 COPY --from=pkg-fhs / /
 COPY --from=pkg-musl / /
 COPY --from=pkg-libressl / /
+COPY --from=pkg-liblzma / /
 COPY --from=pkg-ipmitool / /
-COPY --from=assets /amd64/undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe
-COPY --from=assets /amd64/undionly.kpxe /var/lib/sidero/tftp/undionly.kpxe.0
-COPY --from=assets /amd64/ipxe.efi /var/lib/sidero/tftp/ipxe.efi
-COPY --from=assets /arm64/ipxe.efi /var/lib/sidero/tftp/ipxe-arm64.efi
+COPY --from=pkg-ipxe-amd64 /usr/libexec/ /var/lib/sidero/ipxe/amd64
+COPY --from=pkg-ipxe-arm64 /usr/libexec/ /var/lib/sidero/ipxe/arm64
+COPY --from=pkg-ipxe /usr/libexec/zbin /bin/zbin
 COPY --from=initramfs-archive-amd64 /initramfs.xz /var/lib/sidero/env/agent-amd64/initramfs.xz
 COPY --from=initramfs-archive-arm64 /initramfs.xz /var/lib/sidero/env/agent-arm64/initramfs.xz
 COPY --from=pkg-kernel-amd64 /boot/vmlinuz /var/lib/sidero/env/agent-amd64/vmlinuz
 COPY --from=pkg-kernel-arm64 /boot/vmlinuz /var/lib/sidero/env/agent-arm64/vmlinuz
 COPY --from=build-metal-controller-manager /manager /manager
+
+FROM metal-controller-manager-image AS metal-controller-manager
 LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
 

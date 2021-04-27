@@ -12,7 +12,7 @@ TEST_PKGS ?= ./...
 TALOS_RELEASE ?= v0.9.3
 
 TOOLS ?= ghcr.io/talos-systems/tools:v0.5.0
-PKGS ?= v0.5.0
+PKGS ?= v0.5.0-8-gb0d9cd2
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 

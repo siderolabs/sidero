@@ -12,6 +12,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -36,16 +37,28 @@ var (
 	ErrBootFromDisk = errors.New("boot from disk")
 )
 
+const iPXEPort = 8081
+
+// bootFile is used when iPXE is booted without embedded script via iPXE request http://endpoint:8081/boot.ipxe.
 const bootFile = `#!ipxe
 chain ipxe?uuid=${uuid}&mac=${mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}&arch=${buildarch}
 `
 
+// bootTemplate is embedded into iPXE binary when that binary is sent to the node.
+//
+// bootTemplate should be kept in sync with the bootFile above.
+var bootTemplate = template.Must(template.New("iPXE embedded").Parse(`dhcp
+chain http://{{ .Endpoint }}:{{ .Port }}/ipxe?uuid=${uuid}&mac=${mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}&arch=${buildarch}
+`))
+
+// ipxeTemplate is returned as response to `chain` request from the bootFile/bootTemplate to boot actual OS (or Sidero agent).
 var ipxeTemplate = template.Must(template.New("iPXE config").Parse(`#!ipxe
 kernel /env/{{ .Env.Name }}/{{ .KernelAsset }} {{range $arg := .Env.Spec.Kernel.Args}} {{$arg}}{{end}}
 initrd /env/{{ .Env.Name }}/{{ .InitrdAsset }}
 boot
 `))
 
+// ipxeBootFromDisk script is used to skip PXE booting and boot from disk.
 const ipxeBootFromDisk = `#!ipxe
 exit
 `
@@ -151,7 +164,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if env.ObjectMeta.Name != "agent" {
+	if !strings.HasPrefix(env.ObjectMeta.Name, "agent") {
 		if err = markAsPXEBooted(server); err != nil {
 			log.Printf("error marking server as PXE booted: %s", err)
 		}
@@ -163,6 +176,19 @@ func ServeIPXE(endpoint, args string, mgrClient client.Client) error {
 	extraAgentKernelArgs = args
 	c = mgrClient
 
+	var embeddedScriptBuf bytes.Buffer
+
+	if err := bootTemplate.Execute(&embeddedScriptBuf, map[string]string{
+		"Endpoint": apiEndpoint,
+		"Port":     strconv.Itoa(iPXEPort),
+	}); err != nil {
+		return err
+	}
+
+	if err := PatchBinaries(embeddedScriptBuf.Bytes()); err != nil {
+		return err
+	}
+
 	mux := http.NewServeMux()
 
 	mux.Handle("/boot.ipxe", logRequest(http.HandlerFunc(bootFileHandler)))
@@ -172,7 +198,7 @@ func ServeIPXE(endpoint, args string, mgrClient client.Client) error {
 
 	log.Println("Listening...")
 
-	return http.ListenAndServe(":8081", mux)
+	return http.ListenAndServe(fmt.Sprintf(":%d", iPXEPort), mux)
 }
 
 func logRequest(next http.Handler) http.Handler {
