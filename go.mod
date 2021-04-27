@@ -10,7 +10,7 @@ require (
 	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/onsi/ginkgo v1.15.0
-	github.com/onsi/gomega v1.10.1
+	github.com/onsi/gomega v1.11.0
 	github.com/opencontainers/runtime-spec v1.0.3-0.20200728170252-4d89ac9fbff6 // indirect
 	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
