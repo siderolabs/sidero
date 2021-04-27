@@ -57,6 +57,25 @@ steps:
       - name: docker
         path: /root/.docker/buildx
 
+  - name: unit-test-pull-request
+    image: autonomy/build-container:latest
+    pull: always
+    environment:
+      PLATFORM: linux/amd64,linux/arm64
+    commands:
+      - make unit-tests
+    when:
+      event:
+        include:
+          - pull_request
+    volumes:
+      - name: docker-socket
+        path: /var/run
+      - name: outerdockersock
+        path: /var/outer-run
+      - name: docker
+        path: /root/.docker/buildx
+
   - name: sfyra-pull-request
     image: autonomy/build-container:latest
     pull: always
