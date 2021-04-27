@@ -7,7 +7,6 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.2.1-0.20200730175230-ee2de8da5be6
 	github.com/go-logr/zapr v0.2.0 // indirect
-	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/onsi/ginkgo v1.15.0
 	github.com/onsi/gomega v1.10.1
@@ -28,7 +27,7 @@ require (
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	golang.org/x/sys v0.0.0-20210112080510-489259a85091
 	google.golang.org/grpc v1.36.0
-	google.golang.org/protobuf v1.25.0
+	google.golang.org/protobuf v1.26.0
 	k8s.io/api v0.19.3
 	k8s.io/apiextensions-apiserver v0.19.1
 	k8s.io/apimachinery v0.19.3
