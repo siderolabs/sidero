@@ -16,9 +16,10 @@ function build_registry_mirrors {
       local service="registry-${registry//./-}.ci.svc"
       local addr=`python3 -c "import socket; print(socket.gethostbyname('${service}'))"`
 
-      REGISTRY_MIRROR_FLAGS="${REGISTRY_MIRROR_FLAGS} --registry-mirrors ${registry}=http://${addr}:5000"
+      REGISTRY_MIRROR_FLAGS="${REGISTRY_MIRROR_FLAGS} --registry-mirror ${registry}=http://${addr}:5000"
     done
   else
+    # use the value from the environment, if present
     REGISTRY_MIRROR_FLAGS=${REGISTRY_MIRROR_FLAGS:-}
   fi
 }
