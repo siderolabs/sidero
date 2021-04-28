@@ -54,5 +54,7 @@ func init() {
 	bootstrapClusterCmd.Flags().StringVar(&options.BootstrapTalosInstaller, "bootstrap-installer", options.BootstrapTalosInstaller, "Talos install image for bootstrap cluster")
 	bootstrapClusterCmd.Flags().StringVar(&options.BootstrapCIDR, "bootstrap-cidr", options.BootstrapCIDR, "bootstrap cluster network CIDR")
 	bootstrapClusterCmd.Flags().StringVar(&options.TalosctlPath, "talosctl-path", options.TalosctlPath, "path to the talosctl (for the QEMU provisioner)")
+	bootstrapClusterCmd.Flags().StringSliceVar(&options.RegistryMirrors, "registry-mirror", options.RegistryMirrors, "registry mirrors to use")
 	bootstrapClusterCmd.Flags().StringSliceVar(&options.RegistryMirrors, "registry-mirrors", options.RegistryMirrors, "registry mirrors to use")
+	Should(bootstrapClusterCmd.Flags().MarkDeprecated("registry-mirrors", "please use --registry-mirror (singular) instead"))
 }
