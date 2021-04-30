@@ -52,7 +52,7 @@ The build process makes use of features not currently supported by the default
 builder instance (docker driver). To create a compatible builder instance, run:
 
 ```
-docker buildx create --driver docker-container --name local --buildkitd-flags --use
+docker buildx create --driver docker-container --name local --use
 ```
 
 If you already have a compatible builder instance, you may use that instead.
