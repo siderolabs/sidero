@@ -18,7 +18,7 @@
     "@gridsome/plugin-sitemap": "^0.2.3",
     "@gridsome/remark-prismjs": "^0.3.0",
     "@gridsome/source-filesystem": "^0.6.2",
-    "@gridsome/transformer-remark": "^0.6.3",
+    "@gridsome/transformer-remark": "^0.6.4",
     "fuse.js": "^3.4.6",
     "gridsome-plugin-tailwindcss": "^2.2.36",
     "node-sass": "^4.13.1",
