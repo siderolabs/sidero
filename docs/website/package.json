@@ -15,7 +15,7 @@
     "slugify": "^1.4.5"
   },
   "devDependencies": {
-    "@gridsome/plugin-sitemap": "^0.2.3",
+    "@gridsome/plugin-sitemap": "^0.4.0",
     "@gridsome/remark-prismjs": "^0.3.0",
     "@gridsome/source-filesystem": "^0.6.2",
     "@gridsome/transformer-remark": "^0.6.3",
