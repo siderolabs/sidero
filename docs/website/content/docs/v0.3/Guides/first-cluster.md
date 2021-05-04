@@ -109,7 +109,6 @@ For more information on server acceptance, see the [server docs](/docs/v0.3/conf
 ## Create the Cluster
 
 The cluster creation process should be identical to what was detailed in the previous guide.
-Note that, for this example, the same "default" serverclass that we used in the previous guide is used again.
 Using clusterctl, we can create a cluster manifest with:
 
 ```bash
@@ -128,9 +127,9 @@ Note that there are several variables that should be set in order for the templa
 - `CONTROL_PLANE_SERVERCLASS`: The server class to use for control plane nodes.
 - `WORKER_SERVERCLASS`: The server class to use for worker nodes.
 - `KUBERNETES_VERSION`: The version of Kubernetes to deploy (e.g. `v1.19.4`).
-- `TALOS_VERSION`: This should correspond to the minor version of Talos that you will be deploying (e.g. `v0.9`).
+- `TALOS_VERSION`: This should correspond to the minor version of Talos that you will be deploying (e.g. `v0.10`).
   This value is used in determining the fields present in the machine configuration that gets generated for Talos nodes.
-  Note that the default is currently `v0.8`.
+  Note that the default is currently `v0.9`.
 
 Now that we have the manifest, we can simply apply it:
 
