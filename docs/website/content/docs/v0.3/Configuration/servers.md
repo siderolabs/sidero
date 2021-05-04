@@ -50,7 +50,7 @@ spec:
   configPatches:
     - op: replace
       path: /machine/install/disk
-      value: /dev/sda1
+      value: /dev/sda
 ```
 
 The install disk patch can also be set on the `ServerClass`:
@@ -63,7 +63,7 @@ spec:
   configPatches:
     - op: replace
       path: /machine/install/disk
-      value: /dev/sda1
+      value: /dev/sda
 ```
 
 ## Server Acceptance
