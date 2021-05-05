@@ -23,6 +23,7 @@ type AgentClient interface {
 	MarkServerAsWiped(ctx context.Context, in *MarkServerAsWipedRequest, opts ...grpc.CallOption) (*MarkServerAsWipedResponse, error)
 	ReconcileServerAddresses(ctx context.Context, in *ReconcileServerAddressesRequest, opts ...grpc.CallOption) (*ReconcileServerAddressesResponse, error)
 	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
+	UpdateBMCInfo(ctx context.Context, in *UpdateBMCInfoRequest, opts ...grpc.CallOption) (*UpdateBMCInfoResponse, error)
 }
 
 type agentClient struct {
@@ -69,6 +70,15 @@ func (c *agentClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts 
 	return out, nil
 }
 
+func (c *agentClient) UpdateBMCInfo(ctx context.Context, in *UpdateBMCInfoRequest, opts ...grpc.CallOption) (*UpdateBMCInfoResponse, error) {
+	out := new(UpdateBMCInfoResponse)
+	err := c.cc.Invoke(ctx, "/api.Agent/UpdateBMCInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServer is the server API for Agent service.
 // All implementations must embed UnimplementedAgentServer
 // for forward compatibility
@@ -77,6 +87,7 @@ type AgentServer interface {
 	MarkServerAsWiped(context.Context, *MarkServerAsWipedRequest) (*MarkServerAsWipedResponse, error)
 	ReconcileServerAddresses(context.Context, *ReconcileServerAddressesRequest) (*ReconcileServerAddressesResponse, error)
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
+	UpdateBMCInfo(context.Context, *UpdateBMCInfoRequest) (*UpdateBMCInfoResponse, error)
 	mustEmbedUnimplementedAgentServer()
 }
 
@@ -97,6 +108,10 @@ func (UnimplementedAgentServer) ReconcileServerAddresses(context.Context, *Recon
 
 func (UnimplementedAgentServer) Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Heartbeat not implemented")
+}
+
+func (UnimplementedAgentServer) UpdateBMCInfo(context.Context, *UpdateBMCInfoRequest) (*UpdateBMCInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateBMCInfo not implemented")
 }
 func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
 
@@ -183,6 +198,24 @@ func _Agent_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Agent_UpdateBMCInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateBMCInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).UpdateBMCInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Agent/UpdateBMCInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).UpdateBMCInfo(ctx, req.(*UpdateBMCInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Agent_ServiceDesc is the grpc.ServiceDesc for Agent service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -205,6 +238,10 @@ var Agent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Heartbeat",
 			Handler:    _Agent_Heartbeat_Handler,
+		},
+		{
+			MethodName: "UpdateBMCInfo",
+			Handler:    _Agent_UpdateBMCInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

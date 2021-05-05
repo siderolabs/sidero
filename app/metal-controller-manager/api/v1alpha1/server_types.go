@@ -11,6 +11,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -34,13 +35,24 @@ type BMC struct {
 	// Source for the password value. Cannot be used if Pass is not empty.
 	// +optional
 	PassFrom *CredentialSource `json:"passFrom,omitempty"`
+	// BMC Interface Type. Defaults to lanplus.
+	// +optional
+	Interface string `json:"interface,omitempty"`
 }
 
 // CredentialSource defines a reference to the credential value.
 type CredentialSource struct {
-	// Selects a key of a secret in the cluster namespace
-	// +optional
-	SecretKeyRef *corev1.SecretKeySelector `json:"secretKeyRef,omitempty"`
+	SecretKeyRef *SecretKeyRef `json:"secretKeyRef,omitempty"`
+}
+
+// SecretKeyRef defines a ref to a given key within a secret.
+type SecretKeyRef struct {
+	// Namespace and name of credential secret
+	// nb: can't use namespacedname here b/c it doesn't have json tags in the struct :(
+	Namespace string `json:"namespace"`
+	Name      string `json:"name"`
+	// Key to select
+	Key string `json:"key"`
 }
 
 // Resolve the value using the references.
@@ -55,7 +67,14 @@ func (source *CredentialSource) Resolve(ctx context.Context, reader client.Clien
 
 	var secrets corev1.Secret
 
-	if err := reader.Get(ctx, client.ObjectKey{Namespace: corev1.NamespaceDefault, Name: source.SecretKeyRef.Name}, &secrets); err != nil {
+	if err := reader.Get(
+		ctx,
+		types.NamespacedName{
+			Namespace: source.SecretKeyRef.Namespace,
+			Name:      source.SecretKeyRef.Name,
+		},
+		&secrets,
+	); err != nil {
 		return "", fmt.Errorf("error getting secret %q: %w", source.SecretKeyRef.Name, err)
 	}
 

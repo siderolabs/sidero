@@ -6,8 +6,11 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"errors"
 	"fmt"
 	"log"
+	"math/big"
 	"net"
 	"os"
 	"sync"
@@ -15,6 +18,7 @@ import (
 
 	"github.com/talos-systems/go-blockdevice/blockdevice"
 	"github.com/talos-systems/go-blockdevice/blockdevice/util"
+	kmsg "github.com/talos-systems/go-kmsg"
 	"github.com/talos-systems/go-procfs/procfs"
 	"github.com/talos-systems/go-retry/retry"
 	"github.com/talos-systems/go-smbios/smbios"
@@ -23,7 +27,9 @@ import (
 	"golang.org/x/sys/unix"
 	"google.golang.org/grpc"
 
+	"github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/api"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/power/ipmi"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
 )
 
@@ -68,14 +74,14 @@ func setup() error {
 		return err
 	}
 
-	kmsg, err := os.OpenFile("/dev/kmsg", os.O_RDWR|unix.O_CLOEXEC|unix.O_NONBLOCK|unix.O_NOCTTY, 0o666)
-	if err != nil {
-		return fmt.Errorf("failed to open /dev/kmsg: %w", err)
+	if err := kmsg.SetupLogger(nil, "[sidero]", nil); err != nil {
+		return err
 	}
 
-	log.SetOutput(kmsg)
-	log.SetPrefix("[sidero]" + " ")
-	log.SetFlags(0)
+	// Set the PATH env var.
+	if err := os.Setenv("PATH", "/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"); err != nil {
+		return errors.New("error setting PATH")
+	}
 
 	return nil
 }
@@ -239,6 +245,17 @@ func mainFunc() error {
 
 	log.Println("Registration complete")
 
+	if createResp.GetSetupBmc() {
+		log.Println("Attempting to automatically discover and configure BMC")
+
+		// nb: we don't consider failure to get BMC info a hard failure.
+		//     users can always patch the bmc info to the server themselves.
+		err := attemptBMCSetup(ctx, client, s)
+		if err != nil {
+			log.Printf("encountered error setting up BMC. skipping setup: %q", err.Error())
+		}
+	}
+
 	ips, err := talosnet.IPAddrs()
 	if err != nil {
 		log.Println("failed to discover IPs")
@@ -348,4 +365,164 @@ func mainFunc() error {
 
 func main() {
 	shutdown(mainFunc())
+}
+
+func attemptBMCSetup(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) error {
+	uuid, err := s.SystemInformation().UUID()
+	if err != nil {
+		return err
+	}
+
+	bmcInfo := &api.BMCInfo{}
+
+	// Create "open" client
+	bmcSpec := v1alpha1.BMC{
+		Interface: "open",
+	}
+
+	ipmiClient, err := ipmi.NewClient(bmcSpec)
+	if err != nil {
+		return err
+	}
+
+	// Fetch BMC IP
+	ipResp, err := ipmiClient.GetBMCIP()
+	if err != nil {
+		return err
+	}
+
+	bmcIP := net.IP(ipResp.Data)
+	bmcInfo.Ip = bmcIP.String()
+
+	// Get user summary to see how many user slots
+	summResp, err := ipmiClient.GetUserSummary()
+	if err != nil {
+		return err
+	}
+
+	maxUsers := summResp.MaxUsers & 0x1F // Only bits [0:5] provide this number
+
+	// Check if sidero user already exists by combing through all userIDs
+	// nb: we start looking at user id 2, because 1 should always be an unamed admin user and
+	//     we don't want to confuse that unnamed admin with an open slot we can take over.
+	exists := false
+	sideroUserID := uint8(0)
+
+	for i := uint8(2); i <= maxUsers; i++ {
+		userRes, err := ipmiClient.GetUserName(i)
+		if err != nil {
+			// nb: A failure here actually seems to mean that the user slot is unused,
+			// even though you can also have a slot with empty user as well. *scratches head*
+			// We'll take note of this spot if we haven't already found another empty one.
+			if sideroUserID == 0 {
+				sideroUserID = i
+			}
+
+			continue
+		}
+
+		// Found pre-existing sidero user
+		if userRes.Username == "sidero" {
+			exists = true
+			sideroUserID = i
+			log.Printf("Sidero user already present in slot %d. We'll claim it as our very own.\n", i)
+
+			break
+		} else if userRes.Username == "" && sideroUserID == 0 {
+			// If this is the first empty user that's not the UID 1 (which we skip),
+			// we'll take this spot for sidero user
+			log.Printf("Found empty user slot %d. Noting as a possible place for sidero user.\n", i)
+			sideroUserID = i
+		}
+	}
+
+	// User didn't pre-exist and there's no room
+	// Return without sidero user :(
+	if sideroUserID == 0 {
+		return errors.New("no slot available for sidero user")
+	}
+
+	// Not already present and there's an empty slot so we add sidero user
+	if !exists {
+		log.Printf("Adding sidero user to slot %d\n", sideroUserID)
+
+		_, err := ipmiClient.SetUserName(sideroUserID, "sidero")
+		if err != nil {
+			return err
+		}
+	}
+
+	// Reset pass for sidero user
+	// nb: we _always_ reset the user pass because we can't ever get
+	//     it back out when we find an existing sidero user.
+	pass, err := genPass16()
+	if err != nil {
+		return err
+	}
+
+	_, err = ipmiClient.SetUserPass(sideroUserID, pass)
+	if err != nil {
+		return err
+	}
+
+	// Make sidero an admin
+	// Options: 0xD1 == Callin false, Link false, IPMI Msg true, Channel 1
+	// Limits: 0x03 == Administrator
+	// Session: 0x00 No session limit
+	_, err = ipmiClient.SetUserAccess(0xD1, sideroUserID, 0x04, 0x00)
+	if err != nil {
+		return err
+	}
+
+	// Enable the sidero user
+	_, err = ipmiClient.EnableUser(sideroUserID)
+	if err != nil {
+		return err
+	}
+
+	// Finally fill in info for update request
+	bmcInfo.User = "sidero"
+	bmcInfo.Pass = pass
+
+	// Attempt to update server object
+	err = retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second), retry.WithErrorLogging(true)).Retry(func() error {
+		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
+
+		_, err = client.UpdateBMCInfo(
+			ctx,
+			&api.UpdateBMCInfoRequest{
+				Uuid:    uuid.String(),
+				BmcInfo: bmcInfo,
+			},
+		)
+
+		if err != nil {
+			return retry.ExpectedError(err)
+		}
+
+		return nil
+	})
+
+	return nil
+}
+
+// Returns a random pass string of len 16.
+func genPass16() (string, error) {
+	letterRunes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	b := make([]rune, 16)
+	for i := range b {
+		rando, err := rand.Int(
+			rand.Reader,
+			big.NewInt(int64(len(letterRunes))),
+		)
+		if err != nil {
+			return "", err
+		}
+
+		b[i] = letterRunes[rando.Int64()]
+	}
+
+	return string(b), nil
 }

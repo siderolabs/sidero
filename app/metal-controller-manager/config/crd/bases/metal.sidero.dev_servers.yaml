@@ -61,6 +61,9 @@ spec:
                   endpoint:
                     description: BMC endpoint.
                     type: string
+                  interface:
+                    description: BMC Interface Type. Defaults to lanplus.
+                    type: string
                   pass:
                     description: BMC password value.
                     type: string
@@ -68,19 +71,20 @@ spec:
                     description: Source for the password value. Cannot be used if Pass is not empty.
                     properties:
                       secretKeyRef:
-                        description: Selects a key of a secret in the cluster namespace
+                        description: SecretKeyRef defines a ref to a given key within a secret
                         properties:
                           key:
-                            description: The key of the secret to select from.  Must be a valid secret key.
+                            description: Key to select
                             type: string
                           name:
-                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                             type: string
-                          optional:
-                            description: Specify whether the Secret or its key must be defined
-                            type: boolean
+                          namespace:
+                            description: 'Namespace and name of credential secret nb: can''t use namespacedname here b/c it doesn''t have json tags in the struct :('
+                            type: string
                         required:
                         - key
+                        - name
+                        - namespace
                         type: object
                     type: object
                   user:
@@ -90,19 +94,20 @@ spec:
                     description: Source for the user value. Cannot be used if User is not empty.
                     properties:
                       secretKeyRef:
-                        description: Selects a key of a secret in the cluster namespace
+                        description: SecretKeyRef defines a ref to a given key within a secret
                         properties:
                           key:
-                            description: The key of the secret to select from.  Must be a valid secret key.
+                            description: Key to select
                             type: string
                           name:
-                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                             type: string
-                          optional:
-                            description: Specify whether the Secret or its key must be defined
-                            type: boolean
+                          namespace:
+                            description: 'Namespace and name of credential secret nb: can''t use namespacedname here b/c it doesn''t have json tags in the struct :('
+                            type: string
                         required:
                         - key
+                        - name
+                        - namespace
                         type: object
                     type: object
                 required:
