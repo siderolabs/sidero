@@ -77,7 +77,7 @@ Sidero will never write to or wipe any disk on a computer which is not marked as
 This can be tedious for systems in which all attached computers should be considered to be under the control of Sidero.
 Thus, you may also choose to automatically accept any machine into Sidero on its discovery.
 Please keep in mind that this means that any newly-connected computer **WILL BE WIPED** automatically.
-You can enable auto-acceptance by pasing the `--auto-accept-servers=true` flag to `sidero-controller-manager`.
+You can enable auto-acceptance by passing the `--auto-accept-servers=true` flag to `sidero-controller-manager`.
 
 Once accepted, a server will be reset (all disks wiped) and then made available to Sidero.
 
@@ -90,7 +90,9 @@ its exit.
 
 Sidero can use IPMI information to control `Server` power state, reboot servers and set boot order.
 
-IMPI connection information can be set in the `Server` spec after initial registration:
+IPMI information will be, by default, setup automatically if possible as part of the acceptance process. In this design, a "sidero" user will be added to the IPMI user list and a randomly generated password will be issued. This information is then squirreled away in a Kubernetes secret in the `sidero-system` namespace, with a name format of `<server-uuid>-bmc`. Users wishing to turn off this feature can pass the `--auto-bmc-setup=false` flag to `sidero-controller-manager`
+
+IMPI connection information can also be set manually in the `Server` spec after initial registration:
 
 ```yaml
 apiVersion: metal.sidero.dev/v1alpha1

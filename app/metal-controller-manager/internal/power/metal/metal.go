@@ -47,6 +47,10 @@ func NewManagementClient(ctx context.Context, client client.Client, spec *v1alph
 			}
 		}
 
+		if bmcSpec.Interface == "" {
+			bmcSpec.Interface = "lanplus"
+		}
+
 		return ipmi.NewClient(bmcSpec)
 	case spec.ManagementAPI != nil:
 		return api.NewClient(*spec.ManagementAPI)

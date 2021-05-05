@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
@@ -38,6 +38,7 @@ type server struct {
 
 	autoAccept   bool
 	insecureWipe bool
+	autoBMC      bool
 
 	c             controllerclient.Client
 	scheme        *runtime.Scheme
@@ -55,11 +56,11 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 		}
 
 		obj = &metalv1alpha1.Server{
-			TypeMeta: v1.TypeMeta{
+			TypeMeta: metav1.TypeMeta{
 				Kind:       "Server",
 				APIVersion: metalv1alpha1.GroupVersion.Version,
 			},
-			ObjectMeta: v1.ObjectMeta{
+			ObjectMeta: metav1.ObjectMeta{
 				Name: in.GetSystemInformation().GetUuid(),
 			},
 			Spec: metalv1alpha1.ServerSpec{
@@ -96,14 +97,26 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 
 	resp := &api.CreateServerResponse{}
 
-	// Only return a wipe directive is the server is not clean *AND* it has been accepted.
-	// This avoids the possibility of a random device PXE booting against us, registering, then getting blown away.
-	if !obj.Status.IsClean && obj.Spec.Accepted {
-		log.Printf("Server %q needs wipe", obj.Name)
+	// Make BMC and wiping decisions only if server is accepted
+	// to avoid hijacking random devices that PXE boot against us.
+	if obj.Spec.Accepted {
+		// Respond to agent whether it should attempt bmc setup
+		// We will only tell it to attempt autoconfig if there's not already data there.
+		if obj.Spec.BMC == nil && s.autoBMC {
+			log.Printf("Server %q needs BMC setup", obj.Name)
 
-		resp.Wipe = true
-		resp.InsecureWipe = s.insecureWipe
-		resp.RebootTimeout = s.rebootTimeout.Seconds()
+			resp.SetupBmc = true
+		}
+
+		// Only return a wipe directive is the server is not clean *AND* it has been accepted.
+		// This avoids the possibility of a random device PXE booting against us, registering, then getting blown away.
+		if !obj.Status.IsClean {
+			log.Printf("Server %q needs wipe", obj.Name)
+
+			resp.Wipe = true
+			resp.InsecureWipe = s.insecureWipe
+			resp.RebootTimeout = s.rebootTimeout.Seconds()
+		}
 	}
 
 	return resp, nil
@@ -258,7 +271,96 @@ func (s *server) Heartbeat(ctx context.Context, in *api.HeartbeatRequest) (*api.
 	return resp, nil
 }
 
-func Serve(c controllerclient.Client, recorder record.EventRecorder, scheme *runtime.Scheme, autoAccept, insecureWipe bool, rebootTimeout time.Duration) error {
+func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest) (*api.UpdateBMCInfoResponse, error) {
+	if in.GetBmcInfo() != nil {
+		bmcSecretName := in.GetUuid() + "-bmc"
+
+		// Create or update creds secret
+		credsSecret := &corev1.Secret{}
+		exists := true
+
+		// Fetch corresponding server
+		obj := &metalv1alpha1.Server{}
+
+		if err := s.c.Get(ctx, types.NamespacedName{Name: in.GetUuid()}, obj); err != nil {
+			return nil, err
+		}
+
+		// For auto-created BMC info, we will *always* drop the creds in default namespace
+		// This ensures they'll come along for the ride in a "default" clusterctl move based on our cluster templates.
+		if err := s.c.Get(ctx, types.NamespacedName{Namespace: corev1.NamespaceDefault, Name: bmcSecretName}, credsSecret); err != nil {
+			if !apierrors.IsNotFound(err) {
+				return nil, err
+			}
+
+			log.Printf("BMC secret doesn't exist for server %q, creating.", in.GetUuid())
+
+			credsSecret.ObjectMeta = metav1.ObjectMeta{
+				Namespace: corev1.NamespaceDefault,
+				Name:      bmcSecretName,
+				OwnerReferences: []metav1.OwnerReference{
+					*metav1.NewControllerRef(obj, metalv1alpha1.GroupVersion.WithKind("Server")),
+				},
+			}
+
+			exists = false
+		}
+
+		credsSecret.Data = map[string][]byte{
+			"user": []byte(in.GetBmcInfo().GetUser()),
+			"pass": []byte(in.GetBmcInfo().GetPass()),
+		}
+
+		if exists {
+			if err := s.c.Update(ctx, credsSecret); err != nil {
+				return nil, err
+			}
+		} else {
+			if err := s.c.Create(ctx, credsSecret); err != nil {
+				return nil, err
+			}
+		}
+
+		// Update server spec with pointers to endpoint and creds secret
+
+		obj.Spec.BMC = &metalv1alpha1.BMC{
+			Endpoint: in.GetBmcInfo().GetIp(),
+			UserFrom: &metalv1alpha1.CredentialSource{
+				SecretKeyRef: &metalv1alpha1.SecretKeyRef{
+					Namespace: corev1.NamespaceDefault,
+					Name:      bmcSecretName,
+					Key:       "user",
+				},
+			},
+			PassFrom: &metalv1alpha1.CredentialSource{
+				SecretKeyRef: &metalv1alpha1.SecretKeyRef{
+					Namespace: corev1.NamespaceDefault,
+					Name:      bmcSecretName,
+					Key:       "pass",
+				},
+			},
+		}
+
+		log.Printf("Updating server %q with BMC info", in.GetUuid())
+
+		if err := s.c.Update(ctx, obj); err != nil {
+			return nil, err
+		}
+
+		ref, err := reference.GetReference(s.scheme, obj)
+		if err != nil {
+			return nil, err
+		}
+
+		s.recorder.Event(ref, corev1.EventTypeNormal, "BMC Update", "BMC info updated via API.")
+	}
+
+	resp := &api.UpdateBMCInfoResponse{}
+
+	return resp, nil
+}
+
+func Serve(c controllerclient.Client, recorder record.EventRecorder, scheme *runtime.Scheme, autoAccept, insecureWipe, autoBMC bool, rebootTimeout time.Duration) error {
 	lis, err := net.Listen("tcp", ":"+Port)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
@@ -269,6 +371,7 @@ func Serve(c controllerclient.Client, recorder record.EventRecorder, scheme *run
 	api.RegisterAgentServer(s, &server{
 		autoAccept:    autoAccept,
 		insecureWipe:  insecureWipe,
+		autoBMC:       autoBMC,
 		c:             c,
 		scheme:        scheme,
 		recorder:      recorder,

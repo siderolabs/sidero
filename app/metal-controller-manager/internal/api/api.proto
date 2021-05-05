@@ -12,6 +12,13 @@ service Agent {
   rpc ReconcileServerAddresses(ReconcileServerAddressesRequest)
       returns(ReconcileServerAddressesResponse);
   rpc Heartbeat(HeartbeatRequest) returns(HeartbeatResponse);
+  rpc UpdateBMCInfo(UpdateBMCInfoRequest) returns(UpdateBMCInfoResponse);
+}
+
+message BMCInfo {
+  string ip = 1;
+  string user = 2;
+  string pass = 3;
 }
 
 message SystemInformation {
@@ -43,7 +50,8 @@ message Address {
 message CreateServerResponse {
   bool wipe = 1;
   bool insecure_wipe = 2;
-  double reboot_timeout = 3;
+  bool setup_bmc = 3;
+  double reboot_timeout = 4;
 }
 
 message MarkServerAsWipedRequest { string uuid = 1; }
@@ -51,6 +59,13 @@ message HeartbeatRequest { string uuid = 1; }
 
 message MarkServerAsWipedResponse {}
 message HeartbeatResponse {}
+
+message UpdateBMCInfoRequest {
+  string uuid = 1;
+  BMCInfo bmc_info = 2;
+}
+
+message UpdateBMCInfoResponse {}
 
 message ReconcileServerAddressesRequest {
   string uuid = 1;

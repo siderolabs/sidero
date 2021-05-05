@@ -58,6 +58,7 @@ func main() {
 		enableLeaderElection bool
 		autoAcceptServers    bool
 		insecureWipe         bool
+		autoBMCSetup         bool
 		serverRebootTimeout  time.Duration
 
 		testPowerSimulatedExplicitFailureProb float64
@@ -70,6 +71,7 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", true, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&autoAcceptServers, "auto-accept-servers", false, "Add servers as 'accepted' when they register with Sidero API.")
 	flag.BoolVar(&insecureWipe, "insecure-wipe", true, "Wipe head of the disk only (if false, wipe whole disk).")
+	flag.BoolVar(&autoBMCSetup, "auto-bmc-setup", true, "Attempt to setup BMC info automatically when agent boots.")
 	flag.DurationVar(&serverRebootTimeout, "server-reboot-timeout", constants.DefaultServerRebootTimeout, "Timeout to wait for the server to restart and start wipe.")
 	flag.Float64Var(&testPowerSimulatedExplicitFailureProb, "test-power-simulated-explicit-failure-prob", 0, "Test failure simulation setting.")
 	flag.Float64Var(&testPowerSimulatedSilentFailureProb, "test-power-simulated-silent-failure-prob", 0, "Test failure simulation setting.")
@@ -185,7 +187,7 @@ func main() {
 			mgr.GetScheme(),
 			corev1.EventSource{Component: "sidero-server"})
 
-		if err := server.Serve(mgr.GetClient(), recorder, mgr.GetScheme(), autoAcceptServers, insecureWipe, serverRebootTimeout); err != nil {
+		if err := server.Serve(mgr.GetClient(), recorder, mgr.GetScheme(), autoAcceptServers, insecureWipe, autoBMCSetup, serverRebootTimeout); err != nil {
 			setupLog.Error(err, "unable to start API server", "controller", "Environment")
 			os.Exit(1)
 		}

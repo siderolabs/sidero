@@ -136,6 +136,10 @@ RUN chmod +x /agent
 
 FROM base AS initramfs-archive-amd64
 WORKDIR /initramfs
+COPY --from=pkg-ca-certificates / .
+COPY --from=pkg-musl / .
+COPY --from=pkg-libressl / .
+COPY --from=pkg-ipmitool / .
 COPY --from=agent-build-amd64 /agent ./init
 COPY --from=pkg-linux-firmware-amd64 /lib/firmware/bnx2 ./lib/firmware/bnx2
 COPY --from=pkg-linux-firmware-amd64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
@@ -143,6 +147,10 @@ RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 
 
 FROM base AS initramfs-archive-arm64
 WORKDIR /initramfs
+COPY --from=pkg-ca-certificates / .
+COPY --from=pkg-musl / .
+COPY --from=pkg-libressl / .
+COPY --from=pkg-ipmitool / .
 COPY --from=agent-build-arm64 /agent ./init
 COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2 ./lib/firmware/bnx2
 COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
