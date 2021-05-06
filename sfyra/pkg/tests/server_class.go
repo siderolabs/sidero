@@ -43,6 +43,18 @@ const (
 	workloadServerClassName = "workload"
 )
 
+func TestServerClassAny(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+	return func(t *testing.T) {
+		var serverClass v1alpha1.ServerClass
+		err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass)
+		require.NoError(t, err)
+		assert.Empty(t, serverClass.Spec.Qualifiers)
+
+		numNodes := len(vmSet.Nodes())
+		assert.Len(t, append(serverClass.Status.ServersAvailable, serverClass.Status.ServersInUse...), numNodes)
+	}
+}
+
 // TestServerClassDefault verifies server class creation.
 func TestServerClassDefault(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
 	return func(t *testing.T) {

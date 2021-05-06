@@ -31,7 +31,17 @@ Then launch Sfyra manually with desired flags:
 
     sudo -E _out/sfyra test integration --registry-mirror docker.io=http://172.24.0.1:5000,k8s.gcr.io=http://172.24.0.1:5001,quay.io=http://172.24.0.1:5002,gcr.io=http://172.24.0.1:5003,ghcr.io=http://172.24.0.1:5004,127.0.0.1:5005=http://172.24.0.1:5005 --skip-teardown --clusterctl-config ~/.cluster-api/clusterctl.sfyra.yaml
 
-With `-skip-teardown` flag test leaves the bootstrap cluster running so that next iteration of the test
+Alternatively, you may use `run-sfyra` target with `SFYRA_EXTRA_FLAGS` and `REGISTRY_MIRROR_FLAGS` environment variables:
+
+```sh
+export USERNAME=<username>
+export TAG=v0.1.0
+export REGISTRY_MIRROR_FLAGS="--registry-mirror docker.io=http://172.24.0.1:5000,k8s.gcr.io=http://172.24.0.1:5001,quay.io=http://172.24.0.1:5002,gcr.io=http://172.24.0.1:5003,ghcr.io=http://172.24.0.1:5004,127.0.0.1:5005=http://172.24.0.1:5005"
+export SFYRA_EXTRA_FLAGS="--skip-teardown"
+make run-sfyra
+```
+
+With `--skip-teardown` flag test leaves the bootstrap cluster running so that next iteration of the test
 can be run without waiting for the boostrap actions to be finished. It's possible to run Sfyra tests once
 again without bringing down the test environment, but make sure that all the clusters are deleted with
 `kubectl delete clusters --all`.
@@ -39,7 +49,7 @@ again without bringing down the test environment, but make sure that all the clu
 Flag `--registry-mirror` is optional, but it speeds up provisioning significantly. See Talos guides on setting up registry
 pull-through caches, or just run `hack/start-registry-proxies.sh`.
 
-Kubernetes config can be pulled with `talosconfig -n 172.24.0.2 kubeconfig --force`.
+Kubernetes config can be pulled with `talosctl -n 172.24.0.2 kubeconfig --force`.
 
 When `sfyra` is not running, loadbalancer for `management-cluster` control plane is also down, it can be restarted for manual
 testing with `_out/sfyra loadbalancer create --kubeconfig=$HOME/.kube/config --load-balancer-port 10000`.

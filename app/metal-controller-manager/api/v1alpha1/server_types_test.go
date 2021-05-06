@@ -58,19 +58,6 @@ func Test_PartialEqual(t *testing.T) {
 			},
 			want: false,
 		},
-		{
-			name: "partially equal value",
-			args: args{
-				a: v1alpha1.CPUInformation{
-					Manufacturer: "QEMU",
-				},
-				b: v1alpha1.CPUInformation{
-					Manufacturer: "QEMU",
-					Version:      "1.2.0",
-				},
-			},
-			want: true,
-		},
 	}
 
 	for _, tt := range tests {

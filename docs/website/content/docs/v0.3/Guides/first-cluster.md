@@ -115,7 +115,6 @@ For more information on server acceptance, see the [server docs](/docs/v0.3/conf
 ## Create the Cluster
 
 The cluster creation process should be identical to what was detailed in the previous guide.
-Note that, for this example, the same "default" serverclass that we used in the previous guide is used again.
 Using clusterctl, we can create a cluster manifest with:
 
 ```bash

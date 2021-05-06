@@ -7,9 +7,9 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	"github.com/go-logr/logr"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/cluster-api/util/patch"
@@ -30,113 +30,6 @@ type ServerClassReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-type serverFilter interface {
-	filterCPU([]metalv1alpha1.CPUInformation) serverFilter
-	filterSysInfo([]metalv1alpha1.SystemInformation) serverFilter
-	filterLabels([]map[string]string) serverFilter
-	fetchItems() map[string]metalv1alpha1.Server
-}
-
-type serverResults struct {
-	items map[string]metalv1alpha1.Server
-}
-
-func newServerFilter(sl *metalv1alpha1.ServerList) serverFilter {
-	newSF := &serverResults{
-		items: make(map[string]metalv1alpha1.Server),
-	}
-
-	// Add all servers to serverclass, but only if they've been accepted first
-	for _, server := range sl.Items {
-		if server.Spec.Accepted {
-			newSF.items[server.Name] = server
-		}
-	}
-
-	return newSF
-}
-
-func (sr *serverResults) filterCPU(filters []metalv1alpha1.CPUInformation) serverFilter {
-	if len(filters) == 0 {
-		return sr
-	}
-
-	for _, server := range sr.items {
-		var match bool
-
-		for _, cpu := range filters {
-			if server.Spec.CPU != nil && cpu.PartialEqual(server.Spec.CPU) {
-				match = true
-
-				break
-			}
-		}
-
-		if !match {
-			// Remove from results list if it's there since it's not a match for this qualifier
-			delete(sr.items, server.ObjectMeta.Name)
-		}
-	}
-
-	return sr
-}
-
-func (sr *serverResults) filterSysInfo(filters []metalv1alpha1.SystemInformation) serverFilter {
-	if len(filters) == 0 {
-		return sr
-	}
-
-	for _, server := range sr.items {
-		var match bool
-
-		for _, sysInfo := range filters {
-			if server.Spec.SystemInformation != nil && sysInfo.PartialEqual(server.Spec.SystemInformation) {
-				match = true
-				break
-			}
-		}
-
-		if !match {
-			// Remove from results list if it's there since it's not a match for this qualifier
-			delete(sr.items, server.ObjectMeta.Name)
-		}
-	}
-
-	return sr
-}
-
-func (sr *serverResults) filterLabels(filters []map[string]string) serverFilter {
-	if len(filters) == 0 {
-		return sr
-	}
-
-	for _, server := range sr.items {
-		var match bool
-
-		for _, label := range filters {
-			for labelKey, labelVal := range label {
-				if val, ok := server.ObjectMeta.Labels[labelKey]; ok {
-					if labelVal == val {
-						match = true
-						break
-					}
-				}
-			}
-		}
-
-		if !match {
-			// Remove from results list if it's there since it's not a match for this qualifier
-			delete(sr.items, server.ObjectMeta.Name)
-		}
-	}
-
-	return sr
-}
-
-func (sr *serverResults) fetchItems() map[string]metalv1alpha1.Server {
-	return sr.items
-}
-
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=serverclasses,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=serverclasses/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
@@ -144,13 +37,25 @@ func (sr *serverResults) fetchItems() map[string]metalv1alpha1.Server {
 
 func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
-	l := r.Log.WithValues("serverclass", req.NamespacedName)
 
-	l.Info("fetching serverclass", "serverclass", req.NamespacedName)
+	l := r.Log.WithValues("serverclass", req.NamespacedName)
+	l.Info("reconciling")
+
+	//nolint:godox
+	// TODO: We probably should use admission webhooks instead (or in additional) to prevent
+	// unwanted edits instead of "fixing" the resource after the fact.
+	if req.Name == metalv1alpha1.ServerClassAny {
+		if err := ReconcileServerClassAny(ctx, r.Client); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		// do not return; re-reconcile it to update status
+	} //nolint:wsl
 
 	sc := metalv1alpha1.ServerClass{}
 
 	if err := r.Get(ctx, req.NamespacedName, &sc); err != nil {
+		l.Error(err, "failed fetching resource")
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
@@ -165,18 +70,12 @@ func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		return ctrl.Result{}, fmt.Errorf("unable to get serverclass: %w", err)
 	}
 
-	// Create serverResults struct and seed items with all known, accepted servers
-	results := newServerFilter(sl)
-
-	// Filter servers down based on qualifiers
-	results = results.filterCPU(sc.Spec.Qualifiers.CPU)
-	results = results.filterSysInfo(sc.Spec.Qualifiers.SystemInformation)
-	results = results.filterLabels(sc.Spec.Qualifiers.LabelSelectors)
+	results := metalv1alpha1.FilterAcceptedServers(sl.Items, sc.Spec.Qualifiers)
 
 	avail := []string{}
 	used := []string{}
 
-	for _, server := range results.fetchItems() {
+	for _, server := range results {
 		if server.Status.InUse {
 			used = append(used, server.Name)
 			continue
@@ -184,10 +83,6 @@ func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 
 		avail = append(avail, server.Name)
 	}
-
-	// sort lists to avoid spurious updates due to `map` key ordering
-	sort.Strings(avail)
-	sort.Strings(used)
 
 	sc.Status.ServersAvailable = avail
 	sc.Status.ServersInUse = used
@@ -197,6 +92,36 @@ func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 	}
 
 	return ctrl.Result{}, nil
+}
+
+// ReconcileServerClassAny ensures that ServerClass "any" exist and is in desired state.
+func ReconcileServerClassAny(ctx context.Context, c client.Client) error {
+	key := types.NamespacedName{
+		Name: metalv1alpha1.ServerClassAny,
+	}
+
+	sc := metalv1alpha1.ServerClass{}
+	err := c.Get(ctx, key, &sc)
+
+	switch {
+	case apierrors.IsNotFound(err):
+		sc.Name = metalv1alpha1.ServerClassAny
+
+		return c.Create(ctx, &sc)
+
+	case err == nil:
+		patchHelper, err := patch.NewHelper(&sc, c)
+		if err != nil {
+			return err
+		}
+
+		sc.Spec.Qualifiers = metalv1alpha1.Qualifiers{}
+
+		return patchHelper.Patch(ctx, &sc)
+
+	default:
+		return err
+	}
 }
 
 func (r *ServerClassReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {

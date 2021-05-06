@@ -16,9 +16,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // BMC defines data about how to talk to the node via ipmitool.
 type BMC struct {
 	// BMC endpoint.

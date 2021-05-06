@@ -28,8 +28,3 @@ docker run -d -p 5004:5000 \
     -e REGISTRY_PROXY_REMOTEURL=https://ghcr.io \
     --restart always \
     --name registry-ghcr.io registry:2
-
-docker run -d -p 5004:5000 \
-    -e REGISTRY_PROXY_REMOTEURL=https://ghcr.io \
-    --restart always \
-    --name registry-ghcr.io registry:2

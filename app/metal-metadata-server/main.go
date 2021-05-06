@@ -24,7 +24,7 @@ import (
 
 	"github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/app/metal-metadata-server/pkg/client"
+	"github.com/talos-systems/sidero/internal/client"
 )
 
 var (
