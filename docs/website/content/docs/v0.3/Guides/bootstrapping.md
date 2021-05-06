@@ -191,44 +191,6 @@ spec:
 EOF
 ```
 
-## Create Server Class
-
-We must now create a server class to wrap our servers we registered.
-This is necessary for using the Talos control plane provider for Cluster API.
-The qualifiers needed for your server class will differ based on the data provided by your registration flow.
-See the [server class docs](/docs/v0.3/configuration/serverclasses) for more info on how these work.
-
-Here is an example of how to apply the server class once you have the proper info:
-
-```bash
-cat <<EOF | kubectl apply -f -
-apiVersion: metal.sidero.dev/v1alpha1
-kind: ServerClass
-metadata:
-  name: default
-spec:
-  qualifiers:
-    cpu:
-      - manufacturer: Intel(R) Corporation
-        version: Intel(R) Atom(TM) CPU C3558 @ 2.20GHz
-EOF
-```
-In order to fetch hardware information, you can use
-
-```bash
-kubectl get server -o yaml
-```
-
-Note that for bare-metal setup, you would need to specify an installation disk. See the [Installation Disk](/docs/v0.3/configuration/servers/#installation-disk)
-
-Once created, you should see the servers that make up your server class appear as "available":
-
-```bash
-$ kubectl get serverclass
-NAME      AVAILABLE                                  IN USE
-default   ["00000000-0000-0000-0000-d05099d33360"]   []
-```
-
 ## Create Management Plane
 
 We are now ready to template out our management plane.
@@ -256,8 +218,8 @@ Note that there are several variables that should be set in order for the templa
 
 For instance:
 ```bash
-export CONTROL_PLANE_SERVERCLASS=master
-export WORKER_SERVERCLASS=worker
+export CONTROL_PLANE_SERVERCLASS=any
+export WORKER_SERVERCLASS=any
 export KUBERNETES_VERSION=v1.20.1
 export CONTROL_PLANE_PORT=6443
 export CONTROL_PLANE_ENDPOINT=1.2.3.4

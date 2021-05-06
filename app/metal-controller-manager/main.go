@@ -5,6 +5,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -29,6 +30,7 @@ import (
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/server"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/tftp"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
+	"github.com/talos-systems/sidero/internal/client"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -192,6 +194,17 @@ func main() {
 			os.Exit(1)
 		}
 	}()
+
+	k8sClient, err := client.NewClient(nil)
+	if err != nil {
+		setupLog.Error(err, `failed to create k8s client`)
+		os.Exit(1)
+	}
+
+	if err = controllers.ReconcileServerClassAny(context.TODO(), k8sClient); err != nil {
+		setupLog.Error(err, `failed to reconcile ServerClass "any"`)
+		os.Exit(1)
+	}
 
 	setupLog.Info("starting manager")
 

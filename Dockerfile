@@ -45,6 +45,7 @@ COPY ./go.sum ./
 RUN --mount=type=cache,target=/.cache go mod download
 RUN --mount=type=cache,target=/.cache go mod verify
 COPY ./app/ ./app/
+COPY ./internal/ ./internal/
 COPY ./hack/ ./hack/
 RUN --mount=type=cache,target=/.cache go list -mod=readonly all >/dev/null
 RUN --mount=type=cache,target=/.cache ! go mod tidy -v 2>&1 | grep .

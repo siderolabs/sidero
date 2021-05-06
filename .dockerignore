@@ -4,6 +4,7 @@
 !config
 !hack
 !app
+!internal
 !pkg
 !sfyra
 !templates

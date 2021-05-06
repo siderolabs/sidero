@@ -9,6 +9,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// ServerClassAny is an automatically created ServerClass that includes all Servers.
+const ServerClassAny = "any"
+
 type Qualifiers struct {
 	CPU               []CPUInformation    `json:"cpu,omitempty"`
 	SystemInformation []SystemInformation `json:"systemInformation,omitempty"`

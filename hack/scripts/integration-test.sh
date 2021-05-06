@@ -2,6 +2,10 @@
 
 set -eou pipefail
 
+# extra flags from environment; for example
+#   export SFYRA_EXTRA_FLAGS="--skip-teardown"
+SFYRA_EXTRA_FLAGS="${SFYRA_EXTRA_FLAGS:-}"
+
 INTEGRATION_TEST="${ARTIFACTS}/sfyra"
 
 TALOSCTL="${ARTIFACTS}/${TALOS_RELEASE}/talosctl-linux-amd64"
@@ -37,4 +41,4 @@ ${PREFIX} "${INTEGRATION_TEST}" test integration \
     --clusterctl-config "${CLUSTERCTL_CONFIG}" \
     --power-simulated-explicit-failure-prob=0.1 \
     --power-simulated-silent-failure-prob=0.0 \
-    ${REGISTRY_MIRROR_FLAGS}
+    ${REGISTRY_MIRROR_FLAGS} ${SFYRA_EXTRA_FLAGS}
