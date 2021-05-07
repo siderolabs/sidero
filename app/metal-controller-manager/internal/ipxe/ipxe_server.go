@@ -73,7 +73,7 @@ func bootFileHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, bootFile)
 }
 
-//nolint: unparam
+//nolint:unparam
 func bootFromDiskHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, ipxeBootFromDisk)
 }

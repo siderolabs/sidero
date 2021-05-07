@@ -48,7 +48,7 @@ var testIntegrationCmd = &cobra.Command{
 			}
 
 			if !options.SkipTeardown {
-				defer bootstrapCluster.TearDown(ctx) //nolint: errcheck
+				defer bootstrapCluster.TearDown(ctx) //nolint:errcheck
 			}
 
 			if err = bootstrapCluster.Setup(ctx); err != nil {
@@ -73,7 +73,7 @@ var testIntegrationCmd = &cobra.Command{
 			}
 
 			if !options.SkipTeardown {
-				defer managementSet.TearDown(ctx) //nolint: errcheck
+				defer managementSet.TearDown(ctx) //nolint:errcheck
 			}
 
 			if err = managementSet.Setup(ctx); err != nil {

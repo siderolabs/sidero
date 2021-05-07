@@ -121,7 +121,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 		dummyServer, err := createDummyServer(ctx, metalClient, "dummyserver-0", dummySpec)
 		require.NoError(t, err)
 
-		//nolint: errcheck
+		//nolint:errcheck
 		defer metalClient.Delete(ctx, &dummyServer)
 
 		installConfig := talosconfig.InstallConfig{
@@ -152,7 +152,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 		dummyClass, err := createServerClass(ctx, metalClient, "dummyservers", classSpec)
 		require.NoError(t, err)
 
-		//nolint: errcheck
+		//nolint:errcheck
 		defer metalClient.Delete(ctx, &dummyClass)
 
 		// Create "cluster" using serverclass above
@@ -214,7 +214,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 			require.NoError(t, err)
 
 			if obj.GroupVersionKind().Kind == "Cluster" {
-				//nolint: errcheck
+				//nolint:errcheck
 				defer dr.Delete(ctx, obj.GetName(), metav1.DeleteOptions{})
 			}
 		}
