@@ -31,7 +31,7 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 )
 
-// nolint: wsl
+//nolint:wsl
 func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
 	_ = capiv1.AddToScheme(scheme)

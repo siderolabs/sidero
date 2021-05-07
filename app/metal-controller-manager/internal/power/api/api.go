@@ -32,7 +32,7 @@ func NewClient(spec metalv1alpha1.ManagementAPI) (*Client, error) {
 func (c *Client) postRequest(path string) error {
 	failureMode := DefaultDice.Roll()
 
-	switch failureMode { //nolint: exhaustive
+	switch failureMode { //nolint:exhaustive
 	case ExplicitFailure:
 		return fmt.Errorf("simulated failure from the power management")
 	case SilentFailure:
@@ -91,7 +91,7 @@ func (c *Client) SetPXE() error {
 func (c *Client) IsPoweredOn() (bool, error) {
 	failureMode := DefaultDice.Roll()
 
-	switch failureMode { //nolint: exhaustive
+	switch failureMode { //nolint:exhaustive
 	case ExplicitFailure:
 		return false, fmt.Errorf("simulated failure from the power management")
 	case SilentFailure:

@@ -38,7 +38,7 @@ ENV GOMODCACHE /.cache/mod
 RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.5.0
 RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.21.0
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
-RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /usr/local/bin v1.28.0
+RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /toolchain/bin v1.38.0
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
@@ -206,9 +206,10 @@ RUN --mount=type=cache,target=/.cache --mount=type=cache,target=/root/.cache/go-
 # The lint target performs linting on the source code.
 #
 FROM base AS lint-go
+COPY .golangci.yml .
 ENV GOGC=50
 ENV GOLANGCI_LINT_CACHE /.cache/lint
-RUN --mount=type=cache,target=/.cache /usr/local/bin/golangci-lint run --enable-all --disable gochecknoglobals,gochecknoinits,lll,goerr113,funlen,nestif,maligned,gomnd,gocognit,gocyclo
+RUN --mount=type=cache,target=/.cache golangci-lint run --config .golangci.yml
 ARG MODULE
 RUN --mount=type=cache,target=/.cache FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)
 #
@@ -243,9 +244,10 @@ RUN --mount=type=cache,target=/.cache go list -mod=readonly all >/dev/null
 RUN --mount=type=cache,target=/.cache ! go mod tidy -v 2>&1 | grep .
 
 FROM sfyra-base AS lint-sfyra
+COPY .golangci.yml .
 ENV GOGC=50
 ENV GOLANGCI_LINT_CACHE /.cache/lint
-RUN --mount=type=cache,target=/.cache /usr/local/bin/golangci-lint run --enable-all --disable gochecknoglobals,gochecknoinits,lll,goerr113,funlen,nestif,maligned,gomnd,gocognit,gocyclo,godox
+RUN --mount=type=cache,target=/.cache golangci-lint run --config .golangci.yml
 ARG MODULE
 RUN --mount=type=cache,target=/.cache FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)
 
