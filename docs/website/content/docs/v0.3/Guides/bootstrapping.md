@@ -61,7 +61,7 @@ allow bootp;
 allow booting;
 
 next-server 192.168.1.150;
-filename "ipxe.efi";
+filename "ipxe.efi"; # use "undionly.kpxe" for BIOS netboot or "ipxe.efi" for UEFI netboot
 
 host talos-mgmt-0 {
     fixed-address 192.168.254.2;
