@@ -19,7 +19,7 @@ import (
 	metal "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 )
 
-// NewClient is responsible for creating a controller-runtime k8s client for use by the metadata server.
+// NewClient is responsible for creating a controller-runtime k8s client with all schemas.
 func NewClient(kubeconfig *string) (client.Client, error) {
 	// Build rest config based on whether we've got a kubeconfig
 	var (

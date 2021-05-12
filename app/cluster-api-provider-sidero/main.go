@@ -5,9 +5,11 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 
+	debug "github.com/talos-systems/go-debug"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -24,6 +26,10 @@ import (
 	"github.com/talos-systems/sidero/app/cluster-api-provider-sidero/controllers"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	// +kubebuilder:scaffold:imports
+)
+
+const (
+	debugAddr = ":9994"
 )
 
 var (
@@ -57,6 +63,16 @@ func main() {
 	ctrl.SetLogger(zap.New(func(o *zap.Options) {
 		o.Development = true
 	}))
+
+	go func() {
+		debugLogFunc := func(msg string) {
+			setupLog.Info(msg)
+		}
+		if err := debug.ListenAndServe(context.TODO(), debugAddr, debugLogFunc); err != nil {
+			setupLog.Error(err, "failed to start debug server")
+			os.Exit(1)
+		}
+	}()
 
 	// Machine and cluster operations can create enough events to trigger the event recorder spam filter
 	// Setting the burst size higher ensures all events will be recorded and submitted to the API

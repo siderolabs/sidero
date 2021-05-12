@@ -14,6 +14,7 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch"
 	"github.com/ghodss/yaml"
+	debug "github.com/talos-systems/go-debug"
 	"github.com/talos-systems/talos/pkg/machinery/config/configloader"
 	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1"
 	v1 "k8s.io/api/core/v1"
@@ -25,6 +26,10 @@ import (
 	"github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/internal/client"
+)
+
+const (
+	debugAddr = ":9993"
 )
 
 var (
@@ -51,6 +56,15 @@ func main() {
 	port = flag.String("port", "8080", "port to use for serving metadata")
 	flag.Parse()
 
+	go func() {
+		debugLogFunc := func(msg string) {
+			log.Print(msg)
+		}
+		if err := debug.ListenAndServe(context.TODO(), debugAddr, debugLogFunc); err != nil {
+			log.Fatalf("failed to start debug server: %s", err)
+		}
+	}()
+
 	k8sClient, err := client.NewClient(kubeconfigPath)
 	if err != nil {
 		log.Fatal(fmt.Errorf("failure talking to kubernetes: %s", err))
@@ -60,8 +74,9 @@ func main() {
 		client: k8sClient,
 	}
 
-	http.HandleFunc("/configdata", mm.FetchConfig)
-	log.Fatal(http.ListenAndServe(":"+*port, nil))
+	mux := http.NewServeMux()
+	mux.HandleFunc("/configdata", mm.FetchConfig)
+	log.Fatal(http.ListenAndServe(":"+*port, mux))
 }
 
 func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
