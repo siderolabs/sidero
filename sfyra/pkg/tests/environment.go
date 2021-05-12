@@ -44,6 +44,7 @@ func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, clus
 			cmdline.Append("talos.platform", "metal")
 			cmdline.Append("talos.shutdown", "halt")
 			cmdline.Append("talos.config", fmt.Sprintf("http://%s:9091/configdata?uuid=", cluster.SideroComponentsIP()))
+			cmdline.Append("initrd", "initramfs.xz")
 
 			environment.APIVersion = constants.SideroAPIVersion
 			environment.Name = environmentName
