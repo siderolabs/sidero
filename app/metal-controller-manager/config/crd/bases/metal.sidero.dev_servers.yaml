@@ -71,7 +71,7 @@ spec:
                     description: Source for the password value. Cannot be used if Pass is not empty.
                     properties:
                       secretKeyRef:
-                        description: SecretKeyRef defines a ref to a given key within a secret
+                        description: SecretKeyRef defines a ref to a given key within a secret.
                         properties:
                           key:
                             description: Key to select
@@ -94,7 +94,7 @@ spec:
                     description: Source for the user value. Cannot be used if User is not empty.
                     properties:
                       secretKeyRef:
-                        description: SecretKeyRef defines a ref to a given key within a secret
+                        description: SecretKeyRef defines a ref to a given key within a secret.
                         properties:
                           key:
                             description: Key to select

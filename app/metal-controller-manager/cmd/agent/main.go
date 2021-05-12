@@ -18,6 +18,7 @@ import (
 
 	"github.com/talos-systems/go-blockdevice/blockdevice"
 	"github.com/talos-systems/go-blockdevice/blockdevice/util"
+	debug "github.com/talos-systems/go-debug"
 	kmsg "github.com/talos-systems/go-kmsg"
 	"github.com/talos-systems/go-procfs/procfs"
 	"github.com/talos-systems/go-retry/retry"
@@ -31,6 +32,10 @@ import (
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/api"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/power/ipmi"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
+)
+
+const (
+	debugAddr = ":9991"
 )
 
 func setup() error {
@@ -208,6 +213,15 @@ func connect(ctx context.Context, endpoint string) (*grpc.ClientConn, error) {
 func mainFunc() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	go func() {
+		debugLogFunc := func(msg string) {
+			log.Print(msg)
+		}
+		if err := debug.ListenAndServe(ctx, debugAddr, debugLogFunc); err != nil {
+			log.Fatalf("failed to start debug server: %s", err)
+		}
+	}()
 
 	if err := setup(); err != nil {
 		return err

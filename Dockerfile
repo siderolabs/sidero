@@ -71,7 +71,7 @@ RUN protoc -I/src/app/metal-controller-manager/internal/api \
   --go_out=paths=source_relative:/src/app/metal-controller-manager/internal/api --go-grpc_out=paths=source_relative:/src/app/metal-controller-manager/internal/api \
   api.proto
 RUN --mount=type=cache,target=/.cache controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
-RUN --mount=type=cache,target=/.cache	conversion-gen --input-dirs="./app/cluster-api-provider-sidero/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
+RUN --mount=type=cache,target=/.cache conversion-gen --input-dirs="./app/cluster-api-provider-sidero/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
 ARG MODULE
 RUN --mount=type=cache,target=/.cache gofumports -w -local ${MODULE} .
 
@@ -108,7 +108,8 @@ COPY --from=release-build /cluster-template.yaml /infrastructure-sidero/${TAG}/c
 
 FROM base AS build-cluster-api-provider-sidero
 ARG TARGETARCH
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build -ldflags "-s -w" -o /manager ./app/cluster-api-provider-sidero
+ARG GO_BUILDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "-s -w" -o /manager ./app/cluster-api-provider-sidero
 RUN chmod +x /manager
 
 ## TODO(rsmitty): make bmc pkg and move to talos-systems image
@@ -124,15 +125,18 @@ ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-controller-manager
 ARG TARGETARCH
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build -ldflags "-s -w" -o /manager ./app/metal-controller-manager
+ARG GO_BUILDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "-s -w" -o /manager ./app/metal-controller-manager
 RUN chmod +x /manager
 
 FROM base AS agent-build-amd64
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
+ARG GO_BUILDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=amd64 go build ${GO_BUILDFLAGS} -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
 RUN chmod +x /agent
 
 FROM base AS agent-build-arm64
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=arm64 go build -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
+ARG GO_BUILDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=arm64 go build ${GO_BUILDFLAGS} -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
 RUN chmod +x /agent
 
 FROM base AS initramfs-archive-amd64
@@ -179,7 +183,8 @@ ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-metadata-server
 ARG TARGETARCH
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build -ldflags "-s -w" -o /metal-metadata-server ./app/metal-metadata-server
+ARG GO_BUILDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "-s -w" -o /metal-metadata-server ./app/metal-metadata-server
 RUN chmod +x /metal-metadata-server
 
 FROM scratch AS metal-metadata-server
@@ -255,7 +260,8 @@ FROM sfyra-base AS sfyra-build
 WORKDIR /src/sfyra/cmd/sfyra
 ARG TALOS_RELEASE
 ARG SFYRA_CMD_PKG=github.com/talos-systems/sidero/sfyra/cmd/sfyra/cmd
-RUN --mount=type=cache,target=/.cache GOOS=linux go build -ldflags "-s -w -X ${SFYRA_CMD_PKG}.TalosRelease=${TALOS_RELEASE}" -o /sfyra
+ARG GO_BUILDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "-s -w -X ${SFYRA_CMD_PKG}.TalosRelease=${TALOS_RELEASE}" -o /sfyra
 RUN chmod +x /sfyra
 
 FROM scratch AS sfyra

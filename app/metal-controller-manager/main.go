@@ -11,6 +11,7 @@ import (
 	"os"
 	"time"
 
+	debug "github.com/talos-systems/go-debug"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -36,6 +37,7 @@ import (
 
 const (
 	defaultMaxConcurrentReconciles = 10
+	debugAddr                      = ":9992"
 )
 
 var (
@@ -89,12 +91,22 @@ func main() {
 		apiEndpoint = ""
 	}
 
-	// only for testing, doesn't affect production, default values simulate no failures
-	api.DefaultDice = api.NewFailureDice(testPowerSimulatedExplicitFailureProb, testPowerSimulatedSilentFailureProb)
-
 	ctrl.SetLogger(zap.New(func(o *zap.Options) {
 		o.Development = true
 	}))
+
+	go func() {
+		debugLogFunc := func(msg string) {
+			setupLog.Info(msg)
+		}
+		if err := debug.ListenAndServe(context.TODO(), debugAddr, debugLogFunc); err != nil {
+			setupLog.Error(err, "failed to start debug server")
+			os.Exit(1)
+		}
+	}()
+
+	// only for testing, doesn't affect production, default values simulate no failures
+	api.DefaultDice = api.NewFailureDice(testPowerSimulatedExplicitFailureProb, testPowerSimulatedSilentFailureProb)
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,

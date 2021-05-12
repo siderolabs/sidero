@@ -16,6 +16,14 @@ PKGS ?= v0.5.0-8-gb0d9cd2
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
+GO_BUILDFLAGS ?=
+
+WITH_DEBUG ?=
+
+ifeq ($(WITH_DEBUG), true)
+GO_BUILDFLAGS += -tags sidero.debug
+endif
+
 BUILD := docker buildx build
 PLATFORM ?= linux/amd64
 PROGRESS ?= auto
@@ -30,6 +38,7 @@ COMMON_ARGS += --build-arg=TEST_PKGS=$(TEST_PKGS)
 COMMON_ARGS += --build-arg=PKGS=$(PKGS)
 COMMON_ARGS += --build-arg=TOOLS=$(TOOLS)
 COMMON_ARGS += --build-arg=TALOS_RELEASE=$(TALOS_RELEASE)
+COMMON_ARGS += --build-arg=GO_BUILDFLAGS="$(GO_BUILDFLAGS)"
 
 all: manifests generate cluster-api-provider-sidero metal-controller-manager metal-metadata-server sfyra
 
