@@ -1,3 +1,82 @@
+<a name="v0.3.0-alpha.0"></a>
+## [v0.3.0-alpha.0](https://github.com/talos-systems/sidero/compare/v0.2.0...v0.3.0-alpha.0) (2021-05-13)
+
+### Chore
+
+* parse "boolean" variables
+* bump dependencies
+* allow building with debug handlers
+* add golangci-lint configuration
+* fix `make help` command
+* document Makefile target
+* disable dependabot rebases
+* update dependecies
+* add dependabot config
+* improve build system
+
+### Docs
+
+* fix install disk name in the examples
+* fix typo
+* add guide for upgrades
+* fix the docs around CONTROL_PLANE_ENDPOINT
+* create v0.2 docs and add note about specifying TALOS_VERSION
+
+### Feat
+
+* ship ServerClass "any"
+* enable auto-setup of BMC
+* inject iPXE script into the iPXE binaries
+* pull the Sidero configuration as `clusterctl` variables
+* add an option to reference IPMI creds via the secret refs
+* pull in new version of go-smbios for UUID endiannes fix
+* build Sidero for amd64 and arm64, support arm64 in the agent
+
+### Fix
+
+* back down resource requests
+* remove erroneous wg.Add in environment controller
+
+### Test
+
+* fix the Environment args to support UEFI boot
+* add missing empty tests
+* port improvements from Talos
+* run unit tests on CI, skip broken
+
+
+<a name="v0.2.0"></a>
+## [v0.2.0](https://github.com/talos-systems/talos/compare/v0.2.0-beta.0...v0.2.0) (2021-04-09)
+
+### Release
+
+* **v0.2.0:** prepare release
+
+
+<a name="v0.2.0-beta.0"></a>
+## [v0.2.0-beta.0](https://github.com/talos-systems/talos/compare/v0.2.0-alpha.1...v0.2.0-beta.0) (2021-04-08)
+
+### Chore
+
+* use common 'setup-ci' function
+
+### Feat
+
+* add support for DNS resolution in the agent
+
+### Fix
+
+* break the potential endless reconcile loop of ServerClasses
+* don't marshal the machine configuration via machinery package
+
+### Release
+
+* **v0.2.0-beta.0:** prepare release
+
+### Test
+
+* drop installer image from the server patch
+
 
 <a name="v0.2.0-alpha.1"></a>
 ## [v0.2.0-alpha.1](https://github.com/talos-systems/talos/compare/v0.2.0-alpha.0...v0.2.0-alpha.1) (2021-04-06)
@@ -449,4 +528,3 @@
 ### Release
 
 * **v0.1.0-alpha.0:** prepare release
-
