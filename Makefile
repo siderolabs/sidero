@@ -18,9 +18,9 @@ SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
 GO_BUILDFLAGS ?=
 
-WITH_DEBUG ?=
+WITH_DEBUG ?= false
 
-ifeq ($(WITH_DEBUG), true)
+ifeq ($(shell hack/parsebool.sh $(WITH_DEBUG); echo $$?), 1)
 GO_BUILDFLAGS += -tags sidero.debug
 endif
 
