@@ -489,8 +489,8 @@ github.com/talos-systems/crypto v0.2.1-0.20210202170911-39584f1b6e54 h1:2IGs3f0q
 github.com/talos-systems/crypto v0.2.1-0.20210202170911-39584f1b6e54/go.mod h1:OXCK52Q0dzm88YRG4VdTBdidkPUtqrCxCyW7bUs4DAw=
 github.com/talos-systems/go-blockdevice v0.1.1-0.20201218174450-f2728a581972 h1:/yEPl6h6+pK9XIfQEiZ989GDuw6dCUBeinzUcCu6dyY=
 github.com/talos-systems/go-blockdevice v0.1.1-0.20201218174450-f2728a581972/go.mod h1:efEE9wjtgxiovqsZAV39xlOd/AOI/0sLuZqb5jEgeqo=
-github.com/talos-systems/go-debug v0.1.0 h1:lURdF1U2UwB0by/CiunePULUHBR5BXdsG8I4Mjv+uUw=
-github.com/talos-systems/go-debug v0.1.0/go.mod h1:pR4NjsZQNFqGx3n4qkD4MIj1F2CxyIF8DCiO1+05JO0=
+github.com/talos-systems/go-debug v0.2.0 h1:IbBfDSJE7tUaSXKuytOksHFI/wAbU2/1/szGvnKpgqc=
+github.com/talos-systems/go-debug v0.2.0/go.mod h1:pR4NjsZQNFqGx3n4qkD4MIj1F2CxyIF8DCiO1+05JO0=
 github.com/talos-systems/go-kmsg v0.1.0 h1:juoZn+XioduYvtie6nqi/miKGJPLYSBNXRv5jRe6+lE=
 github.com/talos-systems/go-kmsg v0.1.0/go.mod h1:dppwQn+/mrdvsziGMbXjzfc4E+75oZhr39UIP6LgL0w=
 github.com/talos-systems/go-procfs v0.0.0-20210108152626-8cbc42d3dc24 h1:fN8vYvlB9XBQ5aImb1vLgR0ZaDwvfZfBMptqkpi3aEg=

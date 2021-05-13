@@ -959,8 +959,8 @@ github.com/talos-systems/go-blockdevice v0.2.1-0.20210305142622-bb3ad73f6983 h1:
 github.com/talos-systems/go-blockdevice v0.2.1-0.20210305142622-bb3ad73f6983/go.mod h1:Wt0/JMsa+WysYRDlNo6fu9rdn/re73uRnktFWyVUqjs=
 github.com/talos-systems/go-cmd v0.0.0-20210216164758-68eb0067e0f0 h1:DI+BjK+fcrLBc70Fi50dZocQcaHosqsuWHrGHKp2NzE=
 github.com/talos-systems/go-cmd v0.0.0-20210216164758-68eb0067e0f0/go.mod h1:kf+rZzTEmlDiYQ6ulslvRONnKLQH8x83TowltGMhO+k=
-github.com/talos-systems/go-debug v0.1.0 h1:lURdF1U2UwB0by/CiunePULUHBR5BXdsG8I4Mjv+uUw=
-github.com/talos-systems/go-debug v0.1.0/go.mod h1:pR4NjsZQNFqGx3n4qkD4MIj1F2CxyIF8DCiO1+05JO0=
+github.com/talos-systems/go-debug v0.2.0 h1:IbBfDSJE7tUaSXKuytOksHFI/wAbU2/1/szGvnKpgqc=
+github.com/talos-systems/go-debug v0.2.0/go.mod h1:pR4NjsZQNFqGx3n4qkD4MIj1F2CxyIF8DCiO1+05JO0=
 github.com/talos-systems/go-kmsg v0.1.0/go.mod h1:dppwQn+/mrdvsziGMbXjzfc4E+75oZhr39UIP6LgL0w=
 github.com/talos-systems/go-loadbalancer v0.1.0/go.mod h1:D5Qjfz+29WVjONWECZvOkmaLsBb3f5YeWME0u/5HmIc=
 github.com/talos-systems/go-loadbalancer v0.1.1 h1:qjC0uWHu6O7VXG9EN4ovVPg79sRbypXTrJZJskdaa2k=
