@@ -26,6 +26,6 @@ spec:
               cpu: 1000m
               memory: 512Mi
             requests:
-              cpu: 500m
-              memory: 256Mi
+              cpu: 100m
+              memory: 128Mi
       terminationGracePeriodSeconds: 10
