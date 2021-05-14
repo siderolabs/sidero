@@ -1,0 +1,45 @@
+# commit to be tagged for new release
+commit = "HEAD"
+
+project_name = "Sidero"
+github_repo = "talos-systems/sidero"
+match_deps = "^github.com/(talos-systems/[a-zA-Z0-9-]+)$"
+
+# previous release
+previous = "v0.2.0"
+
+pre_release = true
+
+preface = """\
+"""
+
+[notes]
+
+    [notes.ipxe-script]
+        title = "iPXE script"
+        description = """\
+iPXE image delivered by Sidero (either `ipxe.efi` or `undionly.kpxe`) now containes embedded iPXE script to access Sidero iPXE server.
+This change allows to simplify DHCP server setup to return only iPXE image without any additional `if`s.
+"""
+
+    [notes.ipmi-discovery]
+        title = "IPMI Discovery and Automatic Setup"
+        description = """\
+Sidero agent by default discovers BMC (IPMI) endpoint when it first runs on the server and provisions user for Sidero automatically.
+This feature enables completely automated server and IPMI discovery on the agent boot.
+Variable `SIDERO_CONTROLLER_MANAGER_AUTO_BMC_SETUP` can be used to disable this feature during install or upgrade of Sidero.
+
+Additionally Sidero supports storing IMPI credentials in Kubernetes secrets referencing them from the Server object.
+"""
+
+    [notes.any-serverclass]
+        title = "ServerClass `any`"
+        description = """\
+Sidero now creates ServerClass `any` which matches all servers.
+"""
+
+    [notes.install-variables]
+        title = "Install and Upgrade Variables"
+        description = """\
+Some aspects of Sidero installation can now be [controlled](https://www.sidero.dev/docs/v0.3/getting-started/installation/) via environment variables or `clusterctl` variables.
+"""
