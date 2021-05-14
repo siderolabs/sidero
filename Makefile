@@ -123,6 +123,10 @@ metal-controller-manager: ## Build the CAPI provider container image.
 metal-metadata-server: ## Build the CAPI provider container image.
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
+.PHONY: release-notes
+release-notes:
+	ARTIFACTS=$(ARTIFACTS) ./hack/release.sh $@ $(ARTIFACTS)/RELEASE_NOTES.md $(TAG)
+
 # Sfyra
 
 $(ARTIFACTS)/$(TALOS_RELEASE)/%:

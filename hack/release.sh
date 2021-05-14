@@ -2,15 +2,24 @@
 
 set -e
 
+RELEASE_TOOL_IMAGE="ghcr.io/talos-systems/release-tool:latest"
+
+function release-tool {
+  docker pull "${RELEASE_TOOL_IMAGE}" >/dev/null
+  docker run --rm -w /src -v "${PWD}":/src:ro "${RELEASE_TOOL_IMAGE}" -l -d -n -t "${1}" ./hack/release.toml
+}
+
 function changelog {
   if [ "$#" -eq 1 ]; then
-    git-chglog --output CHANGELOG.md -c ./hack/chglog/config.yml --tag-filter-pattern "^${1}" "${1}.0-alpha.0.."
-  elif [ "$#" -eq 0 ]; then
-    git-chglog --output CHANGELOG.md -c ./hack/chglog/config.yml --sort=semver
+    (release-tool ${1}; echo; cat CHANGELOG.md) > CHANGELOG.md- && mv CHANGELOG.md- CHANGELOG.md
   else
     echo 1>&2 "Usage: $0 changelog [tag]"
     exit 1
   fi
+}
+
+function release-notes {
+  release-tool "${2}" > "${1}"
 }
 
 function cherry-pick {
@@ -42,9 +51,10 @@ then
 else
   cat <<EOF
 Usage:
-  commit:       Create the official release commit message.
+  commit:        Create the official release commit message.
   cherry-pick:   Cherry-pick a commit into a release branch.
-  changelog:    Update the specified CHANGELOG.
+  changelog:     Update the specified CHANGELOG.
+  release-notes: Create release notes for GitHub release.
 EOF
 
   exit 1
