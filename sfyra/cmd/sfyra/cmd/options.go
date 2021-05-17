@@ -71,8 +71,8 @@ func DefaultOptions() Options {
 		ManagementSetName: "sfyra-management",
 		ManagementNodes:   4,
 
-		BootstrapMemMB:  4096,
-		BootstrapCPUs:   5,
+		BootstrapMemMB:  3072,
+		BootstrapCPUs:   3,
 		BootstrapDiskGB: 6,
 
 		ManagementMemMB:  2048,
