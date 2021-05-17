@@ -4,7 +4,6 @@ resources:
 bases:
   - ../app/cluster-api-provider-sidero/config
   - ../app/metal-controller-manager/config
-  - ../app/metal-metadata-server/config
 
 commonLabels:
   app: sidero

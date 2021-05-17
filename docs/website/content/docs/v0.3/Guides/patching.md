@@ -41,7 +41,7 @@ before actual server is provisioned with the config.
 This can be achieved by querying the metadata server endpoint directly:
 
 ```sh
-$ curl http://$PUBLIC_IP:9091/configdata?uuid=$SERVER_UUID
+$ curl http://$PUBLIC_IP:8081/configdata?uuid=$SERVER_UUID
 version: v1alpha1
 ...
 ```

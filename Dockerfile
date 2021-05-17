@@ -87,15 +87,12 @@ COPY ./config ./config
 COPY ./templates ./templates
 COPY ./app/cluster-api-provider-sidero/config ./app/cluster-api-provider-sidero/config
 COPY ./app/metal-controller-manager/config ./app/metal-controller-manager/config
-COPY ./app/metal-metadata-server/config ./app/metal-metadata-server/config
 ARG REGISTRY_AND_USERNAME
 ARG TAG
 RUN cd ./app/cluster-api-provider-sidero/config/manager \
   && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/cluster-api-provider-sidero:${TAG}
 RUN cd ./app/metal-controller-manager/config/manager \
   && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/metal-controller-manager:${TAG}
-RUN cd ./app/metal-metadata-server/config/server \
-  && kustomize edit set image server=${REGISTRY_AND_USERNAME}/metal-metadata-server:${TAG}
 RUN kustomize build config > /infrastructure-components.yaml \
   && cp ./config/metadata/metadata.yaml /metadata.yaml \
   && cp ./templates/cluster-template.yaml /cluster-template.yaml
@@ -180,19 +177,6 @@ COPY --from=build-metal-controller-manager /manager /manager
 FROM metal-controller-manager-image AS metal-controller-manager
 LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
-
-FROM base AS build-metal-metadata-server
-ARG TARGETARCH
-ARG GO_BUILDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "-s -w" -o /metal-metadata-server ./app/metal-metadata-server
-RUN chmod +x /metal-metadata-server
-
-FROM scratch AS metal-metadata-server
-COPY --from=pkg-ca-certificates / /
-COPY --from=pkg-fhs / /
-COPY --from=build-metal-metadata-server /metal-metadata-server /metal-metadata-server
-LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
-ENTRYPOINT [ "/metal-metadata-server" ]
 
 FROM base AS unit-tests-runner
 ARG TEST_PKGS

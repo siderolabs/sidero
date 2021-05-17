@@ -43,3 +43,13 @@ Sidero now creates ServerClass `any` which matches all servers.
         description = """\
 Some aspects of Sidero installation can now be [controlled](https://www.sidero.dev/docs/v0.3/getting-started/installation/) via environment variables or `clusterctl` variables.
 """
+
+    [notes.ports]
+        title = "`metal-controller-manager` External Ports Change"
+        description = """\
+Component `metal-metadata-server` was merged into `metal-controller-manager`, and three separate HTTP endpoints were merged into one endpoint on port `:8081`:
+
+* iPXE server (which used to be on port 8081)
+* internal gRPC server (Sidero agent uses it to talk back to Sidero service), previously was 50001
+* metadata server endpoint (used to be separate deployment and service, docs used port 9091)
+"""

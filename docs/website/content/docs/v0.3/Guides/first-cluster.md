@@ -27,16 +27,6 @@ Metal Controller Manager:
 kubectl patch deploy -n sidero-system sidero-controller-manager --type='json' -p='[{"op": "add", "path": "/spec/template/spec/hostNetwork", "value": true}]'
 ```
 
-Metadata Server:
-
-```bash
-# Convert metadata server service to nodeport
-kubectl patch service -n sidero-system sidero-metadata-server --type='json' -p='[{"op": "replace", "path": "/spec/type", "value": "NodePort"}]'
-
-## Set a known nodeport for metadata server
-kubectl patch service -n sidero-system sidero-metadata-server --type='json' -p='[{"op": "replace", "path": "/spec/ports", "value": [{"port": 80, "protocol": "TCP", "targetPort": "http", "nodePort": 30005}]}]'
-```
-
 #### Update Environment
 
 The metadata server's information needs to be updated in the default environment.
