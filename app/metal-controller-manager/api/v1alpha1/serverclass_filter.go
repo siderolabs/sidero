@@ -4,7 +4,12 @@
 
 package v1alpha1
 
-import "sort"
+import (
+	"sort"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+)
 
 // FilterAcceptedServers returns a new slice of Servers that are accepted and qualify.
 //
@@ -53,12 +58,19 @@ func FilterAcceptedServers(servers []Server, q Qualifiers) []Server {
 			var match bool
 
 			for _, filter := range filters {
-				for labelKey, labelVal := range filter {
-					if val, ok := server.ObjectMeta.Labels[labelKey]; ok && labelVal == val {
-						match = true
-						break
-					}
+				ls := metav1.SetAsLabelSelector(labels.Set(filter))
+				s, err := metav1.LabelSelectorAsSelector(ls)
+				if err != nil {
+					// TODO: At least log an error.
+					continue
 				}
+
+				if !s.Matches(labels.Set(server.GetLabels())) {
+					continue
+				}
+
+				match = true
+				break
 			}
 
 			if !match {
