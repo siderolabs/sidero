@@ -3,6 +3,19 @@ kind: ServerClass
 metadata:
   name: serverclass-sample
 spec:
+  selector:
+    matchLabels:
+      common-label: "true"
+    matchExpressions:
+      - key: zone
+        operator: In
+        values:
+          - central
+          - east
+      - key: environment
+        operator: NotIn
+        values:
+          - prod
   qualifiers:
     cpu:
       - manufacturer: "Intel(R) Corporation"
@@ -14,6 +27,3 @@ spec:
         serialNumber: Unknown
         skuNumber: Unknown
         version: Unknown
-    labelSelectors:
-      - key1: "val1"
-      - key2: "val2"

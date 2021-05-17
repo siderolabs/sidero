@@ -70,7 +70,14 @@ func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		return ctrl.Result{}, fmt.Errorf("unable to get serverclass: %w", err)
 	}
 
-	results := metalv1alpha1.FilterAcceptedServers(sl.Items, sc.Spec.Qualifiers)
+	results, err := metalv1alpha1.FilterServers(sl.Items,
+		metalv1alpha1.AcceptedServerFilter,
+		sc.SelectorFilter(),
+		sc.QualifiersFilter(),
+	)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("unable to filter servers: %w", err)
+	}
 
 	avail := []string{}
 	used := []string{}
