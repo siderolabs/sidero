@@ -5,12 +5,12 @@ weight: 3
 
 # Server Classes
 
-Server classes are a way to group distinct server resources.
-The "qualifiers" key allows the administrator to specify criteria upon which to group these servers.
-There are currently three keys: `cpu`, `systemInformation`, and `labelSelectors`.
-Each of these keys accepts a list of entries.
-The top level keys are a "logical AND", while the lists under each key are a "logical OR".
-Qualifiers that are not specified are not evaluated.
+Server classes are a way to group distinct server resources.  The "qualifiers"
+key allows the administrator to specify criteria upon which to group these
+servers.  There are currently four keys: `cpu`, `systemInformation`,
+`labelSelectors`, and `labelSelector`.  Each of these keys accepts a list of
+entries.  The top level keys are a "logical AND", while the lists under each
+key are a "logical OR".  Qualifiers that are not specified are not evaluated.
 
 An example:
 
@@ -27,7 +27,21 @@ spec:
       - manufacturer: Advanced Micro Devices, Inc.
         version: AMD Ryzen 7 2700X Eight-Core Processor
     labelSelectors:
-      - "my-server-label": "true"
+      - my-server-label: true
+    labelSelector:
+      matchLabels:
+        foo: bar
+      matchExpressions:
+        - key: topology.kubernetes.io/region
+          operator: In
+          values:
+            - central
+            - east
+        - key: environment
+          operator: NotIn
+          values:
+            - prod
 ```
 
-Servers would only be added to the above class if they had _EITHER_ CPU info, _AND_ the label associated with the server resource.
+Servers would only be added to the above class if they had _EITHER_ CPU info,
+_AND_ the label associated with the server resource.

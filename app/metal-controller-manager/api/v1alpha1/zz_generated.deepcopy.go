@@ -10,6 +10,7 @@ package v1alpha1
 
 import (
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/cluster-api/api/v1alpha3"
 )
@@ -417,6 +418,11 @@ func (in *ServerClassSpec) DeepCopyInto(out *ServerClassSpec) {
 		**out = **in
 	}
 	in.Qualifiers.DeepCopyInto(&out.Qualifiers)
+	if in.Selector != nil {
+		in, out := &in.Selector, &out.Selector
+		*out = new(metav1.LabelSelector)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.ConfigPatches != nil {
 		in, out := &in.ConfigPatches, &out.ConfigPatches
 		*out = make([]ConfigPatches, len(*in))

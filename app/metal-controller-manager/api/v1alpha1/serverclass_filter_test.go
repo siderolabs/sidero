@@ -5,6 +5,7 @@
 package v1alpha1_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,6 +18,12 @@ func TestFilterAcceptedServers(t *testing.T) {
 	t.Parallel()
 
 	atom := metalv1alpha1.Server{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"common-label": "true",
+				"zone":         "central",
+			},
+		},
 		Spec: metalv1alpha1.ServerSpec{
 			Accepted: true,
 			CPU: &metalv1alpha1.CPUInformation{
@@ -28,7 +35,8 @@ func TestFilterAcceptedServers(t *testing.T) {
 	ryzen := metalv1alpha1.Server{
 		ObjectMeta: metav1.ObjectMeta{
 			Labels: map[string]string{
-				"my-server-label": "true",
+				"common-label": "true",
+				"zone":         "east",
 			},
 		},
 		Spec: metalv1alpha1.ServerSpec{
@@ -45,7 +53,8 @@ func TestFilterAcceptedServers(t *testing.T) {
 	notAccepted := metalv1alpha1.Server{
 		ObjectMeta: metav1.ObjectMeta{
 			Labels: map[string]string{
-				"my-server-label": "true",
+				"common-label": "true",
+				"zone":         "west",
 			},
 		},
 		Spec: metalv1alpha1.ServerSpec{
@@ -63,6 +72,7 @@ func TestFilterAcceptedServers(t *testing.T) {
 	servers := []metalv1alpha1.Server{atom, ryzen, notAccepted}
 
 	testdata := map[string]struct {
+		s        *metav1.LabelSelector
 		q        metalv1alpha1.Qualifiers
 		expected []metalv1alpha1.Server
 	}{
@@ -90,7 +100,95 @@ func TestFilterAcceptedServers(t *testing.T) {
 			q: metalv1alpha1.Qualifiers{
 				LabelSelectors: []map[string]string{
 					{
-						"my-server-label": "true",
+						"common-label": "true",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
+		// This should probably only return atom. Leaving it as-is to
+		// avoid breaking changes before we remove LabelSelectors in
+		// favor of selectors.
+		"with multiple labels - single selector": {
+			q: metalv1alpha1.Qualifiers{
+				LabelSelectors: []map[string]string{
+					{
+						"common-label": "true",
+						"zone":         "central",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
+		"with multiple labels - multiple selectors": {
+			q: metalv1alpha1.Qualifiers{
+				LabelSelectors: []map[string]string{
+					{
+						"common-label": "true",
+					},
+					{
+						"zone": "central",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
+		"with same label key different label value": {
+			q: metalv1alpha1.Qualifiers{
+				LabelSelectors: []map[string]string{
+					{
+						"zone": "central",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{atom},
+		},
+		"selector - single MatchLabels single result": {
+			s: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"zone": "central",
+				},
+			},
+			expected: []metalv1alpha1.Server{atom},
+		},
+		"selector - single MatchLabels multiple results": {
+			s: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"common-label": "true",
+				},
+			},
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
+		"selector - multiple MatchLabels": {
+			s: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"zone":         "central",
+					"common-label": "true",
+				},
+			},
+			expected: []metalv1alpha1.Server{atom},
+		},
+		"selector - MatchExpressions common label key": {
+			s: &metav1.LabelSelector{
+				MatchExpressions: []metav1.LabelSelectorRequirement{
+					metav1.LabelSelectorRequirement{
+						Key:      "common-label",
+						Operator: "Exists",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
+		"selector - MatchExpressions multiple values": {
+			s: &metav1.LabelSelector{
+				MatchExpressions: []metav1.LabelSelectorRequirement{
+					metav1.LabelSelectorRequirement{
+						Key:      "zone",
+						Operator: "In",
+						Values: []string{
+							"east",
+							"west",
+						},
 					},
 				},
 			},
@@ -106,8 +204,16 @@ func TestFilterAcceptedServers(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			actual := metalv1alpha1.FilterAcceptedServers(servers, td.q)
-			assert.Equal(t, actual, td.expected)
+			fmt.Printf("### DEBUG0 ###\nname: %v\ns: %#v\nq: %#v\n", name, td.s, td.q)
+			sc := &metalv1alpha1.ServerClass{
+				Spec: metalv1alpha1.ServerClassSpec{
+					Selector:   td.s,
+					Qualifiers: td.q,
+				},
+			}
+			actual, err := sc.FilterServers(servers)
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, actual)
 		})
 	}
 }

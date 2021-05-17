@@ -22,6 +22,7 @@ type Qualifiers struct {
 type ServerClassSpec struct {
 	EnvironmentRef *corev1.ObjectReference `json:"environmentRef,omitempty"`
 	Qualifiers     Qualifiers              `json:"qualifiers"`
+	Selector       *metav1.LabelSelector   `json:"selector"`
 	ConfigPatches  []ConfigPatches         `json:"configPatches,omitempty"`
 }
 

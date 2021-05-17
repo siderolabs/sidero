@@ -17,3 +17,16 @@ spec:
     labelSelectors:
       - key1: "val1"
       - key2: "val2"
+    labelSelector:
+      matchLabels:
+        foo: bar
+      matchExpressions:
+        - key: topology.kubernetes.io/region
+          operator: In
+          values:
+            - central
+            - east
+        - key: environment
+          operator: NotIn
+          values:
+            - prod

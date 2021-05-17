@@ -4,7 +4,38 @@
 
 package v1alpha1
 
-import "sort"
+import (
+	"sort"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+)
+
+// FilterServers returns the subset of servers that:
+// - Are accepted.
+// - Match the ServerClass selection criteria.
+//
+// In case of error the returned slice will be nil.
+func (sc *ServerClass) FilterServers(servers []Server) ([]Server, error) {
+	s, err := metav1.LabelSelectorAsSelector(sc.Spec.Selector)
+	if err != nil {
+		return nil, err
+	}
+
+	matches := make([]Server, 0, len(servers))
+
+	for _, server := range servers {
+		if !server.Spec.Accepted {
+			continue
+		}
+
+		if sc.Spec.Selector == nil || s.Matches(labels.Set(server.GetLabels())) {
+			matches = append(matches, server)
+		}
+	}
+
+	return FilterAcceptedServers(matches, sc.Spec.Qualifiers), nil
+}
 
 // FilterAcceptedServers returns a new slice of Servers that are accepted and qualify.
 //

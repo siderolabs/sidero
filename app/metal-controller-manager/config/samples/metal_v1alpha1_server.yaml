@@ -5,3 +5,5 @@ metadata:
 spec:
   # Add fields here
   foo: bar
+  topology.kubernetes.io/region: central
+  environment: dev
