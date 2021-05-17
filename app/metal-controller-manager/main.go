@@ -8,10 +8,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	debug "github.com/talos-systems/go-debug"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
+	"golang.org/x/sync/errgroup"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -19,6 +24,7 @@ import (
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/tools/record"
+	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -27,6 +33,7 @@ import (
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/controllers"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/ipxe"
+	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/metadata"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/power/api"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/server"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/tftp"
@@ -38,6 +45,7 @@ import (
 const (
 	defaultMaxConcurrentReconciles = 10
 	debugAddr                      = ":9992"
+	httpPort                       = 8081
 )
 
 var (
@@ -48,6 +56,7 @@ var (
 //nolint:wsl
 func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
+	_ = capi.AddToScheme(scheme)
 
 	_ = metalv1alpha1.AddToScheme(scheme)
 	_ = infrav1.AddToScheme(scheme)
@@ -58,6 +67,7 @@ func main() {
 	var (
 		metricsAddr          string
 		apiEndpoint          string
+		apiPort              int
 		extraAgentKernelArgs string
 		enableLeaderElection bool
 		autoAcceptServers    bool
@@ -69,7 +79,8 @@ func main() {
 		testPowerSimulatedSilentFailureProb   float64
 	)
 
-	flag.StringVar(&apiEndpoint, "api-endpoint", "", "The endpoint used by the discovery environment.")
+	flag.StringVar(&apiEndpoint, "api-endpoint", "", "The endpoint (hostname or IP address) Sidero can be reached at from the servers.")
+	flag.IntVar(&apiPort, "api-port", httpPort, "The TCP port Sidero components can be reached at from the servers.")
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8081", "The address the metric endpoint binds to.")
 	flag.StringVar(&extraAgentKernelArgs, "extra-agent-kernel-args", "", "A comma delimited list of key-value pairs to be added to the agent environment kernel parameters.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", true, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
@@ -176,36 +187,38 @@ func main() {
 		}
 	}()
 
+	httpMux := http.NewServeMux()
+
 	setupLog.Info("starting iPXE server")
 
-	go func() {
-		if apiEndpoint == "" {
-			if endpoint, ok := os.LookupEnv("API_ENDPOINT"); ok {
-				apiEndpoint = endpoint
-			} else {
-				setupLog.Error(fmt.Errorf("no api endpoint found"), "unable to start iPXE server", "controller", "Environment")
-				os.Exit(1)
-			}
-		}
-
-		if err := ipxe.ServeIPXE(apiEndpoint, extraAgentKernelArgs, mgr.GetClient()); err != nil {
-			setupLog.Error(err, "unable to start iPXE server", "controller", "Environment")
+	if apiEndpoint == "" {
+		if endpoint, ok := os.LookupEnv("API_ENDPOINT"); ok {
+			apiEndpoint = endpoint
+		} else {
+			setupLog.Error(fmt.Errorf("no api endpoint found"), "unable to start iPXE server", "controller", "Environment")
 			os.Exit(1)
 		}
-	}()
+	}
+
+	if err := ipxe.RegisterIPXE(httpMux, apiEndpoint, apiPort, extraAgentKernelArgs, apiPort, mgr.GetClient()); err != nil {
+		setupLog.Error(err, "unable to start iPXE server", "controller", "Environment")
+		os.Exit(1)
+	}
+
+	setupLog.Info("starting metadata server")
+
+	if err := metadata.RegisterServer(httpMux, mgr.GetClient()); err != nil {
+		setupLog.Error(err, "unable to start metadata server", "controller", "Environment")
+		os.Exit(1)
+	}
 
 	setupLog.Info("starting internal API server")
 
-	go func() {
-		recorder := eventBroadcaster.NewRecorder(
-			mgr.GetScheme(),
-			corev1.EventSource{Component: "sidero-server"})
+	apiRecorder := eventBroadcaster.NewRecorder(
+		mgr.GetScheme(),
+		corev1.EventSource{Component: "sidero-server"})
 
-		if err := server.Serve(mgr.GetClient(), recorder, mgr.GetScheme(), autoAcceptServers, insecureWipe, autoBMCSetup, serverRebootTimeout); err != nil {
-			setupLog.Error(err, "unable to start API server", "controller", "Environment")
-			os.Exit(1)
-		}
-	}()
+	grpcServer := server.CreateServer(mgr.GetClient(), apiRecorder, mgr.GetScheme(), autoAcceptServers, insecureWipe, autoBMCSetup, serverRebootTimeout)
 
 	k8sClient, err := client.NewClient(nil)
 	if err != nil {
@@ -218,10 +231,49 @@ func main() {
 		os.Exit(1)
 	}
 
-	setupLog.Info("starting manager")
+	setupLog.Info("starting manager and HTTP server")
 
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-		setupLog.Error(err, "problem running manager")
+	var eg errgroup.Group
+
+	eg.Go(func() error {
+		err := mgr.Start(ctrl.SetupSignalHandler())
+		if err != nil {
+			setupLog.Error(err, "problem running manager")
+		}
+
+		return err
+	})
+
+	eg.Go(func() error {
+		// Go standard library doesn't support running HTTP/2 on non-TLS HTTP connections.
+		// Package h2c provides handling for HTTP/2 over plaintext connection.
+		// gRPC provides its own HTTP/2 server implementation, so that's not an issue for gRPC,
+		// but as we unify all endpoints under a single HTTP endpoint, we have to provide additional
+		// layer of support here.
+		h2s := &http2.Server{}
+
+		grpcHandler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.ProtoMajor == 2 && strings.HasPrefix(
+				req.Header.Get("Content-Type"), "application/grpc") {
+				// grpcServer provides internal gRPC API server
+				grpcServer.ServeHTTP(w, req)
+
+				return
+			}
+
+			// httpMux contains iPXE server and metadata server handlers
+			httpMux.ServeHTTP(w, req)
+		})
+
+		err := http.ListenAndServe(fmt.Sprintf(":%d", httpPort), h2c.NewHandler(grpcHandler, h2s))
+		if err != nil {
+			setupLog.Error(err, "problem running HTTP server")
+		}
+
+		return err
+	})
+
+	if err := eg.Wait(); err != nil {
 		os.Exit(1)
 	}
 }

@@ -14,25 +14,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ipxe
+  name: http
   namespace: system
 spec:
   ports:
-    - port: 80
+    - port: ${SIDERO_CONTROLLER_MANAGER_API_PORT:=8081}
       targetPort: http
-      protocol: TCP
-  selector:
-    control-plane: metal-controller-manager
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: api
-  namespace: system
-spec:
-  ports:
-    - port: 50100
-      targetPort: grpc
       protocol: TCP
   selector:
     control-plane: metal-controller-manager
@@ -61,6 +48,7 @@ spec:
           args:
             - --metrics-addr=127.0.0.1:8080
             - --api-endpoint=${SIDERO_CONTROLLER_MANAGER_API_ENDPOINT:=-}
+            - --api-port=${SIDERO_CONTROLLER_MANAGER_API_PORT:=8081}
             - --extra-agent-kernel-args=${SIDERO_CONTROLLER_MANAGER_EXTRA_AGENT_KERNEL_ARGS:=-}
             - --auto-accept-servers=${SIDERO_CONTROLLER_MANAGER_AUTO_ACCEPT_SERVERS:=false}
             - --insecure-wipe=${SIDERO_CONTROLLER_MANAGER_INSECURE_WIPE:=true}
@@ -77,9 +65,6 @@ spec:
               protocol: UDP
             - name: http
               containerPort: 8081
-              protocol: TCP
-            - name: grpc
-              containerPort: 50100
               protocol: TCP
           env:
             - name: API_ENDPOINT

@@ -6,9 +6,7 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"net"
 	"reflect"
 	"time"
 
@@ -27,10 +25,6 @@ import (
 
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/api"
-)
-
-const (
-	Port = "50100"
 )
 
 type server struct {
@@ -360,12 +354,7 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 	return resp, nil
 }
 
-func Serve(c controllerclient.Client, recorder record.EventRecorder, scheme *runtime.Scheme, autoAccept, insecureWipe, autoBMC bool, rebootTimeout time.Duration) error {
-	lis, err := net.Listen("tcp", ":"+Port)
-	if err != nil {
-		return fmt.Errorf("failed to listen: %v", err)
-	}
-
+func CreateServer(c controllerclient.Client, recorder record.EventRecorder, scheme *runtime.Scheme, autoAccept, insecureWipe, autoBMC bool, rebootTimeout time.Duration) *grpc.Server {
 	s := grpc.NewServer()
 
 	api.RegisterAgentServer(s, &server{
@@ -378,9 +367,5 @@ func Serve(c controllerclient.Client, recorder record.EventRecorder, scheme *run
 		rebootTimeout: rebootTimeout,
 	})
 
-	if err := s.Serve(lis); err != nil {
-		return fmt.Errorf("failed to serve: %v", err)
-	}
-
-	return nil
+	return s
 }

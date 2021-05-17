@@ -45,7 +45,7 @@ spec:
       - panic=0
       - printk.devkmsg=on
       - talos.platform=metal
-      - talos.config=http://$PUBLIC_IP:9091/configdata?uuid=
+      - talos.config=http://$PUBLIC_IP:8081/configdata?uuid=
   initrd:
     url: "https://github.com/talos-systems/talos/releases/download/v0.8.1/initramfs-amd64.xz"
     sha512: ""

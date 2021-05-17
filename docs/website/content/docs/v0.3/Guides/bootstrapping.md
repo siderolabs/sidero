@@ -90,7 +90,7 @@ Issue the following to create a single-node cluster:
 
 ```bash
 talosctl cluster create \
-  -p 69:69/udp,8081:8081/tcp,9091:9091/tcp,50100:50100/tcp \
+  -p 69:69/udp,8081:8081/tcp \
   --workers 0 \
   --endpoint $PUBLIC_IP
 ```
@@ -116,9 +116,7 @@ As of Cluster API version 0.3.9, Sidero is included as a default infrastructure 
 To install Sidero and the other Talos providers, simply issue:
 
 ```bash
-SIDERO_METADATA_SERVER_HOST_NETWORK=true \
-  SIDERO_METADATA_SERVER_PORT=9091 \
-  SIDERO_CONTROLLER_MANAGER_HOST_NETWORK=true \
+SIDERO_CONTROLLER_MANAGER_HOST_NETWORK=true \
   SIDERO_CONTROLLER_MANAGER_API_ENDPOINT=$PUBLIC_IP \
   clusterctl init -b talos -c talos -i sidero
 ```
@@ -184,7 +182,7 @@ spec:
       - panic=0
       - printk.devkmsg=on
       - talos.platform=metal
-      - talos.config=http://$PUBLIC_IP:9091/configdata?uuid=
+      - talos.config=http://$PUBLIC_IP:8081/configdata?uuid=
   initrd:
     url: "https://github.com/talos-systems/talos/releases/latest/download/initramfs-amd64.xz"
     sha512: ""

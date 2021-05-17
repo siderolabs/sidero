@@ -40,7 +40,7 @@ COMMON_ARGS += --build-arg=TOOLS=$(TOOLS)
 COMMON_ARGS += --build-arg=TALOS_RELEASE=$(TALOS_RELEASE)
 COMMON_ARGS += --build-arg=GO_BUILDFLAGS="$(GO_BUILDFLAGS)"
 
-all: manifests generate cluster-api-provider-sidero metal-controller-manager metal-metadata-server sfyra
+all: manifests generate cluster-api-provider-sidero metal-controller-manager sfyra
 
 
 # Help Menu
@@ -117,10 +117,6 @@ cluster-api-provider-sidero: ## Build the CAPI provider container image.
 
 .PHONY: metal-controller-manager
 metal-controller-manager: ## Build the CAPI provider container image.
-	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
-
-.PHONY: metal-metadata-server
-metal-metadata-server: ## Build the CAPI provider container image.
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
 .PHONY: release-notes

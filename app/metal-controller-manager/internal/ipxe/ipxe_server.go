@@ -28,7 +28,6 @@ import (
 
 	infrav1 "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/app/metal-controller-manager/internal/server"
 	"github.com/talos-systems/sidero/app/metal-controller-manager/pkg/constants"
 )
 
@@ -36,8 +35,6 @@ var (
 	ErrNotInUse     = errors.New("server not in use")
 	ErrBootFromDisk = errors.New("boot from disk")
 )
-
-const iPXEPort = 8081
 
 // bootFile is used when iPXE is booted without embedded script via iPXE request http://endpoint:8081/boot.ipxe.
 const bootFile = `#!ipxe
@@ -65,6 +62,7 @@ exit
 
 var (
 	apiEndpoint          string
+	apiPort              int
 	extraAgentKernelArgs string
 	c                    client.Client
 )
@@ -171,8 +169,9 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ServeIPXE(endpoint, args string, mgrClient client.Client) error {
+func RegisterIPXE(mux *http.ServeMux, endpoint string, port int, args string, iPXEPort int, mgrClient client.Client) error {
 	apiEndpoint = endpoint
+	apiPort = port
 	extraAgentKernelArgs = args
 	c = mgrClient
 
@@ -189,16 +188,12 @@ func ServeIPXE(endpoint, args string, mgrClient client.Client) error {
 		return err
 	}
 
-	mux := http.NewServeMux()
-
 	mux.Handle("/boot.ipxe", logRequest(http.HandlerFunc(bootFileHandler)))
 	mux.Handle("/ipxe", logRequest(http.HandlerFunc(ipxeHandler)))
 	mux.Handle("/env/", logRequest(http.StripPrefix("/env/", http.FileServer(http.Dir("/var/lib/sidero/env")))))
 	mux.Handle("/tftp/", logRequest(http.StripPrefix("/tftp/", http.FileServer(http.Dir("/var/lib/sidero/tftp")))))
 
-	log.Println("Listening...")
-
-	return http.ListenAndServe(fmt.Sprintf(":%d", iPXEPort), mux)
+	return nil
 }
 
 func logRequest(next http.Handler) http.Handler {
@@ -324,7 +319,7 @@ func newAgentEnvironment(arch string) *metalv1alpha1.Environment {
 		"console=tty0",
 		"console=ttyS0",
 		"printk.devkmsg=on",
-		fmt.Sprintf("%s=%s:%s", constants.AgentEndpointArg, apiEndpoint, server.Port),
+		fmt.Sprintf("%s=%s:%d", constants.AgentEndpointArg, apiEndpoint, apiPort),
 	}
 
 	cmdline := procfs.NewCmdline(strings.Join(args, " "))
