@@ -12,7 +12,7 @@
     "gridsome": "^0.7.0",
     "gridsome-plugin-remark-mermaid": "^1.0.1",
     "gridsome-source-docs": "^0.1.0",
-    "slugify": "^1.4.5"
+    "slugify": "^1.5.3"
   },
   "devDependencies": {
     "@gridsome/plugin-sitemap": "^0.2.3",
