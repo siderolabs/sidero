@@ -417,6 +417,7 @@ func (in *ServerClassSpec) DeepCopyInto(out *ServerClassSpec) {
 		**out = **in
 	}
 	in.Qualifiers.DeepCopyInto(&out.Qualifiers)
+	in.Selector.DeepCopyInto(&out.Selector)
 	if in.ConfigPatches != nil {
 		in, out := &in.ConfigPatches, &out.ConfigPatches
 		*out = make([]ConfigPatches, len(*in))

@@ -17,6 +17,12 @@ func TestFilterAcceptedServers(t *testing.T) {
 	t.Parallel()
 
 	atom := metalv1alpha1.Server{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{
+				"common-label": "true",
+				"zone":         "central",
+			},
+		},
 		Spec: metalv1alpha1.ServerSpec{
 			Accepted: true,
 			CPU: &metalv1alpha1.CPUInformation{
@@ -28,7 +34,8 @@ func TestFilterAcceptedServers(t *testing.T) {
 	ryzen := metalv1alpha1.Server{
 		ObjectMeta: metav1.ObjectMeta{
 			Labels: map[string]string{
-				"my-server-label": "true",
+				"common-label": "true",
+				"zone":         "east",
 			},
 		},
 		Spec: metalv1alpha1.ServerSpec{
@@ -45,7 +52,8 @@ func TestFilterAcceptedServers(t *testing.T) {
 	notAccepted := metalv1alpha1.Server{
 		ObjectMeta: metav1.ObjectMeta{
 			Labels: map[string]string{
-				"my-server-label": "true",
+				"common-label": "true",
+				"zone":         "west",
 			},
 		},
 		Spec: metalv1alpha1.ServerSpec{
@@ -63,9 +71,14 @@ func TestFilterAcceptedServers(t *testing.T) {
 	servers := []metalv1alpha1.Server{atom, ryzen, notAccepted}
 
 	testdata := map[string]struct {
+		s        metav1.LabelSelector
 		q        metalv1alpha1.Qualifiers
 		expected []metalv1alpha1.Server
 	}{
+		"empty selector - empty qualifier": {
+			// Matches all servers
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
 		"Intel only": {
 			q: metalv1alpha1.Qualifiers{
 				CPU: []metalv1alpha1.CPUInformation{
@@ -90,11 +103,144 @@ func TestFilterAcceptedServers(t *testing.T) {
 			q: metalv1alpha1.Qualifiers{
 				LabelSelectors: []map[string]string{
 					{
-						"my-server-label": "true",
+						"common-label": "true",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
+		// This should probably only return atom. Leaving it as-is to
+		// avoid breaking changes before we remove LabelSelectors in
+		// favor of Selector.
+		"with multiple labels - single selector": {
+			q: metalv1alpha1.Qualifiers{
+				LabelSelectors: []map[string]string{
+					{
+						"common-label": "true",
+						"zone":         "central",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
+		"with multiple labels - multiple selectors": {
+			q: metalv1alpha1.Qualifiers{
+				LabelSelectors: []map[string]string{
+					{
+						"common-label": "true",
+					},
+					{
+						"zone": "central",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
+		"with same label key different label value": {
+			q: metalv1alpha1.Qualifiers{
+				LabelSelectors: []map[string]string{
+					{
+						"zone": "central",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{atom},
+		},
+		"selector - single MatchLabels single result": {
+			s: metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"zone": "central",
+				},
+			},
+			expected: []metalv1alpha1.Server{atom},
+		},
+		"selector - single MatchLabels multiple results": {
+			s: metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"common-label": "true",
+				},
+			},
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
+		"selector - multiple MatchLabels": {
+			s: metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"zone":         "central",
+					"common-label": "true",
+				},
+			},
+			expected: []metalv1alpha1.Server{atom},
+		},
+		"selector - MatchExpressions common label key": {
+			s: metav1.LabelSelector{
+				MatchExpressions: []metav1.LabelSelectorRequirement{
+					{
+						Key:      "common-label",
+						Operator: "Exists",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{atom, ryzen},
+		},
+		"selector - MatchExpressions multiple values": {
+			s: metav1.LabelSelector{
+				MatchExpressions: []metav1.LabelSelectorRequirement{
+					{
+						Key:      "zone",
+						Operator: "In",
+						Values: []string{
+							"east",
+							"west",
+						},
 					},
 				},
 			},
 			expected: []metalv1alpha1.Server{ryzen},
+		},
+		"selector and qualifiers both match": {
+			s: metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"common-label": "true",
+				},
+			},
+			q: metalv1alpha1.Qualifiers{
+				SystemInformation: []metalv1alpha1.SystemInformation{
+					{
+						Manufacturer: "QEMU",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{ryzen},
+		},
+		"selector and qualifiers with disqualifying selector": {
+			s: metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"common-label": "no-match",
+				},
+			},
+			q: metalv1alpha1.Qualifiers{
+				SystemInformation: []metalv1alpha1.SystemInformation{
+					{
+						Manufacturer: "QEMU",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{},
+		},
+		"selector and qualifiers with disqualifying qualifier": {
+			s: metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"common-label": "true",
+				},
+			},
+			q: metalv1alpha1.Qualifiers{
+				SystemInformation: []metalv1alpha1.SystemInformation{
+					{
+						Manufacturer: "Gateway",
+					},
+				},
+			},
+			expected: []metalv1alpha1.Server{},
 		},
 		metalv1alpha1.ServerClassAny: {
 			expected: []metalv1alpha1.Server{atom, ryzen},
@@ -106,8 +252,19 @@ func TestFilterAcceptedServers(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			actual := metalv1alpha1.FilterAcceptedServers(servers, td.q)
-			assert.Equal(t, actual, td.expected)
+			sc := &metalv1alpha1.ServerClass{
+				Spec: metalv1alpha1.ServerClassSpec{
+					Selector:   td.s,
+					Qualifiers: td.q,
+				},
+			}
+			actual, err := metalv1alpha1.FilterServers(servers,
+				metalv1alpha1.AcceptedServerFilter,
+				sc.SelectorFilter(),
+				sc.QualifiersFilter(),
+			)
+			assert.NoError(t, err)
+			assert.Equal(t, td.expected, actual)
 		})
 	}
 }

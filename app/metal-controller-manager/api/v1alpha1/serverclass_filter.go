@@ -4,19 +4,37 @@
 
 package v1alpha1
 
-import "sort"
+import (
+	"fmt"
+	"sort"
 
-// FilterAcceptedServers returns a new slice of Servers that are accepted and qualify.
-//
-// Returned Servers are always sorted by name for stable results.
-func FilterAcceptedServers(servers []Server, q Qualifiers) []Server {
-	res := make([]Server, 0, len(servers))
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+)
 
-	for _, server := range servers {
-		// skip non-accepted servers
-		if !server.Spec.Accepted {
-			continue
+// AcceptedServerFilter matches Servers that have Spec.Accepted set to true.
+func AcceptedServerFilter(s Server) (bool, error) {
+	return s.Spec.Accepted, nil
+}
+
+// SelectorFilter returns a ServerFilter that matches servers against the
+// serverclass's selector field.
+func (sc *ServerClass) SelectorFilter() func(Server) (bool, error) {
+	return func(server Server) (bool, error) {
+		s, err := metav1.LabelSelectorAsSelector(&sc.Spec.Selector)
+		if err != nil {
+			return false, fmt.Errorf("failed to get selector from labelselector: %v", err)
 		}
+
+		return s.Matches(labels.Set(server.GetLabels())), nil
+	}
+}
+
+// QualifiersFilter returns a ServerFilter that matches servers against the
+// serverclass's qualifiers field.
+func (sc *ServerClass) QualifiersFilter() func(Server) (bool, error) {
+	return func(server Server) (bool, error) {
+		q := sc.Spec.Qualifiers
 
 		// check CPU qualifiers if they are present
 		if filters := q.CPU; len(filters) > 0 {
@@ -30,7 +48,7 @@ func FilterAcceptedServers(servers []Server, q Qualifiers) []Server {
 			}
 
 			if !match {
-				continue
+				return false, nil
 			}
 		}
 
@@ -45,7 +63,7 @@ func FilterAcceptedServers(servers []Server, q Qualifiers) []Server {
 			}
 
 			if !match {
-				continue
+				return false, nil
 			}
 		}
 
@@ -62,14 +80,41 @@ func FilterAcceptedServers(servers []Server, q Qualifiers) []Server {
 			}
 
 			if !match {
-				continue
+				return false, nil
 			}
 		}
 
-		res = append(res, server)
+		return true, nil
+	}
+}
+
+// FilterServers returns the subset of servers that pass all provided filters.
+// In case of error the returned slice will be nil.
+func FilterServers(servers []Server, filters ...func(Server) (bool, error)) ([]Server, error) {
+	matches := make([]Server, 0, len(servers))
+
+	for _, server := range servers {
+		match := true
+
+		for _, filter := range filters {
+			var err error
+
+			match, err = filter(server)
+			if err != nil {
+				return nil, fmt.Errorf("failed to filter server: %v", err)
+			}
+
+			if !match {
+				break
+			}
+		}
+
+		if match {
+			matches = append(matches, server)
+		}
 	}
 
-	sort.Slice(res, func(i, j int) bool { return res[i].Name < res[j].Name })
+	sort.Slice(matches, func(i, j int) bool { return matches[i].Name < matches[j].Name })
 
-	return res
+	return matches, nil
 }

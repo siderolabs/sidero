@@ -15,6 +15,10 @@ apiVersion: metal.sidero.dev/v1alpha1
 kind: Server
 metadata:
   name: 00000000-0000-0000-0000-d05099d333e0
+  labels:
+    common-label: "true"
+    zone: east
+    environment: test
 spec:
   accepted: false
   configPatches:
@@ -28,12 +32,7 @@ spec:
     manufacturer: Intel(R) Corporation
     version: Intel(R) Atom(TM) CPU C3558 @ 2.20GHz
   system:
-    family: Unknown
-    manufacturer: Unknown
-    productName: Unknown
-    serialNumber: Unknown
-    skuNumber: Unknown
-    version: Unknown
+    manufacturer: Dell Inc.
 ```
 
 ## Installation Disk
