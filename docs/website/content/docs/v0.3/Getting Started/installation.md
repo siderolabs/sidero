@@ -24,3 +24,13 @@ variables or as variables in the `clusterctl` configuration:
 * `SIDERO_CONTROLLER_MANAGER_AUTO_BMC_SETUP` (`true`): automatically attempt to configure the BMC with a `sidero` user that will be used for all IPMI tasks.
 * `SIDERO_CONTROLLER_MANAGER_INSECURE_WIPE` (`true`): wipe only the first megabyte of each disk on the server, otherwise wipe the full disk
 * `SIDERO_CONTROLLER_MANAGER_SERVER_REBOOT_TIMEOUT` (`20m`): timeout for the server reboot (how long it might take for the server to be rebooted before Sidero retries an IPMI reboot operation)
+
+Sidero provides two endpoints which should be made available to the infrastructure:
+
+* TCP port 8081 which provides combined iPXE, metadata and gRPC service (external endpoint should be passed to Sidero as `SIDERO_CONTROLLER_MANAGER_API_ENDPOINT` and  `SIDERO_CONTROLLER_MANAGER_API_PORT`)
+* UDP port 69 for the TFTP service (DHCP server should point the nodes to PXE boot from that IP)
+
+These endpoints could be exposed to the infrastructure using different strategies:
+
+* running `sidero-controller-manager` on the host network.
+* using Kubernetes load balancers (e.g. MetalLB), ingress controllers, etc.
