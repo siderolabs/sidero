@@ -213,12 +213,13 @@ COPY --from=fmt-build /src /
 #
 # The markdownlint target performs linting on Markdown files.
 #
-FROM node:8.16.1-alpine AS lint-markdown
+FROM node:16.1.0-alpine AS lint-markdown
+WORKDIR /opt
 RUN npm install -g markdownlint-cli@0.23.2
-RUN npm i sentences-per-line
+RUN npm install sentences-per-line
 WORKDIR /src
 COPY --from=base /src .
-RUN markdownlint --ignore '**/hack/chglog/**' --rules /node_modules/sentences-per-line/index.js .
+RUN markdownlint --ignore '**/hack/chglog/**' --rules /opt/node_modules/sentences-per-line/index.js .
 #
 # The sfyra-build target builds the Sfyra source.
 #

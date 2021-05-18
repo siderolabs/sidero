@@ -20,8 +20,8 @@ require (
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
-	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.11
-	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.11
+	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.12
+	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.12
 	github.com/talos-systems/go-blockdevice v0.1.1-0.20201218174450-f2728a581972
 	github.com/talos-systems/go-debug v0.2.0
 	github.com/talos-systems/go-kmsg v0.1.0
@@ -37,7 +37,7 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6
 	golang.org/x/tools v0.0.0-20210101214203-2dba1e4ea05c // indirect
-	google.golang.org/grpc v1.37.0
+	google.golang.org/grpc v1.37.1
 	google.golang.org/protobuf v1.26.0
 	k8s.io/api v0.19.3
 	k8s.io/apiextensions-apiserver v0.19.1
