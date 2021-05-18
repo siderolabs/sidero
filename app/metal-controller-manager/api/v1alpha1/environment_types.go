@@ -5,8 +5,15 @@
 package v1alpha1
 
 import (
+	"fmt"
+	"sort"
+
+	"github.com/talos-systems/talos/pkg/machinery/kernel"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+// EnvironmentDefault is an automatically created Environment.
+const EnvironmentDefault = "default"
 
 type Asset struct {
 	URL    string `json:"url,omitempty"`
@@ -63,6 +70,30 @@ type EnvironmentList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []Environment `json:"items"`
+}
+
+// EnvironmentDefaultSpec returns EnvironmentDefault's spec.
+func EnvironmentDefaultSpec(talosRelease, apiEndpoint string, apiPort uint16) *EnvironmentSpec {
+	args := make([]string, 0, len(kernel.DefaultArgs)+6)
+	args = append(args, kernel.DefaultArgs...)
+	args = append(args, "console=tty0", "console=ttyS1,115200n8", "earlyprintk=ttyS1,115200n8")
+	args = append(args, "initrd=initramfs.xz", "talos.platform=metal")
+	args = append(args, fmt.Sprintf("talos.config=http://%s:%d/configdata?uuid=", apiEndpoint, apiPort))
+	sort.Strings(args)
+
+	return &EnvironmentSpec{
+		Kernel: Kernel{
+			Asset: Asset{
+				URL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz-amd64", talosRelease),
+			},
+			Args: args,
+		},
+		Initrd: Initrd{
+			Asset: Asset{
+				URL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs-amd64.xz", talosRelease),
+			},
+		},
+	}
 }
 
 func init() {

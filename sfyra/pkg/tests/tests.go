@@ -71,12 +71,16 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			TestEnvironmentDefault(ctx, metalClient, cluster, options.KernelURL, options.InitrdURL),
 		},
 		{
+			"TestEnvironmentCreate",
+			TestEnvironmentCreate(ctx, metalClient, cluster, options.KernelURL, options.InitrdURL),
+		},
+		{
 			"TestServerClassAny",
 			TestServerClassAny(ctx, metalClient, vmSet),
 		},
 		{
-			"TestServerClassDefault",
-			TestServerClassDefault(ctx, metalClient, vmSet),
+			"TestServerClassCreate",
+			TestServerClassCreate(ctx, metalClient, vmSet),
 		},
 		{
 			"TestServerClassPatch",

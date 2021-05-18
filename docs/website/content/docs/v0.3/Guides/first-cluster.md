@@ -30,7 +30,7 @@ kubectl patch deploy -n sidero-system sidero-controller-manager --type='json' -p
 #### Update Environment
 
 The metadata server's information needs to be updated in the default environment.
-Edit the environment with `kubectl edit environment default` and update the `talos.config` kernel arg with the IP of one of the management plane nodes (or the DNS entry you created) and the nodeport we specified above (30005).
+Edit the environment with `kubectl edit environment default` and update the `talos.config` kernel arg with the IP of one of the management plane nodes (or the DNS entry you created).
 
 ### Update DHCP
 
@@ -123,7 +123,7 @@ Note that there are several variables that should be set in order for the templa
 - `CONTROL_PLANE_SERVERCLASS`: The server class to use for control plane nodes.
 - `WORKER_SERVERCLASS`: The server class to use for worker nodes.
 - `KUBERNETES_VERSION`: The version of Kubernetes to deploy (e.g. `v1.19.4`).
-- `TALOS_VERSION`: This should correspond to the minor version of Talos that you will be deploying (e.g. `v0.9`).
+- `TALOS_VERSION`: This should correspond to the minor version of Talos that you will be deploying (e.g. `v0.10`).
   This value is used in determining the fields present in the machine configuration that gets generated for Talos nodes.
   Note that the default is currently `v0.8`.
 

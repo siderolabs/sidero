@@ -19,6 +19,7 @@ import (
 	multierror "github.com/hashicorp/go-multierror"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -30,37 +31,38 @@ import (
 // EnvironmentReconciler reconciles a Environment object.
 type EnvironmentReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	Log          logr.Logger
+	Scheme       *runtime.Scheme
+	TalosRelease string
+	APIEndpoint  string
+	APIPort      uint16
 }
 
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=environments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=environments/status,verbs=get;update;patch
 
 func (r *EnvironmentReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	return r.reconcile(req)
-}
-
-func (r *EnvironmentReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
-	return ctrl.NewControllerManagedBy(mgr).
-		WithOptions(options).
-		For(&metalv1alpha1.Environment{}).
-		Complete(r)
-}
-
-func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()
 
 	l := r.Log.WithValues("environment", req.Name)
+	l.Info("reconciling")
+
+	//nolint:godox
+	// TODO: We probably should use admission webhooks instead (or in additional) to prevent
+	// unwanted edits instead of "fixing" the resource after the fact.
+	if req.Name == metalv1alpha1.EnvironmentDefault {
+		if err := ReconcileEnvironmentDefault(ctx, r.Client, r.TalosRelease, r.APIEndpoint, r.APIPort); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		// do not return; re-reconcile it to update status
+	} //nolint:wsl
 
 	var env metalv1alpha1.Environment
 
 	if err := r.Get(ctx, req.NamespacedName, &env); err != nil {
-		if apierrors.IsNotFound(err) {
-			return ctrl.Result{}, nil
-		}
-
-		return ctrl.Result{}, fmt.Errorf("unable to get environment: %w", err)
+		l.Error(err, "failed fetching resource")
+		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
 	envs := filepath.Join("/var/lib/sidero/env", env.GetName())
@@ -178,6 +180,36 @@ func (r *EnvironmentReconciler) reconcile(req ctrl.Request) (ctrl.Result, error)
 	}
 
 	return ctrl.Result{}, nil
+}
+
+// ReconcileEnvironmentDefault ensures that Environment "default" exist.
+func ReconcileEnvironmentDefault(ctx context.Context, c client.Client, talosRelease, apiEndpoint string, apiPort uint16) error {
+	key := types.NamespacedName{
+		Name: metalv1alpha1.EnvironmentDefault,
+	}
+
+	env := metalv1alpha1.Environment{}
+	err := c.Get(ctx, key, &env)
+
+	if apierrors.IsNotFound(err) {
+		env.Name = metalv1alpha1.EnvironmentDefault
+		env.Spec = *metalv1alpha1.EnvironmentDefaultSpec(talosRelease, apiEndpoint, apiPort)
+
+		err = c.Create(ctx, &env)
+	}
+
+	return err
+}
+
+func (r *EnvironmentReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
+	if r.TalosRelease == "" {
+		return errors.New("TalosRelease is not set")
+	}
+
+	return ctrl.NewControllerManagedBy(mgr).
+		WithOptions(options).
+		For(&metalv1alpha1.Environment{}).
+		Complete(r)
 }
 
 func save(ctx context.Context, asset metalv1alpha1.Asset, file string) error {

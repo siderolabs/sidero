@@ -4,23 +4,25 @@ metadata:
   name: default
 spec:
   kernel:
-    url: 'https://github.com/talos-systems/talos/releases/download/v0.4.0-alpha.5/vmlinuz'
-    sha512: ''
+    url: "https://github.com/talos-systems/talos/releases/download/v0.10.2/vmlinuz-amd64"
+    sha512: ""
     args:
-      - initrd=initramfs.xz
-      - page_poison=1
-      - slab_nomerge
-      - slub_debug=P
-      - pti=on
-      - random.trust_cpu=on
-      - ima_template=ima-ng
+      - console=tty0
+      - console=ttyS1,115200n8
+      - consoleblank=0
+      - earlyprintk=ttyS1,115200n8
       - ima_appraise=fix
       - ima_hash=sha512
-      - console=tty0
-      - console=ttyS0
+      - ima_template=ima-ng
+      - init_on_alloc=1
+      - initrd=initramfs.xz
+      - nvme_core.io_timeout=4294967295
       - printk.devkmsg=on
+      - pti=on
+      - random.trust_cpu=on
+      - slab_nomerge=
+      - talos.config=http://192.168.1.10:8081/configdata?uuid=
       - talos.platform=metal
-      - talos.config=http://192.168.1.10:8080/assets/controlplane.yaml
   initrd:
-    url: 'https://github.com/talos-systems/talos/releases/download/v0.4.0-alpha.5/initramfs.xz'
-    sha512: ''
+    url: "https://github.com/talos-systems/talos/releases/download/v0.10.2/initramfs-amd64.xz"
+    sha512: ""

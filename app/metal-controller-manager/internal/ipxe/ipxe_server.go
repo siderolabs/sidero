@@ -305,20 +305,20 @@ func newEnvironment(server *metalv1alpha1.Server, serverBinding *infrav1.ServerB
 
 func newAgentEnvironment(arch string) *metalv1alpha1.Environment {
 	args := []string{
-		"initrd=initramfs.xz",
-		"page_poison=1",
-		"slab_nomerge",
-		"slub_debug=P",
-		"pti=on",
-		"panic=30",
-		"random.trust_cpu=on",
-		"ima_template=ima-ng",
-		"ima_appraise=fix",
-		"ima_hash=sha512",
-		"ip=dhcp",
 		"console=tty0",
 		"console=ttyS0",
+		"ima_appraise=fix",
+		"ima_hash=sha512",
+		"ima_template=ima-ng",
+		"initrd=initramfs.xz",
+		"ip=dhcp",
+		"page_poison=1",
+		"panic=30",
 		"printk.devkmsg=on",
+		"pti=on",
+		"random.trust_cpu=on",
+		"slab_nomerge=",
+		"slub_debug=P",
 		fmt.Sprintf("%s=%s:%d", constants.AgentEndpointArg, apiEndpoint, apiPort),
 	}
 
@@ -347,7 +347,7 @@ func newAgentEnvironment(arch string) *metalv1alpha1.Environment {
 func newDefaultEnvironment() (env *metalv1alpha1.Environment, err error) {
 	env = &metalv1alpha1.Environment{}
 
-	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: "default"}, env); err != nil {
+	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: metalv1alpha1.EnvironmentDefault}, env); err != nil {
 		return nil, err
 	}
 
