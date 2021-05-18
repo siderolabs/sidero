@@ -948,10 +948,10 @@ github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69
 github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/syndtr/gocapability v0.0.0-20180916011248-d98352740cb2/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.10/go.mod h1:mOZ/olE9x+nAFkA8WHZqGec9z1ZEZ+vDhMauyn4JYEc=
-github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.11 h1:kxGlrgxYP/EwT5msdsLFItUZSE/uHygUYi31NTLGJIc=
-github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.11/go.mod h1:mOZ/olE9x+nAFkA8WHZqGec9z1ZEZ+vDhMauyn4JYEc=
-github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.11 h1:dijg3BdwBMRGQQgb+wvQwfoGFt3sNz9Lu0fKGqGE1vA=
-github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.11/go.mod h1:tUpcSpMivJtbDCLNEy8OQc+dyrPpY6EuIx230R8qNy8=
+github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.12 h1:+cbdEpnhJXYw9NF/9qAC9Ly5b4SwwKCrcCx5UUfs8l0=
+github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.12/go.mod h1:YX/xq65oTwRyztlG8dfwX7+9tZR3RY6uqBaoPrrDHAA=
+github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.12 h1:rn7f0jNFT2nyvCj5Erx06EIzZG1cujDhuM7a1oHz1Wc=
+github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.12/go.mod h1:e6Q5Gqi/wUk0rMFkVTsI3O+VK0IoIJUnNhPUxL8z9as=
 github.com/talos-systems/crypto v0.2.1-0.20210202170911-39584f1b6e54 h1:2IGs3f0qG7f33Fv37XuYzIMxLARl4dcpwahZXLmdT2A=
 github.com/talos-systems/crypto v0.2.1-0.20210202170911-39584f1b6e54/go.mod h1:OXCK52Q0dzm88YRG4VdTBdidkPUtqrCxCyW7bUs4DAw=
 github.com/talos-systems/go-blockdevice v0.1.1-0.20201218174450-f2728a581972/go.mod h1:efEE9wjtgxiovqsZAV39xlOd/AOI/0sLuZqb5jEgeqo=
@@ -986,6 +986,7 @@ github.com/talos-systems/os-runtime v0.0.0-20210315190223-7b3d14457439/go.mod h1
 github.com/talos-systems/talos v0.9.3 h1:Zlak+rApXhCz0ap0R5qvp4sUvYLoYWBRZ03n9FaXphc=
 github.com/talos-systems/talos v0.9.3/go.mod h1:oiw/BOdugthkRS7yDm/v4bgdH9uSqaiAmllUmKyaEsI=
 github.com/talos-systems/talos/pkg/machinery v0.0.0-20210216142802-8d7a36cc0cc2/go.mod h1:hhWsbfLrP53M03VRmJ5j92yimTHx0NBwngaXnvKkPE0=
+github.com/talos-systems/talos/pkg/machinery v0.0.0-20210218160848-32d25885288f/go.mod h1:7xqrV27kGtf2On8mrFjhv6dlNBRvtYsr+1npSZXJDlc=
 github.com/talos-systems/talos/pkg/machinery v0.0.0-20210302191918-8ffb55943c71/go.mod h1:iXEEFjuw0F65yZw10nKBd8XI4SBQNfJ0J02Mt26pfkA=
 github.com/talos-systems/talos/pkg/machinery v0.0.0-20210416105550-2b83440d6f7f h1:zBxe/T2FTXW8f9mda2LwRIDbFAa5MT5ISnEFfAwI1aU=
 github.com/talos-systems/talos/pkg/machinery v0.0.0-20210416105550-2b83440d6f7f/go.mod h1:gneeHzNAhtCoTypG5KiYNshKNH+b5UldUl66psuuP4Q=
@@ -1488,8 +1489,8 @@ google.golang.org/grpc v1.30.0/go.mod h1:N36X2cJ7JwdamYAgDz+s+rVMFjt3numwzf/HckM
 google.golang.org/grpc v1.31.0/go.mod h1:N36X2cJ7JwdamYAgDz+s+rVMFjt3numwzf/HckM8pak=
 google.golang.org/grpc v1.32.0/go.mod h1:N36X2cJ7JwdamYAgDz+s+rVMFjt3numwzf/HckM8pak=
 google.golang.org/grpc v1.36.0/go.mod h1:qjiiYl8FncCW8feJPdyg3v6XW24KsRHe+dy9BAGRRjU=
-google.golang.org/grpc v1.37.0 h1:uSZWeQJX5j11bIQ4AJoj+McDBo29cY1MCoC1wO3ts+c=
-google.golang.org/grpc v1.37.0/go.mod h1:NREThFqKR1f3iQ6oBuvc5LadQuXVGo9rkm5ZGrQdJfM=
+google.golang.org/grpc v1.37.1 h1:ARnQJNWxGyYJpdf/JXscNlQr/uv607ZPU9Z7ogHi+iI=
+google.golang.org/grpc v1.37.1/go.mod h1:NREThFqKR1f3iQ6oBuvc5LadQuXVGo9rkm5ZGrQdJfM=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
 google.golang.org/protobuf v0.0.0-20200221191635-4d8936d0db64/go.mod h1:kwYJMbMJ01Woi6D6+Kah6886xMZcty6N08ah7+eCXa0=
 google.golang.org/protobuf v0.0.0-20200228230310-ab0ca4ff8a60/go.mod h1:cfTl7dwQJ+fmap5saPgwCLgHXTUD7jkjRqWcaiX5VyM=
