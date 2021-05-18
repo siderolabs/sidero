@@ -1,4 +1,14 @@
 [build]
-  base = "docs/website/"
+  base = "website"
+  publish = "dist"
+  command = "gridsome build"
+
+[context.deploy-preview]
+  base = "website"
+  publish = "dist"
+  command = "gridsome build"
+
+[context.branch-deploy]
+  base = "website"
   publish = "dist"
   command = "gridsome build"

@@ -56,7 +56,7 @@ func TestMachineDeploymentReconcile(ctx context.Context, metalClient client.Clie
 
 			err = metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: machineDeploymentName}, &machineDeployment)
 			if err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			if machineDeployment.Status.UnavailableReplicas != replicas {
@@ -71,7 +71,7 @@ func TestMachineDeploymentReconcile(ctx context.Context, metalClient client.Clie
 		err = retry.Constant(10*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
 			err = metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: machineDeploymentName}, &machineDeployment)
 			if err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			if v1alpha3.MachineDeploymentPhase(machineDeployment.Status.Phase) != v1alpha3.MachineDeploymentPhaseRunning {
@@ -167,7 +167,7 @@ func TestMetalMachineServerRefReconcile(ctx context.Context, metalClient client.
 
 		require.NoError(t, retry.Constant(time.Minute, retry.WithUnits(5*time.Second)).Retry(func() error {
 			if err := metalClient.Get(ctx, types.NamespacedName{Namespace: serverBinding.Spec.MetalMachineRef.Namespace, Name: serverBinding.Spec.MetalMachineRef.Name}, &metalMachine); err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			if metalMachine.Spec.ServerRef == nil {

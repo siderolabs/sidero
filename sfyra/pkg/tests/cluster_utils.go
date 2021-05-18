@@ -143,7 +143,7 @@ func deleteCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 		if err == nil {
 			err = metalClient.Delete(ctx, &cluster)
 			if err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			return retry.ExpectedError(fmt.Errorf("cluster is not deleted yet"))
@@ -153,6 +153,6 @@ func deleteCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 			return nil
 		}
 
-		return retry.UnexpectedError(err)
+		return err
 	}))
 }

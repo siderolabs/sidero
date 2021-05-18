@@ -153,7 +153,7 @@ func scale(ctx context.Context, metalClient client.Client, name string, obj runt
 
 		err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: name}, obj)
 		if err != nil {
-			return retry.UnexpectedError(err)
+			return err
 		}
 
 		err = verify(obj)
