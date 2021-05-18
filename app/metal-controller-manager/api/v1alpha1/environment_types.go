@@ -76,7 +76,7 @@ type EnvironmentList struct {
 func EnvironmentDefaultSpec(talosRelease, apiEndpoint string, apiPort uint16) *EnvironmentSpec {
 	args := make([]string, 0, len(kernel.DefaultArgs)+6)
 	args = append(args, kernel.DefaultArgs...)
-	args = append(args, "console=tty0", "console=ttyS1,115200n8", "earlyprintk=ttyS1,115200n8")
+	args = append(args, "console=tty0", "console=ttyS0", "earlyprintk=ttyS0")
 	args = append(args, "initrd=initramfs.xz", "talos.platform=metal")
 	args = append(args, fmt.Sprintf("talos.config=http://%s:%d/configdata?uuid=", apiEndpoint, apiPort))
 	sort.Strings(args)

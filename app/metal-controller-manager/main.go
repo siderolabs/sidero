@@ -72,6 +72,7 @@ func main() {
 		apiEndpoint          string
 		apiPort              int
 		extraAgentKernelArgs string
+		bootFromDiskMethod   string
 		enableLeaderElection bool
 		autoAcceptServers    bool
 		insecureWipe         bool
@@ -86,6 +87,7 @@ func main() {
 	flag.IntVar(&apiPort, "api-port", httpPort, "The TCP port Sidero components can be reached at from the servers.")
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8081", "The address the metric endpoint binds to.")
 	flag.StringVar(&extraAgentKernelArgs, "extra-agent-kernel-args", "", "A comma delimited list of key-value pairs to be added to the agent environment kernel parameters.")
+	flag.StringVar(&bootFromDiskMethod, "boot-from-disk-method", string(ipxe.BootIPXEExit), "Default method to use to boot server from disk if it hits iPXE endpoint after install.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", true, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&autoAcceptServers, "auto-accept-servers", false, "Add servers as 'accepted' when they register with Sidero API.")
 	flag.BoolVar(&insecureWipe, "insecure-wipe", true, "Wipe head of the disk only (if false, wipe whole disk).")
@@ -211,7 +213,7 @@ func main() {
 
 	setupLog.Info("starting iPXE server")
 
-	if err := ipxe.RegisterIPXE(httpMux, apiEndpoint, apiPort, extraAgentKernelArgs, apiPort, mgr.GetClient()); err != nil {
+	if err := ipxe.RegisterIPXE(httpMux, apiEndpoint, apiPort, extraAgentKernelArgs, ipxe.BootFromDisk(bootFromDiskMethod), apiPort, mgr.GetClient()); err != nil {
 		setupLog.Error(err, "unable to start iPXE server", "controller", "Environment")
 		os.Exit(1)
 	}

@@ -50,6 +50,7 @@ spec:
             - --api-endpoint=${SIDERO_CONTROLLER_MANAGER_API_ENDPOINT:=-}
             - --api-port=${SIDERO_CONTROLLER_MANAGER_API_PORT:=8081}
             - --extra-agent-kernel-args=${SIDERO_CONTROLLER_MANAGER_EXTRA_AGENT_KERNEL_ARGS:=-}
+            - --boot-from-disk-method=${SIDERO_CONTROLLER_MANAGER_BOOT_FROM_DISK_METHOD:=ipxe-exit}
             - --auto-accept-servers=${SIDERO_CONTROLLER_MANAGER_AUTO_ACCEPT_SERVERS:=false}
             - --insecure-wipe=${SIDERO_CONTROLLER_MANAGER_INSECURE_WIPE:=true}
             - --auto-bmc-setup=${SIDERO_CONTROLLER_MANAGER_AUTO_BMC_SETUP:=true}
