@@ -35,6 +35,8 @@ var bootstrapServersCmd = &cobra.Command{
 				CPUs:   options.ManagementCPUs,
 				MemMB:  options.ManagementMemMB,
 				DiskGB: options.ManagementDiskGB,
+
+				DefaultBootOrder: options.DefaultBootOrder,
 			})
 			if err != nil {
 				return err
@@ -52,4 +54,5 @@ func init() {
 	bootstrapServersCmd.Flags().IntVar(&options.ManagementNodes, "management-nodes", options.ManagementNodes, "number of PXE nodes to create for the management rack")
 	bootstrapServersCmd.Flags().StringVar(&options.ManagementCIDR, "management-cidr", options.ManagementCIDR, "management cluster network CIDR")
 	bootstrapServersCmd.Flags().StringVar(&bootSource, "boot-source", "172.24.0.2", "the boot source IP for the iPXE boot")
+	bootstrapServersCmd.Flags().StringVar(&options.DefaultBootOrder, "default-boot-order", options.DefaultBootOrder, "QEMU default boot order")
 }

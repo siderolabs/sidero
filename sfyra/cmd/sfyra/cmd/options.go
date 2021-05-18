@@ -39,6 +39,8 @@ type Options struct {
 	ManagementCPUs   int64
 	ManagementDiskGB int64
 
+	DefaultBootOrder string
+
 	TalosctlPath string
 
 	PowerSimulatedExplicitFailureProb float64
@@ -76,6 +78,8 @@ func DefaultOptions() Options {
 		ManagementMemMB:  2048,
 		ManagementCPUs:   2,
 		ManagementDiskGB: 6,
+
+		DefaultBootOrder: "cn", // disk, then network; override to "nc" to force PXE boot each time
 
 		TalosctlPath: fmt.Sprintf("_out/%s/talosctl-linux-amd64", TalosRelease),
 	}

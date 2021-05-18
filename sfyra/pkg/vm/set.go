@@ -42,6 +42,8 @@ type Options struct {
 	MemMB  int64
 	CPUs   int64
 	DiskGB int64
+
+	DefaultBootOrder string
 }
 
 // NewSet creates new VM set.
@@ -163,6 +165,7 @@ func (set *Set) create(ctx context.Context) error {
 				TFTPServer:          set.options.BootSource.String(),
 				IPXEBootFilename:    "undionly.kpxe",
 				SkipInjectingConfig: true,
+				DefaultBootOrder:    set.options.DefaultBootOrder,
 			})
 	}
 

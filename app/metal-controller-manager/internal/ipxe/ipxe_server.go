@@ -55,16 +55,31 @@ initrd /env/{{ .Env.Name }}/{{ .InitrdAsset }}
 boot
 `))
 
-// ipxeBootFromDisk script is used to skip PXE booting and boot from disk.
-const ipxeBootFromDisk = `#!ipxe
+// ipxeBootFromDiskExit script is used to skip PXE booting and boot from disk via exit.
+const ipxeBootFromDiskExit = `#!ipxe
 exit
 `
 
+// ipxeBootFromDiskSanboot script is used to skip PXE booting and boot from disk via sanboot.
+const ipxeBootFromDiskSanboot = `#!ipxe
+sanboot --no-describe --drive 0x80
+`
+
+// BootFromDisk defines a way to boot from disk.
+type BootFromDisk string
+
+const (
+	BootIPXEExit BootFromDisk = "ipxe-exit"    // Use iPXE script with `exit` command.
+	Boot404      BootFromDisk = "http-404"     // Return HTTP 404 response to iPXE.
+	BootSANDisk  BootFromDisk = "ipxe-sanboot" // Use iPXE script with `sanboot` command.
+)
+
 var (
-	apiEndpoint          string
-	apiPort              int
-	extraAgentKernelArgs string
-	c                    client.Client
+	apiEndpoint               string
+	apiPort                   int
+	extraAgentKernelArgs      string
+	defaultBootFromDiskMethod BootFromDisk
+	c                         client.Client
 )
 
 func bootFileHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,8 +87,17 @@ func bootFileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 //nolint:unparam
-func bootFromDiskHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, ipxeBootFromDisk)
+func bootFromDiskHandler(method BootFromDisk, w http.ResponseWriter, r *http.Request) {
+	switch method { //nolint:exhaustive
+	case Boot404:
+		w.WriteHeader(http.StatusNotFound)
+	case BootSANDisk:
+		fmt.Fprint(w, ipxeBootFromDiskSanboot)
+	case BootIPXEExit:
+		fallthrough
+	default:
+		fmt.Fprint(w, ipxeBootFromDiskExit)
+	}
 }
 
 func ipxeHandler(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +128,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, ErrBootFromDisk) {
 			log.Printf("Server %q booting from disk", uuid)
-			bootFromDiskHandler(w, r)
+			bootFromDiskHandler(defaultBootFromDiskMethod, w, r)
 
 			return
 		}
@@ -169,10 +193,11 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func RegisterIPXE(mux *http.ServeMux, endpoint string, port int, args string, iPXEPort int, mgrClient client.Client) error {
+func RegisterIPXE(mux *http.ServeMux, endpoint string, port int, args string, bootMethod BootFromDisk, iPXEPort int, mgrClient client.Client) error {
 	apiEndpoint = endpoint
 	apiPort = port
 	extraAgentKernelArgs = args
+	defaultBootFromDiskMethod = bootMethod
 	c = mgrClient
 
 	var embeddedScriptBuf bytes.Buffer

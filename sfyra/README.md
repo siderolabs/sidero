@@ -62,6 +62,18 @@ One can also run parts of the test flow:
 
 See each command help on how to customize the operations.
 
+## Testing Always PXE Boot
+
+By default, QEMU VMs provisioned to emulate metal servers are configured to boot from the disk first, and Sidero uses API
+call to force PXE boot to run the agent.
+
+Sometimes it's important to test the flow when the servers are configured to boot from the network first always (e.g. if
+bare metal setup doesn't have IPMI), in that case it's important to force VMs to boot from the network always.
+This can be achieved by adding a flag `--default-boot-order=nc` to `sfyra` invocation.
+In this case Sidero iPXE server will force VM to boot from disk via iPXE if the server is already provisioned.
+
+> Note: due to the dependency on new `talosctl`, this feature will be available once Talos in Sfyra is updated to version >= 0.11.
+
 ## Running with Talos HEAD
 
 Build the artifacts in Talos:
