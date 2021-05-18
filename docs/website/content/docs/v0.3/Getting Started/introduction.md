@@ -12,10 +12,9 @@ Sidero is also a subproject of Talos Systems' [Arges](https://github.com/talos-s
 
 ## Overview
 
-Sidero is made currently made up of three components:
+Sidero is currently made up of two components:
 
-- Metal Metadata Server: Provides a Cluster API (CAPI)-aware metadata server
-- Metal Controller Manager: Provides custom resources and controllers for managing the lifecycle of metal machines
+- Metal Controller Manager: Provides custom resources and controllers for managing the lifecycle of metal machines, iPXE server, metadata service, and gRPC API service
 - Cluster API Provider Sidero (CAPS): A Cluster API infrastructure provider that makes use of the pieces above to spin up Kubernetes clusters
 
 Sidero also needs these co-requisites in order to be useful:
@@ -24,7 +23,7 @@ Sidero also needs these co-requisites in order to be useful:
 - [Cluster API Control Plane Provider Talos](https://github.com/talos-systems/cluster-api-control-plane-provider-talos)
 - [Cluster API Bootstrap Provider Talos](https://github.com/talos-systems/cluster-api-bootstrap-provider-talos)
 
-All componenets mentioned above can be installed using Cluster API's `clusterctl` tool.
+All components mentioned above can be installed using Cluster API's `clusterctl` tool.
 
 Because of the design of Cluster API, there is inherently a "chicken and egg" problem with needing an existing Kubernetes cluster in order to provision the management plane.
 Talos Systems and the Cluster API community have created tools to help make this transition easier.
