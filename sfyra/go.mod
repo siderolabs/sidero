@@ -9,6 +9,11 @@ replace (
 	// `go get github.com/smira/tcpproxy@combined-fixes`, then copy pseudo-version there
 	inet.af/tcpproxy => github.com/smira/tcpproxy v0.0.0-20201015133617-de5f7797b95b
 
+	// keep older versions of k8s.io packages to keep compatiblity with cluster-api
+	k8s.io/api v0.21.0 => k8s.io/api v0.20.5
+	k8s.io/apimachinery v0.21.0 => k8s.io/apimachinery v0.20.5
+	k8s.io/client-go v0.21.0 => k8s.io/client-go v0.20.5
+
 	sigs.k8s.io/cluster-api v0.3.12 => sigs.k8s.io/cluster-api v0.3.9
 )
 
@@ -23,14 +28,14 @@ require (
 	github.com/talos-systems/go-retry v0.3.0
 	github.com/talos-systems/net v0.2.1-0.20210212213224-05190541b0fa
 	github.com/talos-systems/sidero v0.0.0-00010101000000-000000000000
-	github.com/talos-systems/talos v0.9.3
-	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210416105550-2b83440d6f7f // v0.9.3
+	github.com/talos-systems/talos v0.10.2
+	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210513202018-8d73bc5999b4 // v0.10.2
 	google.golang.org/grpc v1.37.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
-	k8s.io/api v0.20.5
+	k8s.io/api v0.21.0
 	k8s.io/apiextensions-apiserver v0.19.1
-	k8s.io/apimachinery v0.20.5
-	k8s.io/client-go v0.20.5
+	k8s.io/apimachinery v0.21.0
+	k8s.io/client-go v0.21.0
 	sigs.k8s.io/cluster-api v0.3.12
 	sigs.k8s.io/controller-runtime v0.6.3
 )

@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/talos-systems/go-blockdevice/blockdevice"
-	"github.com/talos-systems/go-blockdevice/blockdevice/util"
+	"github.com/talos-systems/go-blockdevice/blockdevice/util/disk"
 	debug "github.com/talos-systems/go-debug"
 	kmsg "github.com/talos-systems/go-kmsg"
 	"github.com/talos-systems/go-procfs/procfs"
@@ -282,7 +282,7 @@ func mainFunc() error {
 	}
 
 	if createResp.GetWipe() {
-		disks, err := util.GetDisks()
+		disks, err := disk.List()
 		if err != nil {
 			shutdown(err)
 		}
