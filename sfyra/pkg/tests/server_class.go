@@ -100,7 +100,7 @@ func TestServerClassCreate(ctx context.Context, metalClient client.Client, vmSet
 		// wait for the server class to gather all nodes (all nodes should match)
 		require.NoError(t, retry.Constant(2*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
 			if err := metalClient.Get(ctx, types.NamespacedName{Name: defaultServerClassName}, &serverClass); err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			if len(serverClass.Status.ServersAvailable)+len(serverClass.Status.ServersInUse) != numNodes {
@@ -253,7 +253,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 			client := &http.Client{}
 			response, err := client.Do(req)
 			if err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			if response.StatusCode != http.StatusOK {
@@ -263,7 +263,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 			defer response.Body.Close()
 			metadataBytes, err = ioutil.ReadAll(response.Body)
 			if err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 			return nil
 		}))

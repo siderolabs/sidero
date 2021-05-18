@@ -21,7 +21,7 @@ func CheckClusterReady(ctx context.Context, metalClient client.Client, clusterNa
 	var cluster v1alpha3.Cluster
 
 	if err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: clusterName}, &cluster); err != nil {
-		return retry.UnexpectedError(err)
+		return err
 	}
 
 	ready := false
@@ -41,7 +41,7 @@ func CheckClusterReady(ctx context.Context, metalClient client.Client, clusterNa
 	var controlPlane cacpt.TalosControlPlane
 
 	if err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: clusterName + "-cp"}, &controlPlane); err != nil {
-		return retry.UnexpectedError(err)
+		return err
 	}
 
 	if !controlPlane.Status.Ready {
@@ -59,7 +59,7 @@ func CheckClusterReady(ctx context.Context, metalClient client.Client, clusterNa
 	var machineDeployment v1alpha3.MachineDeployment
 
 	if err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: clusterName + "-workers"}, &machineDeployment); err != nil {
-		return retry.UnexpectedError(err)
+		return err
 	}
 
 	if machineDeployment.Status.GetTypedPhase() != v1alpha3.MachineDeploymentPhaseRunning {

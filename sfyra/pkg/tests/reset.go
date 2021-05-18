@@ -48,7 +48,7 @@ func TestServerReset(ctx context.Context, metalClient client.Client) TestFunc {
 
 			err = metalClient.List(ctx, &servers)
 			if err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			cleanedCount := 0

@@ -44,7 +44,7 @@ func TestServerRegistration(ctx context.Context, metalClient client.Client, vmSe
 			servers = &v1alpha1.ServerList{}
 
 			if err := metalClient.List(ctx, servers); err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			if len(servers.Items) != numNodes {
@@ -206,7 +206,7 @@ func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet 
 		require.NoError(t, retry.Constant(1*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
 			err = metalClient.List(ctx, dummyServers, client.MatchingLabelsSelector{Selector: labelSelector})
 			if err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			if len(dummyServers.Items) != numDummies {
@@ -294,7 +294,7 @@ func TestServerResetOnAcceptance(ctx context.Context, metalClient client.Client)
 				var s v1alpha1.Server
 
 				if err := metalClient.Get(ctx, types.NamespacedName{Name: server.Name, Namespace: server.Namespace}, &s); err != nil {
-					return retry.UnexpectedError(err)
+					return err
 				}
 
 				if !s.Status.IsClean {
@@ -316,7 +316,7 @@ func TestServersReady(ctx context.Context, metalClient client.Client) TestFunc {
 			servers := v1alpha1.ServerList{}
 
 			if err := metalClient.List(ctx, &servers); err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			for _, server := range servers.Items {
@@ -337,7 +337,7 @@ func TestServersDiscoveredIPs(ctx context.Context, metalClient client.Client) Te
 			servers := v1alpha1.ServerList{}
 
 			if err := metalClient.List(ctx, &servers); err != nil {
-				return retry.UnexpectedError(err)
+				return err
 			}
 
 			for _, server := range servers.Items {
@@ -383,12 +383,12 @@ func createDummyServer(ctx context.Context, metalClient client.Client, name stri
 
 		err = metalClient.Get(ctx, types.NamespacedName{Name: name}, &server)
 		if err != nil {
-			return retry.UnexpectedError(fmt.Errorf("failed refetching dummy server: %w", err))
+			return fmt.Errorf("failed refetching dummy server: %w", err)
 		}
 
 		patchHelper, err := patch.NewHelper(&server, metalClient)
 		if err != nil {
-			return retry.UnexpectedError(fmt.Errorf("failed creating patch helper for dummy server: %w", err))
+			return fmt.Errorf("failed creating patch helper for dummy server: %w", err)
 		}
 
 		server.Status.InUse = false
