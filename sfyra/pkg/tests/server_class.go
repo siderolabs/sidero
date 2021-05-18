@@ -43,20 +43,44 @@ const (
 	workloadServerClassName = "workload"
 )
 
+// TestServerClassAny verifies server class "any".
 func TestServerClassAny(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
 	return func(t *testing.T) {
+		numNodes := len(vmSet.Nodes())
+
 		var serverClass v1alpha1.ServerClass
 		err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass)
 		require.NoError(t, err)
 		assert.Empty(t, serverClass.Spec.Qualifiers)
+		assert.Len(t, append(serverClass.Status.ServersAvailable, serverClass.Status.ServersInUse...), numNodes)
 
-		numNodes := len(vmSet.Nodes())
+		// delete server class to see it being recreated
+		err = metalClient.Delete(ctx, &serverClass)
+		require.NoError(t, err)
+
+		serverClass = v1alpha1.ServerClass{}
+		err = retry.Constant(10 * time.Second).Retry(func() error {
+			if err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass); err != nil {
+				if apierrors.IsNotFound(err) {
+					return retry.ExpectedError(err)
+				}
+				return err
+			}
+
+			if len(serverClass.Status.ServersAvailable)+len(serverClass.Status.ServersInUse) != numNodes {
+				return retry.ExpectedErrorf("%d + %d != %d", len(serverClass.Status.ServersAvailable), len(serverClass.Status.ServersInUse), numNodes)
+			}
+
+			return nil
+		})
+		require.NoError(t, err)
+		assert.Empty(t, serverClass.Spec.Qualifiers)
 		assert.Len(t, append(serverClass.Status.ServersAvailable, serverClass.Status.ServersInUse...), numNodes)
 	}
 }
 
-// TestServerClassDefault verifies server class creation.
-func TestServerClassDefault(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+// TestServerClassCreate verifies server class creation.
+func TestServerClassCreate(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
 	return func(t *testing.T) {
 		classSpec := v1alpha1.ServerClassSpec{
 			Qualifiers: v1alpha1.Qualifiers{
@@ -80,7 +104,7 @@ func TestServerClassDefault(ctx context.Context, metalClient client.Client, vmSe
 			}
 
 			if len(serverClass.Status.ServersAvailable)+len(serverClass.Status.ServersInUse) != numNodes {
-				return retry.ExpectedError(fmt.Errorf("%d + %d != %d", len(serverClass.Status.ServersAvailable), len(serverClass.Status.ServersInUse), numNodes))
+				return retry.ExpectedErrorf("%d + %d != %d", len(serverClass.Status.ServersAvailable), len(serverClass.Status.ServersInUse), numNodes)
 			}
 
 			return nil
@@ -233,7 +257,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 			}
 
 			if response.StatusCode != http.StatusOK {
-				return retry.ExpectedError(fmt.Errorf("metadata not yet present: %d", response.StatusCode))
+				return retry.ExpectedErrorf("metadata not yet present: %d", response.StatusCode)
 			}
 
 			defer response.Body.Close()

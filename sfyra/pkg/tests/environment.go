@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/talos-systems/go-procfs/procfs"
 	"github.com/talos-systems/go-retry/retry"
@@ -23,10 +24,57 @@ import (
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
 )
 
-const environmentName = "default"
+const environmentName = "sfyra"
 
-// TestEnvironmentDefault verifies default environment creation.
+func isEnvironmentReady(env *v1alpha1.Environment) bool {
+	assetURLs := map[string]struct{}{
+		env.Spec.Kernel.URL: {},
+		env.Spec.Initrd.URL: {},
+	}
+
+	for _, cond := range env.Status.Conditions {
+		if cond.Status == "True" && cond.Type == "Ready" {
+			delete(assetURLs, cond.URL)
+		}
+	}
+
+	return len(assetURLs) == 0
+}
+
+// TestEnvironmentDefault verifies environment "default".
 func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, cluster talos.Cluster, kernelURL, initrdURL string) TestFunc {
+	return func(t *testing.T) {
+		var environment v1alpha1.Environment
+		err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.EnvironmentDefault}, &environment)
+		require.NoError(t, err)
+		assert.True(t, isEnvironmentReady(&environment))
+
+		// delete environment to see it being recreated
+		err = metalClient.Delete(ctx, &environment)
+		require.NoError(t, err)
+
+		environment = v1alpha1.Environment{}
+		err = retry.Constant(30 * time.Second).Retry(func() error {
+			if err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.EnvironmentDefault}, &environment); err != nil {
+				if apierrors.IsNotFound(err) {
+					return retry.ExpectedError(err)
+				}
+				return err
+			}
+
+			if !isEnvironmentReady(&environment) {
+				return retry.ExpectedErrorf("some assets are not ready")
+			}
+
+			return nil
+		})
+		require.NoError(t, err)
+		assert.True(t, isEnvironmentReady(&environment))
+	}
+}
+
+// TestEnvironmentCreate verifies environment creation.
+func TestEnvironmentCreate(ctx context.Context, metalClient client.Client, cluster talos.Cluster, kernelURL, initrdURL string) TestFunc {
 	return func(t *testing.T) {
 		var environment v1alpha1.Environment
 
@@ -63,19 +111,8 @@ func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, clus
 				return retry.UnexpectedError(err)
 			}
 
-			assetURLs := map[string]struct{}{
-				kernelURL: {},
-				initrdURL: {},
-			}
-
-			for _, cond := range environment.Status.Conditions {
-				if cond.Status == "True" && cond.Type == "Ready" {
-					delete(assetURLs, cond.URL)
-				}
-			}
-
-			if len(assetURLs) > 0 {
-				return retry.ExpectedError(fmt.Errorf("some assets are not ready: %v", assetURLs))
+			if !isEnvironmentReady(&environment) {
+				return retry.ExpectedErrorf("some assets are not ready")
 			}
 
 			return nil

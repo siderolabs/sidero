@@ -46,9 +46,7 @@ type Options struct {
 }
 
 // TalosRelease is set as build argument.
-var (
-	TalosRelease string
-)
+var TalosRelease string
 
 // DefaultOptions returns default settings.
 func DefaultOptions() Options {

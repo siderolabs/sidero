@@ -121,9 +121,10 @@ LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-metal-controller-manager
+ARG TALOS_RELEASE
 ARG TARGETARCH
 ARG GO_BUILDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "-s -w" -o /manager ./app/metal-controller-manager
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "-s -w -X main.TalosRelease=${TALOS_RELEASE}" -o /manager ./app/metal-controller-manager
 RUN chmod +x /manager
 
 FROM base AS agent-build-amd64

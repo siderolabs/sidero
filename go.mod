@@ -26,7 +26,7 @@ require (
 	github.com/talos-systems/go-debug v0.2.0
 	github.com/talos-systems/go-kmsg v0.1.0
 	github.com/talos-systems/go-procfs v0.0.0-20210108152626-8cbc42d3dc24
-	github.com/talos-systems/go-retry v0.2.0
+	github.com/talos-systems/go-retry v0.3.0
 	github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a
 	github.com/talos-systems/net v0.2.1-0.20210212213224-05190541b0fa
 	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210416105550-2b83440d6f7f // v0.9.3

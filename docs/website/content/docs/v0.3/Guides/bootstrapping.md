@@ -148,47 +148,6 @@ kubectl patch server 00000000-0000-0000-0000-d05099d33360 --type='json' -p='[{"o
 
 For more information on server acceptance, see the [server docs](/docs/v0.3/configuration/servers).
 
-## Create the Default Environment
-
-We must now create an `Environment` in our bootstrap cluster.
-An environment is a CRD that tells the PXE component of Sidero what information to return to nodes that request a PXE boot after completing the registration process above.
-Things that can be controlled here are kernel flags and the kernel and init images to use.
-
-To create a default environment that will use the latest published Talos release, issue the following:
-
-```bash
-cat <<EOF | kubectl apply -f -
-apiVersion: metal.sidero.dev/v1alpha1
-kind: Environment
-metadata:
-  name: default
-spec:
-  kernel:
-    url: "https://github.com/talos-systems/talos/releases/latest/download/vmlinuz-amd64"
-    sha512: ""
-    args:
-      - initrd=initramfs.xz
-      - page_poison=1
-      - slab_nomerge
-      - slub_debug=P
-      - pti=on
-      - random.trust_cpu=on
-      - ima_template=ima-ng
-      - ima_appraise=fix
-      - ima_hash=sha512
-      - console=tty0
-      - console=ttyS1,115200n8
-      - earlyprintk=ttyS1,115200n8
-      - panic=0
-      - printk.devkmsg=on
-      - talos.platform=metal
-      - talos.config=http://$PUBLIC_IP:8081/configdata?uuid=
-  initrd:
-    url: "https://github.com/talos-systems/talos/releases/latest/download/initramfs-amd64.xz"
-    sha512: ""
-EOF
-```
-
 ## Create Management Plane
 
 We are now ready to template out our management plane.
@@ -211,7 +170,7 @@ Note that there are several variables that should be set in order for the templa
 - `WORKER_SERVERCLASS`: The server class to use for worker nodes.
 - `KUBERNETES_VERSION`: The version of Kubernetes to deploy (e.g. `v1.19.4`).
 - `CONTROL_PLANE_PORT`: The port used for the Kubernetes API server (port 6443)
-- `TALOS_VERSION`: This should correspond to the minor version of Talos that you will be deploying (e.g. `v0.9`).
+- `TALOS_VERSION`: This should correspond to the minor version of Talos that you will be deploying (e.g. `v0.10`).
   This value is used in determining the fields present in the machine configuration that gets generated for Talos nodes.
 
 For instance:
