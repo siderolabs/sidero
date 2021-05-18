@@ -248,7 +248,7 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 func patchConfigs(decodedData []byte, patches []metalv1alpha1.ConfigPatches) ([]byte, errorWithCode) {
 	marshalledPatches, err := json.Marshal(patches)
 	if err != nil {
-		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure marshalling config patches from server: %s", err)}
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure marshaling config patches from server: %s", err)}
 	}
 
 	jsonDecodedData, err := yaml.YAMLToJSON(decodedData)

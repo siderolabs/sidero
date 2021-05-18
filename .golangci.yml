@@ -124,15 +124,12 @@ linters:
     - forcetypeassert
     - gci
     - gocyclo
-    - godot
     - golint
     - govet
     - lll
-    - misspell
     - nlreturn
     - predeclared
     - revive
-    - staticcheck
     - stylecheck
 
     - gas
