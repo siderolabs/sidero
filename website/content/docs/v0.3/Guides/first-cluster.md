@@ -73,9 +73,9 @@ host talos-mgmt-0 {
 
 There are multiple ways to boot the via iPXE:
 
-* if the node has built-in iPXE, direct URL to the iPXE script can be used: `http://192.168.254.2:8081/boot.ipxe`.
-* depending on the boot mode (BIOS or UEFI), either `ipxe.efi` or `undionly.kpxe` can be used (these images contain embedded iPXE scripts).
-* iPXE binaries can be delivered either over TFTP or HTTP (HTTP support depends on node firmware).
+- if the node has built-in iPXE, direct URL to the iPXE script can be used: `http://192.168.254.2:8081/boot.ipxe`.
+- depending on the boot mode (BIOS or UEFI), either `ipxe.efi` or `undionly.kpxe` can be used (these images contain embedded iPXE scripts).
+- iPXE binaries can be delivered either over TFTP or HTTP (HTTP support depends on node firmware).
 
 ## Register the Servers
 
@@ -133,7 +133,8 @@ Now that we have the manifest, we can simply apply it:
 kubectl apply -f workload-cluster.yaml
 ```
 
-**NOTE: The templated manifest above is meant to act as a starting point. If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.**
+**NOTE: The templated manifest above is meant to act as a starting point.**
+**If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.**
 
 Once the workload cluster is setup, you can fetch the talosconfig with a command like:
 

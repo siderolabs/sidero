@@ -119,6 +119,7 @@ linters:
   enable-all: true
   disable:
     # FIXME those linters should be enabled ASAP
+    # https://github.com/talos-systems/sidero/issues/421
     - cyclop
     - errcheck
     - forcetypeassert

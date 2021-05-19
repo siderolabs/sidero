@@ -49,8 +49,8 @@ version: v1alpha1
 Replace `$PUBLIC_IP` with the Sidero IP address and `$SERVER_UUID` with the name of the `Server` to test
 against.
 
-If metadata endpoint returns an error on applying JSON patches, make sure config subtree being patched
-exists in the config. If it doesn't exist, create it with the `op: add` above the `op: replace` patch.
+If metadata endpoint returns an error on applying JSON patches, make sure config subtree being patched exists in the config.
+If it doesn't exist, create it with the `op: add` above the `op: replace` patch.
 
 ## Combining Patches from Multiple Sources
 

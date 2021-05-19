@@ -120,6 +120,7 @@ SIDERO_CONTROLLER_MANAGER_HOST_NETWORK=true \
   SIDERO_CONTROLLER_MANAGER_API_ENDPOINT=$PUBLIC_IP \
   clusterctl init -b talos -c talos -i sidero
 ```
+
 We will now want to ensure that the Sidero services that got created are publicly accessible across our subnet.
 These variables above will allow the metal machines to speak to these services later.
 
@@ -174,6 +175,7 @@ Note that there are several variables that should be set in order for the templa
   This value is used in determining the fields present in the machine configuration that gets generated for Talos nodes.
 
 For instance:
+
 ```bash
 export CONTROL_PLANE_SERVERCLASS=any
 export WORKER_SERVERCLASS=any
@@ -183,7 +185,8 @@ export CONTROL_PLANE_ENDPOINT=1.2.3.4
 clusterctl config cluster management-plane -i sidero > management-plane.yaml
 ```
 
-In addition, you can specify the replicas for control-plane & worker nodes in management-plane.yaml manifest for TalosControlPlane and MachineDeployment objects. Also, they can be scaled if needed:
+In addition, you can specify the replicas for control-plane & worker nodes in management-plane.yaml manifest for TalosControlPlane and MachineDeployment objects.
+Also, they can be scaled if needed:
 
 ```bash
 kubectl get taloscontrolplane
@@ -197,7 +200,8 @@ Now that we have the manifest, we can simply apply it:
 kubectl apply -f management-plane.yaml
 ```
 
-**NOTE: The templated manifest above is meant to act as a starting point. If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.**
+**NOTE: The templated manifest above is meant to act as a starting point.**
+**If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.**
 
 Once the management plane is setup, you can fetch the talosconfig by using the cluster label.
 Be sure to update the cluster name and issue the following command:
