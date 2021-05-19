@@ -16,12 +16,23 @@ PKGS ?= v0.5.0-8-gb0d9cd2
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
+CGO_ENABLED ?= 0
 GO_BUILDFLAGS ?=
+GO_LDFLAGS ?=
 
+WITH_RACE ?= false
 WITH_DEBUG ?= false
+
+ifeq ($(shell hack/parsebool.sh $(WITH_RACE); echo $$?), 1)
+CGO_ENABLED = 1
+GO_BUILDFLAGS += -race
+GO_LDFLAGS += -linkmode=external -extldflags '-static'
+endif
 
 ifeq ($(shell hack/parsebool.sh $(WITH_DEBUG); echo $$?), 1)
 GO_BUILDFLAGS += -tags sidero.debug
+else
+GO_LDFLAGS += -s -w
 endif
 
 BUILD := docker buildx build
@@ -38,7 +49,9 @@ COMMON_ARGS += --build-arg=TEST_PKGS=$(TEST_PKGS)
 COMMON_ARGS += --build-arg=PKGS=$(PKGS)
 COMMON_ARGS += --build-arg=TOOLS=$(TOOLS)
 COMMON_ARGS += --build-arg=TALOS_RELEASE=$(TALOS_RELEASE)
+COMMON_ARGS += --build-arg=CGO_ENABLED=$(CGO_ENABLED)
 COMMON_ARGS += --build-arg=GO_BUILDFLAGS="$(GO_BUILDFLAGS)"
+COMMON_ARGS += --build-arg=GO_LDFLAGS="$(GO_LDFLAGS)"
 
 all: manifests generate cluster-api-provider-sidero metal-controller-manager sfyra
 

@@ -32,7 +32,8 @@ RUN ["/toolchain/bin/ln", "-svf", "/toolchain/bin/bash", "/bin/sh"]
 RUN ["/toolchain/bin/ln", "-svf", "/toolchain/etc/ssl", "/etc/ssl"]
 ENV GO111MODULE on
 ENV GOPROXY https://proxy.golang.org
-ENV CGO_ENABLED 0
+ARG CGO_ENABLED
+ENV CGO_ENABLED ${CGO_ENABLED}
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
 RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.5.0
@@ -106,7 +107,8 @@ COPY --from=release-build /cluster-template.yaml /infrastructure-sidero/${TAG}/c
 FROM base AS build-cluster-api-provider-sidero
 ARG TARGETARCH
 ARG GO_BUILDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "-s -w" -o /manager ./app/cluster-api-provider-sidero
+ARG GO_LDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /manager ./app/cluster-api-provider-sidero
 RUN chmod +x /manager
 
 ## TODO(rsmitty): make bmc pkg and move to talos-systems image
@@ -124,17 +126,20 @@ FROM base AS build-metal-controller-manager
 ARG TALOS_RELEASE
 ARG TARGETARCH
 ARG GO_BUILDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "-s -w -X main.TalosRelease=${TALOS_RELEASE}" -o /manager ./app/metal-controller-manager
+ARG GO_LDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X main.TalosRelease=${TALOS_RELEASE}" -o /manager ./app/metal-controller-manager
 RUN chmod +x /manager
 
 FROM base AS agent-build-amd64
 ARG GO_BUILDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=amd64 go build ${GO_BUILDFLAGS} -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
+ARG GO_LDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=amd64 go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /agent ./app/metal-controller-manager/cmd/agent
 RUN chmod +x /agent
 
 FROM base AS agent-build-arm64
 ARG GO_BUILDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=arm64 go build ${GO_BUILDFLAGS} -ldflags "-s -w" -o /agent ./app/metal-controller-manager/cmd/agent
+ARG GO_LDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=arm64 go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /agent ./app/metal-controller-manager/cmd/agent
 RUN chmod +x /agent
 
 FROM base AS initramfs-archive-amd64
@@ -266,7 +271,8 @@ WORKDIR /src/sfyra/cmd/sfyra
 ARG TALOS_RELEASE
 ARG SFYRA_CMD_PKG=github.com/talos-systems/sidero/sfyra/cmd/sfyra/cmd
 ARG GO_BUILDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "-s -w -X ${SFYRA_CMD_PKG}.TalosRelease=${TALOS_RELEASE}" -o /sfyra
+ARG GO_LDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${SFYRA_CMD_PKG}.TalosRelease=${TALOS_RELEASE}" -o /sfyra
 RUN chmod +x /sfyra
 
 FROM scratch AS sfyra
