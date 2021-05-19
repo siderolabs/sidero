@@ -106,6 +106,5 @@ spec:
 If IPMI information is set, server boot order might be set to boot from disk, then network, Sidero will switch servers
 to PXE boot once that is required.
 
-Without IPMI info, Sidero can still register servers, wipe them and provision clusters, but Sidero won't be able to
-reboot servers once they are removed from the cluster. If IPMI info is not set, servers should be configured to boot first from network,
-then from disk.
+Without IPMI info, Sidero can still register servers, wipe them and provision clusters, but Sidero won't be able to reboot servers once they are removed from the cluster.
+If IPMI info is not set, servers should be configured to boot first from network, then from disk.

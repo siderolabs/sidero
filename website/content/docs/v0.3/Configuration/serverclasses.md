@@ -32,4 +32,5 @@ spec:
 
 Servers would only be added to the above class if they had _EITHER_ CPU info, _AND_ the label associated with the server resource.
 
-Additionally, Sidero automatically creates and maintains a server class called `"any"` that includes all (accepted) servers. Attempts to add qualifiers to it will be reverted.
+Additionally, Sidero automatically creates and maintains a server class called `"any"` that includes all (accepted) servers.
+Attempts to add qualifiers to it will be reverted.

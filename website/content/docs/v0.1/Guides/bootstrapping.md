@@ -244,13 +244,15 @@ spec:
         version: Intel(R) Atom(TM) CPU C3558 @ 2.20GHz
 EOF
 ```
+
 In order to fetch hardware information, you can use
 
 ```bash
 kubectl get server -o yaml
 ```
 
-Note that for bare-metal setup, you would need to specify an installation disk. See the [Installation Disk](/docs/v0.1/configuration/servers/#installation-disk)
+Note that for bare-metal setup, you would need to specify an installation disk.
+See the [Installation Disk](/docs/v0.1/configuration/servers/#installation-disk)
 
 Once created, you should see the servers that make up your server class appear as "available":
 
@@ -283,6 +285,7 @@ Note that there are several variables that should be set in order for the templa
 - `CONTROL_PLANE_PORT`: The port used for the Kubernetes API server (port 6443)
 
 For instance:
+
 ```bash
 export CONTROL_PLANE_SERVERCLASS=master
 export WORKER_SERVERCLASS=worker
@@ -292,7 +295,8 @@ export CONTROL_PLANE_ENDPOINT=1.2.3.4
 clusterctl config cluster management-plane -i sidero > management-plane.yaml
 ```
 
-In addition, you can specify the replicas for control-plane & worker nodes in management-plane.yaml manifest for TalosControlPlane and MachineDeployment objects. Also, they can be scaled if needed:
+In addition, you can specify the replicas for control-plane & worker nodes in management-plane.yaml manifest for TalosControlPlane and MachineDeployment objects.
+Also, they can be scaled if needed:
 
 ```bash
 kubectl get taloscontrolplane
@@ -306,7 +310,8 @@ Now that we have the manifest, we can simply apply it:
 kubectl apply -f management-plane.yaml
 ```
 
-**NOTE: The templated manifest above is meant to act as a starting point. If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.**
+**NOTE: The templated manifest above is meant to act as a starting point.**
+**If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.**
 
 Once the management plane is setup, you can fetch the talosconfig by using the cluster label.
 Be sure to update the cluster name and issue the following command:

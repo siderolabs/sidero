@@ -90,7 +90,10 @@ its exit.
 
 Sidero can use IPMI information to control `Server` power state, reboot servers and set boot order.
 
-IPMI information will be, by default, setup automatically if possible as part of the acceptance process. In this design, a "sidero" user will be added to the IPMI user list and a randomly generated password will be issued. This information is then squirreled away in a Kubernetes secret in the `sidero-system` namespace, with a name format of `<server-uuid>-bmc`. Users wishing to turn off this feature can pass the `--auto-bmc-setup=false` flag to `sidero-controller-manager`
+IPMI information will be, by default, setup automatically if possible as part of the acceptance process.
+In this design, a "sidero" user will be added to the IPMI user list and a randomly generated password will be issued.
+This information is then squirreled away in a Kubernetes secret in the `sidero-system` namespace, with a name format of `<server-uuid>-bmc`.
+Users wishing to turn off this feature can pass the `--auto-bmc-setup=false` flag to `sidero-controller-manager`
 
 IMPI connection information can also be set manually in the `Server` spec after initial registration:
 
@@ -108,12 +111,10 @@ spec:
 If IPMI information is set, server boot order might be set to boot from disk, then network, Sidero will switch servers
 to PXE boot once that is required.
 
-Without IPMI info, Sidero can still register servers, wipe them and provision clusters, but Sidero won't be able to
-reboot servers once they are removed from the cluster. If IPMI info is not set, servers should be configured to boot first from network,
-then from disk.
+Without IPMI info, Sidero can still register servers, wipe them and provision clusters, but Sidero won't be able to reboot servers once they are removed from the cluster.
+If IPMI info is not set, servers should be configured to boot first from network, then from disk.
 
 Sidero can also fetch IPMI credentials via the `Secret` reference:
-
 
 ```yaml
 apiVersion: metal.sidero.dev/v1alpha1

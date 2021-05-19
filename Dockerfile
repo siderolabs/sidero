@@ -211,16 +211,35 @@ RUN --mount=type=cache,target=/.cache gofumports -w -local ${MODULE} .
 #
 FROM scratch AS fmt
 COPY --from=fmt-build /src /
+
 #
 # The markdownlint target performs linting on Markdown files.
 #
 FROM node:16.1.0-alpine AS lint-markdown
-WORKDIR /opt
-RUN npm install -g markdownlint-cli@0.23.2
-RUN npm install sentences-per-line
+RUN apk add --no-cache findutils
+RUN npm i -g markdownlint-cli@0.23.2
+RUN npm i -g textlint@11.7.6
+RUN npm i -g textlint-filter-rule-comments@1.2.2
+RUN npm i -g textlint-rule-one-sentence-per-line@1.0.2
 WORKDIR /src
-COPY --from=base /src .
-RUN markdownlint --ignore '**/hack/chglog/**' --rules /opt/node_modules/sentences-per-line/index.js .
+COPY . .
+RUN markdownlint \
+    --ignore '**/LICENCE.md' \
+    --ignore '**/CHANGELOG.md' \
+    --ignore '**/CODE_OF_CONDUCT.md' \
+    --ignore '**/node_modules/**' \
+    --ignore '**/hack/chglog/**' \
+    .
+RUN find . \
+    -name '*.md' \
+    -not -path './LICENCE.md' \
+    -not -path './CHANGELOG.md' \
+    -not -path './CODE_OF_CONDUCT.md' \
+    -not -path '*/node_modules/*' \
+    -not -path './hack/chglog/**' \
+    -print0 \
+    | xargs -0 textlint
+
 #
 # The sfyra-build target builds the Sfyra source.
 #

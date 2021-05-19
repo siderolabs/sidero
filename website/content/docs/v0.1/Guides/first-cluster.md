@@ -134,7 +134,8 @@ Now that we have the manifest, we can simply apply it:
 kubectl apply -f workload-cluster.yaml
 ```
 
-**NOTE: The templated manifest above is meant to act as a starting point. If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.**
+**NOTE: The templated manifest above is meant to act as a starting point.**
+**If customizations are needed to ensure proper setup of your Talos cluster, they should be added before applying.**
 
 Once the workload cluster is setup, you can fetch the talosconfig with a command like:
 
