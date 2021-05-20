@@ -44,6 +44,7 @@ steps:
     environment:
       PLATFORM: linux/amd64,linux/arm64
     commands:
+      - make release-notes
       - make REGISTRY=registry.dev.talos-systems.io PUSH=true
     when:
       event:
@@ -80,7 +81,7 @@ steps:
     image: autonomy/build-container:latest
     pull: always
     commands:
-      - make run-sfyra REGISTRY=registry.dev.talos-systems.io
+      - make xxrun-sfyra REGISTRY=registry.dev.talos-systems.io
     privileged: true
     when:
       event:
@@ -168,6 +169,26 @@ steps:
     when:
       event:
         - tag
+    volumes:
+      - name: docker-socket
+        path: /var/run
+
+services:
+  - name: docker
+    image: docker:19.03-dind
+    entrypoint:
+    - dockerd
+    commands:
+    - --dns=8.8.8.8
+    - --dns=8.8.4.4
+    - --mtu=1500
+    - --log-level=error
+    privileged: true
+    volumes:
+    - name: docker-socket
+      path: /var/run
+    - name: docker
+      path: /root/.docker/buildx
 
 volumes:
   - name: docker-socket
