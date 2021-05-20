@@ -121,7 +121,8 @@ metal-controller-manager: ## Build the CAPI provider container image.
 
 .PHONY: release-notes
 release-notes:
-	ARTIFACTS=$(ARTIFACTS) ./hack/release.sh $@ $(ARTIFACTS)/RELEASE_NOTES.md $(TAG)
+	@mkdir -p $(ARTIFACTS)
+	@ARTIFACTS=$(ARTIFACTS) ./hack/release.sh $@ $(ARTIFACTS)/RELEASE_NOTES.md $(TAG)
 
 # Sfyra
 
