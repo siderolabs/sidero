@@ -105,6 +105,10 @@ generate: ## Generate source code.
 manifests: ## Generate manifests (e.g. CRD, RBAC, etc.).
 	@$(MAKE) local-$@ DEST=./ PLATFORM=linux/amd64
 
+.PHONY: check-dirty
+check-dirty: ## Verifies that source tree is not dirty
+	@if test -n "`git status --porcelain`"; then echo "Source tree is dirty"; git status; exit 1 ; fi
+
 # Artifacts
 
 .PHONY: release
