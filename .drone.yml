@@ -21,6 +21,20 @@ steps:
       - name: docker
         path: /root/.docker/buildx
 
+  - name: check-dirty
+    image: autonomy/build-container:latest
+    pull: always
+    commands:
+      - make generate manifests
+      - make check-dirty
+    volumes:
+      - name: docker-socket
+        path: /var/run
+      - name: outerdockersock
+        path: /var/outer-run
+      - name: docker
+        path: /root/.docker/buildx
+
   - name: lint-pull-request
     image: autonomy/build-container:latest
     pull: always
@@ -226,6 +240,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: 91cb4a5779732a7cd24e222da0862c8993441fe56cde03f330c0dd42b18a5ea7
+hmac: 04c7419d7c3f8495fc1f98d0a44f04adf1cbefe83490598592c5017ae93830d8
 
 ...
