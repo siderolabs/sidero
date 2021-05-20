@@ -168,6 +168,26 @@ steps:
     when:
       event:
         - tag
+    volumes:
+      - name: docker-socket
+        path: /var/run
+
+services:
+  - name: docker
+    image: docker:19.03-dind
+    entrypoint:
+    - dockerd
+    commands:
+    - --dns=8.8.8.8
+    - --dns=8.8.4.4
+    - --mtu=1500
+    - --log-level=error
+    privileged: true
+    volumes:
+    - name: docker-socket
+      path: /var/run
+    - name: docker
+      path: /root/.docker/buildx
 
 volumes:
   - name: docker-socket
@@ -206,6 +226,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: e1f2cfd7a0d5c7b9d8a77a743454403124e94e1d84c79e68110980fe2520685c
+hmac: 91cb4a5779732a7cd24e222da0862c8993441fe56cde03f330c0dd42b18a5ea7
 
 ...
