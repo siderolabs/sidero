@@ -168,6 +168,26 @@ steps:
     when:
       event:
         - tag
+    volumes:
+      - name: docker-socket
+        path: /var/run
+
+services:
+  - name: docker
+    image: docker:19.03-dind
+    entrypoint:
+    - dockerd
+    commands:
+    - --dns=8.8.8.8
+    - --dns=8.8.4.4
+    - --mtu=1500
+    - --log-level=error
+    privileged: true
+    volumes:
+    - name: docker-socket
+      path: /var/run
+    - name: docker
+      path: /root/.docker/buildx
 
 volumes:
   - name: docker-socket
