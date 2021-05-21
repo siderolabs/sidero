@@ -20,10 +20,23 @@ type Qualifiers struct {
 
 // ServerClassSpec defines the desired state of ServerClass.
 type ServerClassSpec struct {
+	// Reference to the environment which should be used to provision the servers via this server class.
+	// +optional
 	EnvironmentRef *corev1.ObjectReference `json:"environmentRef,omitempty"`
-	Qualifiers     Qualifiers              `json:"qualifiers"`
-	Selector       metav1.LabelSelector    `json:"selector"`
-	ConfigPatches  []ConfigPatches         `json:"configPatches,omitempty"`
+	// Qualifiers to match on the server spec.
+	//
+	// If qualifiers are empty, they match all servers.
+	// Server should match both qualifiers and selector conditions to be included into the server class.
+	// +optional
+	Qualifiers Qualifiers `json:"qualifiers"`
+	// Label selector to filter the matching servers based on labels.
+	// A label selector is a label query over a set of resources. The result of matchLabels and
+	// matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects.
+	// +optional
+	Selector metav1.LabelSelector `json:"selector"`
+	// Set of config patches to apply to the machine configuration to the servers provisioned via this server class.
+	// +optional
+	ConfigPatches []ConfigPatches `json:"configPatches,omitempty"`
 }
 
 // ServerClassStatus defines the observed state of ServerClass.
