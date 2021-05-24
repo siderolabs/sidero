@@ -36,12 +36,11 @@ require (
 	golang.org/x/net v0.0.0-20210505214959-0714010a04ed
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6
-	golang.org/x/tools v0.0.0-20210101214203-2dba1e4ea05c // indirect
 	google.golang.org/grpc v1.37.1
 	google.golang.org/protobuf v1.26.0
-	k8s.io/api v0.19.3
+	k8s.io/api v0.21.1
 	k8s.io/apiextensions-apiserver v0.19.1
-	k8s.io/apimachinery v0.19.3
+	k8s.io/apimachinery v0.21.1
 	k8s.io/apiserver v0.19.3 // indirect
 	k8s.io/client-go v0.19.3
 	k8s.io/utils v0.0.0-20201110183641-67b214c5f920
