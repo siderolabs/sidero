@@ -1,9 +1,8 @@
 ---
 description: "A guide describing patching"
 weight: 3
+title: "Patching"
 ---
-
-# Patching
 
 Server resources can be updated by using the `configPatches` section of the custom resource.
 Any field of the [Talos machine config](https://www.talos.dev/docs/v0.8/reference/configuration/)

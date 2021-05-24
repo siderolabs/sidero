@@ -1,9 +1,8 @@
 ---
 description: ""
 weight: 3
+title: Architecture
 ---
-
-# Architecture
 
 The overarching architecture of Sidero centers around a "management plane".
 This plane is expected to serve as a single interface upon which administrators can create, scale, upgrade, and delete Kubernetes clusters.

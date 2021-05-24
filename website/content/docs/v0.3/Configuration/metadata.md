@@ -1,9 +1,8 @@
 ---
 description: ""
 weight: 4
+title: Metadata
 ---
-
-# Metadata
 
 The Metadata server manages the Machine metadata.
 In terms of Talos (the OS on which the Kubernetes cluster is formed), this is the

@@ -1,4 +1,6 @@
-# Documentation
+---
+title: "Welcome"
+---
 
 Welcome to the Sidero documentation.
 

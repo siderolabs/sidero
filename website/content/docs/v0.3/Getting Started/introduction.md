@@ -1,9 +1,8 @@
 ---
 description: ""
 weight: 1
+title: Introduction
 ---
-
-# Introduction
 
 Sidero ("Iron" in Greek) is a project created by the [Talos Systems](https://www.talos-systems.com/) team.
 The goal of this project is to provide lightweight, composable tools that can be used to create bare-metal Talos + Kubernetes clusters.
