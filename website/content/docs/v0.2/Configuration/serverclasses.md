@@ -1,9 +1,8 @@
 ---
 description: ""
 weight: 3
+title: Server Classes
 ---
-
-# Server Classes
 
 Server classes are a way to group distinct server resources.
 The "qualifiers" key allows the administrator to specify criteria upon which to group these servers.

@@ -1,9 +1,8 @@
 ---
 description: "A guide for creating your first cluster with the Sidero management plane"
 weight: 2
+title: Creating Your First Cluster
 ---
-
-# Creating Your First Cluster
 
 ## Introduction
 
@@ -30,7 +29,7 @@ kubectl patch deploy -n sidero-system sidero-controller-manager --type='json' -p
 Metadata Server:
 
 ```bash
-# Convert metadata server service to nodeport
+## Convert metadata server service to nodeport
 kubectl patch service -n sidero-system sidero-metadata-server --type='json' -p='[{"op": "replace", "path": "/spec/type", "value": "NodePort"}]'
 
 ## Set a known nodeport for metadata server

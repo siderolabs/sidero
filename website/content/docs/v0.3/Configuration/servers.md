@@ -1,9 +1,8 @@
 ---
 description: ""
 weight: 2
+title: Servers
 ---
-
-# Servers
 
 Servers are the basic resource of bare metal in the Metal Controller Manager.
 These are created by PXE booting the servers and allowing them to send a registration request to the management plane.

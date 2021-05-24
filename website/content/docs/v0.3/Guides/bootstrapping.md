@@ -1,9 +1,8 @@
 ---
 description: "A guide for bootstrapping Sidero management plane"
 weight: 1
+title: "Bootstrapping"
 ---
-
-# Bootstrapping
 
 ## Introduction
 

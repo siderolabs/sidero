@@ -1,9 +1,8 @@
 ---
 description: ""
 weight: 1
+title: Environments
 ---
-
-# Environments
 
 Environments are a custom resource provided by the Metal Controller Manager.
 An environment is a codified description of what should be returned by the PXE server when a physical server attempts to PXE boot.

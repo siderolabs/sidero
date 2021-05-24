@@ -1,9 +1,8 @@
 ---
 description: "Diagrams for various flows in Sidero."
 weight: 4
+title: "Provisioning Flow"
 ---
-
-# Provisioning Flow
 
 ```mermaid
 graph TD;

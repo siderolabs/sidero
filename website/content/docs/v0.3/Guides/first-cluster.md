@@ -1,9 +1,8 @@
 ---
 description: "A guide for creating your first cluster with the Sidero management plane"
 weight: 2
+title: "Creating Your First Cluster"
 ---
-
-# Creating Your First Cluster
 
 ## Introduction
 
