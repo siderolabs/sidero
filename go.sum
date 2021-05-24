@@ -488,8 +488,8 @@ github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.10/go.mod h1:mOZ/olE9x+nAFkA8WHZqGec9z1ZEZ+vDhMauyn4JYEc=
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.12 h1:+cbdEpnhJXYw9NF/9qAC9Ly5b4SwwKCrcCx5UUfs8l0=
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.12/go.mod h1:YX/xq65oTwRyztlG8dfwX7+9tZR3RY6uqBaoPrrDHAA=
-github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.12 h1:rn7f0jNFT2nyvCj5Erx06EIzZG1cujDhuM7a1oHz1Wc=
-github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.12/go.mod h1:e6Q5Gqi/wUk0rMFkVTsI3O+VK0IoIJUnNhPUxL8z9as=
+github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.13 h1:qcCQLwcyOiwtjaRxg+xBYjfkYQokp+3pXU1T9wpyyaE=
+github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.13/go.mod h1:KobqRRsnGpiMfuDcV7Hms2BJPikS2/+ya+wQqLsWjTg=
 github.com/talos-systems/crypto v0.2.1-0.20210202170911-39584f1b6e54/go.mod h1:OXCK52Q0dzm88YRG4VdTBdidkPUtqrCxCyW7bUs4DAw=
 github.com/talos-systems/crypto v0.2.1-0.20210427105118-4f80b976b640 h1:dDChkGwqk1jcRO0k63VTgGzt1UrY20UiDS3yNcCLW0k=
 github.com/talos-systems/crypto v0.2.1-0.20210427105118-4f80b976b640/go.mod h1:OXCK52Q0dzm88YRG4VdTBdidkPUtqrCxCyW7bUs4DAw=
@@ -797,8 +797,8 @@ google.golang.org/grpc v1.27.0/go.mod h1:qbnxyOmOxrQa7FizSgH+ReBfzJrCY1pSN7KXBS8
 google.golang.org/grpc v1.29.1/go.mod h1:itym6AZVZYACWQqET3MqgPpjcuV5QH3BxFS3IjizoKk=
 google.golang.org/grpc v1.36.1/go.mod h1:qjiiYl8FncCW8feJPdyg3v6XW24KsRHe+dy9BAGRRjU=
 google.golang.org/grpc v1.37.0/go.mod h1:NREThFqKR1f3iQ6oBuvc5LadQuXVGo9rkm5ZGrQdJfM=
-google.golang.org/grpc v1.37.1 h1:ARnQJNWxGyYJpdf/JXscNlQr/uv607ZPU9Z7ogHi+iI=
-google.golang.org/grpc v1.37.1/go.mod h1:NREThFqKR1f3iQ6oBuvc5LadQuXVGo9rkm5ZGrQdJfM=
+google.golang.org/grpc v1.38.0 h1:/9BgsAsa5nWe26HqOlvlgJnqBuktYOLCgjCPqsa56W0=
+google.golang.org/grpc v1.38.0/go.mod h1:NREThFqKR1f3iQ6oBuvc5LadQuXVGo9rkm5ZGrQdJfM=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
 google.golang.org/protobuf v0.0.0-20200221191635-4d8936d0db64/go.mod h1:kwYJMbMJ01Woi6D6+Kah6886xMZcty6N08ah7+eCXa0=
 google.golang.org/protobuf v0.0.0-20200228230310-ab0ca4ff8a60/go.mod h1:cfTl7dwQJ+fmap5saPgwCLgHXTUD7jkjRqWcaiX5VyM=
