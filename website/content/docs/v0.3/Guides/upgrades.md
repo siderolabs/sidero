@@ -1,7 +1,7 @@
 ---
 description: "A guide describing upgrades"
-weight: 3
 title: "Upgrading"
+weight: 5
 ---
 
 Upgrading a running workload cluster or management plane is the same process as describe in the Talos documentation.
