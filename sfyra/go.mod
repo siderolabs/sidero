@@ -21,7 +21,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0
 	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.12
-	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.12
+	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.13
 	github.com/talos-systems/go-debug v0.2.0
 	github.com/talos-systems/go-loadbalancer v0.1.1
 	github.com/talos-systems/go-procfs v0.0.0-20210108152626-8cbc42d3dc24
@@ -30,7 +30,7 @@ require (
 	github.com/talos-systems/sidero v0.0.0-00010101000000-000000000000
 	github.com/talos-systems/talos v0.10.0-alpha.2.0.20210518203841-d3d9112f288d // 0.11-alpha to get DefaultBootOrder
 	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210513202018-8d73bc5999b4 // v0.10.2
-	google.golang.org/grpc v1.37.1
+	google.golang.org/grpc v1.38.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/api v0.21.0
 	k8s.io/apiextensions-apiserver v0.19.1
