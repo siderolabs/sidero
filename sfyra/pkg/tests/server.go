@@ -27,7 +27,7 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/vm"
 )

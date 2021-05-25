@@ -15,8 +15,8 @@ import (
 	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	caps "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
-	metal "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	caps "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	scm "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // NewClient is responsible for creating a controller-runtime k8s client with all schemas.
@@ -62,7 +62,7 @@ func NewClient(kubeconfig *string) (client.Client, error) {
 		return nil, err
 	}
 
-	if err = metal.AddToScheme(scheme); err != nil {
+	if err = scm.AddToScheme(scheme); err != nil {
 		return nil, err
 	}
 

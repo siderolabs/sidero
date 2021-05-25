@@ -15,6 +15,18 @@ preface = """\
 
 [notes]
 
+    [notes.app-rename]
+        title = "Application Renaming"
+        description = """\
+The layout of this repository, as well as the naming of the two apps that make up Sidero have changed.
+In an effort to give better clarity to users, there are two apps:
+
+- caps-controller-manager: Responsible for all things related to the Cluster API infrastructur provider
+- sidero-controller-manager: Responsible for all things related to Sidero's bare metal integrations.
+
+It should also be noted that container image names, as well as the kustomize code has been edited to match.
+"""
+
     [notes.ipxe-script]
         title = "iPXE script"
         description = """\

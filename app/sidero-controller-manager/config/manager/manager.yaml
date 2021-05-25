@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tftp
+  namespace: system
+spec:
+  ports:
+    - port: 69
+      targetPort: tftp
+      protocol: UDP
+  selector:
+    control-plane: sidero-controller-manager
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: http
+  namespace: system
+spec:
+  ports:
+    - port: ${SIDERO_CONTROLLER_MANAGER_API_PORT:=8081}
+      targetPort: http
+      protocol: TCP
+  selector:
+    control-plane: sidero-controller-manager
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controller-manager
+  namespace: system
+  labels:
+    control-plane: sidero-controller-manager
+spec:
+  selector:
+    matchLabels:
+      control-plane: sidero-controller-manager
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        control-plane: sidero-controller-manager
+    spec:
+      hostNetwork: ${SIDERO_CONTROLLER_MANAGER_HOST_NETWORK:=false}
+      containers:
+        - command:
+            - /manager
+          args:
+            - --metrics-addr=127.0.0.1:8080
+            - --api-endpoint=${SIDERO_CONTROLLER_MANAGER_API_ENDPOINT:=-}
+            - --api-port=${SIDERO_CONTROLLER_MANAGER_API_PORT:=8081}
+            - --extra-agent-kernel-args=${SIDERO_CONTROLLER_MANAGER_EXTRA_AGENT_KERNEL_ARGS:=-}
+            - --boot-from-disk-method=${SIDERO_CONTROLLER_MANAGER_BOOT_FROM_DISK_METHOD:=ipxe-exit}
+            - --auto-accept-servers=${SIDERO_CONTROLLER_MANAGER_AUTO_ACCEPT_SERVERS:=false}
+            - --insecure-wipe=${SIDERO_CONTROLLER_MANAGER_INSECURE_WIPE:=true}
+            - --auto-bmc-setup=${SIDERO_CONTROLLER_MANAGER_AUTO_BMC_SETUP:=true}
+            - --server-reboot-timeout=${SIDERO_CONTROLLER_MANAGER_SERVER_REBOOT_TIMEOUT:=20m}
+            - --test-power-simulated-explicit-failure-prob=${SIDERO_CONTROLLER_MANAGER_TEST_POWER_EXPLICIT_FAILURE:=0}
+            - --test-power-simulated-silent-failure-prob=${SIDERO_CONTROLLER_MANAGER_TEST_POWER_SILENT_FAILURE:=0}
+          image: controller:latest
+          imagePullPolicy: Always
+          name: manager
+          ports:
+            - name: tftp
+              containerPort: 69
+              protocol: UDP
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+          env:
+            - name: API_ENDPOINT
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+      terminationGracePeriodSeconds: 10

@@ -27,8 +27,8 @@ import (
 	"sigs.k8s.io/cluster-api/api/v1alpha3"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
-	metal "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // Cluster attaches to the provisioned CAPI cluster and provides talos.Cluster.

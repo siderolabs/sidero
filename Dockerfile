@@ -53,47 +53,47 @@ RUN --mount=type=cache,target=/.cache ! go mod tidy -v 2>&1 | grep .
 
 FROM base AS manifests-build
 RUN --mount=type=cache,target=/.cache controller-gen \
-  crd:crdVersions=v1 paths="./app/cluster-api-provider-sidero/api/..." output:crd:dir="./app/cluster-api-provider-sidero/config/crd/bases" \
-  rbac:roleName=manager-role paths="./app/cluster-api-provider-sidero/controllers/..." output:rbac:dir="./app/cluster-api-provider-sidero/config/rbac" \
-  webhook output:webhook:dir="./app/cluster-api-provider-sidero/config/webhook"
+  crd:crdVersions=v1 paths="./app/caps-controller-manager/api/..." output:crd:dir="./app/caps-controller-manager/config/crd/bases" \
+  rbac:roleName=manager-role paths="./app/caps-controller-manager/controllers/..." output:rbac:dir="./app/caps-controller-manager/config/rbac" \
+  webhook output:webhook:dir="./app/caps-controller-manager/config/webhook"
 RUN --mount=type=cache,target=/.cache controller-gen \
-  crd:crdVersions=v1 paths="./app/metal-controller-manager/api/..." output:crd:dir="./app/metal-controller-manager/config/crd/bases" \
-  rbac:roleName=manager-role paths="./app/metal-controller-manager/controllers/..." output:rbac:dir="./app/metal-controller-manager/config/rbac" \
-  webhook output:webhook:dir="./app/metal-controller-manager/config/webhook"
+  crd:crdVersions=v1 paths="./app/sidero-controller-manager/api/..." output:crd:dir="./app/sidero-controller-manager/config/crd/bases" \
+  rbac:roleName=manager-role paths="./app/sidero-controller-manager/controllers/..." output:rbac:dir="./app/sidero-controller-manager/config/rbac" \
+  webhook output:webhook:dir="./app/sidero-controller-manager/config/webhook"
 
 FROM scratch AS manifests
-COPY --from=manifests-build /src/app/cluster-api-provider-sidero/config ./app/cluster-api-provider-sidero/config
-COPY --from=manifests-build /src/app/metal-controller-manager/config ./app/metal-controller-manager/config
+COPY --from=manifests-build /src/app/caps-controller-manager/config ./app/caps-controller-manager/config
+COPY --from=manifests-build /src/app/sidero-controller-manager/config ./app/sidero-controller-manager/config
 
 FROM base AS generate-build
-COPY ./app/metal-controller-manager/internal/api/api.proto \
-  /src/app/metal-controller-manager/internal/api/api.proto
-RUN protoc -I/src/app/metal-controller-manager/internal/api \
-  --go_out=paths=source_relative:/src/app/metal-controller-manager/internal/api --go-grpc_out=paths=source_relative:/src/app/metal-controller-manager/internal/api \
+COPY ./app/sidero-controller-manager/internal/api/api.proto \
+  /src/app/sidero-controller-manager/internal/api/api.proto
+RUN protoc -I/src/app/sidero-controller-manager/internal/api \
+  --go_out=paths=source_relative:/src/app/sidero-controller-manager/internal/api --go-grpc_out=paths=source_relative:/src/app/sidero-controller-manager/internal/api \
   api.proto
 RUN --mount=type=cache,target=/.cache controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
-RUN --mount=type=cache,target=/.cache conversion-gen --input-dirs="./app/cluster-api-provider-sidero/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
+RUN --mount=type=cache,target=/.cache conversion-gen --input-dirs="./app/caps-controller-manager/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
 ARG MODULE
 RUN --mount=type=cache,target=/.cache gofumports -w -local ${MODULE} .
 
 FROM scratch AS generate
-COPY --from=generate-build /src/app/cluster-api-provider-sidero/api ./app/cluster-api-provider-sidero/api
-COPY --from=generate-build /src/app/metal-controller-manager/api ./app/metal-controller-manager/api
-COPY --from=generate-build /src/app/metal-controller-manager/internal/api ./app/metal-controller-manager/internal/api
+COPY --from=generate-build /src/app/caps-controller-manager/api ./app/caps-controller-manager/api
+COPY --from=generate-build /src/app/sidero-controller-manager/api ./app/sidero-controller-manager/api
+COPY --from=generate-build /src/app/sidero-controller-manager/internal/api ./app/sidero-controller-manager/internal/api
 
 FROM --platform=${BUILDPLATFORM} alpine:3.13 AS release-build
 ADD https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.1.0/kustomize_v4.1.0_linux_amd64.tar.gz .
 RUN  tar -xf kustomize_v4.1.0_linux_amd64.tar.gz -C /usr/local/bin && rm kustomize_v4.1.0_linux_amd64.tar.gz
 COPY ./config ./config
 COPY ./templates ./templates
-COPY ./app/cluster-api-provider-sidero/config ./app/cluster-api-provider-sidero/config
-COPY ./app/metal-controller-manager/config ./app/metal-controller-manager/config
+COPY ./app/caps-controller-manager/config ./app/caps-controller-manager/config
+COPY ./app/sidero-controller-manager/config ./app/sidero-controller-manager/config
 ARG REGISTRY_AND_USERNAME
 ARG TAG
-RUN cd ./app/cluster-api-provider-sidero/config/manager \
-  && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/cluster-api-provider-sidero:${TAG}
-RUN cd ./app/metal-controller-manager/config/manager \
-  && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/metal-controller-manager:${TAG}
+RUN cd ./app/caps-controller-manager/config/manager \
+  && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/caps-controller-manager:${TAG}
+RUN cd ./app/sidero-controller-manager/config/manager \
+  && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/sidero-controller-manager:${TAG}
 RUN kustomize build config > /infrastructure-components.yaml \
   && cp ./config/metadata/metadata.yaml /metadata.yaml \
   && cp ./templates/cluster-template.yaml /cluster-template.yaml
@@ -104,42 +104,42 @@ COPY --from=release-build /infrastructure-components.yaml /infrastructure-sidero
 COPY --from=release-build /metadata.yaml /infrastructure-sidero/${TAG}/metadata.yaml
 COPY --from=release-build /cluster-template.yaml /infrastructure-sidero/${TAG}/cluster-template.yaml
 
-FROM base AS build-cluster-api-provider-sidero
+FROM base AS build-caps-controller-manager
 ARG TARGETARCH
 ARG GO_BUILDFLAGS
 ARG GO_LDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /manager ./app/cluster-api-provider-sidero
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /manager ./app/caps-controller-manager
 RUN chmod +x /manager
 
 ## TODO(rsmitty): make bmc pkg and move to talos-systems image
-FROM scratch AS cluster-api-provider-sidero
+FROM scratch AS caps-controller-manager
 COPY --from=pkg-ca-certificates / /
 COPY --from=pkg-fhs / /
 COPY --from=pkg-musl / /
 COPY --from=pkg-libressl / /
 COPY --from=pkg-ipmitool / /
-COPY --from=build-cluster-api-provider-sidero /manager /manager
+COPY --from=build-caps-controller-manager /manager /manager
 LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
 
-FROM base AS build-metal-controller-manager
+FROM base AS build-sidero-controller-manager
 ARG TALOS_RELEASE
 ARG TARGETARCH
 ARG GO_BUILDFLAGS
 ARG GO_LDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X main.TalosRelease=${TALOS_RELEASE}" -o /manager ./app/metal-controller-manager
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X main.TalosRelease=${TALOS_RELEASE}" -o /manager ./app/sidero-controller-manager
 RUN chmod +x /manager
 
 FROM base AS agent-build-amd64
 ARG GO_BUILDFLAGS
 ARG GO_LDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=amd64 go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /agent ./app/metal-controller-manager/cmd/agent
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=amd64 go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /agent ./app/sidero-controller-manager/cmd/agent
 RUN chmod +x /agent
 
 FROM base AS agent-build-arm64
 ARG GO_BUILDFLAGS
 ARG GO_LDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=arm64 go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /agent ./app/metal-controller-manager/cmd/agent
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=arm64 go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /agent ./app/sidero-controller-manager/cmd/agent
 RUN chmod +x /agent
 
 FROM base AS initramfs-archive-amd64
@@ -164,7 +164,7 @@ COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2 ./lib/firmware/bnx2
 COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
 RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 
-FROM scratch AS metal-controller-manager-image
+FROM scratch AS sidero-controller-manager-image
 COPY --from=pkg-ca-certificates / /
 COPY --from=pkg-fhs / /
 COPY --from=pkg-musl / /
@@ -178,9 +178,9 @@ COPY --from=initramfs-archive-amd64 /initramfs.xz /var/lib/sidero/env/agent-amd6
 COPY --from=initramfs-archive-arm64 /initramfs.xz /var/lib/sidero/env/agent-arm64/initramfs.xz
 COPY --from=pkg-kernel-amd64 /boot/vmlinuz /var/lib/sidero/env/agent-amd64/vmlinuz
 COPY --from=pkg-kernel-arm64 /boot/vmlinuz /var/lib/sidero/env/agent-arm64/vmlinuz
-COPY --from=build-metal-controller-manager /manager /manager
+COPY --from=build-sidero-controller-manager /manager /manager
 
-FROM metal-controller-manager-image AS metal-controller-manager
+FROM sidero-controller-manager-image AS sidero-controller-manager
 LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
 ENTRYPOINT [ "/manager" ]
 
