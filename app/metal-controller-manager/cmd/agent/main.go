@@ -262,11 +262,20 @@ func mainFunc() error {
 	if createResp.GetSetupBmc() {
 		log.Println("Attempting to automatically discover and configure BMC")
 
-		// nb: we don't consider failure to get BMC info a hard failure.
+		// Attempt to discover the BMC IP
+		// nb: we don't consider failure to get BMC info a hard failure
 		//     users can always patch the bmc info to the server themselves.
-		err := attemptBMCSetup(ctx, client, s)
+		err := attemptBMCIP(ctx, client, s)
 		if err != nil {
-			log.Printf("encountered error setting up BMC. skipping setup: %q", err.Error())
+			log.Printf("encountered error discovering BMC IP. skipping setup: %q", err.Error())
+		} else {
+			// Attempt to add sidero user to BMC only if we discovered the IP
+			// nb: we don't consider failure to get BMC info a hard failure.
+			//     users can always patch the bmc info to the server themselves.
+			err = attemptBMCUserSetup(ctx, client, s)
+			if err != nil {
+				log.Printf("encountered error setting up BMC user. skipping setup: %q", err.Error())
+			}
 		}
 	}
 
@@ -381,7 +390,7 @@ func main() {
 	shutdown(mainFunc())
 }
 
-func attemptBMCSetup(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) error {
+func attemptBMCIP(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) error {
 	uuid, err := s.SystemInformation().UUID()
 	if err != nil {
 		return err
@@ -407,6 +416,47 @@ func attemptBMCSetup(ctx context.Context, client api.AgentClient, s *smbios.SMBI
 
 	bmcIP := net.IP(ipResp.Data)
 	bmcInfo.Ip = bmcIP.String()
+
+	// Attempt to update server object
+	err = retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second), retry.WithErrorLogging(true)).Retry(func() error {
+		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
+
+		_, err = client.UpdateBMCInfo(
+			ctx,
+			&api.UpdateBMCInfoRequest{
+				Uuid:    uuid.String(),
+				BmcInfo: bmcInfo,
+			},
+		)
+
+		if err != nil {
+			return retry.ExpectedError(err)
+		}
+
+		return nil
+	})
+
+	return nil
+}
+
+func attemptBMCUserSetup(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) error {
+	uuid, err := s.SystemInformation().UUID()
+	if err != nil {
+		return err
+	}
+
+	bmcInfo := &api.BMCInfo{}
+
+	// Create "open" client
+	bmcSpec := v1alpha1.BMC{
+		Interface: "open",
+	}
+
+	ipmiClient, err := ipmi.NewClient(bmcSpec)
+	if err != nil {
+		return err
+	}
 
 	// Get user summary to see how many user slots
 	summResp, err := ipmiClient.GetUserSummary()
