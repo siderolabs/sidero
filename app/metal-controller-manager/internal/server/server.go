@@ -266,22 +266,35 @@ func (s *server) Heartbeat(ctx context.Context, in *api.HeartbeatRequest) (*api.
 }
 
 func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest) (*api.UpdateBMCInfoResponse, error) {
-	if in.GetBmcInfo() != nil {
-		bmcSecretName := in.GetUuid() + "-bmc"
+	bmcInfo := in.GetBmcInfo()
 
+	// Fetch corresponding server
+	obj := &metalv1alpha1.Server{}
+
+	if err := s.c.Get(ctx, types.NamespacedName{Name: in.GetUuid()}, obj); err != nil {
+		return nil, err
+	}
+
+	// Create a BMC struct if non-existent
+	if obj.Spec.BMC == nil {
+		obj.Spec.BMC = &metalv1alpha1.BMC{}
+	}
+
+	// Update bmc info with IP if we've got it.
+	if ip := in.GetBmcInfo().GetIp(); ip != "" {
+		obj.Spec.BMC.Endpoint = ip
+	}
+
+	// Generate or update bmc secret if we have creds
+	if bmcInfo.User != "" && bmcInfo.Pass != "" {
 		// Create or update creds secret
 		credsSecret := &corev1.Secret{}
 		exists := true
 
-		// Fetch corresponding server
-		obj := &metalv1alpha1.Server{}
-
-		if err := s.c.Get(ctx, types.NamespacedName{Name: in.GetUuid()}, obj); err != nil {
-			return nil, err
-		}
-
 		// For auto-created BMC info, we will *always* drop the creds in default namespace
 		// This ensures they'll come along for the ride in a "default" clusterctl move based on our cluster templates.
+		bmcSecretName := in.GetUuid() + "-bmc"
+
 		if err := s.c.Get(ctx, types.NamespacedName{Namespace: corev1.NamespaceDefault, Name: bmcSecretName}, credsSecret); err != nil {
 			if !apierrors.IsNotFound(err) {
 				return nil, err
@@ -316,38 +329,35 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 		}
 
 		// Update server spec with pointers to endpoint and creds secret
-
-		obj.Spec.BMC = &metalv1alpha1.BMC{
-			Endpoint: in.GetBmcInfo().GetIp(),
-			UserFrom: &metalv1alpha1.CredentialSource{
-				SecretKeyRef: &metalv1alpha1.SecretKeyRef{
-					Namespace: corev1.NamespaceDefault,
-					Name:      bmcSecretName,
-					Key:       "user",
-				},
-			},
-			PassFrom: &metalv1alpha1.CredentialSource{
-				SecretKeyRef: &metalv1alpha1.SecretKeyRef{
-					Namespace: corev1.NamespaceDefault,
-					Name:      bmcSecretName,
-					Key:       "pass",
-				},
+		obj.Spec.BMC.UserFrom = &metalv1alpha1.CredentialSource{
+			SecretKeyRef: &metalv1alpha1.SecretKeyRef{
+				Namespace: corev1.NamespaceDefault,
+				Name:      bmcSecretName,
+				Key:       "user",
 			},
 		}
 
-		log.Printf("Updating server %q with BMC info", in.GetUuid())
-
-		if err := s.c.Update(ctx, obj); err != nil {
-			return nil, err
+		obj.Spec.BMC.PassFrom = &metalv1alpha1.CredentialSource{
+			SecretKeyRef: &metalv1alpha1.SecretKeyRef{
+				Namespace: corev1.NamespaceDefault,
+				Name:      bmcSecretName,
+				Key:       "pass",
+			},
 		}
-
-		ref, err := reference.GetReference(s.scheme, obj)
-		if err != nil {
-			return nil, err
-		}
-
-		s.recorder.Event(ref, corev1.EventTypeNormal, "BMC Update", "BMC info updated via API.")
 	}
+
+	log.Printf("Updating server %q with BMC info", in.GetUuid())
+
+	if err := s.c.Update(ctx, obj); err != nil {
+		return nil, err
+	}
+
+	ref, err := reference.GetReference(s.scheme, obj)
+	if err != nil {
+		return nil, err
+	}
+
+	s.recorder.Event(ref, corev1.EventTypeNormal, "BMC Update", "BMC info updated via API.")
 
 	resp := &api.UpdateBMCInfoResponse{}
 
