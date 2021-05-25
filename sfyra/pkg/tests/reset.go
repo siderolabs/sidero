@@ -15,8 +15,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	metal "github.com/talos-systems/sidero/app/cluster-api-provider-sidero/api/v1alpha3"
-	sidero "github.com/talos-systems/sidero/app/metal-controller-manager/api/v1alpha1"
+	metal "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	sidero "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // TestServerReset verifies that all the servers got reset.

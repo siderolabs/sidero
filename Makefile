@@ -53,7 +53,7 @@ COMMON_ARGS += --build-arg=CGO_ENABLED=$(CGO_ENABLED)
 COMMON_ARGS += --build-arg=GO_BUILDFLAGS="$(GO_BUILDFLAGS)"
 COMMON_ARGS += --build-arg=GO_LDFLAGS="$(GO_LDFLAGS)"
 
-all: manifests generate cluster-api-provider-sidero metal-controller-manager sfyra
+all: manifests generate caps-controller-manager sidero-controller-manager sfyra
 
 
 # Help Menu
@@ -128,12 +128,12 @@ check-dirty: ## Verifies that source tree is not dirty
 release: manifests ## Create the release YAML. The build result will be ouput to the specified local destination.
 	@$(MAKE) local-$@ DEST=./$(ARTIFACTS)
 
-.PHONY: cluster-api-provider-sidero
-cluster-api-provider-sidero: ## Build the CAPI provider container image.
+.PHONY: caps-controller-manager
+caps-controller-manager: ## Build the CAPI provider container image.
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
-.PHONY: metal-controller-manager
-metal-controller-manager: ## Build the CAPI provider container image.
+.PHONY: sidero-controller-manager
+sidero-controller-manager: ## Build the CAPI provider container image.
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
 .PHONY: release-notes

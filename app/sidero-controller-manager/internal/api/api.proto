@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package api;
+
+option go_package =
+    "github.com/talos-systems/sidero/app/sidero-controller-manager/internal/api";
+
+service Agent {
+  rpc CreateServer(CreateServerRequest) returns(CreateServerResponse);
+  rpc MarkServerAsWiped(MarkServerAsWipedRequest)
+      returns(MarkServerAsWipedResponse);
+  rpc ReconcileServerAddresses(ReconcileServerAddressesRequest)
+      returns(ReconcileServerAddressesResponse);
+  rpc Heartbeat(HeartbeatRequest) returns(HeartbeatResponse);
+  rpc UpdateBMCInfo(UpdateBMCInfoRequest) returns(UpdateBMCInfoResponse);
+}
+
+message BMCInfo {
+  string ip = 1;
+  string user = 2;
+  string pass = 3;
+}
+
+message SystemInformation {
+  string uuid = 1;
+  string manufacturer = 2;
+  string product_name = 3;
+  string version = 4;
+  string serial_number = 5;
+  string sku_number = 6;
+  string family = 7;
+}
+
+message CPU {
+  string manufacturer = 1;
+  string version = 2;
+}
+
+message CreateServerRequest {
+  SystemInformation system_information = 1;
+  CPU cpu = 2;
+  string hostname = 3;
+}
+
+message Address {
+  string type = 1;
+  string address = 2;
+}
+
+message CreateServerResponse {
+  bool wipe = 1;
+  bool insecure_wipe = 2;
+  bool setup_bmc = 3;
+  double reboot_timeout = 4;
+}
+
+message MarkServerAsWipedRequest { string uuid = 1; }
+message HeartbeatRequest { string uuid = 1; }
+
+message MarkServerAsWipedResponse {}
+message HeartbeatResponse {}
+
+message UpdateBMCInfoRequest {
+  string uuid = 1;
+  BMCInfo bmc_info = 2;
+}
+
+message UpdateBMCInfoResponse {}
+
+message ReconcileServerAddressesRequest {
+  string uuid = 1;
+  repeated Address address = 2;
+}
+
+message ReconcileServerAddressesResponse {}
