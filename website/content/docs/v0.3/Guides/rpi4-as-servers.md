@@ -1,9 +1,8 @@
 ---
-description: "Using Raspberrypi pi 4 as servers"
+description: "Using Raspberrypi Pi 4 as servers"
 weight: 6
+title: "Raspberry Pi4 as Servers"
 ---
-
-# Raspberrypi4 as servers
 
 This guide will explain on how to use Sidero to manage Raspberrypi-4's as
 servers.
@@ -16,7 +15,7 @@ Once you finish with this guide, you will need to go back to the
 bootstrapping guide and continue with "Register the servers".
 
 The rest of this guide goes with the assumption that you've a cluster setup with
-sidero and ready to accept servers.
+Sidero and ready to accept servers.
 This guide will explain the changes that needs to be made to be able to accept RPI4 as server.
 
 ## RPI4 boot process
