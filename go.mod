@@ -29,7 +29,7 @@ require (
 	github.com/talos-systems/go-retry v0.3.0
 	github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a
 	github.com/talos-systems/net v0.2.1-0.20210212213224-05190541b0fa
-	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210513202018-8d73bc5999b4 // v0.10.2
+	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210520132439-70ee15b793fb // v0.10.3
 	go.uber.org/zap v1.16.0 // indirect
 	golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392 // indirect
 	golang.org/x/mod v0.4.0 // indirect
