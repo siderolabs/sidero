@@ -29,7 +29,7 @@ require (
 	github.com/talos-systems/net v0.2.1-0.20210212213224-05190541b0fa
 	github.com/talos-systems/sidero v0.0.0-00010101000000-000000000000
 	github.com/talos-systems/talos v0.10.0-alpha.2.0.20210518203841-d3d9112f288d // 0.11-alpha to get DefaultBootOrder
-	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210513202018-8d73bc5999b4 // v0.10.2
+	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210520132439-70ee15b793fb // v0.10.3
 	google.golang.org/grpc v1.38.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/api v0.21.0

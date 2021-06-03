@@ -222,7 +222,7 @@ github.com/containerd/containerd v1.3.2/go.mod h1:bC6axHOhabU15QhwfG7w5PipXdVtMX
 github.com/containerd/containerd v1.4.0-beta.2.0.20200729163537-40b22ef07410/go.mod h1:bC6axHOhabU15QhwfG7w5PipXdVtMXFTttgp+kVtyUA=
 github.com/containerd/containerd v1.4.1/go.mod h1:bC6axHOhabU15QhwfG7w5PipXdVtMXFTttgp+kVtyUA=
 github.com/containerd/containerd v1.4.3/go.mod h1:bC6axHOhabU15QhwfG7w5PipXdVtMXFTttgp+kVtyUA=
-github.com/containerd/containerd v1.4.5/go.mod h1:bC6axHOhabU15QhwfG7w5PipXdVtMXFTttgp+kVtyUA=
+github.com/containerd/containerd v1.4.6/go.mod h1:bC6axHOhabU15QhwfG7w5PipXdVtMXFTttgp+kVtyUA=
 github.com/containerd/containerd v1.5.0-beta.1/go.mod h1:5HfvG1V2FsKesEGQ17k5/T7V960Tmcumvqn8Mc+pCYQ=
 github.com/containerd/containerd v1.5.0-beta.3/go.mod h1:/wr9AVtEM7x9c+n0+stptlo/uBBoBORwEx6ardVcmKU=
 github.com/containerd/containerd v1.5.0-beta.4/go.mod h1:GmdgZd2zA2GYIBZ0w09ZvgqEq8EfBp/m3lcVZIvPHhI=
@@ -1195,8 +1195,8 @@ github.com/talos-systems/talos v0.10.0-alpha.2.0.20210518203841-d3d9112f288d/go.
 github.com/talos-systems/talos/pkg/machinery v0.0.0-20210216142802-8d7a36cc0cc2/go.mod h1:hhWsbfLrP53M03VRmJ5j92yimTHx0NBwngaXnvKkPE0=
 github.com/talos-systems/talos/pkg/machinery v0.0.0-20210218160848-32d25885288f/go.mod h1:7xqrV27kGtf2On8mrFjhv6dlNBRvtYsr+1npSZXJDlc=
 github.com/talos-systems/talos/pkg/machinery v0.0.0-20210302191918-8ffb55943c71/go.mod h1:iXEEFjuw0F65yZw10nKBd8XI4SBQNfJ0J02Mt26pfkA=
-github.com/talos-systems/talos/pkg/machinery v0.0.0-20210513202018-8d73bc5999b4 h1:azrJdauho93eMpb3ufIO1gf087c17/8DOBK0nfuC/CI=
-github.com/talos-systems/talos/pkg/machinery v0.0.0-20210513202018-8d73bc5999b4/go.mod h1:v/I3uBRKB3P04fnBeM1e9i/4XkzgE2HYE3tLc8f1VP0=
+github.com/talos-systems/talos/pkg/machinery v0.0.0-20210520132439-70ee15b793fb h1:4kbvoWOQrwh5+YPa1tFtukG3VOnB2MzHAxF3K0A+U3U=
+github.com/talos-systems/talos/pkg/machinery v0.0.0-20210520132439-70ee15b793fb/go.mod h1:aFEgwo1bYcfADnnUCndIb8hT00WYHYCy77pq9tYocF4=
 github.com/tchap/go-patricia v2.2.6+incompatible/go.mod h1:bmLyhP68RS6kStMGxByiQ23RP/odRBOTVjwp2cDyi6I=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
