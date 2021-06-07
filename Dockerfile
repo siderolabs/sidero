@@ -10,10 +10,16 @@ ARG PKGS
 FROM ghcr.io/talos-systems/ca-certificates:${PKGS} AS pkg-ca-certificates
 FROM ghcr.io/talos-systems/fhs:${PKGS} AS pkg-fhs
 FROM ghcr.io/talos-systems/ipmitool:${PKGS} AS pkg-ipmitool
+FROM --platform=amd64 ghcr.io/talos-systems/ipmitool:${PKGS} AS pkg-ipmitool-amd64
+FROM --platform=arm64 ghcr.io/talos-systems/ipmitool:${PKGS} AS pkg-ipmitool-arm64
 FROM ghcr.io/talos-systems/libressl:${PKGS} AS pkg-libressl
+FROM --platform=amd64 ghcr.io/talos-systems/libressl:${PKGS} AS pkg-libressl-amd64
+FROM --platform=arm64 ghcr.io/talos-systems/libressl:${PKGS} AS pkg-libressl-arm64
 FROM --platform=amd64 ghcr.io/talos-systems/linux-firmware:${PKGS} AS pkg-linux-firmware-amd64
 FROM --platform=arm64 ghcr.io/talos-systems/linux-firmware:${PKGS} AS pkg-linux-firmware-arm64
 FROM ghcr.io/talos-systems/musl:${PKGS} AS pkg-musl
+FROM --platform=amd64 ghcr.io/talos-systems/musl:${PKGS} AS pkg-musl-amd64
+FROM --platform=arm64 ghcr.io/talos-systems/musl:${PKGS} AS pkg-musl-arm64
 FROM --platform=amd64 ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel-amd64
 FROM --platform=arm64 ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel-arm64
 FROM ghcr.io/talos-systems/liblzma:${PKGS} AS pkg-liblzma
@@ -145,9 +151,9 @@ RUN chmod +x /agent
 FROM base AS initramfs-archive-amd64
 WORKDIR /initramfs
 COPY --from=pkg-ca-certificates / .
-COPY --from=pkg-musl / .
-COPY --from=pkg-libressl / .
-COPY --from=pkg-ipmitool / .
+COPY --from=pkg-musl-amd64 / .
+COPY --from=pkg-libressl-amd64 / .
+COPY --from=pkg-ipmitool-amd64 / .
 COPY --from=agent-build-amd64 /agent ./init
 COPY --from=pkg-linux-firmware-amd64 /lib/firmware/bnx2 ./lib/firmware/bnx2
 COPY --from=pkg-linux-firmware-amd64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
@@ -156,9 +162,9 @@ RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 
 FROM base AS initramfs-archive-arm64
 WORKDIR /initramfs
 COPY --from=pkg-ca-certificates / .
-COPY --from=pkg-musl / .
-COPY --from=pkg-libressl / .
-COPY --from=pkg-ipmitool / .
+COPY --from=pkg-musl-arm64 / .
+COPY --from=pkg-libressl-arm64 / .
+COPY --from=pkg-ipmitool-arm64 / .
 COPY --from=agent-build-arm64 /agent ./init
 COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2 ./lib/firmware/bnx2
 COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
