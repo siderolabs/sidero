@@ -1,6 +1,6 @@
 ---
 description: "A guide for bootstrapping Sidero management plane"
-weight: 1
+weight: 9
 ---
 
 # Scale the Workload Cluster

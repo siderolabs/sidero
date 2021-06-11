@@ -1,9 +1,9 @@
 ---
-description: "Tutorial Index"
+description: "Overview"
 weight: 1
 ---
 
-# Tutorial Index
+# Overview
 
 This tutorial will walk you through a complete Sidero setup and the formation,
 scaling, and destruction of a workload cluster.
@@ -28,7 +28,7 @@ To complete this tutorial, you will need a few things:
 1. Prerequisite: DHCP server
 1. Prerequisite: Kubernetes
 1. Install Sidero
-1. Expose Services
+1. Expose services
 1. Import workload machines
 1. Create a workload cluster
 1. Scale the workload cluster

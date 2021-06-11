@@ -1,6 +1,6 @@
 ---
 description: "Create a Workload Cluster"
-weight: 1
+weight: 8
 ---
 
 # Create a Workload Cluster

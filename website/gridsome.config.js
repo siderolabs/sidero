@@ -60,20 +60,22 @@ module.exports = {
         pathPrefix: "/docs",
         sidebarOrder: {
           "v0.3": [
+            { title: "Overview", method: "weighted" },
             { title: "Getting Started", method: "weighted" },
-            { title: "Configuration", method: "alphabetical" },
+            { title: "Resource Configuration", method: "alphabetical" },
             { title: "Guides", method: "alphabetical" },
           ],
           "v0.2": [
+            { title: "Overview", method: "weighted" },
             { title: "Getting Started", method: "weighted" },
-            { title: "Configuration", method: "alphabetical" },
+            { title: "Resource Configuration", method: "alphabetical" },
             { title: "Guides", method: "alphabetical" },
           ],
           "v0.1": [
-            { title: "Getting Started", method: "weighted" },
-            { title: "Configuration", method: "alphabetical" },
+            { title: "Overview", method: "weighted" },
+            { title: "Resource Configuration", method: "alphabetical" },
             { title: "Guides", method: "alphabetical" },
-         ],
+          ],
         },
         remark: {
           externalLinksTarget: "_blank",

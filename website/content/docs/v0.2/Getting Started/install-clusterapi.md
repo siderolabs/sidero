@@ -1,6 +1,6 @@
 ---
 description: "Install Sidero"
-weight: 1
+weight: 5
 ---
 
 # Install Sidero
