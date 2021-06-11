@@ -1,6 +1,6 @@
 ---
 description: "Prerequisite: CLI tools"
-weight: 10
+weight: 99
 ---
 
 # Prerequisite: CLI tools

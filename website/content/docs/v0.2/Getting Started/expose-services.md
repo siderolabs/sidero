@@ -1,6 +1,6 @@
 ---
 description: "A guide for bootstrapping Sidero management plane"
-weight: 1
+weight: 6
 ---
 
 # Expose Sidero Services
@@ -10,7 +10,7 @@ weight: 1
 There are two external Services which Sidero serves and which much be made
 reachable by the servers which it will be driving.
 
-For most servers, TFTP (port 69/udp) will be needed.\
+For most servers, TFTP (port 69/udp) will be needed.
 This is used for PXE booting, both BIOS and UEFI.
 Being a primitive UDP protocl, many load balancers do not support TFTP.
 Instead, solutions such as [MetalLB](https://metallb.universe.tf) may be used to expose TFTP over a known IP address.

@@ -1,6 +1,6 @@
 ---
 description: "A guide for bootstrapping Sidero management plane"
-weight: 1
+weight: 11
 ---
 
 # Optional: Pivot management cluster
