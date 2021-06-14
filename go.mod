@@ -20,7 +20,7 @@ require (
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
-	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-alpha.12
+	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0-beta.0
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0-alpha.13
 	github.com/talos-systems/go-blockdevice v0.2.1-0.20210407132431-1d830a25f64f
 	github.com/talos-systems/go-debug v0.2.0
@@ -29,7 +29,7 @@ require (
 	github.com/talos-systems/go-retry v0.3.0
 	github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a
 	github.com/talos-systems/net v0.2.1-0.20210212213224-05190541b0fa
-	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210520132439-70ee15b793fb // v0.10.3
+	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210520203624-828772cec9a3 // v0.10.3
 	go.uber.org/zap v1.16.0 // indirect
 	golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392 // indirect
 	golang.org/x/mod v0.4.0 // indirect
