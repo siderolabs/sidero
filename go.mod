@@ -8,10 +8,9 @@ replace (
 )
 
 require (
-	github.com/evanphx/json-patch v4.9.0+incompatible
+	github.com/evanphx/json-patch v4.11.0+incompatible
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.4.0
-	github.com/go-logr/zapr v0.2.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.13.0
@@ -30,21 +29,16 @@ require (
 	github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a
 	github.com/talos-systems/net v0.2.1-0.20210212213224-05190541b0fa
 	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210520132439-70ee15b793fb // v0.10.3
-	go.uber.org/zap v1.16.0 // indirect
-	golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392 // indirect
-	golang.org/x/mod v0.4.0 // indirect
 	golang.org/x/net v0.0.0-20210505214959-0714010a04ed
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6
-	golang.org/x/tools v0.0.0-20210101214203-2dba1e4ea05c // indirect
+	golang.org/x/sys v0.0.0-20210603081109-ebe580a85c40
 	google.golang.org/grpc v1.38.0
 	google.golang.org/protobuf v1.26.0
-	k8s.io/api v0.19.3
-	k8s.io/apiextensions-apiserver v0.19.1
-	k8s.io/apimachinery v0.19.3
-	k8s.io/apiserver v0.19.3 // indirect
-	k8s.io/client-go v0.19.3
-	k8s.io/utils v0.0.0-20201110183641-67b214c5f920
+	k8s.io/api v0.21.1
+	k8s.io/apiextensions-apiserver v0.21.1
+	k8s.io/apimachinery v0.21.1
+	k8s.io/client-go v0.21.1
+	k8s.io/utils v0.0.0-20210527160623-6fdb442a123b
 	sigs.k8s.io/cluster-api v0.3.12
-	sigs.k8s.io/controller-runtime v0.6.3
+	sigs.k8s.io/controller-runtime v0.9.0
 )
