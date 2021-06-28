@@ -25,7 +25,7 @@ require (
 	github.com/talos-systems/go-debug v0.2.0
 	github.com/talos-systems/go-loadbalancer v0.1.1
 	github.com/talos-systems/go-procfs v0.0.0-20210108152626-8cbc42d3dc24
-	github.com/talos-systems/go-retry v0.3.0
+	github.com/talos-systems/go-retry v0.3.1
 	github.com/talos-systems/net v0.2.1-0.20210212213224-05190541b0fa
 	github.com/talos-systems/sidero v0.0.0-00010101000000-000000000000
 	github.com/talos-systems/talos v0.10.0-alpha.2.0.20210518203841-d3d9112f288d // 0.11-alpha to get DefaultBootOrder
