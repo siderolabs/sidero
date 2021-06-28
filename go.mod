@@ -23,7 +23,7 @@ require (
 	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0
 	github.com/talos-systems/go-blockdevice v0.2.1-0.20210407132431-1d830a25f64f
-	github.com/talos-systems/go-debug v0.2.0
+	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-kmsg v0.1.0
 	github.com/talos-systems/go-procfs v0.0.0-20210108152626-8cbc42d3dc24
 	github.com/talos-systems/go-retry v0.3.0
