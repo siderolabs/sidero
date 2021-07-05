@@ -34,6 +34,7 @@ type Manager struct {
 // Options for the CAPI installer.
 type Options struct {
 	ClusterctlConfigPath    string
+	CoreProvider            string
 	BootstrapProviders      []string
 	InfrastructureProviders []string
 	ControlPlaneProviders   []string
@@ -128,7 +129,7 @@ func (clusterAPI *Manager) Install(ctx context.Context) error {
 
 	options := client.InitOptions{
 		Kubeconfig:              kubeconfig,
-		CoreProvider:            "",
+		CoreProvider:            clusterAPI.options.CoreProvider,
 		BootstrapProviders:      clusterAPI.options.BootstrapProviders,
 		ControlPlaneProviders:   clusterAPI.options.ControlPlaneProviders,
 		InfrastructureProviders: clusterAPI.options.InfrastructureProviders,
