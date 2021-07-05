@@ -84,6 +84,7 @@ var testIntegrationCmd = &cobra.Command{
 
 			clusterAPI, err := capi.NewManager(ctx, bootstrapCluster, capi.Options{
 				ClusterctlConfigPath:    options.ClusterctlConfigPath,
+				CoreProvider:            options.CoreProvider,
 				BootstrapProviders:      options.BootstrapProviders,
 				InfrastructureProviders: options.InfrastructureProviders,
 				ControlPlaneProviders:   options.ControlPlaneProviders,
