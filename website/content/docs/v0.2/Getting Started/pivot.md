@@ -1,9 +1,8 @@
 ---
 description: "A guide for bootstrapping Sidero management plane"
 weight: 11
+title: "Optional: Pivot management cluster"
 ---
-
-# Optional: Pivot management cluster
 
 Having the Sidero cluster running inside a Docker container is not the most
 robust place for it, but it did make for an expedient start.

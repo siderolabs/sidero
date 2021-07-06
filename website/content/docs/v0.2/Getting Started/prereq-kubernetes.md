@@ -1,9 +1,8 @@
 ---
 description: "Prerequisite: Kubernetes"
 weight: 99
+title: "Prerequisite: Kubernetes"
 ---
-
-# Prerequisite: Kubernetes
 
 In order to run Sidero, you first need a Kubernetes "cluster".
 There is nothing special about this cluster.

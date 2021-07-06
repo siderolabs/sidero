@@ -1,9 +1,8 @@
 ---
 description: "A guide for bootstrapping Sidero management plane"
 weight: 9
+title: "Scale the Workload Cluster"
 ---
-
-# Scale the Workload Cluster
 
 If you have more machines available, you can scale both the controlplane
 (`TalosControlPlane`) and the workers (`MachineDeployment`) for any cluster

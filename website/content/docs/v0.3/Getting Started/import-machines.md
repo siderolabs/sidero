@@ -1,9 +1,8 @@
 ---
 description: "A guide for bootstrapping Sidero management plane"
 weight: 7
+title: "Import Workload Machines"
 ---
-
-# Import Workload Machines
 
 At this point, any servers on the same network as Sidero should network boot from Sidero.
 To register a server with Sidero, simply turn it on and Sidero will do the rest.
