@@ -1,9 +1,8 @@
 ---
 description: "Install Sidero"
 weight: 5
+title: "Install Sidero"
 ---
-
-# Install Sidero
 
 Sidero is included as a default infrastructure provider in `clusterctl`, so the
 installation of both Sidero and the Cluster API (CAPI) components is as simple

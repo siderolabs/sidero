@@ -1,9 +1,8 @@
 ---
 description: "Prerequisite: CLI tools"
 weight: 99
+title: "Prerequisite: CLI tools"
 ---
-
-# Prerequisite: CLI tools
 
 You will need three CLI tools installed on your workstation in order to interact
 with Sidero:

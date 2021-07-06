@@ -1,9 +1,8 @@
 ---
 description: "Create a Workload Cluster"
 weight: 8
+title: "Create a Workload Cluster"
 ---
-
-# Create a Workload Cluster
 
 Once created and accepted, you should see the servers that make up your ServerClasses appear as "available":
 

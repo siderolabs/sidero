@@ -1,9 +1,8 @@
 ---
 description: "Troubleshooting"
 weight: 99
+title: "Troubleshooting"
 ---
-
-# Troubleshooting
 
 The first thing to do in troubleshooting problems with the Sidero installation
 and operation is to figure out _where_ in the process that failure is occurring.

@@ -1,9 +1,8 @@
 ---
 description: "A guide for bootstrapping Sidero management plane"
 weight: 6
+title: "Expose Sidero Services"
 ---
-
-# Expose Sidero Services
 
 > If you built your cluster as specified in the [Prerequisite: Kubernetes] section in this tutorial, your services are already exposed and you can skip this section.
 

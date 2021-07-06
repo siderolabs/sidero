@@ -1,9 +1,8 @@
 ---
 description: "Overview"
 weight: 1
+title: "Overview"
 ---
-
-# Overview
 
 This tutorial will walk you through a complete Sidero setup and the formation,
 scaling, and destruction of a workload cluster.

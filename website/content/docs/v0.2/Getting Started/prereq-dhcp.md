@@ -1,9 +1,8 @@
 ---
 description: "Prerequisite: DHCP Service"
 weight: 99
+title: "Prerequisite: DHCP service"
 ---
-
-# Prerequisite: DHCP service
 
 In order to network boot Talos, we need to set up our DHCP server to supply the
 network boot parameters to our servers.
