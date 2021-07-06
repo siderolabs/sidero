@@ -270,9 +270,8 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 				r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Management", "Server powered on and set to PXE boot once.")
 			}
 
-			// remove the condition in case it was already set to make sure LastTransitionTime will be updated
-			conditions.Delete(&s, metalv1alpha1.ConditionPowerCycle)
-			conditions.MarkFalse(&s, metalv1alpha1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, "Server power cycled for wiping.")
+			// make sure message is updated in case condition was already set to make sure LastTransitionTime will be updated
+			conditions.MarkFalse(&s, metalv1alpha1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, fmt.Sprintf("Server power cycled for wiping at %s.", time.Now().Format(time.RFC3339)))
 		}
 
 		// requeue to check for wipe timeout
