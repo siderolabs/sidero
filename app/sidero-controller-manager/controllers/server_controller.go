@@ -317,7 +317,7 @@ func (r *ServerReconciler) checkBinding(ctx context.Context, req ctrl.Request) (
 }
 
 func (r *ServerReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
-	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &infrav1.MetalMachine{}, infrav1.MetalMachineServerRefField, func(rawObj runtime.Object) []string {
+	if err := mgr.GetFieldIndexer().IndexField(&infrav1.MetalMachine{}, infrav1.MetalMachineServerRefField, func(rawObj runtime.Object) []string {
 		metalMachine := rawObj.(*infrav1.MetalMachine)
 
 		if metalMachine.Spec.ServerRef == nil {
