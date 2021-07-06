@@ -22,10 +22,10 @@ require (
 	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0
 	github.com/talos-systems/go-blockdevice v0.2.1
-	github.com/talos-systems/go-debug v0.2.0
-	github.com/talos-systems/go-kmsg v0.1.0
+	github.com/talos-systems/go-debug v0.2.1
+	github.com/talos-systems/go-kmsg v0.1.1
 	github.com/talos-systems/go-procfs v0.0.0-20210108152626-8cbc42d3dc24
-	github.com/talos-systems/go-retry v0.3.0
+	github.com/talos-systems/go-retry v0.3.1
 	github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a
 	github.com/talos-systems/net v0.3.0
 	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210701194847-1179d6bafc9d // v0.11.0-beta.2
@@ -33,14 +33,13 @@ require (
 	golang.org/x/net v0.0.0-20210525063256-abc453219eb5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22
-	google.golang.org/grpc v1.38.0
-	google.golang.org/protobuf v1.26.0
-	k8s.io/api v0.19.3
-	k8s.io/apiextensions-apiserver v0.19.1
-	k8s.io/apimachinery v0.19.3
-	k8s.io/apiserver v0.19.3 // indirect
-	k8s.io/client-go v0.19.3
+	google.golang.org/grpc v1.39.0
+	google.golang.org/protobuf v1.27.1
+	k8s.io/api v0.17.9
+	k8s.io/apiextensions-apiserver v0.17.9
+	k8s.io/apimachinery v0.17.9
+	k8s.io/client-go v0.17.9
 	k8s.io/utils v0.0.0-20201110183641-67b214c5f920
-	sigs.k8s.io/cluster-api v0.3.12
-	sigs.k8s.io/controller-runtime v0.6.3
+	sigs.k8s.io/cluster-api v0.3.20
+	sigs.k8s.io/controller-runtime v0.5.14
 )

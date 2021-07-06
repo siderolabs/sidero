@@ -189,7 +189,7 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 }
 
 func (r *MetalMachineReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
-	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &infrav1.ServerBinding{}, infrav1.ServerBindingMetalMachineRefField, func(rawObj runtime.Object) []string {
+	if err := mgr.GetFieldIndexer().IndexField(&infrav1.ServerBinding{}, infrav1.ServerBindingMetalMachineRefField, func(rawObj runtime.Object) []string {
 		serverBinding := rawObj.(*infrav1.ServerBinding)
 
 		return []string{serverBinding.Spec.MetalMachineRef.Name}
@@ -306,7 +306,6 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 	r.Log.Info("Searching for node", "label", label)
 
 	nodes, err := clientset.CoreV1().Nodes().List(
-		ctx,
 		metav1.ListOptions{
 			LabelSelector: label,
 		},
@@ -336,7 +335,7 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 
 		node.Spec.ProviderID = providerID
 
-		_, err = clientset.CoreV1().Nodes().Update(ctx, &node, metav1.UpdateOptions{})
+		_, err = clientset.CoreV1().Nodes().Update(&node)
 		if err != nil {
 			return err
 		}
