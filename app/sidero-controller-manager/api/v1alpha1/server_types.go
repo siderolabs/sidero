@@ -20,6 +20,9 @@ import (
 type BMC struct {
 	// BMC endpoint.
 	Endpoint string `json:"endpoint"`
+	// BMC port. Defaults to 623.
+	// +optional
+	Port uint32 `json:"port,omitempty"`
 	// BMC user value.
 	// +optional
 	User string `json:"user,omitempty"`

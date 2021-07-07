@@ -25,6 +25,7 @@ import (
 
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/api"
+	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 )
 
 type server struct {
@@ -283,6 +284,14 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 	// Update bmc info with IP if we've got it.
 	if ip := in.GetBmcInfo().GetIp(); ip != "" {
 		obj.Spec.BMC.Endpoint = ip
+	}
+
+	// Update bmc info with port
+	obj.Spec.BMC.Port = constants.DefaultBMCPort
+
+	port := in.GetBmcInfo().GetPort()
+	if port != 0 {
+		obj.Spec.BMC.Port = port
 	}
 
 	// Generate or update bmc secret if we have creds

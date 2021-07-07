@@ -87,6 +87,10 @@ spec:
                         - namespace
                         type: object
                     type: object
+                  port:
+                    description: BMC port. Defaults to 623.
+                    format: int32
+                    type: integer
                   user:
                     description: BMC user value.
                     type: string

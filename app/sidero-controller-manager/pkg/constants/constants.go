@@ -16,4 +16,6 @@ const (
 	DefaultRequeueAfter = time.Second * 20
 
 	DefaultServerRebootTimeout = time.Minute * 20
+
+	DefaultBMCPort = uint32(623)
 )

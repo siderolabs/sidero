@@ -23,6 +23,7 @@ type Client struct {
 func NewClient(bmcInfo metalv1alpha1.BMC) (*Client, error) {
 	conn := &goipmi.Connection{
 		Hostname:  bmcInfo.Endpoint,
+		Port:      int(bmcInfo.Port),
 		Username:  bmcInfo.User,
 		Password:  bmcInfo.Pass,
 		Interface: bmcInfo.Interface,
@@ -84,14 +85,14 @@ func (c *Client) SetPXE() error {
 	return c.IPMIClient.SetBootDeviceEFI(goipmi.BootDevicePxe)
 }
 
-// GetLANConfig fetches LAN Config param 3 which contains BMC IP. (see 23.2).
-func (c *Client) GetBMCIP() (*goipmi.LANConfigResponse, error) {
+// GetLANConfig fetches a given param from the LAN Config. (see 23.2).
+func (c *Client) GetLANConfig(param uint8) (*goipmi.LANConfigResponse, error) {
 	req := &goipmi.Request{
 		NetworkFunction: goipmi.NetworkFunctionTransport,
 		Command:         goipmi.CommandGetLANConfig,
 		Data: &goipmi.LANConfigRequest{
 			ChannelNumber: 0x01,
-			Param:         0x03,
+			Param:         param,
 		},
 	}
 
