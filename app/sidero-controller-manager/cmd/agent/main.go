@@ -7,6 +7,7 @@ package main
 import (
 	"context"
 	"crypto/rand"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"log"
@@ -408,14 +409,24 @@ func attemptBMCIP(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS)
 		return err
 	}
 
-	// Fetch BMC IP
-	ipResp, err := ipmiClient.GetBMCIP()
+	// Fetch BMC IP (param 3 in LAN config)
+	ipResp, err := ipmiClient.GetLANConfig(0x03)
 	if err != nil {
 		return err
 	}
 
 	bmcIP := net.IP(ipResp.Data)
 	bmcInfo.Ip = bmcIP.String()
+
+	// Fetch BMC Port (param 8 in LAN config)
+	portResp, err := ipmiClient.GetLANConfig(0x08)
+	if err != nil {
+		return err
+	}
+
+	// Port is only a 16bit piece of data,
+	// but the smallest protobuf supports is 32bit, so we have this little conversion.
+	bmcInfo.Port = uint32(binary.LittleEndian.Uint16(portResp.Data))
 
 	// Attempt to update server object
 	err = retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second), retry.WithErrorLogging(true)).Retry(func() error {

@@ -13,6 +13,7 @@ import (
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/api"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/ipmi"
+	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 )
 
 // ManagementClient control power and boot order of metal machine.
@@ -49,6 +50,10 @@ func NewManagementClient(ctx context.Context, client client.Client, spec *v1alph
 
 		if bmcSpec.Interface == "" {
 			bmcSpec.Interface = "lanplus"
+		}
+
+		if bmcSpec.Port == 0 {
+			bmcSpec.Port = constants.DefaultBMCPort
 		}
 
 		return ipmi.NewClient(bmcSpec)
