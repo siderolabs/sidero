@@ -5,7 +5,7 @@ go 1.16
 replace (
 	github.com/talos-systems/sidero => ../
 
-	github.com/talos-systems/talos/pkg/machinery => github.com/talos-systems/talos/pkg/machinery v0.0.0-20210701194847-1179d6bafc9d // v0.11.0-beta.2
+	github.com/talos-systems/talos/pkg/machinery => github.com/talos-systems/talos/pkg/machinery v0.11.0-beta.3
 
 	// See https://github.com/talos-systems/go-loadbalancer/pull/4
 	// `go get github.com/smira/tcpproxy@combined-fixes`, then copy pseudo-version there
@@ -30,8 +30,8 @@ require (
 	github.com/talos-systems/go-retry v0.3.1
 	github.com/talos-systems/net v0.3.0
 	github.com/talos-systems/sidero v0.0.0-00010101000000-000000000000
-	github.com/talos-systems/talos v0.11.0-beta.2
-	github.com/talos-systems/talos/pkg/machinery v0.0.0-20210701194847-1179d6bafc9d // v0.11.0-beta.2
+	github.com/talos-systems/talos v0.11.0-beta.3
+	github.com/talos-systems/talos/pkg/machinery v0.11.0-beta.3
 	google.golang.org/grpc v1.39.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/api v0.21.2
