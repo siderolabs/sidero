@@ -9,7 +9,7 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 TEST_PKGS ?= ./...
-TALOS_RELEASE ?= v0.11.0-beta.2
+TALOS_RELEASE ?= v0.11.0-beta.3
 
 TOOLS ?= ghcr.io/talos-systems/tools:v0.6.0
 PKGS ?= v0.6.0

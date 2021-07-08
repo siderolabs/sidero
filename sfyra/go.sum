@@ -1119,10 +1119,10 @@ github.com/talos-systems/go-smbios v0.1.0/go.mod h1:HxhrzAoTZ7ed5Z5VvtCvnCIrOxyX
 github.com/talos-systems/grpc-proxy v0.2.0/go.mod h1:sm97Vc/z2cok3pu6ruNeszQej4KDxFrDgfWs4C1mtC4=
 github.com/talos-systems/net v0.3.0 h1:TG6PoiNdg9NmSeSjyecSgguUXzoJ8wp5a8RYlIdkq3Y=
 github.com/talos-systems/net v0.3.0/go.mod h1:VreSAyRmxMtqussAHSKMKkJQa1YwBTSVfkmE4Jydam4=
-github.com/talos-systems/talos v0.11.0-beta.2 h1:HqEyk3U2HAFxyPijEVQ8DHti88HqgnqrMqObebDW+58=
-github.com/talos-systems/talos v0.11.0-beta.2/go.mod h1:Ubg09rmds2/mPcfSh3uedJ2r3AeJKuZ+Aiw6X8Cf6G4=
-github.com/talos-systems/talos/pkg/machinery v0.0.0-20210701194847-1179d6bafc9d h1:nQ+w9nwXC8ViLv80Kys8xoqbC2DmFUuP6EAuDxhVzXI=
-github.com/talos-systems/talos/pkg/machinery v0.0.0-20210701194847-1179d6bafc9d/go.mod h1:TH99lX6IMJys9kgBJ6MNIOV0UsxmTVS0fUr7rP5KTac=
+github.com/talos-systems/talos v0.11.0-beta.3 h1:wbxPgsCiBqh6stJP0dCibohAZuQ0+eiBVoh/ZuMbuB0=
+github.com/talos-systems/talos v0.11.0-beta.3/go.mod h1:Ubg09rmds2/mPcfSh3uedJ2r3AeJKuZ+Aiw6X8Cf6G4=
+github.com/talos-systems/talos/pkg/machinery v0.11.0-beta.3 h1:FcuM39G7NxrO7iPsIOfS/vgDWbCRhrzkdS+aGLU9aIk=
+github.com/talos-systems/talos/pkg/machinery v0.11.0-beta.3/go.mod h1:TH99lX6IMJys9kgBJ6MNIOV0UsxmTVS0fUr7rP5KTac=
 github.com/tchap/go-patricia v2.2.6+incompatible/go.mod h1:bmLyhP68RS6kStMGxByiQ23RP/odRBOTVjwp2cDyi6I=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
