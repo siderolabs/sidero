@@ -28,7 +28,7 @@ require (
 	github.com/talos-systems/go-retry v0.3.1
 	github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a
 	github.com/talos-systems/net v0.3.0
-	github.com/talos-systems/talos/pkg/machinery v0.11.0-beta.3
+	github.com/talos-systems/talos/pkg/machinery v0.11.0
 	golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392 // indirect
 	golang.org/x/net v0.0.0-20210525063256-abc453219eb5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
