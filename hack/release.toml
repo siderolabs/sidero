@@ -6,7 +6,7 @@ github_repo = "talos-systems/sidero"
 match_deps = "^github.com/(talos-systems/[a-zA-Z0-9-]+)$"
 
 # previous release
-previous = "v0.2.0"
+previous = "v0.3.0"
 
 pre_release = true
 
@@ -15,90 +15,8 @@ preface = """\
 
 [notes]
 
-    [notes.app-rename]
-        title = "Application Renaming"
+    [notes.bmc-port]
+        title = "BMC Port"
         description = """\
-The layout of this repository, as well as the naming of the two apps that make up Sidero have changed.
-In an effort to give better clarity to users, there are two apps:
-
-- caps-controller-manager: Responsible for all things related to the Cluster API infrastructur provider
-- sidero-controller-manager: Responsible for all things related to Sidero's bare metal integrations.
-
-It should also be noted that container image names, as well as the kustomize code has been edited to match.
-"""
-
-    [notes.ipxe-script]
-        title = "iPXE script"
-        description = """\
-iPXE image delivered by Sidero (either `ipxe.efi` or `undionly.kpxe`) now contains embedded iPXE script to access Sidero iPXE server.
-This change allows to simplify DHCP server setup to return only iPXE image without any additional `if`s.
-"""
-
-    [notes.ipmi-discovery]
-        title = "IPMI Discovery and Automatic Setup"
-        description = """\
-Sidero agent by default discovers BMC (IPMI) endpoint when it first runs on the server and provisions user for Sidero automatically.
-This feature enables completely automated server and IPMI discovery on the agent boot.
-Variable `SIDERO_CONTROLLER_MANAGER_AUTO_BMC_SETUP` can be used to disable this feature during install or upgrade of Sidero.
-
-Additionally Sidero supports storing IMPI credentials in Kubernetes secrets referencing them from the Server object.
-"""
-
-    [notes.any-serverclass]
-        title = "ServerClass `any` and Environment `default`"
-        description = """\
-Sidero now creates ServerClass `any` which matches all servers.
-
-Environment `default` is created which will supply Talos release that Sidero was built with, as well as default kernel flags.
-"""
-
-    [notes.install-variables]
-        title = "Install and Upgrade Variables"
-        description = """\
-Some aspects of Sidero installation can now be [controlled](https://www.sidero.dev/docs/v0.3/getting-started/installation/) via environment variables or `clusterctl` variables.
-"""
-
-    [notes.ports]
-        title = "`metal-controller-manager` External Ports Change"
-        description = """\
-Component `metal-metadata-server` was merged into `metal-controller-manager`, and three separate HTTP endpoints were merged into one endpoint on port `:8081`:
-
-* iPXE server (which used to be on port 8081)
-* internal gRPC server (Sidero agent uses it to talk back to Sidero service), previously was 50001
-* metadata server endpoint (used to be separate deployment and service, docs used port 9091)
-"""
-
-    [notes.rpi]
-        title = "Support for arm64"
-        description = """\
-All components are now capable of running on arm64, including Rasberry Pi 4.
-
-Sidero can provision `amd64` and `arm64` nodes from any platform.
-Only UEFI boot is supported for `arm64`.
-
-> Note: Upstream CAPI includes `kube-rbac-proxy` component which is not compatible with `arm64` at the moment of this writing.
-A workaround is to patch the deployment to bump the `kube-rbac-proxy` image from v0.4.1 to v0.8.0.
-"""
-
-    [notes.label-selector]
-        title = "Label Selector support in ServerClass"
-        description = """\
-ServerClasses now support Kubernetes label selectors: Servers can be selected based on their labels.
-"""
-
-    [notes.boot-from-disk]
-        title = """Boot from Disk Methods"""
-        description = """\
-If the server is configured to PXE boot by default, it might hit the Sidero iPXE server after Talos install, so Sidero has to force the
-server to boot from disk.
-
-Sidero 0.2 supports default method via iPXE `exit` command, but this command doesn't always work
-([details](https://ipxe.org/appnote/work_around_bios_halting_on_ipxe_exit)).
-
-Sidero 0.3 adds support for two additional methods:
-
-* `http-404` force HTTP 404 response from iPXE server
-* `ipxe-sanboot` uses `sanboot` command to boot from the first disk
-
-Variable `SIDERO_CONTROLLER_MANAGER_BOOT_FROM_DISK_METHOD` controls this setting.
+Sidero now supports the ability to specify the port in a server's BMC info. By default, this value will be determined by talking directly to the BMC if possible, with a fallback to port 623. The value can also simply be specied as part of editing the Server resource directly.
 """
