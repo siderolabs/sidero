@@ -541,10 +541,10 @@ func attemptBMCUserSetup(ctx context.Context, client api.AgentClient, s *smbios.
 	}
 
 	// Make sidero an admin
-	// Options: 0xD1 == Callin false, Link false, IPMI Msg true, Channel 1
+	// Options: 0x91 == Callin true, Link false, IPMI Msg true, Channel 1
 	// Limits: 0x03 == Administrator
 	// Session: 0x00 No session limit
-	_, err = ipmiClient.SetUserAccess(0xD1, sideroUserID, 0x04, 0x00)
+	_, err = ipmiClient.SetUserAccess(0x91, sideroUserID, 0x04, 0x00)
 	if err != nil {
 		return err
 	}
