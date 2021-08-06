@@ -42,10 +42,6 @@ This feature enables completely automated server and IPMI discovery on the agent
 Variable `SIDERO_CONTROLLER_MANAGER_AUTO_BMC_SETUP` can be used to disable this feature during install or upgrade of Sidero.
 
 Additionally Sidero supports storing IMPI credentials in Kubernetes secrets referencing them from the Server object.
-
-**
-Note that this functionality is known to have issues with iDRAC currently. This can be worked around by updating the `<server-uuid>-bmc` secret that is created in the `sidero-system` namespace with credentials of an existing iDRAC admin user or by disabling the feature altogether with the aforementioned environment variable.
-**
 """
 
     [notes.any-serverclass]
