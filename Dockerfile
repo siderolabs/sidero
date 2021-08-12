@@ -275,10 +275,11 @@ RUN --mount=type=cache,target=/.cache FILES="$(gofumports -l -local ${MODULE} .)
 FROM sfyra-base AS sfyra-build
 WORKDIR /src/sfyra/cmd/sfyra
 ARG TALOS_RELEASE
+ARG DEFAULT_K8S_VERSION
 ARG SFYRA_CMD_PKG=github.com/talos-systems/sidero/sfyra/cmd/sfyra/cmd
 ARG GO_BUILDFLAGS
 ARG GO_LDFLAGS
-RUN --mount=type=cache,target=/.cache GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${SFYRA_CMD_PKG}.TalosRelease=${TALOS_RELEASE}" -o /sfyra
+RUN --mount=type=cache,target=/.cache GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${SFYRA_CMD_PKG}.TalosRelease=${TALOS_RELEASE} -X ${SFYRA_CMD_PKG}.KubernetesVersion=${DEFAULT_K8S_VERSION}" -o /sfyra
 RUN chmod +x /sfyra
 
 FROM scratch AS sfyra

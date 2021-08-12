@@ -33,7 +33,7 @@ import (
 )
 
 func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, vmSet *vm.Set,
-	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64) (*loadbalancer.ControlPlane, *capi.Cluster) {
+	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string) (*loadbalancer.ControlPlane, *capi.Cluster) {
 	t.Logf("deploying cluster %q from server class %q with loadbalancer port %d", clusterName, serverClassName, loadbalancerPort)
 
 	kubeconfig, err := capiManager.GetKubeconfig(ctx)
@@ -51,9 +51,8 @@ func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 	os.Setenv("CONTROL_PLANE_PORT", strconv.Itoa(loadbalancerPort))
 	os.Setenv("CONTROL_PLANE_SERVERCLASS", serverClassName)
 	os.Setenv("WORKER_SERVERCLASS", serverClassName)
-	// TODO: make it configurable
-	os.Setenv("KUBERNETES_VERSION", "v1.20.4")
-	os.Setenv("TALOS_VERSION", "v0.9")
+	os.Setenv("KUBERNETES_VERSION", kubernetesVersion)
+	os.Setenv("TALOS_VERSION", talosVersion)
 
 	templateOptions := capiclient.GetClusterTemplateOptions{
 		Kubeconfig:               kubeconfig,

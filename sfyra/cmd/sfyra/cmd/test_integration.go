@@ -110,6 +110,9 @@ var testIntegrationCmd = &cobra.Command{
 				RegistryMirrors: options.RegistryMirrors,
 
 				RunTestPattern: runTestPattern,
+
+				TalosRelease:      TalosRelease,
+				KubernetesVersion: KubernetesVersion,
 			}); !ok {
 				return fmt.Errorf("test failure")
 			}
