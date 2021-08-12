@@ -48,8 +48,11 @@ type Options struct {
 	PowerSimulatedSilentFailureProb   float64
 }
 
-// TalosRelease is set as build argument.
-var TalosRelease string
+// TalosRelease and KubernetesVersion are set as build arguments.
+var (
+	TalosRelease      string
+	KubernetesVersion string
+)
 
 // DefaultOptions returns default settings.
 func DefaultOptions() Options {

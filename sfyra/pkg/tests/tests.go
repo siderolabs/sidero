@@ -26,6 +26,9 @@ type Options struct {
 	RegistryMirrors []string
 
 	RunTestPattern string
+
+	TalosRelease      string
+	KubernetesVersion string
 }
 
 // Run all the tests.
@@ -88,7 +91,7 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		},
 		{
 			"TestManagementCluster",
-			TestManagementCluster(ctx, metalClient, cluster, vmSet, capiManager),
+			TestManagementCluster(ctx, metalClient, cluster, vmSet, capiManager, options.TalosRelease, options.KubernetesVersion),
 		},
 		{
 			"TestMatchServersMetalMachines",
@@ -128,7 +131,7 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		},
 		{
 			"TestWorkloadCluster",
-			TestWorkloadCluster(ctx, metalClient, cluster, vmSet, capiManager),
+			TestWorkloadCluster(ctx, metalClient, cluster, vmSet, capiManager, options.TalosRelease, options.KubernetesVersion),
 		},
 	}
 

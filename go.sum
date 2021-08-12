@@ -515,8 +515,8 @@ github.com/talos-systems/crypto v0.2.1-0.20210427105118-4f80b976b640/go.mod h1:O
 github.com/talos-systems/crypto v0.3.1 h1:TSUfwrN3+sAunR/e78pU8JMbBo9VDfS3fJtpMg7xQ6k=
 github.com/talos-systems/crypto v0.3.1/go.mod h1:xaNCB2/Bxaj+qrkdeodhRv5eKQVvKOGBBMj58MrIPY8=
 github.com/talos-systems/go-blockdevice v0.2.1-0.20210407132431-1d830a25f64f/go.mod h1:qnn/zDc09I1DA2BUDDCOSA2D0P8pIDjN8pGiRoRaQig=
-github.com/talos-systems/go-blockdevice v0.2.1 h1:swoY5NcssuMgdCf/dlMngNDgEAasGp2jviPqAz9Epss=
-github.com/talos-systems/go-blockdevice v0.2.1/go.mod h1:qnn/zDc09I1DA2BUDDCOSA2D0P8pIDjN8pGiRoRaQig=
+github.com/talos-systems/go-blockdevice v0.2.2 h1:UHXN93Aj86uKjXJ5F6w/NgBbdzcAMhatRCgsRIgbJQ8=
+github.com/talos-systems/go-blockdevice v0.2.2/go.mod h1:qnn/zDc09I1DA2BUDDCOSA2D0P8pIDjN8pGiRoRaQig=
 github.com/talos-systems/go-cmd v0.0.0-20210216164758-68eb0067e0f0/go.mod h1:kf+rZzTEmlDiYQ6ulslvRONnKLQH8x83TowltGMhO+k=
 github.com/talos-systems/go-debug v0.2.1 h1:VSN8P1zXWeHWgUBZn4cVT3keBcecCAJBG9Up+F6N2KM=
 github.com/talos-systems/go-debug v0.2.1/go.mod h1:pR4NjsZQNFqGx3n4qkD4MIj1F2CxyIF8DCiO1+05JO0=
@@ -536,8 +536,8 @@ github.com/talos-systems/net v0.2.1-0.20210212213224-05190541b0fa/go.mod h1:VreS
 github.com/talos-systems/net v0.3.0 h1:TG6PoiNdg9NmSeSjyecSgguUXzoJ8wp5a8RYlIdkq3Y=
 github.com/talos-systems/net v0.3.0/go.mod h1:VreSAyRmxMtqussAHSKMKkJQa1YwBTSVfkmE4Jydam4=
 github.com/talos-systems/talos/pkg/machinery v0.0.0-20210520203624-828772cec9a3/go.mod h1:aFEgwo1bYcfADnnUCndIb8hT00WYHYCy77pq9tYocF4=
-github.com/talos-systems/talos/pkg/machinery v0.11.0-beta.3 h1:FcuM39G7NxrO7iPsIOfS/vgDWbCRhrzkdS+aGLU9aIk=
-github.com/talos-systems/talos/pkg/machinery v0.11.0-beta.3/go.mod h1:TH99lX6IMJys9kgBJ6MNIOV0UsxmTVS0fUr7rP5KTac=
+github.com/talos-systems/talos/pkg/machinery v0.11.5 h1:gCY6PLGykY7jjipUbgKTXF68pGs1J1KAiA75qbcxh6k=
+github.com/talos-systems/talos/pkg/machinery v0.11.5/go.mod h1:9PBe4kF3ATr/3ORtrN/c+FQoNds+D0U6yol1gH7J/yE=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=

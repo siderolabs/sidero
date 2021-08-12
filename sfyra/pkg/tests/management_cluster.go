@@ -21,8 +21,8 @@ const (
 )
 
 // TestManagementCluster deploys the management cluster via CAPI.
-func TestManagementCluster(ctx context.Context, metalClient client.Client, cluster talos.Cluster, vmSet *vm.Set, capiManager *capi.Manager) TestFunc {
+func TestManagementCluster(ctx context.Context, metalClient client.Client, cluster talos.Cluster, vmSet *vm.Set, capiManager *capi.Manager, talosRelease, kubernetesVersion string) TestFunc {
 	return func(t *testing.T) {
-		deployCluster(ctx, t, metalClient, cluster, vmSet, capiManager, managementClusterName, defaultServerClassName, managementClusterLBPort, 1, 1)
+		deployCluster(ctx, t, metalClient, cluster, vmSet, capiManager, managementClusterName, defaultServerClassName, managementClusterLBPort, 1, 1, talosRelease, kubernetesVersion)
 	}
 }

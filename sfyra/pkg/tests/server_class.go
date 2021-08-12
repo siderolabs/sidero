@@ -195,9 +195,8 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 		os.Setenv("CONTROL_PLANE_PORT", "11111")
 		os.Setenv("CONTROL_PLANE_SERVERCLASS", "dummyservers")
 		os.Setenv("WORKER_SERVERCLASS", "dummyservers")
-		// TODO: make it configurable
-		os.Setenv("KUBERNETES_VERSION", "v1.20.4")
-		os.Setenv("TALOS_VERSION", "v0.9")
+		os.Setenv("KUBERNETES_VERSION", "v1.20.4") // dummy cluster, actual value doesn't matter
+		os.Setenv("TALOS_VERSION", "v0.9")         // dummy cluster, actual value doesn't matter
 
 		templateOptions := capiclient.GetClusterTemplateOptions{
 			Kubeconfig:               kubeconfig,
