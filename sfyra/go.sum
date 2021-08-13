@@ -905,8 +905,9 @@ github.com/onsi/gomega v1.7.0/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1Cpa
 github.com/onsi/gomega v1.7.1/go.mod h1:XdKZgCCFLUoM/7CFJVPcG8C1xQ1AJ0vpAezJrB7JYyY=
 github.com/onsi/gomega v1.10.1/go.mod h1:iN09h71vgCQne3DLsj+A5owkum+a2tYe+TOCB1ybHNo=
 github.com/onsi/gomega v1.10.3/go.mod h1:V9xEwhxec5O8UDM77eCW8vLymOMltsqPVYWrpDsH8xc=
-github.com/onsi/gomega v1.13.0 h1:7lLHu94wT9Ij0o6EWWclhu0aOh32VxhkwEJvzuWPeak=
 github.com/onsi/gomega v1.13.0/go.mod h1:lRk9szgn8TxENtWd0Tp4c3wjlRfMTMH27I+3Je41yGY=
+github.com/onsi/gomega v1.15.0 h1:WjP/FQ/sk43MRmnEcT+MlDw2TFvkrXlprrPST/IudjU=
+github.com/onsi/gomega v1.15.0/go.mod h1:cIuvLEne0aoVhAgh/O6ac0Op8WWw9H6eYCriF+tEHG0=
 github.com/opencontainers/go-digest v0.0.0-20170106003457-a6d0ee40d420/go.mod h1:cMLVZDEM3+U2I4VmLI6N8jQYUd2OVphdqWwCJHrFt2s=
 github.com/opencontainers/go-digest v0.0.0-20180430190053-c9281466c8b2/go.mod h1:cMLVZDEM3+U2I4VmLI6N8jQYUd2OVphdqWwCJHrFt2s=
 github.com/opencontainers/go-digest v1.0.0-rc1/go.mod h1:cMLVZDEM3+U2I4VmLI6N8jQYUd2OVphdqWwCJHrFt2s=
@@ -1099,8 +1100,8 @@ github.com/syndtr/gocapability v0.0.0-20180916011248-d98352740cb2/go.mod h1:hkRG
 github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0 h1:neYRQZWXYI2b0s9XVUfL4teOZQ1d+CTgvBLgKo5QhzE=
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.2.0/go.mod h1:lzie3WxFNZZVMGsCDInNvE8N1ZJuE5X8D+pKTxZ+uKc=
-github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0 h1:FvUhJ4Rl5Q5WgtNtkKggO55PGTDEtPXLKsPJ8Pgdstk=
-github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.0/go.mod h1:DMLOFFtcU4ozEgW/wPgBse8Y+ifu6aAyys7kQa0Tw/Q=
+github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.1 h1:lOTDt4/t6hTzbdJuGErrMWjn57tmzscZ4dezGPbeaLE=
+github.com/talos-systems/cluster-api-control-plane-provider-talos v0.1.1/go.mod h1:DMLOFFtcU4ozEgW/wPgBse8Y+ifu6aAyys7kQa0Tw/Q=
 github.com/talos-systems/crypto v0.2.1-0.20210427105118-4f80b976b640/go.mod h1:OXCK52Q0dzm88YRG4VdTBdidkPUtqrCxCyW7bUs4DAw=
 github.com/talos-systems/crypto v0.3.1 h1:TSUfwrN3+sAunR/e78pU8JMbBo9VDfS3fJtpMg7xQ6k=
 github.com/talos-systems/crypto v0.3.1/go.mod h1:xaNCB2/Bxaj+qrkdeodhRv5eKQVvKOGBBMj58MrIPY8=
@@ -1736,8 +1737,8 @@ google.golang.org/grpc v1.36.0/go.mod h1:qjiiYl8FncCW8feJPdyg3v6XW24KsRHe+dy9BAG
 google.golang.org/grpc v1.36.1/go.mod h1:qjiiYl8FncCW8feJPdyg3v6XW24KsRHe+dy9BAGRRjU=
 google.golang.org/grpc v1.37.0/go.mod h1:NREThFqKR1f3iQ6oBuvc5LadQuXVGo9rkm5ZGrQdJfM=
 google.golang.org/grpc v1.38.0/go.mod h1:NREThFqKR1f3iQ6oBuvc5LadQuXVGo9rkm5ZGrQdJfM=
-google.golang.org/grpc v1.39.0 h1:Klz8I9kdtkIN6EpHHUOMLCYhTn/2WAe5a0s1hcBkdTI=
-google.golang.org/grpc v1.39.0/go.mod h1:PImNr+rS9TWYb2O4/emRugxiyHZ5JyHW5F+RPnDzfrE=
+google.golang.org/grpc v1.40.0 h1:AGJ0Ih4mHjSeibYkFGh1dD9KJ/eOtZ93I6hoHhukQ5Q=
+google.golang.org/grpc v1.40.0/go.mod h1:ogyxbiOoUXAkP+4+xa6PZSE9DZgIHtSpzjDTB9KAK34=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
 google.golang.org/protobuf v0.0.0-20200221191635-4d8936d0db64/go.mod h1:kwYJMbMJ01Woi6D6+Kah6886xMZcty6N08ah7+eCXa0=
 google.golang.org/protobuf v0.0.0-20200228230310-ab0ca4ff8a60/go.mod h1:cfTl7dwQJ+fmap5saPgwCLgHXTUD7jkjRqWcaiX5VyM=
