@@ -26,7 +26,7 @@ credentials to communicate).
 > Note: if you are running in a safe environment, you can configure Sidero to
 > automatically accept new machines.
 
-For more information on server acceptance, see the [server docs](/docs/v0.3/configuration/servers/#server-acceptance).
+For more information on server acceptance, see the [server docs](/docs/v0.3/resource-configuration/servers/#server-acceptance).
 
 ## Create ServerClasses
 
@@ -41,7 +41,7 @@ This is analogous to cloud providers using such classes as `m3.large` or
 `c2.small`, but the names are free-form and only need to make sense to you.
 
 For more information on ServerClasses, see the [ServerClass
-docs](/docs/v0.3/configuration/serverclasses/).
+docs](/docs/v0.3/resource-configuration/serverclasses/).
 
 ## Hardware differences
 
@@ -67,7 +67,7 @@ those patches will be applied to the final machine configuration for those
 nodes without having to know anything about those nodes at the allocation level.
 
 For examples of install disk patching, see the [Installation Disk
-doc](/docs/v0.3/configuration/servers/#installation-disk).
+doc](/docs/v0.3/resource-configuration/servers/#installation-disk).
 
 For more information about patching in general, see the [Patching
 Guide](/docs/v0.3/guides/patching).
