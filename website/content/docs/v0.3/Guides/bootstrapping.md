@@ -146,7 +146,7 @@ Servers can be accepted by issuing a patch command like:
 kubectl patch server 00000000-0000-0000-0000-d05099d33360 --type='json' -p='[{"op": "replace", "path": "/spec/accepted", "value": true}]'
 ```
 
-For more information on server acceptance, see the [server docs](/docs/v0.3/configuration/servers).
+For more information on server acceptance, see the [server docs](/docs/v0.3/resource-configuration/servers).
 
 ## Create Management Plane
 
