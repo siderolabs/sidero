@@ -10,7 +10,7 @@ In this guide, we are going to install Talos on Raspberry Pi4, deploy Sidero and
 
 ## Prerequisites
 
-Please see Talos documentation for additional information on [installing Talos on Raspberry Pi4](https://www.talos.dev/docs/v0.10/single-board-computers/rpi_4/).
+Please see Talos documentation for additional information on [installing Talos on Raspberry Pi4](https://www.talos.dev/docs/v0.11/single-board-computers/rpi_4/).
 
 Download the `clusterctl` CLI  from [CAPI releases](https://github.com/kubernetes-sigs/cluster-api/releases).
 The minimum required version is 0.3.17.
@@ -154,5 +154,5 @@ Configure your DHCP server to PXE boot your bare metal servers from `$SIDERO_END
 
 ## Backup and Recovery
 
-SD cards are not very reliable, so make sure you are taking regular [etcd backups](https://www.talos.dev/docs/v0.10/guides/disaster-recovery/),
-so that you can [recover](https://www.talos.dev/docs/v0.10/guides/disaster-recovery/) your Sidero installation in case of data loss.
+SD cards are not very reliable, so make sure you are taking regular [etcd backups](https://www.talos.dev/docs/v0.11/guides/disaster-recovery/),
+so that you can [recover](https://www.talos.dev/docs/v0.11/guides/disaster-recovery/) your Sidero installation in case of data loss.

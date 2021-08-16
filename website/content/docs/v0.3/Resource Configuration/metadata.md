@@ -6,7 +6,7 @@ title: Metadata
 
 The Metadata server manages the Machine metadata.
 In terms of Talos (the OS on which the Kubernetes cluster is formed), this is the
-"[machine config](https://www.talos.dev/docs/v0.10/reference/configuration/)",
+"[machine config](https://www.talos.dev/docs/v0.11/reference/configuration/)",
 which is used during the automated installation.
 
 ## Talos Machine Configuration
