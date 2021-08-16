@@ -30,7 +30,7 @@ We will use the EEPROM to boot into UEFI, which we will then use to PXE and iPXE
 
 ### Update EEPROM
 
-_NOTE:_ If you've updated the EEPROM with the image that was referenced on [the talos docs](https://www.talos.dev/docs/v0.10/single-board-computers/rpi_4/#updating-the-eeprom),
+_NOTE:_ If you've updated the EEPROM with the image that was referenced on [the talos docs](https://www.talos.dev/docs/v0.11/single-board-computers/rpi_4/#updating-the-eeprom),
 you can either flash it with the one mentioned below, or visit [the EEPROM config docs](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2711_bootloader_config.md)
 and change the boot order of EEPROM to `0xf21`.
 Which means try booting from SD first, then try network.

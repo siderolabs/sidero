@@ -48,8 +48,8 @@ spec:
         version: "Intel(R) Atom(TM) CPU C3558 @ 2.20GHz"
       - manufacturer: Advanced Micro Devices, Inc.
         version: AMD Ryzen 7 2700X Eight-Core Processor
-    system:
-      manufacturer: Dell Inc.
+    systemInformation:
+      - manufacturer: Dell Inc.
 ```
 
 Servers would only be added to the above class if they:
