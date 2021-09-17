@@ -16,7 +16,6 @@ import (
 	debug "github.com/talos-systems/go-debug"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
-	"golang.org/x/sync/errgroup"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -32,6 +31,7 @@ import (
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/controllers"
+	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/healthz"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/ipxe"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/metadata"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/api"
@@ -200,13 +200,16 @@ func main() {
 	}
 	// +kubebuilder:scaffold:builder
 
+	errCh := make(chan error)
+
 	setupLog.Info("starting TFTP server")
 
 	go func() {
 		if err := tftp.ServeTFTP(); err != nil {
 			setupLog.Error(err, "unable to start TFTP server", "controller", "Environment")
-			os.Exit(1)
 		}
+
+		errCh <- err
 	}()
 
 	httpMux := http.NewServeMux()
@@ -222,6 +225,13 @@ func main() {
 
 	if err := metadata.RegisterServer(httpMux, mgr.GetClient()); err != nil {
 		setupLog.Error(err, "unable to start metadata server", "controller", "Environment")
+		os.Exit(1)
+	}
+
+	setupLog.Info("starting healthz server")
+
+	if err := healthz.RegisterServer(httpMux); err != nil {
+		setupLog.Error(err, "unable to start healthz server", "controller", "Environment")
 		os.Exit(1)
 	}
 
@@ -251,18 +261,16 @@ func main() {
 
 	setupLog.Info("starting manager and HTTP server")
 
-	var eg errgroup.Group
-
-	eg.Go(func() error {
+	go func() {
 		err := mgr.Start(ctrl.SetupSignalHandler())
 		if err != nil {
 			setupLog.Error(err, "problem running manager")
 		}
 
-		return err
-	})
+		errCh <- err
+	}()
 
-	eg.Go(func() error {
+	go func() {
 		// Go standard library doesn't support running HTTP/2 on non-TLS HTTP connections.
 		// Package h2c provides handling for HTTP/2 over plaintext connection.
 		// gRPC provides its own HTTP/2 server implementation, so that's not an issue for gRPC,
@@ -288,10 +296,12 @@ func main() {
 			setupLog.Error(err, "problem running HTTP server")
 		}
 
-		return err
-	})
+		errCh <- err
+	}()
 
-	if err := eg.Wait(); err != nil {
-		os.Exit(1)
+	for err = range errCh {
+		if err != nil {
+			os.Exit(1)
+		}
 	}
 }
