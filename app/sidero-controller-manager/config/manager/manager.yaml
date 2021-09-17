@@ -65,7 +65,7 @@ spec:
               containerPort: 69
               protocol: UDP
             - name: http
-              containerPort: 8081
+              containerPort: ${SIDERO_CONTROLLER_MANAGER_API_PORT:=8081}
               protocol: TCP
           env:
             - name: API_ENDPOINT
@@ -79,4 +79,14 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 15
       terminationGracePeriodSeconds: 10
