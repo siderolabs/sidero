@@ -188,7 +188,7 @@ steps:
 
 services:
   - name: docker
-    image: docker:19.03-dind
+    image: docker:20.10-dind
     entrypoint:
     - dockerd
     commands:
