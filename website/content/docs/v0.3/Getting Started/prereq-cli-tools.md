@@ -1,6 +1,6 @@
 ---
 description: "Prerequisite: CLI tools"
-weight: 99
+weight: 2
 title: "Prerequisite: CLI tools"
 ---
 
@@ -39,9 +39,12 @@ The main article for installing `clusterctl` can be found
 
 ```bash
 sudo curl -Lo /usr/local/bin/clusterctl \
-  "https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.21/clusterctl-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64" \
+  "https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.23/clusterctl-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64" \
 sudo chmod +x /usr/local/bin/clusterctl
 ```
+
+> Note: Sidero is currently only compatible with CAPI v1alpha3,
+> so versions of `clusterctl` above v0.3.x will not work.
 
 ## Install `talosctl`
 

@@ -1,6 +1,6 @@
 ---
 description: "Prerequisite: Kubernetes"
-weight: 99
+weight: 3
 title: "Prerequisite: Kubernetes"
 ---
 

@@ -62,3 +62,21 @@ Additionally, Sidero automatically creates and maintains a server class called `
 Attempts to add qualifiers to it will be reverted.
 
 [label-selector-docs]: https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/label-selector/
+
+## `configPatches`
+
+Server configs of servers matching a server class can be updated by using the `configPatches` section of the custom resource.
+See [patching](/docs/v0.3/guides/patching) for more information on how this works.
+
+An example of settings the default install disk for all servers matching a server class:
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: ServerClass
+...
+spec:
+  configPatches:
+    - op: replace
+      path: /machine/install/disk
+      value: /dev/sda
+```

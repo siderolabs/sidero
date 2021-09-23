@@ -89,10 +89,13 @@ Issue the following to create a single-node cluster:
 
 ```bash
 talosctl cluster create \
+ --kubernetes-version 1.21.3 \
   -p 69:69/udp,8081:8081/tcp \
   --workers 0 \
   --endpoint $PUBLIC_IP
 ```
+
+> Note: Kubernetes 1.21.x is the highest version compatible with `clusterctl` v0.3.x.
 
 Note that there are several ports mentioned in the command above.
 These allow us to access the services that will get deployed on this node.
@@ -134,6 +137,26 @@ $ kubectl get servers -o wide
 NAME                                   HOSTNAME        ACCEPTED   ALLOCATED   CLEAN
 00000000-0000-0000-0000-d05099d33360   192.168.254.2   false      false       false
 ```
+
+## Setting up IPMI
+
+Sidero can use IPMI information to control Server power state, reboot servers and set boot order.
+IPMI information will be, by default, setup automatically if possible as part of the acceptance process.
+See [IPMI](/docs/v0.3/resource-configuration/servers/#ipmi) for more information.
+
+IMPI connection information can also be set manually in the Server spec after initial registration:
+
+```bash
+kubectl patch server 00000000-0000-0000-0000-d05099d33360 --type='json' -p='[{"op": "add", "path": "/spec/bmc", "value": {"endpoint": "192.168.88.9", "user": "ADMIN", "pass":"ADMIN"}}]'
+```
+
+If IPMI info is not set, servers should be configured to boot first from network, then from disk.
+
+## Configuring the installation disk
+
+Note that for bare-metal setup, you would need to specify an installation disk.
+See [Installation Disk](/docs/v0.3/configuration/servers/#installation-disk) for details on how to do this.
+You should configure this before accepting the server.
 
 ## Accept the Servers
 
@@ -178,14 +201,15 @@ For instance:
 ```bash
 export CONTROL_PLANE_SERVERCLASS=any
 export WORKER_SERVERCLASS=any
-export KUBERNETES_VERSION=v1.20.1
+export TALOS_VERSION=v0.11
+export KUBERNETES_VERSION=v1.21.3
 export CONTROL_PLANE_PORT=6443
 export CONTROL_PLANE_ENDPOINT=1.2.3.4
 clusterctl config cluster management-plane -i sidero > management-plane.yaml
 ```
 
 In addition, you can specify the replicas for control-plane & worker nodes in management-plane.yaml manifest for TalosControlPlane and MachineDeployment objects.
-Also, they can be scaled if needed:
+Also, they can be scaled if needed (after applying the `management-plane.yaml` manifest):
 
 ```bash
 kubectl get taloscontrolplane
