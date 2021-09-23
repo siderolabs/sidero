@@ -1,6 +1,6 @@
 ---
 description: "Prerequisite: DHCP Service"
-weight: 99
+weight: 4
 title: "Prerequisite: DHCP service"
 ---
 
