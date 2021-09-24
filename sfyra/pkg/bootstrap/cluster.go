@@ -50,8 +50,9 @@ type Cluster struct {
 
 // Options for the bootstrap cluster.
 type Options struct {
-	Name string
-	CIDR string
+	Name            string
+	CIDR            string
+	BootstrapMaster string
 
 	Vmlinuz, Initramfs string
 	InstallerImage     string
@@ -227,7 +228,7 @@ func (cluster *Cluster) create(ctx context.Context) error {
 
 	request.Nodes = append(request.Nodes,
 		provision.NodeRequest{
-			Name:     constants.BootstrapMaster,
+			Name:     cluster.options.BootstrapMaster,
 			Type:     machine.TypeControlPlane,
 			IPs:      []net.IP{cluster.masterIP},
 			Memory:   cluster.options.MemMB * 1024 * 1024,
@@ -276,7 +277,7 @@ func (cluster *Cluster) untaint(ctx context.Context) error {
 		return err
 	}
 
-	n, err := clientset.CoreV1().Nodes().Get(ctx, constants.BootstrapMaster, metav1.GetOptions{})
+	n, err := clientset.CoreV1().Nodes().Get(ctx, cluster.options.BootstrapMaster, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}

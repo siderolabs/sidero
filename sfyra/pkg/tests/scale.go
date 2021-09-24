@@ -27,7 +27,7 @@ type ScaleCallBack func(runtime.Object) error
 // TestScaleControlPlaneUp verifies that the control plane can scale up.
 func TestScaleControlPlaneUp(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
 	return func(t *testing.T) {
-		err := scaleControlPlane(ctx, metalClient, 3)
+		err := scaleControlPlane(ctx, metalClient, 3, nil)
 		require.NoError(t, err)
 
 		err = verifyClusterHealth(ctx, metalClient, vmSet, t)
@@ -38,7 +38,24 @@ func TestScaleControlPlaneUp(ctx context.Context, metalClient client.Client, vmS
 // TestScaleControlPlaneDown verifies that the control plane can scale down.
 func TestScaleControlPlaneDown(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
 	return func(t *testing.T) {
-		err := scaleControlPlane(ctx, metalClient, 1)
+		err := scaleControlPlane(ctx, metalClient, 1, nil)
+		require.NoError(t, err)
+
+		err = verifyClusterHealth(ctx, metalClient, vmSet, t)
+		require.NoError(t, err)
+	}
+}
+
+// TestScaleControlPlaneUpAndDown scale up and then scale down immediately.
+func TestScaleControlPlaneUpAndDown(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+	return func(t *testing.T) {
+		err := scaleControlPlane(ctx, metalClient, 3, func(runtime.Object) error {
+			return nil
+		})
+		require.NoError(t, err)
+		time.Sleep(time.Second)
+
+		err = scaleControlPlane(ctx, metalClient, 1, nil)
 		require.NoError(t, err)
 
 		err = verifyClusterHealth(ctx, metalClient, vmSet, t)
@@ -68,19 +85,21 @@ func TestScaleWorkersDown(ctx context.Context, metalClient client.Client, vmSet 
 	}
 }
 
-func scaleControlPlane(ctx context.Context, metalClient client.Client, replicas int32) error {
-	verify := func(obj runtime.Object) error {
-		o := obj.(*capbt.TalosControlPlane)
+func scaleControlPlane(ctx context.Context, metalClient client.Client, replicas int32, verify func(obj runtime.Object) error) error {
+	if verify == nil {
+		verify = func(obj runtime.Object) error {
+			o := obj.(*capbt.TalosControlPlane)
 
-		if o.Status.Replicas != replicas {
-			return fmt.Errorf("expected %d replicas, got %d", replicas, o.Status.ReadyReplicas)
+			if o.Status.Replicas != replicas {
+				return fmt.Errorf("expected %d replicas, got %d", replicas, o.Status.ReadyReplicas)
+			}
+
+			if o.Status.ReadyReplicas != replicas {
+				return fmt.Errorf("expected %d ready replicas, got %d", replicas, o.Status.ReadyReplicas)
+			}
+
+			return nil
 		}
-
-		if o.Status.ReadyReplicas != replicas {
-			return fmt.Errorf("expected %d ready replicas, got %d", replicas, o.Status.ReadyReplicas)
-		}
-
-		return nil
 	}
 
 	set := func(obj runtime.Object) error {

@@ -4,7 +4,11 @@
 
 package cmd
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/talos-systems/sidero/sfyra/pkg/constants"
+)
 
 // Options control the sidero testing.
 type Options struct {
@@ -16,6 +20,7 @@ type Options struct {
 	BootstrapTalosInstaller string
 	BootstrapCNIBundleURL   string
 	BootstrapCIDR           string
+	BootstrapMaster         string
 
 	TalosKernelURL string
 	TalosInitrdURL string
@@ -63,6 +68,7 @@ func DefaultOptions() Options {
 		BootstrapTalosInstaller: fmt.Sprintf("ghcr.io/talos-systems/installer:%s", TalosRelease),
 		BootstrapCNIBundleURL:   fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/talosctl-cni-bundle-%s.tar.gz", TalosRelease, "amd64"),
 		BootstrapCIDR:           "172.24.0.0/24",
+		BootstrapMaster:         constants.BootstrapMaster,
 
 		TalosKernelURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz-amd64", TalosRelease),
 		TalosInitrdURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs-amd64.xz", TalosRelease),

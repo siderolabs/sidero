@@ -21,8 +21,9 @@ var bootstrapCAPICmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return cli.WithContext(context.Background(), func(ctx context.Context) error {
 			bootstrapCluster, err := bootstrap.NewCluster(ctx, bootstrap.Options{
-				Name: options.BootstrapClusterName,
-				CIDR: options.BootstrapCIDR,
+				Name:            options.BootstrapClusterName,
+				CIDR:            options.BootstrapCIDR,
+				BootstrapMaster: options.BootstrapMaster,
 
 				Vmlinuz:        options.BootstrapTalosVmlinuz,
 				Initramfs:      options.BootstrapTalosInitramfs,
@@ -69,6 +70,7 @@ func init() {
 	bootstrapCAPICmd.Flags().StringVar(&options.BootstrapTalosInitramfs, "bootstrap-initramfs", options.BootstrapTalosInitramfs, "Talos initramfs image for bootstrap cluster")
 	bootstrapCAPICmd.Flags().StringVar(&options.BootstrapTalosInstaller, "bootstrap-installer", options.BootstrapTalosInstaller, "Talos install image for bootstrap cluster")
 	bootstrapCAPICmd.Flags().StringVar(&options.BootstrapCIDR, "bootstrap-cidr", options.BootstrapCIDR, "bootstrap cluster network CIDR")
+	bootstrapCAPICmd.Flags().StringVar(&options.BootstrapMaster, "bootstrap-master", options.BootstrapMaster, "bootstrap master node")
 	bootstrapCAPICmd.Flags().StringVar(&options.TalosctlPath, "talosctl-path", options.TalosctlPath, "path to the talosctl (for the QEMU provisioner)")
 	bootstrapCAPICmd.Flags().StringSliceVar(&options.RegistryMirrors, "registry-mirror", options.RegistryMirrors, "registry mirrors to use")
 	bootstrapCAPICmd.Flags().StringSliceVar(&options.RegistryMirrors, "registry-mirrors", options.RegistryMirrors, "")

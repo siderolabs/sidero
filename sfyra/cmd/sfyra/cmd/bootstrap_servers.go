@@ -50,6 +50,10 @@ var bootstrapServersCmd = &cobra.Command{
 func init() {
 	bootstrapCmd.AddCommand(bootstrapServersCmd)
 
+	bootstrapServersCmd.Flags().StringVar(&options.BootstrapTalosVmlinuz, "bootstrap-vmlinuz", options.BootstrapTalosVmlinuz, "Talos kernel image for bootstrap cluster")
+	bootstrapServersCmd.Flags().StringVar(&options.BootstrapTalosInitramfs, "bootstrap-initramfs", options.BootstrapTalosInitramfs, "Talos initramfs image for bootstrap cluster")
+	bootstrapServersCmd.Flags().StringVar(&options.BootstrapTalosInstaller, "bootstrap-installer", options.BootstrapTalosInstaller, "Talos install image for bootstrap cluster")
+	bootstrapServersCmd.Flags().StringVar(&options.TalosctlPath, "talosctl-path", options.TalosctlPath, "path to the talosctl (for the QEMU provisioner)")
 	bootstrapServersCmd.Flags().StringVar(&options.ManagementSetName, "management-set-name", options.ManagementSetName, "name for the management VM set")
 	bootstrapServersCmd.Flags().IntVar(&options.ManagementNodes, "management-nodes", options.ManagementNodes, "number of PXE nodes to create for the management rack")
 	bootstrapServersCmd.Flags().StringVar(&options.ManagementCIDR, "management-cidr", options.ManagementCIDR, "management cluster network CIDR")
