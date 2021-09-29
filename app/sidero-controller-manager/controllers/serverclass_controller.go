@@ -35,9 +35,7 @@ type ServerClassReconciler struct {
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers/status,verbs=get;update;patch
 
-func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	ctx := context.Background()
-
+func (r *ServerClassReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := r.Log.WithValues("serverclass", req.NamespacedName)
 	l.Info("reconciling")
 
@@ -59,7 +57,7 @@ func (r *ServerClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error)
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	patchHelper, err := patch.NewHelper(&sc, r)
+	patchHelper, err := patch.NewHelper(&sc, r.Client)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -131,43 +129,40 @@ func ReconcileServerClassAny(ctx context.Context, c client.Client) error {
 	}
 }
 
-func (r *ServerClassReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
+func (r *ServerClassReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager, options controller.Options) error {
 	// This mapRequests handler allows us to add a watch on server resources. Upon a server resource update,
 	// we will dump all server classes and issue a reconcile against them so that they will get updated statuses
 	// for available/in-use servers that match.
-	mapRequests := handler.ToRequestsFunc(
-		func(a handler.MapObject) []reconcile.Request {
-			reqList := []reconcile.Request{}
+	mapRequests := func(a client.Object) []reconcile.Request {
+		reqList := []reconcile.Request{}
 
-			scList := &metalv1alpha1.ServerClassList{}
+		scList := &metalv1alpha1.ServerClassList{}
 
-			if err := r.List(context.Background(), scList); err != nil {
-				return reqList
-			}
-
-			for _, serverClass := range scList.Items {
-				reqList = append(
-					reqList,
-					reconcile.Request{
-						NamespacedName: types.NamespacedName{
-							Name:      serverClass.Name,
-							Namespace: serverClass.Namespace,
-						},
-					},
-				)
-			}
-
+		if err := r.List(ctx, scList); err != nil {
 			return reqList
-		})
+		}
+
+		for _, serverClass := range scList.Items {
+			reqList = append(
+				reqList,
+				reconcile.Request{
+					NamespacedName: types.NamespacedName{
+						Name:      serverClass.Name,
+						Namespace: serverClass.Namespace,
+					},
+				},
+			)
+		}
+
+		return reqList
+	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(options).
 		For(&metalv1alpha1.ServerClass{}).
 		Watches(
 			&source.Kind{Type: &metalv1alpha1.Server{}},
-			&handler.EnqueueRequestsFromMapFunc{
-				ToRequests: mapRequests,
-			},
+			handler.EnqueueRequestsFromMapFunc(mapRequests),
 		).
 		Complete(r)
 }

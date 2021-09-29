@@ -19,6 +19,8 @@ spec:
         - command:
             - /manager
           image: controller:latest
+          args:
+            - --metrics-bind-addr=127.0.0.1:8080
           imagePullPolicy: Always
           name: manager
           resources:

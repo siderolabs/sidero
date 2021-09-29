@@ -23,7 +23,7 @@ import (
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/tools/record"
-	capi "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capi "sigs.k8s.io/cluster-api/api/v1alpha4"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -85,7 +85,7 @@ func main() {
 
 	flag.StringVar(&apiEndpoint, "api-endpoint", "", "The endpoint (hostname or IP address) Sidero can be reached at from the servers.")
 	flag.IntVar(&apiPort, "api-port", httpPort, "The TCP port Sidero components can be reached at from the servers.")
-	flag.StringVar(&metricsAddr, "metrics-addr", ":8081", "The address the metric endpoint binds to.")
+	flag.StringVar(&metricsAddr, "metrics-bind-addr", ":8081", "The address the metric endpoint binds to.")
 	flag.StringVar(&extraAgentKernelArgs, "extra-agent-kernel-args", "", "A comma delimited list of key-value pairs to be added to the agent environment kernel parameters.")
 	flag.StringVar(&bootFromDiskMethod, "boot-from-disk-method", string(ipxe.BootIPXEExit), "Default method to use to boot server from disk if it hits iPXE endpoint after install.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", true, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
@@ -166,6 +166,8 @@ func main() {
 		mgr.GetScheme(),
 		corev1.EventSource{Component: "sidero-controller-manager"})
 
+	ctx := context.Background()
+
 	if err = (&controllers.EnvironmentReconciler{
 		Client:       mgr.GetClient(),
 		Log:          ctrl.Log.WithName("controllers").WithName("Environment"),
@@ -173,7 +175,7 @@ func main() {
 		TalosRelease: TalosRelease,
 		APIEndpoint:  apiEndpoint,
 		APIPort:      uint16(apiPort),
-	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
+	}).SetupWithManager(ctx, mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Environment")
 		os.Exit(1)
 	}
@@ -185,7 +187,7 @@ func main() {
 		APIReader:     mgr.GetAPIReader(),
 		Recorder:      recorder,
 		RebootTimeout: serverRebootTimeout,
-	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
+	}).SetupWithManager(ctx, mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Server")
 		os.Exit(1)
 	}
@@ -194,7 +196,7 @@ func main() {
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("ServerClass"),
 		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
+	}).SetupWithManager(ctx, mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ServerClass")
 		os.Exit(1)
 	}
@@ -249,12 +251,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = controllers.ReconcileServerClassAny(context.TODO(), k8sClient); err != nil {
+	if err = controllers.ReconcileServerClassAny(ctx, k8sClient); err != nil {
 		setupLog.Error(err, `failed to reconcile ServerClass "any"`)
 		os.Exit(1)
 	}
 
-	if err = controllers.ReconcileEnvironmentDefault(context.TODO(), k8sClient, TalosRelease, apiEndpoint, uint16(apiPort)); err != nil {
+	if err = controllers.ReconcileEnvironmentDefault(ctx, k8sClient, TalosRelease, apiEndpoint, uint16(apiPort)); err != nil {
 		setupLog.Error(err, `failed to reconcile Environment "default"`)
 		os.Exit(1)
 	}

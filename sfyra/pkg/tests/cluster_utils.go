@@ -22,7 +22,7 @@ import (
 	"k8s.io/client-go/discovery/cached/memory"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/restmapper"
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
 	capiclient "sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -127,7 +127,7 @@ func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 }
 
 func deleteCluster(ctx context.Context, t *testing.T, metalClient client.Client, clusterName string) {
-	var cluster v1alpha3.Cluster
+	var cluster capiv1.Cluster
 
 	err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: clusterName}, &cluster)
 	require.NoError(t, err)

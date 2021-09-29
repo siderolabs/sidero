@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
@@ -19,7 +19,7 @@ import (
 // TestMatchServersMetalMachines verifies that number of metal machines and servers match.
 func TestMatchServersMetalMachines(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
-		var machines v1alpha3.MachineList
+		var machines capiv1.MachineList
 
 		require.NoError(t, metalClient.List(ctx, &machines))
 

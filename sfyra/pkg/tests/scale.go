@@ -15,7 +15,7 @@ import (
 	"github.com/talos-systems/go-retry/retry"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/talos-systems/sidero/sfyra/pkg/capi"
@@ -98,10 +98,10 @@ func scaleControlPlane(ctx context.Context, metalClient client.Client, replicas 
 
 func scaleWorkers(ctx context.Context, metalClient client.Client, replicas int32) error {
 	verify := func(obj runtime.Object) error {
-		o := obj.(*v1alpha3.MachineDeployment)
+		o := obj.(*capiv1.MachineDeployment)
 
-		if v1alpha3.MachineDeploymentPhase(o.Status.Phase) != v1alpha3.MachineDeploymentPhaseRunning {
-			return fmt.Errorf("expected %s phase, got %s", v1alpha3.MachineDeploymentPhaseRunning, o.Status.Phase)
+		if capiv1.MachineDeploymentPhase(o.Status.Phase) != capiv1.MachineDeploymentPhaseRunning {
+			return fmt.Errorf("expected %s phase, got %s", capiv1.MachineDeploymentPhaseRunning, o.Status.Phase)
 		}
 
 		if o.Status.Replicas != replicas {
@@ -116,19 +116,19 @@ func scaleWorkers(ctx context.Context, metalClient client.Client, replicas int32
 	}
 
 	set := func(obj runtime.Object) error {
-		o := obj.(*v1alpha3.MachineDeployment)
+		o := obj.(*capiv1.MachineDeployment)
 
 		o.Spec.Replicas = &replicas
 
 		return nil
 	}
 
-	var obj v1alpha3.MachineDeployment
+	var obj capiv1.MachineDeployment
 
 	return scale(ctx, metalClient, "management-cluster-workers", &obj, set, verify)
 }
 
-func scale(ctx context.Context, metalClient client.Client, name string, obj runtime.Object, set, verify ScaleCallBack) error {
+func scale(ctx context.Context, metalClient client.Client, name string, obj client.Object, set, verify ScaleCallBack) error {
 	cleanObj := obj.DeepCopyObject()
 
 	err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: name}, obj)
@@ -149,7 +149,7 @@ func scale(ctx context.Context, metalClient client.Client, name string, obj runt
 	}
 
 	err = retry.Constant(10*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
-		obj = cleanObj.DeepCopyObject()
+		obj = cleanObj.DeepCopyObject().(client.Object)
 
 		err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: name}, obj)
 		if err != nil {

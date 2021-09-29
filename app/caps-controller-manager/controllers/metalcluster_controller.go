@@ -36,8 +36,7 @@ type MetalClusterReconciler struct {
 // +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=metalclusters/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=cluster.x-k8s.io,resources=clusters;clusters/status,verbs=get;list;watch
 
-func (r *MetalClusterReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err error) {
-	ctx := context.TODO()
+func (r *MetalClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, err error) {
 	log := r.Log.WithValues("metalcluster", req.NamespacedName)
 
 	// Fetch the metalCluster instance
@@ -69,7 +68,7 @@ func (r *MetalClusterReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 	log = log.WithName(fmt.Sprintf("cluster=%s", cluster.Name))
 
 	// Initialize the patch helper
-	patchHelper, err := patch.NewHelper(metalCluster, r)
+	patchHelper, err := patch.NewHelper(metalCluster, r.Client)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -103,7 +102,7 @@ func (r *MetalClusterReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 	return ctrl.Result{}, nil
 }
 
-func (r *MetalClusterReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
+func (r *MetalClusterReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager, options controller.Options) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(options).
 		For(&infrav1.MetalCluster{}).

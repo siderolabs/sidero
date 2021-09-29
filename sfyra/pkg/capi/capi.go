@@ -134,7 +134,6 @@ func (clusterAPI *Manager) Install(ctx context.Context) error {
 		ControlPlaneProviders:   clusterAPI.options.ControlPlaneProviders,
 		InfrastructureProviders: clusterAPI.options.InfrastructureProviders,
 		TargetNamespace:         "",
-		WatchingNamespace:       "",
 		LogUsageInstructions:    false,
 	}
 

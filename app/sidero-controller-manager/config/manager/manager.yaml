@@ -46,7 +46,7 @@ spec:
         - command:
             - /manager
           args:
-            - --metrics-addr=127.0.0.1:8080
+            - --metrics-bind-addr=127.0.0.1:8080
             - --api-endpoint=${SIDERO_CONTROLLER_MANAGER_API_ENDPOINT:=-}
             - --api-port=${SIDERO_CONTROLLER_MANAGER_API_PORT:=8081}
             - --extra-agent-kernel-args=${SIDERO_CONTROLLER_MANAGER_EXTRA_AGENT_KERNEL_ARGS:=-}

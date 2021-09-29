@@ -41,9 +41,7 @@ type EnvironmentReconciler struct {
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=environments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=environments/status,verbs=get;update;patch
 
-func (r *EnvironmentReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	ctx := context.Background()
-
+func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := r.Log.WithValues("environment", req.Name)
 	l.Info("reconciling")
 
@@ -201,7 +199,7 @@ func ReconcileEnvironmentDefault(ctx context.Context, c client.Client, talosRele
 	return err
 }
 
-func (r *EnvironmentReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
+func (r *EnvironmentReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager, options controller.Options) error {
 	if r.TalosRelease == "" {
 		return errors.New("TalosRelease is not set")
 	}

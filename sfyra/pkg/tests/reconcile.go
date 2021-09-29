@@ -15,7 +15,7 @@ import (
 	"github.com/talos-systems/go-retry/retry"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -26,14 +26,14 @@ import (
 // TestMachineDeploymentReconcile verifies that machine deployment can reconcile delete machines.
 func TestMachineDeploymentReconcile(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
-		var machineDeployment v1alpha3.MachineDeployment
+		var machineDeployment capiv1.MachineDeployment
 
 		const machineDeploymentName = "management-cluster-workers"
 
 		err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: machineDeploymentName}, &machineDeployment)
 		require.NoError(t, err)
 
-		var machines v1alpha3.MachineList
+		var machines capiv1.MachineList
 
 		labelSelector, err := labels.Parse(machineDeployment.Status.Selector)
 		require.NoError(t, err)
@@ -52,7 +52,7 @@ func TestMachineDeploymentReconcile(ctx context.Context, metalClient client.Clie
 
 		// first, controller should pick up the fact that some replicas are missing
 		err = retry.Constant(1*time.Minute, retry.WithUnits(100*time.Millisecond)).Retry(func() error {
-			var machineDeployment v1alpha3.MachineDeployment
+			var machineDeployment capiv1.MachineDeployment
 
 			err = metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: machineDeploymentName}, &machineDeployment)
 			if err != nil {
@@ -74,8 +74,8 @@ func TestMachineDeploymentReconcile(ctx context.Context, metalClient client.Clie
 				return err
 			}
 
-			if v1alpha3.MachineDeploymentPhase(machineDeployment.Status.Phase) != v1alpha3.MachineDeploymentPhaseRunning {
-				return retry.ExpectedError(fmt.Errorf("expected %s phase, got %s", v1alpha3.MachineDeploymentPhaseRunning, machineDeployment.Status.Phase))
+			if capiv1.MachineDeploymentPhase(machineDeployment.Status.Phase) != capiv1.MachineDeploymentPhaseRunning {
+				return retry.ExpectedError(fmt.Errorf("expected %s phase, got %s", capiv1.MachineDeploymentPhaseRunning, machineDeployment.Status.Phase))
 			}
 
 			if machineDeployment.Status.Replicas != replicas {

@@ -19,7 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
 	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -60,8 +60,7 @@ type ServerReconciler struct {
 // +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 
-func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	ctx := context.Background()
+func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := r.Log.WithValues("server", req.NamespacedName)
 
 	s := metalv1alpha1.Server{}
@@ -70,7 +69,7 @@ func (r *ServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	patchHelper, err := patch.NewHelper(&s, r)
+	patchHelper, err := patch.NewHelper(&s, r.Client)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -315,8 +314,8 @@ func (r *ServerReconciler) checkBinding(ctx context.Context, req ctrl.Request) (
 	return false, false, nil
 }
 
-func (r *ServerReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
-	if err := mgr.GetFieldIndexer().IndexField(&infrav1.MetalMachine{}, infrav1.MetalMachineServerRefField, func(rawObj runtime.Object) []string {
+func (r *ServerReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager, options controller.Options) error {
+	if err := mgr.GetFieldIndexer().IndexField(ctx, &infrav1.MetalMachine{}, infrav1.MetalMachineServerRefField, func(rawObj client.Object) []string {
 		metalMachine := rawObj.(*infrav1.MetalMachine)
 
 		if metalMachine.Spec.ServerRef == nil {
@@ -328,27 +327,24 @@ func (r *ServerReconciler) SetupWithManager(mgr ctrl.Manager, options controller
 		return err
 	}
 
-	mapRequests := handler.ToRequestsFunc(
-		func(a handler.MapObject) []reconcile.Request {
-			// servers and serverbindings always have matching names
-			return []reconcile.Request{
-				{
-					NamespacedName: types.NamespacedName{
-						Name:      a.Meta.GetName(),
-						Namespace: a.Meta.GetNamespace(),
-					},
+	mapRequests := func(a client.Object) []reconcile.Request {
+		// servers and serverbindings always have matching names
+		return []reconcile.Request{
+			{
+				NamespacedName: types.NamespacedName{
+					Name:      a.GetName(),
+					Namespace: a.GetNamespace(),
 				},
-			}
-		})
+			},
+		}
+	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(options).
 		For(&metalv1alpha1.Server{}).
 		Watches(
 			&source.Kind{Type: &infrav1.ServerBinding{}},
-			&handler.EnqueueRequestsFromMapFunc{
-				ToRequests: mapRequests,
-			},
+			handler.EnqueueRequestsFromMapFunc(mapRequests),
 		).
 		Complete(r)
 }

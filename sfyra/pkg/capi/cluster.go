@@ -24,7 +24,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
 	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
@@ -44,10 +44,10 @@ type Cluster struct {
 // NewCluster fetches cluster info from the CAPI state.
 func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterName string, bridgeIP net.IP) (*Cluster, error) {
 	var (
-		cluster            v1alpha3.Cluster
+		cluster            capiv1.Cluster
 		controlPlane       cacpt.TalosControlPlane
-		machines           v1alpha3.MachineList
-		machineDeployments v1alpha3.MachineDeploymentList
+		machines           capiv1.MachineList
+		machineDeployments capiv1.MachineDeploymentList
 		talosConfig        cabpt.TalosConfig
 	)
 
@@ -85,7 +85,7 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 		return nil, err
 	}
 
-	resolveMachinesToIPs := func(machines v1alpha3.MachineList) ([]string, error) {
+	resolveMachinesToIPs := func(machines capiv1.MachineList) ([]string, error) {
 		var endpoints []string
 
 		for _, machine := range machines.Items {
@@ -93,7 +93,7 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 				continue
 			}
 
-			if v1alpha3.MachinePhase(machine.Status.Phase) != v1alpha3.MachinePhaseRunning {
+			if capiv1.MachinePhase(machine.Status.Phase) != capiv1.MachinePhaseRunning {
 				continue
 			}
 

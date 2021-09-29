@@ -22,7 +22,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/cluster-api/api/v1alpha3"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
@@ -127,7 +127,7 @@ func (cp *ControlPlane) reconcileLoop() {
 }
 
 func (cp *ControlPlane) reconcile() error {
-	var cluster v1alpha3.Cluster
+	var cluster capiv1.Cluster
 
 	if err := cp.client.Get(cp.ctx, types.NamespacedName{Namespace: cp.clusterNamespace, Name: cp.clusterName}, &cluster); err != nil {
 		return err
@@ -139,7 +139,7 @@ func (cp *ControlPlane) reconcile() error {
 		return err
 	}
 
-	var machines v1alpha3.MachineList
+	var machines capiv1.MachineList
 
 	labelSelector, err := labels.Parse(controlPlane.Status.Selector)
 	if err != nil {

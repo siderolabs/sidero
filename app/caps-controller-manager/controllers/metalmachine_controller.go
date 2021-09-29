@@ -21,7 +21,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
 	"k8s.io/utils/pointer"
-	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha3"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
 	"sigs.k8s.io/cluster-api/util"
 	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -54,8 +54,7 @@ type MetalMachineReconciler struct {
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
-func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err error) {
-	ctx := context.Background()
+func (r *MetalMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, err error) {
 	logger := r.Log.WithValues("metalmachine", req.NamespacedName)
 
 	// Fetch the metalMachine instance.
@@ -105,7 +104,7 @@ func (r *MetalMachineReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err
 	}
 
 	// Initialize the patch helper
-	patchHelper, err := patch.NewHelper(metalMachine, r)
+	patchHelper, err := patch.NewHelper(metalMachine, r.Client)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -188,8 +187,8 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 	return ctrl.Result{}, nil
 }
 
-func (r *MetalMachineReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
-	if err := mgr.GetFieldIndexer().IndexField(&infrav1.ServerBinding{}, infrav1.ServerBindingMetalMachineRefField, func(rawObj runtime.Object) []string {
+func (r *MetalMachineReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager, options controller.Options) error {
+	if err := mgr.GetFieldIndexer().IndexField(ctx, &infrav1.ServerBinding{}, infrav1.ServerBindingMetalMachineRefField, func(rawObj client.Object) []string {
 		serverBinding := rawObj.(*infrav1.ServerBinding)
 
 		return []string{serverBinding.Spec.MetalMachineRef.Name}
@@ -306,6 +305,7 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 	r.Log.Info("Searching for node", "label", label)
 
 	nodes, err := clientset.CoreV1().Nodes().List(
+		ctx,
 		metav1.ListOptions{
 			LabelSelector: label,
 		},
@@ -335,7 +335,7 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 
 		node.Spec.ProviderID = providerID
 
-		_, err = clientset.CoreV1().Nodes().Update(&node)
+		_, err = clientset.CoreV1().Nodes().Update(ctx, &node, metav1.UpdateOptions{})
 		if err != nil {
 			return err
 		}

@@ -44,8 +44,7 @@ type ServerBindingReconciler struct {
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers/status,verbs=get;list;watch
 // +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
-func (r *ServerBindingReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, err error) {
-	ctx := context.Background()
+func (r *ServerBindingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, err error) {
 	logger := r.Log.WithValues("serverbinding", req.NamespacedName)
 
 	serverBinding := &infrav1.ServerBinding{}
@@ -60,7 +59,7 @@ func (r *ServerBindingReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, er
 	}
 
 	// Initialize the patch helper
-	patchHelper, err := patch.NewHelper(serverBinding, r)
+	patchHelper, err := patch.NewHelper(serverBinding, r.Client)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -94,8 +93,8 @@ func (r *ServerBindingReconciler) Reconcile(req ctrl.Request) (_ ctrl.Result, er
 	return ctrl.Result{}, nil
 }
 
-func (r *ServerBindingReconciler) SetupWithManager(mgr ctrl.Manager, options controller.Options) error {
-	if err := mgr.GetFieldIndexer().IndexField(&infrav1.MetalMachine{}, infrav1.MetalMachineServerRefField, func(rawObj runtime.Object) []string {
+func (r *ServerBindingReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager, options controller.Options) error {
+	if err := mgr.GetFieldIndexer().IndexField(ctx, &infrav1.MetalMachine{}, infrav1.MetalMachineServerRefField, func(rawObj client.Object) []string {
 		metalMachine := rawObj.(*infrav1.MetalMachine)
 
 		if metalMachine.Spec.ServerRef == nil {
@@ -108,36 +107,33 @@ func (r *ServerBindingReconciler) SetupWithManager(mgr ctrl.Manager, options con
 	}
 
 	// This mapRequests handler allows us to transition to the new scheme with ServerBinding.
-	mapRequests := handler.ToRequestsFunc(
-		func(a handler.MapObject) []reconcile.Request {
-			metalMachine := &infrav1.MetalMachine{}
+	mapRequests := func(a client.Object) []reconcile.Request {
+		metalMachine := &infrav1.MetalMachine{}
 
-			if err := r.Get(context.Background(), types.NamespacedName{Namespace: a.Meta.GetNamespace(), Name: a.Meta.GetName()}, metalMachine); err != nil {
-				return nil
-			}
+		if err := r.Get(context.Background(), types.NamespacedName{Namespace: a.GetNamespace(), Name: a.GetName()}, metalMachine); err != nil {
+			return nil
+		}
 
-			if metalMachine.Spec.ServerRef == nil {
-				return nil
-			}
+		if metalMachine.Spec.ServerRef == nil {
+			return nil
+		}
 
-			return []reconcile.Request{
-				{
-					NamespacedName: types.NamespacedName{
-						Name:      metalMachine.Spec.ServerRef.Name,
-						Namespace: metalMachine.Spec.ServerRef.Namespace,
-					},
+		return []reconcile.Request{
+			{
+				NamespacedName: types.NamespacedName{
+					Name:      metalMachine.Spec.ServerRef.Name,
+					Namespace: metalMachine.Spec.ServerRef.Namespace,
 				},
-			}
-		})
+			},
+		}
+	}
 
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(options).
 		For(&infrav1.ServerBinding{}).
 		Watches(
 			&source.Kind{Type: &infrav1.MetalMachine{}},
-			&handler.EnqueueRequestsFromMapFunc{
-				ToRequests: mapRequests,
-			},
+			handler.EnqueueRequestsFromMapFunc(mapRequests),
 		).
 		Complete(r)
 }
