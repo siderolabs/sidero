@@ -67,10 +67,10 @@ func DefaultOptions() Options {
 		TalosKernelURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz-amd64", TalosRelease),
 		TalosInitrdURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs-amd64.xz", TalosRelease),
 
-		CoreProvider:            "cluster-api:v0.3.19",
-		BootstrapProviders:      []string{"talos"},
+		CoreProvider:            "cluster-api:v0.4.3",
+		BootstrapProviders:      []string{"talos:v0.4.0-alpha.0"},
 		InfrastructureProviders: []string{"sidero"},
-		ControlPlaneProviders:   []string{"talos"},
+		ControlPlaneProviders:   []string{"talos:v0.3.0-alpha.0"},
 
 		ManagementCIDR:    "172.25.0.0/24",
 		ManagementSetName: "sfyra-management",
