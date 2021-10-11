@@ -1050,8 +1050,9 @@ github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8/go.mod h1:hkRG
 github.com/syndtr/gocapability v0.0.0-20180916011248-d98352740cb2/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/talos-systems/capi-utils v0.0.0-20210930173123-b2f8f83d3df6/go.mod h1:5egJGdIX7+vrHG3SJwZqkzwifIzHOiPlfzlAzBEzdaY=
-github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.4.0-alpha.0 h1:wEOeOVBmzJdVz2oHBUhdyER3m2/QiG/9GQkWhIS4Fcg=
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.4.0-alpha.0/go.mod h1:CzRApRMVHn0jCprVRyh+DZAqTXpjOgqMsjeLfNN4Xm0=
+github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.4.0 h1:Mle76zu+hzD/L0T/L6vWG/16dVc9JX4XYizDBAuzzUQ=
+github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.4.0/go.mod h1:CzRApRMVHn0jCprVRyh+DZAqTXpjOgqMsjeLfNN4Xm0=
 github.com/talos-systems/cluster-api-control-plane-provider-talos v0.3.0-alpha.0 h1:iRew2uaknEA0rr4rUPs3PBIkTHZGQIcDxnRyZEFZydk=
 github.com/talos-systems/cluster-api-control-plane-provider-talos v0.3.0-alpha.0/go.mod h1:FwM3L6rBkLJjPQJ//EtJmxEJi7HOk0kt37lKvvWju58=
 github.com/talos-systems/crypto v0.3.2 h1:I+MC9ql6K29EMlbPzdSeHZInSRWdze1FX1qGGrlom8Q=
