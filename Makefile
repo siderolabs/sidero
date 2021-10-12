@@ -9,14 +9,11 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 TEST_PKGS ?= ./...
-TALOS_RELEASE ?= v0.12.3
+TALOS_RELEASE ?= v0.13.0
 DEFAULT_K8S_VERSION ?= v1.22.2
 
-CONTROLLER_GEN_VERSION ?= v0.6.2
-CONVERSION_GEN_VERSION ?= v0.21.3
-
-TOOLS ?= ghcr.io/talos-systems/tools:v0.6.0
-PKGS ?= v0.6.0
+TOOLS ?= ghcr.io/talos-systems/tools:v0.8.0
+PKGS ?= v0.8.0
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
@@ -52,8 +49,6 @@ COMMON_ARGS += --build-arg=MODULE=$(MODULE)
 COMMON_ARGS += --build-arg=TEST_PKGS=$(TEST_PKGS)
 COMMON_ARGS += --build-arg=PKGS=$(PKGS)
 COMMON_ARGS += --build-arg=TOOLS=$(TOOLS)
-COMMON_ARGS += --build-arg=CONTROLLER_GEN_VERSION=$(CONTROLLER_GEN_VERSION)
-COMMON_ARGS += --build-arg=CONVERSION_GEN_VERSION=$(CONVERSION_GEN_VERSION)
 COMMON_ARGS += --build-arg=TALOS_RELEASE=$(TALOS_RELEASE)
 COMMON_ARGS += --build-arg=DEFAULT_K8S_VERSION=$(DEFAULT_K8S_VERSION)
 COMMON_ARGS += --build-arg=CGO_ENABLED=$(CGO_ENABLED)
