@@ -70,6 +70,7 @@ func main() {
 		metricsAddr          string
 		apiEndpoint          string
 		apiPort              int
+		httpPort             int
 		extraAgentKernelArgs string
 		bootFromDiskMethod   string
 		enableLeaderElection bool
@@ -84,6 +85,7 @@ func main() {
 
 	flag.StringVar(&apiEndpoint, "api-endpoint", "", "The endpoint (hostname or IP address) Sidero can be reached at from the servers.")
 	flag.IntVar(&apiPort, "api-port", 8081, "The TCP port Sidero components can be reached at from the servers.")
+	flag.IntVar(&httpPort, "http-port", 8081, "The TCP port Sidero controller manager HTTP server is running.")
 	flag.StringVar(&metricsAddr, "metrics-bind-addr", ":8081", "The address the metric endpoint binds to.")
 	flag.StringVar(&extraAgentKernelArgs, "extra-agent-kernel-args", "", "A comma delimited list of key-value pairs to be added to the agent environment kernel parameters.")
 	flag.StringVar(&bootFromDiskMethod, "boot-from-disk-method", string(ipxe.BootIPXEExit), "Default method to use to boot server from disk if it hits iPXE endpoint after install.")
@@ -292,7 +294,7 @@ func main() {
 			httpMux.ServeHTTP(w, req)
 		})
 
-		err := http.ListenAndServe(fmt.Sprintf(":%d", apiPort), h2c.NewHandler(grpcHandler, h2s))
+		err := http.ListenAndServe(fmt.Sprintf(":%d", httpPort), h2c.NewHandler(grpcHandler, h2s))
 		if err != nil {
 			setupLog.Error(err, "problem running HTTP server")
 		}
