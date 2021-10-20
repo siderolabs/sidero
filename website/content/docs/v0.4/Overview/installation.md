@@ -18,6 +18,7 @@ variables or as variables in the `clusterctl` configuration:
 - `SIDERO_CONTROLLER_MANAGER_HOST_NETWORK` (`false`): run `sidero-controller-manager` on host network
 - `SIDERO_CONTROLLER_MANAGER_API_ENDPOINT` (empty): specifies the IP address controller manager can be reached on, defaults to the node IP
 - `SIDERO_CONTROLLER_MANAGER_API_PORT` (8081): specifies the port controller manager can be reached on
+- `SIDERO_CONTROLLER_MANAGER_CONTAINER_API_PORT` (8081): specifies the controller manager internal container port
 - `SIDERO_CONTROLLER_MANAGER_EXTRA_AGENT_KERNEL_ARGS` (empty): specifies additional Linux kernel arguments for the Sidero agent (for example, different console settings)
 - `SIDERO_CONTROLLER_MANAGER_AUTO_ACCEPT_SERVERS` (`false`): automatically accept discovered servers, by default `.spec.accepted` should be changed to `true` to accept the server
 - `SIDERO_CONTROLLER_MANAGER_AUTO_BMC_SETUP` (`true`): automatically attempt to configure the BMC with a `sidero` user that will be used for all IPMI tasks.
@@ -34,3 +35,5 @@ These endpoints could be exposed to the infrastructure using different strategie
 
 - running `sidero-controller-manager` on the host network.
 - using Kubernetes load balancers (e.g. MetalLB), ingress controllers, etc.
+
+> Note: If you want to run `sidero-controller-manager` on the host network using port different from `8081` you should set both `SIDERO_CONTROLLER_MANAGER_API_PORT` and `SIDERO_CONTROLLER_MANAGER_CONTAINER_API_PORT` to the same value.
