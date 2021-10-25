@@ -15,7 +15,7 @@ require (
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
-	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.4.0
+	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.4.1
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.3.0
 	github.com/talos-systems/go-blockdevice v0.2.4
 	github.com/talos-systems/go-debug v0.2.1
