@@ -36,7 +36,7 @@ talosctl gen config --config-patch='[{"op": "add", "path": "/cluster/allowSchedu
 Submit the generated configuration to Talos:
 
 ```bash
-talosctl apply-config --insecure -n ${SIDERO_ENDPOINT} -f controlplane.yml
+talosctl apply-config --insecure -n ${SIDERO_ENDPOINT} -f controlplane.yaml
 ```
 
 Merge client configuration `talosconfig` into default `~/.talos/config` location:
