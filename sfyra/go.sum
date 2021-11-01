@@ -1014,7 +1014,7 @@ github.com/talos-systems/cluster-api-control-plane-provider-talos v0.3.0/go.mod 
 github.com/talos-systems/crypto v0.3.2/go.mod h1:xaNCB2/Bxaj+qrkdeodhRv5eKQVvKOGBBMj58MrIPY8=
 github.com/talos-systems/crypto v0.3.4 h1:bg4N27CH1MvUBasr70BlZObPXQYEhUTwOOm/jhCRFxg=
 github.com/talos-systems/crypto v0.3.4/go.mod h1:xaNCB2/Bxaj+qrkdeodhRv5eKQVvKOGBBMj58MrIPY8=
-github.com/talos-systems/discovery-service v0.1.0/go.mod h1:+9VWFbTcUChtlE0qc2fQ3Lyj1kj2AakFQ/ITnaB8Pd0=
+github.com/talos-systems/discovery-service v0.1.1/go.mod h1:7o4Fo240P3e2Bo7vZZ+4d/sykqPYI8LTtXCgjKgbqo4=
 github.com/talos-systems/go-blockdevice v0.2.3/go.mod h1:qnn/zDc09I1DA2BUDDCOSA2D0P8pIDjN8pGiRoRaQig=
 github.com/talos-systems/go-blockdevice v0.2.4 h1:/E5I95byCxfdmQIiBEyWgdUo+6vPBbbOJQIF9+yeysU=
 github.com/talos-systems/go-blockdevice v0.2.4/go.mod h1:qnn/zDc09I1DA2BUDDCOSA2D0P8pIDjN8pGiRoRaQig=
@@ -1038,11 +1038,12 @@ github.com/talos-systems/go-smbios v0.1.0/go.mod h1:HxhrzAoTZ7ed5Z5VvtCvnCIrOxyX
 github.com/talos-systems/grpc-proxy v0.2.0/go.mod h1:sm97Vc/z2cok3pu6ruNeszQej4KDxFrDgfWs4C1mtC4=
 github.com/talos-systems/net v0.3.0 h1:TG6PoiNdg9NmSeSjyecSgguUXzoJ8wp5a8RYlIdkq3Y=
 github.com/talos-systems/net v0.3.0/go.mod h1:VreSAyRmxMtqussAHSKMKkJQa1YwBTSVfkmE4Jydam4=
-github.com/talos-systems/talos v0.13.0 h1:jB7aLt3UlTuaFjovWepCRAz3RWHdFSideMfYZ+b//IQ=
-github.com/talos-systems/talos v0.13.0/go.mod h1:qGbgeL8KCqa5DBTyHwppM7cpaBjc88GWX1oq2Kgk67Q=
+github.com/talos-systems/talos v0.13.1 h1:mvYTvOOjq6PddEH4sl4UnPe2QasZvNUpk5QH167iZIo=
+github.com/talos-systems/talos v0.13.1/go.mod h1:8j02166x9ozSdyc+xr3BhAC8wVeRymWQq1tEz8I3Hc0=
 github.com/talos-systems/talos/pkg/machinery v0.12.3/go.mod h1:qX77JMZawrDTQaJucqecdlFsHy+dbnZ9YL8Kw4qL7d4=
-github.com/talos-systems/talos/pkg/machinery v0.13.0 h1:z7qmmXdTWP7gzmCdi1yE1hG4qo9APccI0R6YwLafmNQ=
 github.com/talos-systems/talos/pkg/machinery v0.13.0/go.mod h1:fQx1FlvFLSexSOYL1DSl0EjtazujlzNmVDCt2yRoLJ4=
+github.com/talos-systems/talos/pkg/machinery v0.13.1 h1:pDLSPDk1ZR8xkXqQNmwCBDCrsFQiM2ZxiX9ZjiK+Qnk=
+github.com/talos-systems/talos/pkg/machinery v0.13.1/go.mod h1:fQx1FlvFLSexSOYL1DSl0EjtazujlzNmVDCt2yRoLJ4=
 github.com/tchap/go-patricia v2.2.6+incompatible/go.mod h1:bmLyhP68RS6kStMGxByiQ23RP/odRBOTVjwp2cDyi6I=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
