@@ -31,10 +31,7 @@ import (
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 )
 
-var (
-	ErrNotInUse     = errors.New("server not in use")
-	ErrBootFromDisk = errors.New("boot from disk")
-)
+var ErrBootFromDisk = errors.New("boot from disk")
 
 // bootFile is used when iPXE is booted without embedded script via iPXE request http://endpoint:8081/boot.ipxe.
 const bootFile = `#!ipxe
@@ -135,13 +132,6 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 
 		if apierrors.IsNotFound(err) {
 			log.Printf("Environment not found: %v", err)
-			w.WriteHeader(http.StatusNotFound)
-
-			return
-		}
-
-		if errors.Is(err, ErrNotInUse) {
-			log.Printf("Server %q not in use, skipping", uuid)
 			w.WriteHeader(http.StatusNotFound)
 
 			return
@@ -296,10 +286,8 @@ func newEnvironment(server *metalv1alpha1.Server, serverBinding *infrav1.ServerB
 	switch {
 	case server == nil:
 		return newAgentEnvironment(arch), nil
-	case serverBinding == nil && !server.Status.IsClean:
-		return newAgentEnvironment(arch), nil
 	case serverBinding == nil:
-		return nil, ErrNotInUse
+		return newAgentEnvironment(arch), nil
 	case conditions.Has(server, metalv1alpha1.ConditionPXEBooted) && !server.Spec.PXEBootAlways:
 		return nil, ErrBootFromDisk
 	case server.Spec.EnvironmentRef != nil:
