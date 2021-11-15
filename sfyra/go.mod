@@ -13,7 +13,7 @@ replace (
 require (
 	github.com/spf13/cobra v1.2.1
 	github.com/stretchr/testify v1.7.0
-	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.4.0
+	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.0
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.3.0
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-loadbalancer v0.1.1
@@ -29,6 +29,6 @@ require (
 	k8s.io/apiextensions-apiserver v0.22.2
 	k8s.io/apimachinery v0.22.2
 	k8s.io/client-go v0.22.2
-	sigs.k8s.io/cluster-api v0.4.3
-	sigs.k8s.io/controller-runtime v0.9.7
+	sigs.k8s.io/cluster-api v1.0.0
+	sigs.k8s.io/controller-runtime v0.10.2
 )
