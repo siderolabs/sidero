@@ -15,7 +15,7 @@ require (
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
-	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.4.0
+	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.0
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.3.0
 	github.com/talos-systems/go-blockdevice v0.2.4
 	github.com/talos-systems/go-debug v0.2.1
@@ -34,7 +34,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.22.2
 	k8s.io/apimachinery v0.22.2
 	k8s.io/client-go v0.22.2
-	k8s.io/utils v0.0.0-20210819203725-bdf08cb9a70a
-	sigs.k8s.io/cluster-api v0.4.3
-	sigs.k8s.io/controller-runtime v0.9.7
+	k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b
+	sigs.k8s.io/cluster-api v1.0.0
+	sigs.k8s.io/controller-runtime v0.10.2
 )
