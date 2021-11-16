@@ -6,7 +6,6 @@ package tests
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -91,7 +90,6 @@ func TestEnvironmentCreate(ctx context.Context, metalClient client.Client, clust
 			cmdline.Append("panic", "1")
 			cmdline.Append("talos.platform", "metal")
 			cmdline.Append("talos.shutdown", "halt")
-			cmdline.Append("talos.config", fmt.Sprintf("http://%s:8081/configdata?uuid=", cluster.SideroComponentsIP()))
 			cmdline.Append("initrd", "initramfs.xz")
 
 			environment.APIVersion = constants.SideroAPIVersion

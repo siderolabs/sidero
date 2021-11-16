@@ -25,6 +25,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/talos-systems/go-procfs/procfs"
+	talosconstants "github.com/talos-systems/talos/pkg/machinery/constants"
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
@@ -364,6 +365,8 @@ func newDefaultEnvironment() (env *metalv1alpha1.Environment, err error) {
 		return nil, err
 	}
 
+	appendTalosConfigArgument(env)
+
 	return env, nil
 }
 
@@ -373,6 +376,8 @@ func newEnvironmentFromServer(server *metalv1alpha1.Server) (env *metalv1alpha1.
 	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: server.Spec.EnvironmentRef.Name}, env); err != nil {
 		return nil, err
 	}
+
+	appendTalosConfigArgument(env)
 
 	return env, nil
 }
@@ -384,15 +389,37 @@ func newEnvironmentFromServerClass(serverBinding *infrav1.ServerBinding) (env *m
 		return nil, err
 	}
 
-	if serverClassResource.Spec.EnvironmentRef != nil {
-		env = &metalv1alpha1.Environment{}
+	if serverClassResource.Spec.EnvironmentRef == nil {
+		return env, nil
+	}
 
-		if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: serverClassResource.Spec.EnvironmentRef.Name}, env); err != nil {
-			return nil, err
+	env = &metalv1alpha1.Environment{}
+
+	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: serverClassResource.Spec.EnvironmentRef.Name}, env); err != nil {
+		return nil, err
+	}
+
+	appendTalosConfigArgument(env)
+
+	return env, nil
+}
+
+func appendTalosConfigArgument(env *metalv1alpha1.Environment) {
+	args := env.Spec.Kernel.Args
+
+	talosConfigPrefix := talosconstants.KernelParamConfig + "="
+
+	for _, arg := range args {
+		if strings.HasPrefix(arg, talosConfigPrefix) {
+			// Environment already has talos.config
+			return
 		}
 	}
 
-	return env, nil
+	// patch environment with the link to the metadata server
+	env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
+		fmt.Sprintf("%s=http://%s:%d/configdata?uuid=", talosconstants.KernelParamConfig, apiEndpoint, apiPort),
+	)
 }
 
 func markAsPXEBooted(server *metalv1alpha1.Server) error {

@@ -78,7 +78,6 @@ func EnvironmentDefaultSpec(talosRelease, apiEndpoint string, apiPort uint16) *E
 	args = append(args, kernel.DefaultArgs...)
 	args = append(args, "console=tty0", "console=ttyS0", "earlyprintk=ttyS0")
 	args = append(args, "initrd=initramfs.xz", "talos.platform=metal")
-	args = append(args, fmt.Sprintf("talos.config=http://%s:%d/configdata?uuid=", apiEndpoint, apiPort))
 	sort.Strings(args)
 
 	return &EnvironmentSpec{
