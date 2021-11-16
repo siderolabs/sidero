@@ -220,6 +220,10 @@ unit-tests-race: ## Performs unit tests with race detection enabled.
 
 # Utilities
 
+.PHONY: conformance
+conformance: ## Performs policy checks against the commit and source code.
+	docker run --rm -it -v $(PWD):/src -w /src ghcr.io/talos-systems/conform:v0.1.0-alpha.22 enforce
+
 .PHONY: clean
 clean:
 	@rm -rf $(ARTIFACTS)
