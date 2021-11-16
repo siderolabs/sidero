@@ -106,13 +106,13 @@ These can be used to compose a bank of `Servers` that are eligible for provision
 
 See the [ServerClasses](../../resource-configuration/serverclasses/) section of our Configuration docs for examples and more detail.
 
-### Metal Metadata Server
+### Sidero Controller Manager
 
-While the metadata server does not present unique CRDs within Kubernetes, it's important to understand the metadata resources that are returned to physical servers during the boot process.
+While the controller does not present unique CRDs within Kubernetes, it's important to understand the metadata resources that are returned to physical servers during the boot process.
 
 #### Metadata
 
-The metadata server may be familiar to you if you have used cloud environments previously.
-Using Talos machine configurations created by the Talos Cluster API bootstrap provider, along with patches specified by editing `Server`/`ServerClass` resources or `TalosConfig`/`TalosControlPlane` resources, metadata is returned to servers who query the metadata server at boot time.
+The Sidero controller manager server may be familiar to you if you have used cloud environments previously.
+Using Talos machine configurations created by the Talos Cluster API bootstrap provider, along with patches specified by editing `Server`/`ServerClass` resources or `TalosConfig`/`TalosControlPlane` resources, metadata is returned to servers who query the controller manager at boot time.
 
 See the [Metadata](../../resource-configuration/metadata/) section of our Configuration docs for examples and more detail.

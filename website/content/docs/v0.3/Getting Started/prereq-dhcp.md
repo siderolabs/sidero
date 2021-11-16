@@ -139,4 +139,4 @@ We are working toward integrating as much as possible into Sidero, to provide as
 much intelligence and automation as can be had, but until then, you will likely
 need to figure out how to begin hunting down problems.
 
-See the Sidero [Troubleshooting](troubleshooting) guide for more assistance.
+See the Sidero [Troubleshooting](../troubleshooting) guide for more assistance.

@@ -16,7 +16,7 @@ The process is fairly simple with a few pieces of information.
 
 - If the server is already part of a cluster (`kubectl get serverbindings` should provide this info), you can now delete the machine that corresponds with this server via `kubectl delete machine <machine_name>`.
 
-- With the machine deleted, Sideo will reboot the machine and wipe its disks.
+- With the machine deleted, Sidero will reboot the machine and wipe its disks.
 
 - Once the disk wiping is complete and the server is turned off, you can finally delete the server from Sidero with `kubectl delete server <server_name>` and repurpose the server for something else.
 

@@ -11,7 +11,7 @@ reachable by the servers which it will be driving.
 
 For most servers, TFTP (port 69/udp) will be needed.
 This is used for PXE booting, both BIOS and UEFI.
-Being a primitive UDP protocl, many load balancers do not support TFTP.
+Being a primitive UDP protocol, many load balancers do not support TFTP.
 Instead, solutions such as [MetalLB](https://metallb.universe.tf) may be used to expose TFTP over a known IP address.
 For servers which support UEFI HTTP Network Boot, TFTP need not be used.
 

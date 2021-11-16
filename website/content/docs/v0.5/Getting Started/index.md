@@ -56,6 +56,6 @@ More information about Talos can be found at
 
 **Workload Cluster** is a cluster, managed by Sidero, on which your Kubernetes
 workloads may be run.
-The workload clusters are where you run your own applications and infrastruture.
+The workload clusters are where you run your own applications and infrastructure.
 Sidero creates them from your available resources, maintains them over time as
 your needs and resources change, and removes them whenever it is told to do so.

@@ -4,7 +4,7 @@ weight: 4
 title: Metadata
 ---
 
-The Metadata server manages the Machine metadata.
+The Sidero controller manager manages the Machine metadata.
 In terms of Talos (the OS on which the Kubernetes cluster is formed), this is the
 "[machine config](https://www.talos.dev/docs/v0.13/reference/configuration/)",
 which is used during the automated installation.

@@ -18,6 +18,6 @@ The rough outline of this process is very short and sweet, as it relies on other
 - With a Kubernetes cluster now in hand (and with access to it via `talosctl` and `kubectl`), you can simply pickup the Getting Started tutorial at the "Install Sidero" section [here](../../getting-started/install-clusterapi).
   Keep in mind, however, that you will be unable to do the "pivoting" section of the tutorial, so just skip that step when you reach the end of the tutorial.
 
-> Note: It may also be of interest to view the prereq guides on [CLI](../../getting-started/prereq-cli-tools) and [DHCP](../../getting-started/prereq-dhcp) setup, as they will still apply to this method.
+> Note: It may also be of interest to view the prerequisite guides on [CLI](../../getting-started/prereq-cli-tools) and [DHCP](../../getting-started/prereq-dhcp) setup, as they will still apply to this method.
 
 - For long-term maintenance of a management plane created in this way, refer to the Talos documentation for upgrading [Kubernetes](https://www.talos.dev/docs/v0.13/guides/upgrading-kubernetes/) and [Talos](https://www.talos.dev/docs/v0.13/guides/upgrading-talos/) itself.
