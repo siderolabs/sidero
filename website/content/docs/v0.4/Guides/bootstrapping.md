@@ -36,6 +36,8 @@ However, here is an example of the configuration for an Ubiquti EdgeRouter that 
 
 This block shows the subnet setup, as well as the extra "subnet-parameters" that tell the DHCP server to include the ipxe-metal.conf file.
 
+> These commands are run under the `configure` option in EdgeRouter
+
 ```bash
 $ show service dhcp-server shared-network-name MetalDHCP
 
@@ -51,7 +53,7 @@ $ show service dhcp-server shared-network-name MetalDHCP
  }
 ```
 
-Here is the ipxe-metal.conf file.
+Here is the `ipxe-metal.conf` file.
 
 ```bash
 $ cat /etc/dhcp/ipxe-metal.conf
@@ -61,6 +63,36 @@ allow booting;
 
 next-server 192.168.1.150;
 filename "ipxe.efi"; # use "undionly.kpxe" for BIOS netboot or "ipxe.efi" for UEFI netboot
+
+host talos-mgmt-0 {
+    fixed-address 192.168.254.2;
+    hardware ethernet d0:50:99:d3:33:60;
+}
+```
+
+> If you want to boot multiple architectures, you can use the *DHCP Option 93* to specify the architecture.
+
+First we need to define *option 93* in the DHCP server configuration.
+
+```bash
+set service dhcp-server global-parameters "option system-arch code 93 = unsigned integer 16;"
+```
+
+Now we can specify condition based on *option 93* in `ipxe-metal.conf` file
+
+```bash
+$ cat /etc/dhcp/ipxe-metal.conf
+
+allow bootp;
+allow booting;
+
+next-server 192.168.1.150;
+
+if option system-arch = 00:0b {
+    filename "ipxe-arm64.efi";
+} else {
+    filename "ipxe.efi";
+}
 
 host talos-mgmt-0 {
     fixed-address 192.168.254.2;

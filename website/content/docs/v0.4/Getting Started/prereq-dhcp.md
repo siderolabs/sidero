@@ -114,19 +114,18 @@ Since we use a number of Ubiquiti EdgeRouter devices especially in our home test
 networks, it is worth mentioning the curious syntax gymnastics we must go
 through there.
 Essentially, the quotes around the path need to be entered as HTML entities:
-`&quote;`.
+`&quot;`.
 
 Ubiquiti EdgeRouter configuration statement:
 
 ```config
 set service dhcp-server shared-network-name sidero \
   subnet 172.16.199.1 \
-  subnet-parameters "include &quote;/config/ipxe-metal.conf&quot;;"
+  subnet-parameters "include &quot;/etc/dhcp/ipxe-metal.conf&quot;;"
 ```
 
-Also note the fact that there are two semicolons at the end of the line;
-the first is part of the HTML-encoded quote;
-the second is the actual terminating semicolon.
+Also note the fact that there are two semicolons at the end of the line.
+The first is part of the HTML-encoded **"** (`&quot;`) and the second is the actual terminating semicolon.
 
 ## Troubleshooting
 
