@@ -29,6 +29,11 @@ func NewClient(spec metalv1alpha1.ManagementAPI) (*Client, error) {
 	}, nil
 }
 
+// Close the client.
+func (c *Client) Close() error {
+	return nil
+}
+
 func (c *Client) postRequest(path string) error {
 	failureMode := DefaultDice.Roll()
 

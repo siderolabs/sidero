@@ -409,6 +409,8 @@ func attemptBMCIP(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS)
 		return err
 	}
 
+	defer ipmiClient.Close() //nolint:errcheck
+
 	// Fetch BMC IP (param 3 in LAN config)
 	ipResp, err := ipmiClient.GetLANConfig(0x03)
 	if err != nil {
@@ -468,6 +470,8 @@ func attemptBMCUserSetup(ctx context.Context, client api.AgentClient, s *smbios.
 	if err != nil {
 		return err
 	}
+
+	defer ipmiClient.Close() //nolint:errcheck
 
 	// Get user summary to see how many user slots
 	summResp, err := ipmiClient.GetUserSummary()

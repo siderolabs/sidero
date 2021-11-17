@@ -87,6 +87,8 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, err
 	}
 
+	defer mgmtClient.Close() //nolint:errcheck
+
 	s.Status.Power = "off"
 
 	poweredOn, powerErr := mgmtClient.IsPoweredOn()
