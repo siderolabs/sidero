@@ -22,6 +22,12 @@ module.exports = {
     },
     dropdownOptions: [
       {
+        version: "v0.5",
+        url: "/docs/v0.5/",
+        latest: false,
+        prerelease: true,
+      },
+      {
         version: "v0.4",
         url: "/docs/v0.4/",
         latest: true,
@@ -65,6 +71,12 @@ module.exports = {
         typeName: "MarkdownPage",
         pathPrefix: "/docs",
         sidebarOrder: {
+          "v0.5": [
+            { title: "Overview", method: "weighted" },
+            { title: "Getting Started", method: "weighted" },
+            { title: "Resource Configuration", method: "alphabetical" },
+            { title: "Guides", method: "alphabetical" },
+          ],
           "v0.4": [
             { title: "Overview", method: "weighted" },
             { title: "Getting Started", method: "weighted" },
