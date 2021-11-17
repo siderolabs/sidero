@@ -2,7 +2,7 @@ module github.com/talos-systems/sidero
 
 go 1.17
 
-replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/talos-systems/goipmi v0.0.0-20210504182258-b54796c8d678
+replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/talos-systems/goipmi v0.0.0-20211117190708-9fec3531c1bc
 
 require (
 	github.com/evanphx/json-patch v4.11.0+incompatible

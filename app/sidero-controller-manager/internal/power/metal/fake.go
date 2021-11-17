@@ -29,3 +29,7 @@ func (fakeClient) IsPoweredOn() (bool, error) {
 func (fakeClient) IsFake() bool {
 	return true
 }
+
+func (fakeClient) Close() error {
+	return nil
+}

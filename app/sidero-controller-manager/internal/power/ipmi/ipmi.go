@@ -5,6 +5,8 @@
 package ipmi
 
 import (
+	"fmt"
+
 	goipmi "github.com/pensando/goipmi"
 
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
@@ -34,7 +36,16 @@ func NewClient(bmcInfo metalv1alpha1.BMC) (*Client, error) {
 		return nil, err
 	}
 
+	if err = ipmiClient.Open(); err != nil {
+		return nil, fmt.Errorf("error opening client: %w", err)
+	}
+
 	return &Client{IPMIClient: ipmiClient}, nil
+}
+
+// Close the client.
+func (c *Client) Close() error {
+	return c.IPMIClient.Close()
 }
 
 // PowerOn will power on a given machine.

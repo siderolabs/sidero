@@ -24,6 +24,7 @@ type ManagementClient interface {
 	IsPoweredOn() (bool, error)
 	SetPXE() error
 	IsFake() bool
+	Close() error
 }
 
 // NewManagementClient builds ManagementClient from the server spec.

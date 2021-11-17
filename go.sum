@@ -683,8 +683,8 @@ github.com/talos-systems/go-retry v0.3.1 h1:GjjyHB8i1CJpb1O5qYPMljq74cRQ5uiDoyMa
 github.com/talos-systems/go-retry v0.3.1/go.mod h1:HiXQqyVStZ35uSY/MTLWVvQVmC3lIW2MS5VdDaMtoKM=
 github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a h1:uUAH6oFZwHdWRlHyBIsM8SEYU4fLM6KGu6bmPZOUKd8=
 github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a/go.mod h1:HxhrzAoTZ7ed5Z5VvtCvnCIrOxyXDS7V2B5hCetAMW8=
-github.com/talos-systems/goipmi v0.0.0-20210504182258-b54796c8d678 h1:udj668k0XBRUBVATjkgjUfW25OS4/aH9sZnMQkmCOXE=
-github.com/talos-systems/goipmi v0.0.0-20210504182258-b54796c8d678/go.mod h1:Vr1Oadtcem03hG2RUT/dpSQS5md9d6rJ9nA0lUBC91Q=
+github.com/talos-systems/goipmi v0.0.0-20211117190708-9fec3531c1bc h1:LerxMYi6JGe5ilm+lohwXOaaeNwyefS/zGaiyrZcMDc=
+github.com/talos-systems/goipmi v0.0.0-20211117190708-9fec3531c1bc/go.mod h1:Vr1Oadtcem03hG2RUT/dpSQS5md9d6rJ9nA0lUBC91Q=
 github.com/talos-systems/net v0.3.0 h1:TG6PoiNdg9NmSeSjyecSgguUXzoJ8wp5a8RYlIdkq3Y=
 github.com/talos-systems/net v0.3.0/go.mod h1:VreSAyRmxMtqussAHSKMKkJQa1YwBTSVfkmE4Jydam4=
 github.com/talos-systems/talos/pkg/machinery v0.12.3/go.mod h1:qX77JMZawrDTQaJucqecdlFsHy+dbnZ9YL8Kw4qL7d4=
