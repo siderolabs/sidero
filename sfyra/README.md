@@ -7,13 +7,13 @@ Integration test for Sidero/Arges.
 Build the test binary and Sidero, push images:
 
 ```sh
-make USERNAME=<username> TAG=v0.1.0 PUSH=true
+make USERNAME=<username> TAG=v0.4.0 PUSH=true
 ```
 
 Run the test (this will trigger `make release`):
 
 ```sh
-make run-sfyra USERNAME=<username> TAG=v0.1.0
+make run-sfyra USERNAME=<username> TAG=v0.4.0
 ```
 
 Test uses CIDRs `172.24.0.0/24`, `172.25.0.0/24` by default.
@@ -26,11 +26,11 @@ Sequence of steps:
 - run the unit-tests
 
 It's also possible to run Sfyra manually to avoid tearing down and recreating whole environment each time.
-After `make USERNAME=<username> TAG=v0.1.0 PUSH=true` run:
+After `make USERNAME=<username> TAG=v0.4.0 PUSH=true` run:
 
 ```sh
 make talos-artifacts # need to run it only once per Talos release change
-make clusterctl-release USERNAME=<username> TAG=v0.1.0 PUSH=true
+make clusterctl-release USERNAME=<username> TAG=v0.4.0 PUSH=true
 ```
 
 Then launch Sfyra manually with desired flags:
@@ -43,7 +43,7 @@ Alternatively, you may use `run-sfyra` target with `SFYRA_EXTRA_FLAGS` and `REGI
 
 ```sh
 export USERNAME=<username>
-export TAG=v0.1.0
+export TAG=v0.4.0
 export REGISTRY_MIRROR_FLAGS="--registry-mirror docker.io=http://172.24.0.1:5000,k8s.gcr.io=http://172.24.0.1:5001,quay.io=http://172.24.0.1:5002,gcr.io=http://172.24.0.1:5003,ghcr.io=http://172.24.0.1:5004,127.0.0.1:5005=http://172.24.0.1:5005"
 export SFYRA_EXTRA_FLAGS="--skip-teardown"
 make run-sfyra
