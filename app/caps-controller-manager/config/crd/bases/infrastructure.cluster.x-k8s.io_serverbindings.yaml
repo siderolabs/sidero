@@ -182,6 +182,20 @@ spec:
                     description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
                     type: string
                 type: object
+              siderolink:
+                description: SideroLink describes state of the SideroLink tunnel.
+                properties:
+                  address:
+                    description: NodeAddress is the tunnel address of the node.
+                    type: string
+                  publicKey:
+                    description: NodePublicKey is the Wireguard public key of the
+                      node.
+                    type: string
+                required:
+                - address
+                - publicKey
+                type: object
             required:
             - metalMachineRef
             type: object

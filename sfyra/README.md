@@ -77,7 +77,7 @@ In this case Sidero iPXE server will force VM to boot from disk via iPXE if the 
 
 > Note: due to the dependency on new `talosctl`, this feature will be available once Talos in Sfyra is updated to version >= 0.11.
 
-## Running with Talos HEAD
+## Running with Talos HEAD as a bootstrap cluster
 
 Build the artifacts in Talos:
 
@@ -92,6 +92,29 @@ sudo -E _out/sfyra test integration --skip-teardown --bootstrap-initramfs=../tal
 ```
 
 This command doesn't tear down the cluster after the test run, so it can be re-run any time for quick another round of testing.
+
+## Running with Talos HEAD as workload clusters
+
+Build the artifacts in Talos:
+
+```sh
+make initramfs kernel
+```
+
+Make sure that the `initramfs` has a matching installer image pushed to the registry.
+
+Start _some_ webserver in Talos directory, e.g.
+
+```sh
+$ python -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+```
+
+From Sidero directory run:
+
+```sh
+sudo -E _out/sfyra test integration --skip-teardown --talos-initrd-url http://172.24.0.1:8000/_out/initramfs-amd64.xz --talos-kernel-url http://172.24.0.1:8000/_out/vmlinuz-amd64
+```
 
 ## Cleaning up
 

@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"sort"
 	"testing"
 	"time"
@@ -19,6 +18,7 @@ import (
 	"github.com/talos-systems/go-retry/retry"
 	"github.com/talos-systems/talos/pkg/machinery/config/configloader"
 	talosconfig "github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1"
+	v1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -39,8 +39,8 @@ import (
 )
 
 const (
-	defaultServerClassName  = "default"
-	workloadServerClassName = "workload"
+	defaultServerClassName = "default"
+	serverClassName        = "sfyra"
 )
 
 // TestServerClassAny verifies server class "any".
@@ -90,6 +90,9 @@ func TestServerClassCreate(ctx context.Context, metalClient client.Client, vmSet
 					},
 				},
 			},
+			EnvironmentRef: &v1.ObjectReference{
+				Name: environmentName,
+			},
 		}
 
 		serverClass, err := createServerClass(ctx, metalClient, defaultServerClassName, classSpec)
@@ -119,14 +122,14 @@ func TestServerClassCreate(ctx context.Context, metalClient client.Client, vmSet
 			expectedUUIDs[i] = nodes[i].UUID.String()
 		}
 
-		actualUUIDs := append(serverClass.Status.ServersAvailable, serverClass.Status.ServersInUse...)
+		actualUUIDs := append(append([]string(nil), serverClass.Status.ServersAvailable...), serverClass.Status.ServersInUse...)
 
 		sort.Strings(expectedUUIDs)
 		sort.Strings(actualUUIDs)
 
 		assert.Equal(t, expectedUUIDs, actualUUIDs)
 
-		_, err = createServerClass(ctx, metalClient, workloadServerClassName, classSpec)
+		_, err = createServerClass(ctx, metalClient, serverClassName, classSpec)
 		require.NoError(t, err)
 	}
 }
@@ -191,12 +194,12 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 		nodeCountCP := int64(1)
 		nodeCountWorker := int64(0)
 
-		os.Setenv("CONTROL_PLANE_ENDPOINT", "localhost")
-		os.Setenv("CONTROL_PLANE_PORT", "11111")
-		os.Setenv("CONTROL_PLANE_SERVERCLASS", "dummyservers")
-		os.Setenv("WORKER_SERVERCLASS", "dummyservers")
-		os.Setenv("KUBERNETES_VERSION", "v1.20.4") // dummy cluster, actual value doesn't matter
-		os.Setenv("TALOS_VERSION", "v0.9")         // dummy cluster, actual value doesn't matter
+		t.Setenv("CONTROL_PLANE_ENDPOINT", "localhost")
+		t.Setenv("CONTROL_PLANE_PORT", "11111")
+		t.Setenv("CONTROL_PLANE_SERVERCLASS", "dummyservers")
+		t.Setenv("WORKER_SERVERCLASS", "dummyservers")
+		t.Setenv("KUBERNETES_VERSION", "v1.20.4") // dummy cluster, actual value doesn't matter
+		t.Setenv("TALOS_VERSION", "v0.9")         // dummy cluster, actual value doesn't matter
 
 		templateOptions := capiclient.GetClusterTemplateOptions{
 			Kubeconfig:               kubeconfig,

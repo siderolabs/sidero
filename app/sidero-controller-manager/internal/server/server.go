@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/talos-systems/grpc-proxy/proxy"
 	"google.golang.org/grpc"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -374,7 +375,14 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 }
 
 func CreateServer(c controllerclient.Client, recorder record.EventRecorder, scheme *runtime.Scheme, autoAccept, insecureWipe, autoBMC bool, rebootTimeout time.Duration) *grpc.Server {
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		// proxy pass unknown requests to sub-components
+		grpc.CustomCodec(proxy.Codec()), //nolint:staticcheck
+		grpc.UnknownServiceHandler(
+			proxy.TransparentHandler(
+				director,
+			)),
+	)
 
 	api.RegisterAgentServer(s, &server{
 		autoAccept:    autoAccept,

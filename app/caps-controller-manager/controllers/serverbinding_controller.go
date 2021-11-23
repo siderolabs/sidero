@@ -51,7 +51,7 @@ func (r *ServerBindingReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 	err = r.Get(ctx, req.NamespacedName, serverBinding)
 	if apierrors.IsNotFound(err) {
-		return r.reconcileTransition(logger, req)
+		return r.reconcileTransition(ctx, logger, req)
 	}
 
 	if err != nil {
@@ -138,9 +138,7 @@ func (r *ServerBindingReconciler) SetupWithManager(ctx context.Context, mgr ctrl
 		Complete(r)
 }
 
-func (r *ServerBindingReconciler) reconcileTransition(logger logr.Logger, req ctrl.Request) (_ ctrl.Result, err error) {
-	ctx := context.Background()
-
+func (r *ServerBindingReconciler) reconcileTransition(ctx context.Context, logger logr.Logger, req ctrl.Request) (_ ctrl.Result, err error) {
 	logger.Info("reconciling missing serverbinding")
 
 	var metalMachineList infrav1.MetalMachineList

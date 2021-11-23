@@ -14,6 +14,19 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: siderolink
+  namespace: system
+spec:
+  ports:
+    - port: ${SIDERO_CONTROLLER_MANAGER_SIDEROLINK_PORT:=51821}
+      targetPort: siderolink
+      protocol: UDP
+  selector:
+    control-plane: sidero-controller-manager
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: http
   namespace: system
 spec:
@@ -90,4 +103,41 @@ spec:
               path: /healthz
               port: http
             initialDelaySeconds: 15
+        - command:
+            - /siderolink-manager
+          args:
+            - --wireguard-endpoint=${SIDERO_CONTROLLER_MANAGER_SIDEROLINK_ENDPOINT:=-}
+            - --wireguard-port=${SIDERO_CONTROLLER_MANAGER_SIDEROLINK_PORT:=51821}
+          image: controller:latest
+          imagePullPolicy: Always
+          name: siderolink
+          env:
+            - name: API_ENDPOINT
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          ports:
+            - name: siderolink
+              containerPort: ${SIDERO_CONTROLLER_MANAGER_SIDEROLINK_PORT:=51821}
+              protocol: UDP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+            privileged: false
+          volumeMounts:
+            - mountPath: /dev/net/tun
+              name: dev-tun
+      volumes:
+        - hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+          name: dev-tun
       terminationGracePeriodSeconds: 10

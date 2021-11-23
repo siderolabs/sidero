@@ -16,6 +16,18 @@ const ServerBindingMetalMachineRefField = "spec.metalMachineRef.name"
 type ServerBindingSpec struct {
 	ServerClassRef  *corev1.ObjectReference `json:"serverClassRef,omitempty"`
 	MetalMachineRef corev1.ObjectReference  `json:"metalMachineRef"`
+
+	// SideroLink describes state of the SideroLink tunnel.
+	// +optional
+	SideroLink SideroLinkSpec `json:"siderolink,omitempty"`
+}
+
+// SideroLinkSpec defines the state of SideroLink connection.
+type SideroLinkSpec struct {
+	// NodeAddress is the tunnel address of the node.
+	NodeAddress string `json:"address"`
+	// NodePublicKey is the Wireguard public key of the node.
+	NodePublicKey string `json:"publicKey"`
 }
 
 // ServerBindingState defines the observed state of ServerBinding.

@@ -7,7 +7,6 @@ package tests
 import (
 	"context"
 	"fmt"
-	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -47,12 +46,12 @@ func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 	loadbalancer, err := loadbalancer.NewControlPlane(metalClient, vmSet.BridgeIP(), loadbalancerPort, "default", clusterName, false)
 	require.NoError(t, err)
 
-	os.Setenv("CONTROL_PLANE_ENDPOINT", vmSet.BridgeIP().String())
-	os.Setenv("CONTROL_PLANE_PORT", strconv.Itoa(loadbalancerPort))
-	os.Setenv("CONTROL_PLANE_SERVERCLASS", serverClassName)
-	os.Setenv("WORKER_SERVERCLASS", serverClassName)
-	os.Setenv("KUBERNETES_VERSION", kubernetesVersion)
-	os.Setenv("TALOS_VERSION", talosVersion)
+	t.Setenv("CONTROL_PLANE_ENDPOINT", vmSet.BridgeIP().String())
+	t.Setenv("CONTROL_PLANE_PORT", strconv.Itoa(loadbalancerPort))
+	t.Setenv("CONTROL_PLANE_SERVERCLASS", serverClassName)
+	t.Setenv("WORKER_SERVERCLASS", serverClassName)
+	t.Setenv("KUBERNETES_VERSION", kubernetesVersion)
+	t.Setenv("TALOS_VERSION", talosVersion)
 
 	templateOptions := capiclient.GetClusterTemplateOptions{
 		Kubeconfig:               kubeconfig,

@@ -365,7 +365,7 @@ func newDefaultEnvironment() (env *metalv1alpha1.Environment, err error) {
 		return nil, err
 	}
 
-	appendTalosConfigArgument(env)
+	appendTalosArguments(env)
 
 	return env, nil
 }
@@ -377,7 +377,7 @@ func newEnvironmentFromServer(server *metalv1alpha1.Server) (env *metalv1alpha1.
 		return nil, err
 	}
 
-	appendTalosConfigArgument(env)
+	appendTalosArguments(env)
 
 	return env, nil
 }
@@ -399,27 +399,41 @@ func newEnvironmentFromServerClass(serverBinding *infrav1.ServerBinding) (env *m
 		return nil, err
 	}
 
-	appendTalosConfigArgument(env)
+	appendTalosArguments(env)
 
 	return env, nil
 }
 
-func appendTalosConfigArgument(env *metalv1alpha1.Environment) {
+func appendTalosArguments(env *metalv1alpha1.Environment) {
 	args := env.Spec.Kernel.Args
 
 	talosConfigPrefix := talosconstants.KernelParamConfig + "="
+	sideroLinkPrefix := talosconstants.KernelParamSideroLink + "="
 
-	for _, arg := range args {
-		if strings.HasPrefix(arg, talosConfigPrefix) {
-			// Environment already has talos.config
-			return
+	for _, prefix := range []string{
+		talosConfigPrefix,
+		sideroLinkPrefix,
+	} {
+		for _, arg := range args {
+			if strings.HasPrefix(arg, prefix) {
+				// Environment already has variable, skip it
+				return
+			}
+		}
+
+		switch prefix {
+		case talosConfigPrefix:
+			// patch environment with the link to the metadata server
+			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
+				fmt.Sprintf("%s=http://%s:%d/configdata?uuid=", talosconstants.KernelParamConfig, apiEndpoint, apiPort),
+			)
+		case sideroLinkPrefix:
+			// patch environment with the SideroLink API
+			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
+				fmt.Sprintf("%s=%s:%d", talosconstants.KernelParamSideroLink, apiEndpoint, apiPort),
+			)
 		}
 	}
-
-	// patch environment with the link to the metadata server
-	env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
-		fmt.Sprintf("%s=http://%s:%d/configdata?uuid=", talosconstants.KernelParamConfig, apiEndpoint, apiPort),
-	)
 }
 
 func markAsPXEBooted(server *metalv1alpha1.Server) error {

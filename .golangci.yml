@@ -150,9 +150,14 @@ linters:
     - paralleltest
     - thelper
     - wrapcheck
+    - ireturn
+    - tagliatelle
+    - varnamelen
+    - gomoddirectives
     # abandoned linters for which golangci shows the warning that the repo is archived by the owner
     - interfacer
     - maligned
+    - scopelint
   disable-all: false
   fast: false
 
