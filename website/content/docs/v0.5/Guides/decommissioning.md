@@ -14,7 +14,10 @@ The process is fairly simple with a few pieces of information.
 - For each matching cluster, edit the cluster resource with `kubectl edit cluster` and set `.spec.paused` to `true`.
   Doing this ensures that no new machines will get created for these servers during the decommissioning process.
 
-- If the server is already part of a cluster (`kubectl get serverbindings` should provide this info), you can now delete the machine that corresponds with this server via `kubectl delete machine <machine_name>`.
+- If you want to mark a server to be not allocated after it's accepted into the cluster, set the `.spec.cordoned` field to `true`.
+  This will prevent the server from being allocated to any new clusters (still allowing it to be wiped).
+
+- If the server is already part of a cluster (`kubectl get serverbindings -o wide` should provide this info), you can now delete the machine that corresponds with this server via `kubectl delete machine <machine_name>`.
 
 - With the machine deleted, Sidero will reboot the machine and wipe its disks.
 

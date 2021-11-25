@@ -17,6 +17,11 @@ func AcceptedServerFilter(s Server) (bool, error) {
 	return s.Spec.Accepted, nil
 }
 
+// NotCordonedServerFilter matches Servers that have Spec.Paused set to false.
+func NotCordonedServerFilter(s Server) (bool, error) {
+	return !s.Spec.Cordoned, nil
+}
+
 // SelectorFilter returns a ServerFilter that matches servers against the
 // serverclass's selector field.
 func (sc *ServerClass) SelectorFilter() func(Server) (bool, error) {

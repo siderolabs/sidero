@@ -1062,10 +1062,10 @@ github.com/talos-systems/net v0.3.0/go.mod h1:VreSAyRmxMtqussAHSKMKkJQa1YwBTSVfk
 github.com/talos-systems/net v0.3.1-0.20211112122313-0abe5bdae8f8 h1:oT2MASZ8V3DuZbhaJWJ8oZ373zfmgXpvw2xLHM5cOYk=
 github.com/talos-systems/net v0.3.1-0.20211112122313-0abe5bdae8f8/go.mod h1:zhcGixNJz9dgwFiUwc7gkkAqdVqXagU1SNNoIVXYKGo=
 github.com/talos-systems/siderolink v0.0.0-20211125180240-f7cadbcdfbb8/go.mod h1:bEGwDYl9QgC3oZ4kdnJTuR2HX/XlUhxZjx/QAakKuBc=
-github.com/talos-systems/talos v0.13.2 h1:XfVA0rO4MxwXsfrTvWkKgxRHRUuMWaYVeU4ORpz7Jqc=
-github.com/talos-systems/talos v0.13.2/go.mod h1:238xIFxpQ5fBRWrA1+hlsz0kCQ1N7tHx/SlKYocumeI=
+github.com/talos-systems/talos v0.13.3 h1:enZICSB9A8SLzF2Kdv4GIbZv93KPhK+P9WKOm9my4Fg=
+github.com/talos-systems/talos v0.13.3/go.mod h1:qKfAsuUd2pz1ZVj0P91oVdmYXdNO9F3fJJ0cbvFlkxE=
 github.com/talos-systems/talos/pkg/machinery v0.12.3/go.mod h1:qX77JMZawrDTQaJucqecdlFsHy+dbnZ9YL8Kw4qL7d4=
-github.com/talos-systems/talos/pkg/machinery v0.13.1/go.mod h1:fQx1FlvFLSexSOYL1DSl0EjtazujlzNmVDCt2yRoLJ4=
+github.com/talos-systems/talos/pkg/machinery v0.13.3/go.mod h1:dJ0cLzqGZJgrFH8dhXpGJHg+r8tzktgjQXEqCOmljdg=
 github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.1.0.20211118180932-1ffa8e048008/go.mod h1:D8NT4Aj+X2OpA6yK6RAtpw1wcgkDS7oD23vqOQWRiP8=
 github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.1.0.20211123134516-852bf4a7de81 h1:/J0yS/k+yfzQpF0Cs2jQfstchDH2Nxnce2XuCxueLGM=
 github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.1.0.20211123134516-852bf4a7de81/go.mod h1:D8NT4Aj+X2OpA6yK6RAtpw1wcgkDS7oD23vqOQWRiP8=

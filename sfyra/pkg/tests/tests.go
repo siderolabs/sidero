@@ -58,6 +58,10 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			TestServerAcceptance(ctx, metalClient, vmSet),
 		},
 		{
+			"TestServerCordoned",
+			TestServerCordoned(ctx, metalClient, vmSet),
+		},
+		{
 			"TestServerResetOnAcceptance",
 			TestServerResetOnAcceptance(ctx, metalClient),
 		},

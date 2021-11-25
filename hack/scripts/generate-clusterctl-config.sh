@@ -2,7 +2,7 @@
 
 set -eou pipefail
 
-mkdir -p `dirname "${CLUSTERCTL_CONFIG}"`
+mkdir -p "$(dirname "${CLUSTERCTL_CONFIG}")"
 
 cat > "${CLUSTERCTL_CONFIG}" <<EOF
 providers:

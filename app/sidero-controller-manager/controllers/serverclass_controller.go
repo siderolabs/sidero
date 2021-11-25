@@ -70,6 +70,7 @@ func (r *ServerClassReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	results, err := metalv1alpha1.FilterServers(sl.Items,
 		metalv1alpha1.AcceptedServerFilter,
+		metalv1alpha1.NotCordonedServerFilter,
 		sc.SelectorFilter(),
 		sc.QualifiersFilter(),
 	)

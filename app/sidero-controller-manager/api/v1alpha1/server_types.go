@@ -153,6 +153,7 @@ type ServerSpec struct {
 	ManagementAPI     *ManagementAPI          `json:"managementApi,omitempty"`
 	ConfigPatches     []ConfigPatches         `json:"configPatches,omitempty"`
 	Accepted          bool                    `json:"accepted"`
+	Cordoned          bool                    `json:"cordoned,omitempty"`
 	PXEBootAlways     bool                    `json:"pxeBootAlways,omitempty"`
 }
 
@@ -192,6 +193,7 @@ type ServerStatus struct {
 // +kubebuilder:resource:scope=Cluster
 // +kubebuilder:printcolumn:name="Hostname",type="string",JSONPath=".spec.hostname",description="server hostname"
 // +kubebuilder:printcolumn:name="Accepted",type="boolean",JSONPath=".spec.accepted",description="indicates if the server is accepted"
+// +kubebuilder:printcolumn:name="Cordoned",type="boolean",JSONPath=".spec.cordoned",description="indicates if the server is cordoned"
 // +kubebuilder:printcolumn:name="Allocated",type="boolean",JSONPath=".status.inUse",description="indicates that the server has been allocated"
 // +kubebuilder:printcolumn:name="Clean",type="boolean",JSONPath=".status.isClean",description="indicates if the server is clean or not"
 // +kubebuilder:printcolumn:name="Power",type="string",JSONPath=".status.power",description="display the current power status"

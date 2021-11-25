@@ -25,6 +25,10 @@ spec:
       jsonPath: .spec.accepted
       name: Accepted
       type: boolean
+    - description: indicates if the server is cordoned
+      jsonPath: .spec.cordoned
+      name: Cordoned
+      type: boolean
     - description: indicates that the server has been allocated
       jsonPath: .status.inUse
       name: Allocated
@@ -143,6 +147,8 @@ spec:
                   - path
                   type: object
                 type: array
+              cordoned:
+                type: boolean
               cpu:
                 properties:
                   manufacturer:

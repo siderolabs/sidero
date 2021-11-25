@@ -53,7 +53,7 @@ func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, clus
 		require.NoError(t, err)
 
 		environment = v1alpha1.Environment{}
-		err = retry.Constant(30 * time.Second).Retry(func() error {
+		err = retry.Constant(60 * time.Second).Retry(func() error {
 			if err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.EnvironmentDefault}, &environment); err != nil {
 				if apierrors.IsNotFound(err) {
 					return retry.ExpectedError(err)
