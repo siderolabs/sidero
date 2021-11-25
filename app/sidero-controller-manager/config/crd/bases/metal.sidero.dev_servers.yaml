@@ -25,6 +25,10 @@ spec:
       jsonPath: .spec.accepted
       name: Accepted
       type: boolean
+    - description: indicates if the server is paused
+      jsonPath: .spec.paused
+      name: Paused
+      type: boolean
     - description: indicates that the server has been allocated
       jsonPath: .status.inUse
       name: Allocated
@@ -220,6 +224,8 @@ spec:
                 required:
                 - endpoint
                 type: object
+              paused:
+                type: boolean
               pxeBootAlways:
                 type: boolean
               system:

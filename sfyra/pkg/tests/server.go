@@ -259,6 +259,122 @@ func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet 
 	}
 }
 
+// TestServerPaused makes sure the paused bool works.
+func TestServerPaused(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+	return func(t *testing.T) {
+		const numDummies = 3
+
+		// create dummy servers to test with
+		dummySpec := v1alpha1.ServerSpec{
+			CPU: &v1alpha1.CPUInformation{
+				Manufacturer: "DummyManufacturer",
+			},
+		}
+
+		for i := 0; i < numDummies; i++ {
+			serverName := fmt.Sprintf("dummyserver-%s", strconv.Itoa(i))
+			_, err := createDummyServer(ctx, metalClient, serverName, dummySpec)
+			require.NoError(t, err)
+		}
+
+		dummyServers := &v1alpha1.ServerList{}
+
+		labelSelector, err := labels.Parse("dummy-server=")
+		require.NoError(t, err)
+		err = metalClient.List(ctx, dummyServers, client.MatchingLabelsSelector{Selector: labelSelector})
+		require.NoError(t, err)
+
+		// clean up dummies
+		defer func(client client.Client) {
+			for _, server := range dummyServers.Items {
+				server := server
+				client.Delete(ctx, &server)
+			}
+		}(metalClient)
+
+		// patch all servers as accepted
+		for _, server := range dummyServers.Items {
+			server := server
+
+			patchHelper, err := patch.NewHelper(&server, metalClient)
+			require.NoError(t, err)
+
+			server.Spec.Accepted = true
+			require.NoError(t, patchHelper.Patch(ctx, &server))
+		}
+
+		// verify that all servers shows up as available in `any` serverclass
+		require.NoError(t, retry.Constant(30*time.Second, retry.WithUnits(5*time.Second)).Retry(func() error {
+			var serverClass v1alpha1.ServerClass
+			err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass)
+			if err != nil {
+				return err
+			}
+
+			availableServers := getAvailableServersFromServerClass(serverClass, dummyServers)
+			if len(availableServers) == numDummies {
+				return nil
+			}
+
+			return retry.ExpectedError(fmt.Errorf("%d != %d", len(availableServers), numDummies))
+		}))
+
+		// // patch a single server and marked as paused
+		serverName := dummyServers.Items[0].Name
+
+		var server v1alpha1.Server
+
+		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: serverName}, &server))
+		patchHelper, err := patch.NewHelper(&server, metalClient)
+		require.NoError(t, err)
+
+		server.Spec.Paused = true
+
+		require.NoError(t, patchHelper.Patch(ctx, &server))
+
+		require.NoError(t, retry.Constant(30*time.Second, retry.WithUnits(5*time.Second)).Retry(func() error {
+			var serverClass v1alpha1.ServerClass
+			err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass)
+			if err != nil {
+				return err
+			}
+
+			availableServers := getAvailableServersFromServerClass(serverClass, dummyServers)
+			if len(availableServers) == numDummies-1 {
+				return nil
+			}
+
+			return retry.ExpectedError(fmt.Errorf("%d != %d", len(availableServers), numDummies-1))
+		}))
+
+		// patch the server and marked as not paused
+		var pausedServer v1alpha1.Server
+
+		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: serverName}, &pausedServer))
+		patchHelperPausedServer, err := patch.NewHelper(&pausedServer, metalClient)
+		require.NoError(t, err)
+
+		pausedServer.Spec.Paused = false
+
+		require.NoError(t, patchHelperPausedServer.Patch(ctx, &pausedServer))
+
+		require.NoError(t, retry.Constant(30*time.Second, retry.WithUnits(5*time.Second)).Retry(func() error {
+			var serverClass v1alpha1.ServerClass
+			err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass)
+			if err != nil {
+				return err
+			}
+
+			availableServers := getAvailableServersFromServerClass(serverClass, dummyServers)
+			if len(availableServers) == numDummies {
+				return nil
+			}
+
+			return retry.ExpectedError(fmt.Errorf("%d != %d", len(availableServers), numDummies))
+		}))
+	}
+}
+
 // TestServerResetOnAcceptance tests that servers are reset when accepted.
 func TestServerResetOnAcceptance(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
@@ -402,4 +518,19 @@ func createDummyServer(ctx context.Context, metalClient client.Client, name stri
 
 		return nil
 	})
+}
+
+// getAvailableServersFromServerClass returns a list of servers that are available as part of a serverclass.
+func getAvailableServersFromServerClass(serverClass v1alpha1.ServerClass, serverList *v1alpha1.ServerList) []string {
+	var foundServers []string
+
+	for _, server := range serverList.Items {
+		for _, serverName := range serverClass.Status.ServersAvailable {
+			if server.Name == serverName {
+				foundServers = append(foundServers, serverName)
+			}
+		}
+	}
+
+	return foundServers
 }
