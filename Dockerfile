@@ -144,6 +144,14 @@ ARG GO_LDFLAGS
 RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X main.TalosRelease=${TALOS_RELEASE}" -o /siderolink-manager ./app/sidero-controller-manager/cmd/siderolink-manager
 RUN chmod +x /siderolink-manager
 
+FROM base AS build-log-receiver
+ARG TALOS_RELEASE
+ARG TARGETARCH
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X main.TalosRelease=${TALOS_RELEASE}" -o /log-receiver ./app/sidero-controller-manager/cmd/log-receiver
+RUN chmod +x /log-receiver
+
 FROM base AS agent-build-amd64
 ARG GO_BUILDFLAGS
 ARG GO_LDFLAGS
@@ -194,6 +202,7 @@ COPY --from=pkg-kernel-amd64 /boot/vmlinuz /var/lib/sidero/env/agent-amd64/vmlin
 COPY --from=pkg-kernel-arm64 /boot/vmlinuz /var/lib/sidero/env/agent-arm64/vmlinuz
 COPY --from=build-sidero-controller-manager /manager /manager
 COPY --from=build-siderolink-manager /siderolink-manager /siderolink-manager
+COPY --from=build-log-receiver /log-receiver /log-receiver
 
 FROM sidero-controller-manager-image AS sidero-controller-manager
 LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero

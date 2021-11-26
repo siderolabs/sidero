@@ -5,7 +5,7 @@ go 1.17
 replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/talos-systems/goipmi v0.0.0-20211117190708-9fec3531c1bc
 
 require (
-	github.com/evanphx/json-patch v4.12.0+incompatible
+	github.com/evanphx/json-patch v5.6.0+incompatible
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.4.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
@@ -25,9 +25,9 @@ require (
 	github.com/talos-systems/go-retry v0.3.1
 	github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a
 	github.com/talos-systems/grpc-proxy v0.2.0
-	github.com/talos-systems/net v0.3.1-0.20211112122313-0abe5bdae8f8
-	github.com/talos-systems/siderolink v0.0.0-20211125180240-f7cadbcdfbb8
-	github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.1.0.20211123134516-852bf4a7de81
+	github.com/talos-systems/net v0.3.1-0.20211129211222-b4b718179a1a
+	github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0
+	github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.2
 	go.uber.org/zap v1.19.0
 	golang.org/x/net v0.0.0-20211108170745-6635138e15ea
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
@@ -110,7 +110,7 @@ require (
 	golang.zx2c4.com/wireguard v0.0.0-20211109020618-685490f568cf // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20211112145013-271947fe86fd // indirect
+	google.golang.org/genproto v0.0.0-20211118181313-81c1377c94b1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

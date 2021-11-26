@@ -27,6 +27,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
@@ -36,6 +37,7 @@ import (
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/metadata"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/api"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/server"
+	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/tftp"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 	"github.com/talos-systems/sidero/internal/client"
@@ -259,6 +261,13 @@ func main() {
 
 	if err = controllers.ReconcileEnvironmentDefault(ctx, k8sClient, TalosRelease, apiEndpoint, uint16(apiPort)); err != nil {
 		setupLog.Error(err, `failed to reconcile Environment "default"`)
+		os.Exit(1)
+	}
+
+	if err = mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
+		return siderolink.Cfg.LoadOrCreate(ctx, mgr.GetClient())
+	})); err != nil {
+		setupLog.Error(err, `failed to add SideroLink configuration initialization`)
 		os.Exit(1)
 	}
 

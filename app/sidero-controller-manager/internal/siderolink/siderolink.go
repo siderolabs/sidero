@@ -9,3 +9,13 @@ package siderolink
 //
 // Secret holds private Sidero Wireguard key and installation ID.
 const SecretName = "siderolink"
+
+// LogReceiverPort is the port of the log receiver container.
+//
+// LogReceiverPort is working only over Wireguard.
+const LogReceiverPort = 4001
+
+// Cfg is a default global instance of the SideroLink configuration.
+//
+// Cfg should be initialized first with `LoadOrCreate`.
+var Cfg Config

@@ -135,6 +135,18 @@ spec:
           volumeMounts:
             - mountPath: /dev/net/tun
               name: dev-tun
+        - command:
+            - /log-receiver
+          image: controller:latest
+          imagePullPolicy: Always
+          name: serverlogs
+          resources:
+            limits:
+              cpu: 256m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
       volumes:
         - hostPath:
             path: /dev/net/tun

@@ -29,6 +29,7 @@ import (
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 )
 
@@ -409,10 +410,12 @@ func appendTalosArguments(env *metalv1alpha1.Environment) {
 
 	talosConfigPrefix := talosconstants.KernelParamConfig + "="
 	sideroLinkPrefix := talosconstants.KernelParamSideroLink + "="
+	logDeliveryPrefix := talosconstants.KernelParamLoggingKernel + "="
 
 	for _, prefix := range []string{
 		talosConfigPrefix,
 		sideroLinkPrefix,
+		logDeliveryPrefix,
 	} {
 		for _, arg := range args {
 			if strings.HasPrefix(arg, prefix) {
@@ -431,6 +434,11 @@ func appendTalosArguments(env *metalv1alpha1.Environment) {
 			// patch environment with the SideroLink API
 			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
 				fmt.Sprintf("%s=%s:%d", talosconstants.KernelParamSideroLink, apiEndpoint, apiPort),
+			)
+		case logDeliveryPrefix:
+			// patch environment with the log receiver endpoint
+			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
+				fmt.Sprintf("%s=tcp://[%s]:%d", talosconstants.KernelParamLoggingKernel, siderolink.Cfg.ServerAddress.IP(), siderolink.LogReceiverPort),
 			)
 		}
 	}

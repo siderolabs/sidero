@@ -96,20 +96,18 @@ func run() error {
 		return fmt.Errorf("error listening for gRPC API: %w", err)
 	}
 
-	cfg := siderolink.Config{
-		WireguardEndpoint: fmt.Sprintf("%s:%d", wireguardEndpoint, wireguardPort),
-	}
+	siderolink.Cfg.WireguardEndpoint = fmt.Sprintf("%s:%d", wireguardEndpoint, wireguardPort)
 
-	if err = cfg.LoadOrCreate(ctx, metalclient); err != nil {
+	if err = siderolink.Cfg.LoadOrCreate(ctx, metalclient); err != nil {
 		return err
 	}
 
-	wireguardEndpoint, err := netaddr.ParseIPPort(cfg.WireguardEndpoint)
+	wireguardEndpoint, err := netaddr.ParseIPPort(siderolink.Cfg.WireguardEndpoint)
 	if err != nil {
 		return fmt.Errorf("invalid Wireguard endpoint: %w", err)
 	}
 
-	wgDevice, err := wireguard.NewDevice(cfg.ServerAddress, cfg.PrivateKey, wireguardEndpoint.Port())
+	wgDevice, err := wireguard.NewDevice(siderolink.Cfg.ServerAddress, siderolink.Cfg.PrivateKey, wireguardEndpoint.Port())
 	if err != nil {
 		return fmt.Errorf("error initializing wgDevice: %w", err)
 	}
@@ -133,7 +131,7 @@ func run() error {
 		),
 	}
 
-	srv := siderolink.NewServer(&cfg, metalclient)
+	srv := siderolink.NewServer(&siderolink.Cfg, metalclient)
 
 	peers := siderolink.NewPeerState(kubeconfig, logger)
 
@@ -160,7 +158,7 @@ func run() error {
 		return nil
 	})
 
-	if err := eg.Wait(); err != nil && !errors.Is(err, grpc.ErrServerStopped) && errors.Is(err, context.Canceled) {
+	if err := eg.Wait(); err != nil && !errors.Is(err, grpc.ErrServerStopped) && !errors.Is(err, context.Canceled) {
 		return err
 	}
 
