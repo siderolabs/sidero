@@ -107,7 +107,7 @@ The cluster creation process should be identical to what was detailed in the pre
 Using clusterctl, we can create a cluster manifest with:
 
 ```bash
-clusterctl config cluster workload-cluster -i sidero > workload-cluster.yaml
+clusterctl generate cluster workload-cluster -i sidero > workload-cluster.yaml
 ```
 
 Note that there are several variables that should be set in order for the templating to work properly:

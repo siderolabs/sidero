@@ -207,7 +207,7 @@ We are now ready to template out our management plane.
 Using clusterctl, we can create a cluster manifest with:
 
 ```bash
-clusterctl config cluster management-plane -i sidero > management-plane.yaml
+clusterctl generate cluster management-plane -i sidero > management-plane.yaml
 ```
 
 Note that there are several variables that should be set in order for the templating to work properly:
@@ -235,7 +235,7 @@ export TALOS_VERSION=v0.13
 export KUBERNETES_VERSION=v1.22.2
 export CONTROL_PLANE_PORT=6443
 export CONTROL_PLANE_ENDPOINT=1.2.3.4
-clusterctl config cluster management-plane -i sidero > management-plane.yaml
+clusterctl generate cluster management-plane -i sidero > management-plane.yaml
 ```
 
 In addition, you can specify the replicas for control-plane & worker nodes in management-plane.yaml manifest for TalosControlPlane and MachineDeployment objects.

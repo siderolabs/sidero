@@ -40,7 +40,7 @@ export KUBERNETES_VERSION=v1.22.2
 export CONTROL_PLANE_PORT=6443
 export CONTROL_PLANE_ENDPOINT=1.2.3.4
 
-clusterctl config cluster cluster-0 -i sidero > cluster-0.yaml
+clusterctl generate cluster cluster-0 -i sidero > cluster-0.yaml
 ```
 
 Take a look at this new `cluster-0.yaml` manifest and make any changes as you
