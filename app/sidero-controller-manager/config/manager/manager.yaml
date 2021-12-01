@@ -147,6 +147,18 @@ spec:
             requests:
               cpu: 50m
               memory: 128Mi
+        - command:
+            - /events-manager
+          image: controller:latest
+          imagePullPolicy: Always
+          name: serverevents
+          resources:
+            limits:
+              cpu: 256m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
       volumes:
         - hostPath:
             path: /dev/net/tun

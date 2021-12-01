@@ -15,6 +15,11 @@ const SecretName = "siderolink"
 // LogReceiverPort is working only over Wireguard.
 const LogReceiverPort = 4001
 
+// EventsSinkPort is the port of the events sink container.
+//
+// EventsSinkPort is working only over wireguard.
+const EventsSinkPort = 4002
+
 // Cfg is a default global instance of the SideroLink configuration.
 //
 // Cfg should be initialized first with `LoadOrCreate`.

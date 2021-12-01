@@ -411,11 +411,13 @@ func appendTalosArguments(env *metalv1alpha1.Environment) {
 	talosConfigPrefix := talosconstants.KernelParamConfig + "="
 	sideroLinkPrefix := talosconstants.KernelParamSideroLink + "="
 	logDeliveryPrefix := talosconstants.KernelParamLoggingKernel + "="
+	eventsSinkPrefix := talosconstants.KernelParamEventsSink + "="
 
 	for _, prefix := range []string{
 		talosConfigPrefix,
 		sideroLinkPrefix,
 		logDeliveryPrefix,
+		eventsSinkPrefix,
 	} {
 		for _, arg := range args {
 			if strings.HasPrefix(arg, prefix) {
@@ -439,6 +441,11 @@ func appendTalosArguments(env *metalv1alpha1.Environment) {
 			// patch environment with the log receiver endpoint
 			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
 				fmt.Sprintf("%s=tcp://[%s]:%d", talosconstants.KernelParamLoggingKernel, siderolink.Cfg.ServerAddress.IP(), siderolink.LogReceiverPort),
+			)
+		case eventsSinkPrefix:
+			// patch environment with the events sink endpoint
+			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
+				fmt.Sprintf("%s=[%s]:%d", talosconstants.KernelParamEventsSink, siderolink.Cfg.ServerAddress.IP(), siderolink.EventsSinkPort),
 			)
 		}
 	}
