@@ -14,6 +14,7 @@ const (
 	InitrdAsset = "initramfs.xz"
 
 	DefaultRequeueAfter = time.Second * 20
+	PowerCheckPeriod    = 5 * time.Minute
 
 	DefaultServerRebootTimeout = time.Minute * 20
 )
