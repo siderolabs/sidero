@@ -217,7 +217,8 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 			}
 		}
 
-		return f(true, ctrl.Result{})
+		// keep checking power state from time to time, as sometimes IPMI lies about the power state
+		return f(true, ctrl.Result{RequeueAfter: constants.PowerCheckPeriod})
 	case !s.Status.InUse && !s.Status.IsClean:
 		// when server is set to PXE boot to be wiped, ConditionPowerCycle is set to mark server
 		// as power cycled to avoid duplicate reboot attempts from subsequent Reconciles
