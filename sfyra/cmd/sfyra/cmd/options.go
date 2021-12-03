@@ -65,9 +65,9 @@ func DefaultOptions() Options {
 		TalosInitrdURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs-amd64.xz", TalosRelease),
 
 		CoreProvider:            "cluster-api:v0.3.19",
-		BootstrapProviders:      []string{"talos"},
+		BootstrapProviders:      []string{"talos:v0.3.2"},
 		InfrastructureProviders: []string{"sidero"},
-		ControlPlaneProviders:   []string{"talos"},
+		ControlPlaneProviders:   []string{"talos:v0.1.0"},
 
 		ManagementCIDR:    "172.25.0.0/24",
 		ManagementSetName: "sfyra-management",
