@@ -20,6 +20,14 @@ type ServerBindingSpec struct {
 	// SideroLink describes state of the SideroLink tunnel.
 	// +optional
 	SideroLink SideroLinkSpec `json:"siderolink,omitempty"`
+
+	// Addresses describes node addresses for the server.
+	// +optional
+	Addresses []string `json:"addresses,omitempty"`
+
+	// Hostname describes node hostname for the server.
+	// +optional
+	Hostname string `json:"hostname,omitempty"`
 }
 
 // SideroLinkSpec defines the state of SideroLink connection.

@@ -350,8 +350,10 @@ func autoConvert_v1alpha2_MetalMachineStatus_To_v1alpha3_MetalMachineStatus(in *
 
 func autoConvert_v1alpha3_MetalMachineStatus_To_v1alpha2_MetalMachineStatus(in *v1alpha3.MetalMachineStatus, out *MetalMachineStatus, s conversion.Scope) error {
 	out.Ready = in.Ready
+	// WARNING: in.Addresses requires manual conversion: does not exist in peer-type
 	// WARNING: in.FailureReason requires manual conversion: does not exist in peer-type
 	// WARNING: in.FailureMessage requires manual conversion: does not exist in peer-type
+	// WARNING: in.Conditions requires manual conversion: does not exist in peer-type
 	return nil
 }
 

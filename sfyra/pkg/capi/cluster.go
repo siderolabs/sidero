@@ -22,9 +22,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
-	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
 	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
@@ -49,6 +50,7 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 		machines           capiv1.MachineList
 		machineDeployments capiv1.MachineDeploymentList
 		talosConfig        cabpt.TalosConfig
+		talosSecret        v1.Secret
 	)
 
 	if err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: clusterName}, &cluster); err != nil {
@@ -78,8 +80,17 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 		return nil, err
 	}
 
+	if err = metalClient.Get(ctx, types.NamespacedName{Namespace: cluster.Namespace, Name: fmt.Sprintf("%s-talosconfig", cluster.Name)}, &talosSecret); err != nil {
+		return nil, err
+	}
+
+	config, ok := talosSecret.Data["talosconfig"]
+	if !ok {
+		return nil, fmt.Errorf("failed to find talosconfig data in the talosconfig secret")
+	}
+
 	var clientConfig *clientconfig.Config
-	clientConfig, err = clientconfig.FromString(talosConfig.Status.TalosConfig)
+	clientConfig, err = clientconfig.FromBytes(config)
 
 	if err != nil {
 		return nil, err

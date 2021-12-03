@@ -7,6 +7,7 @@ package v1alpha3
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/errors"
 )
 
@@ -29,7 +30,11 @@ type MetalMachineSpec struct {
 
 // MetalMachineStatus defines the observed state of MetalMachine.
 type MetalMachineStatus struct {
-	Ready bool `json:"ready"`
+	// +optional
+	Ready bool `json:"ready,omitempty"`
+
+	// Addresses contains the Metal machine associated addresses.
+	Addresses []clusterv1.MachineAddress `json:"addresses,omitempty"`
 
 	// FailureReason will be set in the event that there is a terminal problem
 	// reconciling the Machine and will contain a succinct value suitable
@@ -68,6 +73,10 @@ type MetalMachineStatus struct {
 	// controller's output.
 	// +optional
 	FailureMessage *string `json:"failureMessage,omitempty"`
+
+	// Conditions defines current state of the MetalMachine.
+	// +optional
+	Conditions clusterv1.Conditions `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -87,6 +96,16 @@ type MetalMachine struct {
 
 	Spec   MetalMachineSpec   `json:"spec,omitempty"`
 	Status MetalMachineStatus `json:"status,omitempty"`
+}
+
+// GetConditions returns the set of conditions for this object.
+func (in *MetalMachine) GetConditions() clusterv1.Conditions {
+	return in.Status.Conditions
+}
+
+// SetConditions sets the conditions on this object.
+func (in *MetalMachine) SetConditions(conditions clusterv1.Conditions) {
+	in.Status.Conditions = conditions
 }
 
 // +kubebuilder:object:root=true

@@ -15,6 +15,12 @@ preface = """\
 
 [notes]
 
+    [notes.capi]
+        title = "CAPI v1beta1"
+        description = """\
+This release of CACPPT brings compatibility with CAPI v1beta1.
+"""
+
     [notes.ipmi-pxe-method]
         title = "IPMI PXE Method"
         description = """\
@@ -38,4 +44,13 @@ Events:
 ```
 kubectl logs -f -n sidero-system deployment/sidero-controller-manager serverevents
 ```
+"""
+
+    [notes.addresses]
+        title = "Machine Addresses"
+        description = """\
+Sidero now populates `MetalMachine` addresses with the ones discovered from Siderolink server events.
+Which is then propagated to CAPI `Machine` resources.
+
+Requires Talos >= v0.14.
 """

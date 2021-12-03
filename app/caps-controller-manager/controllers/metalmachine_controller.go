@@ -21,13 +21,17 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
 	"k8s.io/utils/pointer"
-	capiv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/util"
+	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	"github.com/talos-systems/sidero/app/caps-controller-manager/pkg/constants"
@@ -98,7 +102,7 @@ func (r *MetalMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	if machine.Spec.Bootstrap.DataSecretName == nil {
-		logger.Info(" Bootstrap secret is not available yet")
+		logger.Info("Bootstrap secret is not available yet")
 
 		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}
@@ -154,14 +158,47 @@ func (r *MetalMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	// Set the providerID, as its required in upstream capi for machine lifecycle
 	metalMachine.Spec.ProviderID = pointer.StringPtr(fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name))
 
+	if metalMachine.Spec.ServerRef != nil {
+		var serverBinding infrav1.ServerBinding
+
+		err = r.Get(ctx, types.NamespacedName{Namespace: metalMachine.Spec.ServerRef.Namespace, Name: metalMachine.Spec.ServerRef.Name}, &serverBinding)
+		if err != nil {
+			if apierrors.IsNotFound(err) {
+				return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
+			}
+
+			return ctrl.Result{}, err
+		}
+
+		addresses := make([]capiv1.MachineAddress, 0, len(serverBinding.Spec.Addresses))
+		for _, addr := range serverBinding.Spec.Addresses {
+			addresses = append(addresses, capiv1.MachineAddress{
+				Type:    capiv1.MachineInternalIP,
+				Address: addr,
+			})
+		}
+
+		if serverBinding.Spec.Hostname != "" {
+			addresses = append(addresses, capiv1.MachineAddress{
+				Type:    capiv1.MachineHostName,
+				Address: serverBinding.Spec.Hostname,
+			})
+		}
+
+		metalMachine.Status.Addresses = addresses
+		metalMachine.Status.Ready = true
+	}
+
 	err = r.patchProviderID(ctx, cluster, metalMachine)
 	if err != nil {
 		logger.Info("Failed to set provider ID", "error", err)
 
+		conditions.MarkFalse(metalMachine, infrav1.ProviderSetCondition, infrav1.ProviderUpdateFailedReason, capiv1.ConditionSeverityWarning, err.Error())
+
 		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}
 
-	metalMachine.Status.Ready = true
+	conditions.MarkTrue(metalMachine, infrav1.ProviderSetCondition)
 
 	return ctrl.Result{}, nil
 }
@@ -196,9 +233,30 @@ func (r *MetalMachineReconciler) SetupWithManager(ctx context.Context, mgr ctrl.
 		return err
 	}
 
+	mapRequests := func(a client.Object) []reconcile.Request {
+		serverBinding := &infrav1.ServerBinding{}
+
+		if err := r.Get(context.Background(), types.NamespacedName{Namespace: a.GetNamespace(), Name: a.GetName()}, serverBinding); err != nil {
+			return nil
+		}
+
+		return []reconcile.Request{
+			{
+				NamespacedName: types.NamespacedName{
+					Name:      serverBinding.Spec.MetalMachineRef.Name,
+					Namespace: serverBinding.Spec.MetalMachineRef.Namespace,
+				},
+			},
+		}
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(options).
 		For(&infrav1.MetalMachine{}).
+		Watches(
+			&source.Kind{Type: &infrav1.ServerBinding{}},
+			handler.EnqueueRequestsFromMapFunc(mapRequests),
+		).
 		Complete(r)
 }
 

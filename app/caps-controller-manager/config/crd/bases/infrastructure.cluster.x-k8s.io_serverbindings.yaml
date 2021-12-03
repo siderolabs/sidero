@@ -68,6 +68,14 @@ spec:
           spec:
             description: ServerBindingSpec defines the spec of the ServerBinding object.
             properties:
+              addresses:
+                description: Addresses describes node addresses for the server.
+                items:
+                  type: string
+                type: array
+              hostname:
+                description: Hostname describes node hostname for the server.
+                type: string
               metalMachineRef:
                 description: 'ObjectReference contains enough information to let you
                   inspect or modify the referred object. --- New uses of this type

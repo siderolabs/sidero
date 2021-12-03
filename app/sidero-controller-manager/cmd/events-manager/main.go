@@ -55,18 +55,23 @@ func run() error {
 
 	s := grpc.NewServer()
 
-	client, err := getMetalClient()
+	client, kubeconfig, err := getMetalClient()
 	if err != nil {
 		return fmt.Errorf("error getting metal client: %w", err)
 	}
 
-	srv := sink.NewSink(
-		NewAdapter(client,
-			logger.With(zap.String("component", "sink")),
-		),
+	adapter := NewAdapter(client,
+		kubeconfig,
+		logger.With(zap.String("component", "sink")),
 	)
 
+	srv := sink.NewSink(adapter)
+
 	events.RegisterEventSinkServiceServer(s, srv)
+
+	eg.Go(func() error {
+		return adapter.Run(ctx)
+	})
 
 	eg.Go(func() error {
 		logger.Info("started gRPC event sink", zap.String("address", address))

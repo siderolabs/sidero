@@ -1,4 +1,4 @@
-apiVersion: cluster.x-k8s.io/v1alpha4
+apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
 metadata:
   name: ${CLUSTER_NAME}
@@ -52,9 +52,6 @@ spec:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     name: ${CLUSTER_NAME}-cp
   controlPlaneConfig:
-    init:
-      generateType: init
-      talosVersion: ${TALOS_VERSION}
     controlplane:
       generateType: controlplane
       talosVersion: ${TALOS_VERSION}
@@ -69,7 +66,7 @@ spec:
       generateType: join
       talosVersion: ${TALOS_VERSION}
 ---
-apiVersion: cluster.x-k8s.io/v1alpha4
+apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
 metadata:
   name: ${CLUSTER_NAME}-workers

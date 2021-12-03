@@ -10,7 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"sigs.k8s.io/cluster-api/api/v1alpha4"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
 	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
@@ -25,7 +25,7 @@ func GetMetalClient(config *rest.Config) (runtimeclient.Client, error) {
 		return nil, err
 	}
 
-	if err := v1alpha4.AddToScheme(scheme); err != nil {
+	if err := capiv1.AddToScheme(scheme); err != nil {
 		return nil, err
 	}
 
