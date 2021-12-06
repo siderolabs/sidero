@@ -1,3 +1,31 @@
+## [Sidero 0.3.3](https://github.com/talos-systems/sidero/releases/tag/v0.3.3) (2021-12-06)
+
+Welcome to the v0.3.3 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>2 commits</summary>
+<p>
+
+* [`4a87926`](https://github.com/talos-systems/sidero/commit/4a8792640bba3f19d8ff3fe0fecc058d5a24a36b) fix: check for server power state when in use
+* [`b5e71c6`](https://github.com/talos-systems/sidero/commit/b5e71c671f508276671f8e3e830ee18d6ad1de75) test: fix compatibility by locking down v1alpha3 provider versions
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.3.2](https://github.com/talos-systems/sidero/releases/tag/v0.3.2)
+
 ## [Sidero 0.3.2](https://github.com/talos-systems/sidero/releases/tag/v0.3.2) (2021-09-17)
 
 Welcome to the v0.3.2 release of Sidero!
