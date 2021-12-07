@@ -15,8 +15,8 @@ To complete this tutorial, you will need a few things:
   This is the standard DHCP server available on most Linux distributions (NOT
   dnsmasq) as well as on the Ubiquiti EdgeRouter line of products.
 - Machine or Virtual Machine on which to run Sidero itself.
-  The requirements for this machine are very low, but it does need to be x86 for
-  now, and it should have at least 4GB of RAM.
+  The requirements for this machine are very low, it can be x86 or arm64
+  and it should have at least 4GB of RAM.
 - Machines on which to run Kubernetes clusters.
   These have the same minimum specifications as the Sidero machine.
 - Workstation on which `talosctl`, `kubectl`, and `clusterctl` can be run.
