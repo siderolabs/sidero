@@ -15,14 +15,8 @@ preface = """\
 
 [notes]
 
-    [notes.bmc-port]
-        title = "BMC Port"
+    [notes.ipmi-pxe-method]
+        title = "IPMI PXE Method"
         description = """\
-Sidero now supports the ability to specify the port in a server's BMC info. By default, this value will be determined by talking directly to the BMC if possible, with a fallback to port 623. The value can also simply be specied as part of editing the Server resource directly.
-"""
-
-    [notes.v1alpha4]
-        title = "CAPI v1alpha4"
-        description = """\
-This release of Sidero brings compatibility with CAPI v1alpha4.
+IPMI PXE method (UEFI, BIOS) can now be configured with `SIDERO_CONTROLLER_MANAGER_IPMI_PXE_METHOD` while installing Sidero.
 """

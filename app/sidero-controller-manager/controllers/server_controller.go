@@ -32,6 +32,7 @@ import (
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 )
@@ -49,6 +50,7 @@ type ServerReconciler struct {
 	Recorder  record.EventRecorder
 
 	RebootTimeout time.Duration
+	PXEMode       metal.PXEMode
 }
 
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
@@ -79,7 +81,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		return ctrl.Result{}, err
 	}
 
-	mgmtClient, err := metal.NewManagementClient(ctx, r.Client, &s.Spec)
+	mgmtClient, err := power.NewManagementClient(ctx, r.Client, &s.Spec)
 	if err != nil {
 		log.Error(err, "failed to create management client")
 		r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to initialize management client: %s.", err))
@@ -196,7 +198,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 		if !poweredOn {
 			// it's safe to set server to PXE boot even if it's already installed, as PXE server makes sure server is PXE booted only once
-			err = mgmtClient.SetPXE()
+			err = mgmtClient.SetPXE(r.PXEMode)
 			if err != nil {
 				log.Error(err, "failed to set PXE")
 				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to set to PXE boot once: %s.", err))
@@ -239,7 +241,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 			return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
 		}
 
-		err = mgmtClient.SetPXE()
+		err = mgmtClient.SetPXE(r.PXEMode)
 		if err != nil {
 			log.Error(err, "failed to set PXE")
 			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to set to PXE boot once: %s.", err))

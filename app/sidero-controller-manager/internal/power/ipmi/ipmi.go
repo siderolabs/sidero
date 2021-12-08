@@ -10,6 +10,7 @@ import (
 	goipmi "github.com/pensando/goipmi"
 
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
 )
 
 // Link to the IPMI spec: https://www.intel.com/content/dam/www/public/us/en/documents/product-briefs/ipmi-second-gen-interface-spec-v2-rev1-1.pdf
@@ -92,8 +93,15 @@ func (c *Client) Status() (*goipmi.ChassisStatusResponse, error) {
 }
 
 // SetPXE makes sure the node will pxe boot next time.
-func (c *Client) SetPXE() error {
-	return c.IPMIClient.SetBootDeviceEFI(goipmi.BootDevicePxe)
+func (c *Client) SetPXE(mode metal.PXEMode) error {
+	switch mode {
+	case metal.PXEModeBIOS:
+		return c.IPMIClient.SetBootDevice(goipmi.BootDevicePxe)
+	case metal.PXEModeUEFI:
+		return c.IPMIClient.SetBootDeviceEFI(goipmi.BootDevicePxe)
+	default:
+		return fmt.Errorf("unsupported mode %q", mode)
+	}
 }
 
 // GetLANConfig fetches a given param from the LAN Config. (see 23.2).

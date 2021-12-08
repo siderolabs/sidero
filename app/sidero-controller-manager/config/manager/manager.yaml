@@ -69,6 +69,7 @@ spec:
             - --insecure-wipe=${SIDERO_CONTROLLER_MANAGER_INSECURE_WIPE:=true}
             - --auto-bmc-setup=${SIDERO_CONTROLLER_MANAGER_AUTO_BMC_SETUP:=true}
             - --server-reboot-timeout=${SIDERO_CONTROLLER_MANAGER_SERVER_REBOOT_TIMEOUT:=20m}
+            - --ipmi-pxe-method=${SIDERO_CONTROLLER_MANAGER_IPMI_PXE_METHOD:=uefi}
             - --test-power-simulated-explicit-failure-prob=${SIDERO_CONTROLLER_MANAGER_TEST_POWER_EXPLICIT_FAILURE:=0}
             - --test-power-simulated-silent-failure-prob=${SIDERO_CONTROLLER_MANAGER_TEST_POWER_SILENT_FAILURE:=0}
           image: controller:latest
