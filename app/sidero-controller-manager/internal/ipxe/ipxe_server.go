@@ -39,11 +39,57 @@ const bootFile = `#!ipxe
 chain ipxe?uuid=${uuid}&mac=${mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}&arch=${buildarch}
 `
 
-// bootTemplate is embedded into iPXE binary when that binary is sent to the node.
-//
-// bootTemplate should be kept in sync with the bootFile above.
-var bootTemplate = template.Must(template.New("iPXE embedded").Parse(`dhcp
-chain http://{{ .Endpoint }}:{{ .Port }}/ipxe?uuid=${uuid}&mac=${mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}&arch=${buildarch}
+// BootTemplate is embedded into iPXE binary when that binary is sent to the node.
+var BootTemplate = template.Must(template.New("iPXE embedded").Parse(`
+prompt --key 0x02 --timeout 2000 Press Ctrl-B for the iPXE command line... && shell ||
+
+# print interfaces
+ifstat
+
+# retry 10 times overall
+set attempts:int32 10
+set x:int32 0
+
+:retry_loop
+
+	set idx:int32 0
+
+	:loop
+		# try DHCP on each available interface
+		isset ${net${idx}/mac} || goto exhausted
+
+		ifclose
+		dhcp net${idx} && goto boot
+
+	:next_iface
+		inc idx && goto loop
+
+	:boot
+		# attempt boot, if fails try next iface
+		route
+
+		chain http://{{ .Endpoint }}:{{ .Port }}/ipxe?uuid=${uuid}&mac=${net${idx}/mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}&arch=${buildarch} || goto next_iface
+
+:exhausted
+	echo
+	echo Failed to iPXE boot successfully via all interfaces
+
+	iseq ${x} ${attempts} && goto fail ||
+
+	echo Retrying...
+	echo
+
+	inc x
+	goto retry_loop
+
+:fail
+	echo
+	echo Failed to get a valid response after ${attempts} attempts
+	echo
+
+	echo Rebooting in 5 seconds...
+	sleep 5
+	reboot
 `))
 
 // ipxeTemplate is returned as response to `chain` request from the bootFile/bootTemplate to boot actual OS (or Sidero agent).
@@ -193,7 +239,7 @@ func RegisterIPXE(mux *http.ServeMux, endpoint string, port int, args string, bo
 
 	var embeddedScriptBuf bytes.Buffer
 
-	if err := bootTemplate.Execute(&embeddedScriptBuf, map[string]string{
+	if err := BootTemplate.Execute(&embeddedScriptBuf, map[string]string{
 		"Endpoint": apiEndpoint,
 		"Port":     strconv.Itoa(iPXEPort),
 	}); err != nil {
