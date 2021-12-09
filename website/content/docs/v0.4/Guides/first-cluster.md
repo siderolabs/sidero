@@ -13,7 +13,7 @@ There will be two main steps in this guide: reconfiguring the Sidero components 
 
 ### Patch Services
 
-In this guide, we will convert the metadata service to a NodePort service and the other services to use host networking.
+In this guide, we will convert the services to use host networking.
 This is also necessary because some protocols like TFTP don't allow for port configuration.
 Along with some nodeSelectors and a scale up of the metal controller manager deployment, creating the services this way allows for the creation of DNS names that point to all management plane nodes and provide an HA experience if desired.
 It should also be noted, however, that there are many options for achieving this functionality.
@@ -28,8 +28,14 @@ kubectl patch deploy -n sidero-system sidero-controller-manager --type='json' -p
 
 #### Update Environment
 
-The metadata server's information needs to be updated in the default environment.
-Edit the environment with `kubectl edit environment default` and update the `talos.config` kernel arg with the IP of one of the management plane nodes (or the DNS entry you created).
+<!-- textlint-disable -->
+
+Sidero by default appends `talos.config` kernel argument with based on the flags `--api-endpoint` and `--api-port` to the `sidero-controller-manager`:
+`talos.config=http://$API_ENDPOINT:$API_PORT/configdata?uuid=`.
+
+<!-- textlint-enable -->
+
+If this default value doesn't apply, edit the environment with `kubectl edit environment default` and add the `talos.config` kernel arg with the IP of one of the management plane nodes (or the DNS entry you created).
 
 ### Update DHCP
 

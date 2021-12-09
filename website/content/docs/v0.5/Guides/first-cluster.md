@@ -13,7 +13,7 @@ There will be two main steps in this guide: reconfiguring the Sidero components 
 
 ### Patch Services
 
-In this guide, we will convert the metadata service to a NodePort service and the other services to use host networking.
+In this guide, we will convert the services to use host networking.
 This is also necessary because some protocols like TFTP don't allow for port configuration.
 Along with some nodeSelectors and a scale up of the metal controller manager deployment, creating the services this way allows for the creation of DNS names that point to all management plane nodes and provide an HA experience if desired.
 It should also be noted, however, that there are many options for achieving this functionality.
@@ -27,8 +27,6 @@ kubectl patch deploy -n sidero-system sidero-controller-manager --type='json' -p
 ```
 
 #### Update Environment
-
-The metadata server's information might need to be updated in the default environment.
 
 <!-- textlint-disable -->
 
