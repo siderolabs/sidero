@@ -35,13 +35,8 @@ import (
 
 var ErrBootFromDisk = errors.New("boot from disk")
 
-// bootFile is used when iPXE is booted without embedded script via iPXE request http://endpoint:8081/boot.ipxe.
-const bootFile = `#!ipxe
-chain ipxe?uuid=${uuid}&mac=${mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}&arch=${buildarch}
-`
-
 // BootTemplate is embedded into iPXE binary when that binary is sent to the node.
-var BootTemplate = template.Must(template.New("iPXE embedded").Parse(`
+var BootTemplate = template.Must(template.New("iPXE embedded").Parse(`#!ipxe
 prompt --key 0x02 --timeout 2000 Press Ctrl-B for the iPXE command line... && shell ||
 
 # print interfaces
@@ -56,10 +51,11 @@ set x:int32 0
 	set idx:int32 0
 
 	:loop
-		# try DHCP on each available interface
+		# try DHCP on each interface
 		isset ${net${idx}/mac} || goto exhausted
 
 		ifclose
+		iflinkwait --timeout 5000 net${idx} || goto next_iface
 		dhcp net${idx} && goto boot
 
 	:next_iface
@@ -128,7 +124,7 @@ var (
 )
 
 func bootFileHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, bootFile)
+	fmt.Fprint(w, embeddedScriptBuf.Bytes())
 }
 
 //nolint:unparam
@@ -231,14 +227,14 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+var embeddedScriptBuf bytes.Buffer
+
 func RegisterIPXE(mux *http.ServeMux, endpoint string, port int, args string, bootMethod BootFromDisk, iPXEPort int, mgrClient client.Client) error {
 	apiEndpoint = endpoint
 	apiPort = port
 	extraAgentKernelArgs = args
 	defaultBootFromDiskMethod = bootMethod
 	c = mgrClient
-
-	var embeddedScriptBuf bytes.Buffer
 
 	if err := BootTemplate.Execute(&embeddedScriptBuf, map[string]string{
 		"Endpoint": apiEndpoint,
