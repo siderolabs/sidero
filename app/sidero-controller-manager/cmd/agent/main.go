@@ -260,26 +260,6 @@ func mainFunc() error {
 
 	log.Println("Registration complete")
 
-	if createResp.GetSetupBmc() {
-		log.Println("Attempting to automatically discover and configure BMC")
-
-		// Attempt to discover the BMC IP
-		// nb: we don't consider failure to get BMC info a hard failure
-		//     users can always patch the bmc info to the server themselves.
-		err := attemptBMCIP(ctx, client, s)
-		if err != nil {
-			log.Printf("encountered error discovering BMC IP. skipping setup: %q", err.Error())
-		} else {
-			// Attempt to add sidero user to BMC only if we discovered the IP
-			// nb: we don't consider failure to get BMC info a hard failure.
-			//     users can always patch the bmc info to the server themselves.
-			err = attemptBMCUserSetup(ctx, client, s)
-			if err != nil {
-				log.Printf("encountered error setting up BMC user. skipping setup: %q", err.Error())
-			}
-		}
-	}
-
 	ips, err := talosnet.IPAddrs()
 	if err != nil {
 		log.Println("failed to discover IPs")
@@ -382,6 +362,26 @@ func mainFunc() error {
 		}
 
 		log.Println("Wipe complete")
+	}
+
+	if createResp.GetSetupBmc() {
+		log.Println("Attempting to automatically discover and configure BMC")
+
+		// Attempt to discover the BMC IP
+		// nb: we don't consider failure to get BMC info a hard failure
+		//     users can always patch the bmc info to the server themselves.
+		err := attemptBMCIP(ctx, client, s)
+		if err != nil {
+			log.Printf("encountered error discovering BMC IP. skipping setup: %q", err.Error())
+		} else {
+			// Attempt to add sidero user to BMC only if we discovered the IP
+			// nb: we don't consider failure to get BMC info a hard failure.
+			//     users can always patch the bmc info to the server themselves.
+			err = attemptBMCUserSetup(ctx, client, s)
+			if err != nil {
+				log.Printf("encountered error setting up BMC user. skipping setup: %q", err.Error())
+			}
+		}
 	}
 
 	return nil
