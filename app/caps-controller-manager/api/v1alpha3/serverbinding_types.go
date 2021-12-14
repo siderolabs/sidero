@@ -44,6 +44,7 @@ type ServerBindingState struct {
 // +kubebuilder:printcolumn:name="ServerClass",type="string",priority=1,JSONPath=".spec.serverClassRef.name",description="Server Class"
 // +kubebuilder:printcolumn:name="MetalMachine",type="string",priority=1,JSONPath=".spec.metalMachineRef.name",description="Metal Machine"
 // +kubebuilder:printcolumn:name="Cluster",type="string",priority=1,JSONPath=".metadata.labels.cluster\\.x-k8s\\.io/cluster-name",description="Cluster to which this ServerBinding belongs"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp",description="The age of this resource"
 // +kubebuilder:storageversion
 // +kubebuilder:subresource:status
 
