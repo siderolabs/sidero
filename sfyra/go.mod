@@ -33,7 +33,7 @@ require (
 	github.com/talos-systems/go-loadbalancer v0.1.1
 	github.com/talos-systems/go-procfs v0.1.0
 	github.com/talos-systems/go-retry v0.3.1
-	github.com/talos-systems/net v0.3.1-0.20211129211222-b4b718179a1a
+	github.com/talos-systems/net v0.3.1
 	github.com/talos-systems/sidero v0.0.0-00010101000000-000000000000
 	github.com/talos-systems/talos v0.14.0-alpha.2
 	github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.2
