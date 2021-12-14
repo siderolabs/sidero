@@ -39,6 +39,11 @@ func NewManagementClient(ctx context.Context, client client.Client, spec *v1alph
 			}
 		}
 
+		if bmcSpec.User == "" || bmcSpec.Pass == "" {
+			// no username and password, BMC information is not fully populated yet
+			return fakeClient{}, nil
+		}
+
 		if bmcSpec.Interface == "" {
 			bmcSpec.Interface = "lanplus"
 		}
