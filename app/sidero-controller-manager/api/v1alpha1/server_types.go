@@ -191,10 +191,12 @@ type ServerStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster
 // +kubebuilder:printcolumn:name="Hostname",type="string",JSONPath=".spec.hostname",description="server hostname"
+// +kubebuilder:printcolumn:name="BMC IP",type="string",priority=1,JSONPath=".spec.bmc.endpoint",description="BMC IP"
 // +kubebuilder:printcolumn:name="Accepted",type="boolean",JSONPath=".spec.accepted",description="indicates if the server is accepted"
 // +kubebuilder:printcolumn:name="Allocated",type="boolean",JSONPath=".status.inUse",description="indicates that the server has been allocated"
 // +kubebuilder:printcolumn:name="Clean",type="boolean",JSONPath=".status.isClean",description="indicates if the server is clean or not"
 // +kubebuilder:printcolumn:name="Power",type="string",JSONPath=".status.power",description="display the current power status"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp",description="The age of this resource"
 
 // Server is the Schema for the servers API.
 type Server struct {

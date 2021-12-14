@@ -50,6 +50,7 @@ type ServerClassStatus struct {
 // +kubebuilder:resource:scope=Cluster
 // +kubebuilder:printcolumn:name="Available",type="string",JSONPath=".status.serversAvailable",description="the number of available servers"
 // +kubebuilder:printcolumn:name="In Use",type="string",JSONPath=".status.serversInUse",description="the number of servers in use"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp",description="The age of this resource"
 
 // ServerClass is the Schema for the serverclasses API.
 type ServerClass struct {

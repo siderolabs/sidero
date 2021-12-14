@@ -25,6 +25,10 @@ spec:
       jsonPath: .status.serversInUse
       name: In Use
       type: string
+    - description: The age of this resource
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
     name: v1alpha1
     schema:
       openAPIV3Schema:

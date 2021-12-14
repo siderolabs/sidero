@@ -76,6 +76,7 @@ type MetalMachineStatus struct {
 // +kubebuilder:printcolumn:name="Cluster",type="string",priority=1,JSONPath=".metadata.labels.cluster\\.x-k8s\\.io/cluster-name",description="Cluster to which this MetalMachine belongs"
 // +kubebuilder:printcolumn:name="Machine",type="string",priority=1,JSONPath=".metadata.ownerReferences[?(@.kind==\"Machine\")].name",description="Machine object to which this MetalMachine belongs"
 // +kubebuilder:printcolumn:name="Server",type="string",priority=1,JSONPath=".spec.serverRef.name",description="Server ID"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp",description="The age of this resource"
 // +kubebuilder:storageversion
 // +kubebuilder:subresource:status
 

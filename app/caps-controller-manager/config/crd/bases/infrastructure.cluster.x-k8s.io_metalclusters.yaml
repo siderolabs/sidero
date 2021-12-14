@@ -95,6 +95,10 @@ spec:
       name: Endpoint
       priority: 1
       type: string
+    - description: The age of this resource
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
     name: v1alpha3
     schema:
       openAPIV3Schema:

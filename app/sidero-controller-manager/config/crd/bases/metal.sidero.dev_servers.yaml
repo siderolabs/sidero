@@ -21,6 +21,11 @@ spec:
       jsonPath: .spec.hostname
       name: Hostname
       type: string
+    - description: BMC IP
+      jsonPath: .spec.bmc.endpoint
+      name: BMC IP
+      priority: 1
+      type: string
     - description: indicates if the server is accepted
       jsonPath: .spec.accepted
       name: Accepted
@@ -37,6 +42,10 @@ spec:
       jsonPath: .status.power
       name: Power
       type: string
+    - description: The age of this resource
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
     name: v1alpha1
     schema:
       openAPIV3Schema:
