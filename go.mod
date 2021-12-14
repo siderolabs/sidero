@@ -2,7 +2,7 @@ module github.com/talos-systems/sidero
 
 go 1.16
 
-replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/talos-systems/goipmi v0.0.0-20211117190708-9fec3531c1bc
+replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67
 
 require (
 	github.com/evanphx/json-patch v4.11.0+incompatible
@@ -20,10 +20,10 @@ require (
 	github.com/talos-systems/go-blockdevice v0.2.4
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-kmsg v0.1.1
-	github.com/talos-systems/go-procfs v0.0.0-20210108152626-8cbc42d3dc24
+	github.com/talos-systems/go-procfs v0.1.0
 	github.com/talos-systems/go-retry v0.3.1
-	github.com/talos-systems/go-smbios v0.0.0-20210422124317-d3a32bea731a
-	github.com/talos-systems/net v0.3.0
+	github.com/talos-systems/go-smbios v0.1.1
+	github.com/talos-systems/net v0.3.1
 	github.com/talos-systems/talos/pkg/machinery v0.13.0
 	golang.org/x/net v0.0.0-20210716203947-853a461950ff
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
