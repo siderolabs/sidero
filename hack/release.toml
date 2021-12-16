@@ -6,7 +6,7 @@ github_repo = "talos-systems/sidero"
 match_deps = "^github.com/(talos-systems/[a-zA-Z0-9-]+)$"
 
 # previous release
-previous = "v0.3.2"
+previous = "v0.4.0"
 
 pre_release = true
 
@@ -19,4 +19,23 @@ preface = """\
         title = "IPMI PXE Method"
         description = """\
 IPMI PXE method (UEFI, BIOS) can now be configured with `SIDERO_CONTROLLER_MANAGER_IPMI_PXE_METHOD` while installing Sidero.
+"""
+
+    [notes.siderolink]
+        title = "Siderolink"
+        description = """\
+Sidero now connects to all servers using Siderolink.
+This enables streaming of all dmesg logs and events back to sidero.
+
+All server logs can now be viewed by getting logs of one of the container of the `sidero-controller-manager`:
+
+```
+kubectl logs -f -n sidero-system deployment/sidero-controller-manager serverlogs
+```
+
+Events:
+
+```
+kubectl logs -f -n sidero-system deployment/sidero-controller-manager serverevents
+```
 """
