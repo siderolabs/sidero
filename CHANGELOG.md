@@ -1,3 +1,84 @@
+## [Sidero 0.4.1](https://github.com/talos-systems/sidero/releases/tag/v0.4.1) (2021-12-16)
+
+Welcome to the v0.4.1 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### IPMI PXE Method
+
+IPMI PXE method (UEFI, BIOS) can now be configured with `SIDERO_CONTROLLER_MANAGER_IPMI_PXE_METHOD` while installing Sidero.
+
+
+### Contributors
+
+* Andrey Smirnov
+* Artem Chernyshev
+* Noel Georgi
+* Spencer Smith
+
+### Changes
+<details><summary>16 commits</summary>
+<p>
+
+* [`cdb8f5d`](https://github.com/talos-systems/sidero/commit/cdb8f5dce95b1e08a3a534d67e034176a6237c8c) fix: ignore BMC info if username or password are not set
+* [`d056e9c`](https://github.com/talos-systems/sidero/commit/d056e9c971e6d9040d46a7843fec8385c1955304) fix: use environment variables in the ipmitool
+* [`32b80d9`](https://github.com/talos-systems/sidero/commit/32b80d9e71396ebefa7d840635e86506a0567c90) fix: ensure we setup BMC info *after* disk wiping
+* [`03e38da`](https://github.com/talos-systems/sidero/commit/03e38da4f25d44ec924b4e660fea64e08cc26196) feat: additional printer colums
+* [`6bddd75`](https://github.com/talos-systems/sidero/commit/6bddd75e486067c2294f359d08f9560fe1346e96) fix: wait for link up in iPXE script
+* [`2c5ee40`](https://github.com/talos-systems/sidero/commit/2c5ee40ff1b8005523d3495669f4897e89b19e00) fix: make iPXE script replace script on chain request
+* [`c48c392`](https://github.com/talos-systems/sidero/commit/c48c3921ed4a3bd9aca97005b25be17e08f73c10) release(v0.4.1-beta.0): prepare release
+* [`9a79c02`](https://github.com/talos-systems/sidero/commit/9a79c02a926e67fcbfa2e39bc4048c6640f9391c) chore: disable check for one commit
+* [`b6f860f`](https://github.com/talos-systems/sidero/commit/b6f860f2c4c0c77d75e37ce3ee66c8a59db91ad2) feat: extend information printed in the iPXE script, add retries
+* [`fec4d4b`](https://github.com/talos-systems/sidero/commit/fec4d4ba5729b0002dd8ab9803be596e818215e8) feat: provide a way to configure IPMI PXE method
+* [`3e2ae6d`](https://github.com/talos-systems/sidero/commit/3e2ae6d3fc900753d81523d31a5712e2550ad0d1) fix: check for server power state when in use
+* [`b2a693e`](https://github.com/talos-systems/sidero/commit/b2a693e0092107b74bc8553f0e51a882c8a1695b) fix: update CAPI resources versions to v1alpha4 in the cluster template
+* [`4fdcbb3`](https://github.com/talos-systems/sidero/commit/4fdcbb3283f2cf6d3ffdf7f3c5ae8abdf4394669) feat: automatically append talos.config to the Environment
+* [`b8553d4`](https://github.com/talos-systems/sidero/commit/b8553d4fee44608f07901a06e2f6ccd4d38f3511) fix: hide password from ipmitool args
+* [`198f102`](https://github.com/talos-systems/sidero/commit/198f10233098cd1cf4683db0f13485f8d99933df) fix: drop into the agent for non-allocated servers
+* [`ce626cf`](https://github.com/talos-systems/sidero/commit/ce626cf049d7aa5dff08a7092a368f7062c21430) feat: allow defining http server and api server ports separately
+</p>
+</details>
+
+### Changes since v0.4.1-beta.0
+<details><summary>6 commits</summary>
+<p>
+
+* [`cdb8f5d`](https://github.com/talos-systems/sidero/commit/cdb8f5dce95b1e08a3a534d67e034176a6237c8c) fix: ignore BMC info if username or password are not set
+* [`d056e9c`](https://github.com/talos-systems/sidero/commit/d056e9c971e6d9040d46a7843fec8385c1955304) fix: use environment variables in the ipmitool
+* [`32b80d9`](https://github.com/talos-systems/sidero/commit/32b80d9e71396ebefa7d840635e86506a0567c90) fix: ensure we setup BMC info *after* disk wiping
+* [`03e38da`](https://github.com/talos-systems/sidero/commit/03e38da4f25d44ec924b4e660fea64e08cc26196) feat: additional printer colums
+* [`6bddd75`](https://github.com/talos-systems/sidero/commit/6bddd75e486067c2294f359d08f9560fe1346e96) fix: wait for link up in iPXE script
+* [`2c5ee40`](https://github.com/talos-systems/sidero/commit/2c5ee40ff1b8005523d3495669f4897e89b19e00) fix: make iPXE script replace script on chain request
+</p>
+</details>
+
+### Changes from talos-systems/go-smbios
+<details><summary>1 commit</summary>
+<p>
+
+* [`fd5ec8c`](https://github.com/talos-systems/go-smbios/commit/fd5ec8ce4873790b7fbd46dba9d7f49c9de7176a) fix: remove useless (?) goroutines leading to data race error
+</p>
+</details>
+
+### Changes from talos-systems/net
+<details><summary>2 commits</summary>
+<p>
+
+* [`b4b7181`](https://github.com/talos-systems/net/commit/b4b718179a1aa68e4f54422baf08ca3761723d2d) feat: add a way to filter list of IPs for the machine
+* [`0abe5bd`](https://github.com/talos-systems/net/commit/0abe5bdae8f85e4e976bc4d90e95dcb4be8fb853) feat: implement FilterIPs function
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/talos-systems/go-smbios**  d3a32bea731a -> v0.1.1
+* **github.com/talos-systems/net**        v0.3.0 -> v0.3.1
+
+Previous release can be found at [v0.4.0](https://github.com/talos-systems/sidero/releases/tag/v0.4.0)
+
 ## [Sidero 0.4.1-beta.0](https://github.com/talos-systems/sidero/releases/tag/v0.4.1-beta.0) (2021-12-09)
 
 Welcome to the v0.4.1-beta.0 release of Sidero!
