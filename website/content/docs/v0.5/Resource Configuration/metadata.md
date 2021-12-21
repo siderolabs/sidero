@@ -20,6 +20,9 @@ The configuration of each machine is constructed from a number of sources:
 
 An example usage of setting a virtual IP for the control plane nodes and adding extra `node-labels` to nodes is shown below:
 
+> Note: because of the way JSON patches work the interface setting also needs to be set in `TalosControlPlane` when defining a Virtual IP.
+This experience is not ideal, but will be addressed in a future release.
+
 *TalosControlPlane* custom resource:
 
 ```yaml
@@ -36,7 +39,9 @@ spec:
         path: /machine/network
         value:
           interfaces:
-          - vip:
+          - interface: eth0
+            dhcp: true
+            vip:
               ip: 172.16.200.52
       generateType: controlplane
       talosVersion: v0.13
@@ -46,7 +51,9 @@ spec:
         path: /machine/network
         value:
           interfaces:
-          - vip:
+          - interface: eth0
+            dhcp: true
+            vip:
               ip: 172.16.200.52
       generateType: init
       talosVersion: v0.13
@@ -81,7 +88,7 @@ spec:
               talos.dev/part-of: cluster/workload-cluster
 ```
 
-and finally in the control plane `ServerClass` custom resource we augment the network information for the nodes:
+and finally in the control plane `ServerClass` custom resource we augment the network information for other interfaces:
 
 ```yaml
 ---
@@ -100,10 +107,9 @@ spec:
     - console=tty0
     - console=ttyS1,115200n8
   - op: add
-    # the vip spec is defined in the TalosControlPlane CR
-    path: /machine/network/interfaces/0
+    path: /machine/network/interfaces/-
     value:
-      interface: eth0
+      interface: eth1
       dhcp: true
   qualifiers:
     cpu:
@@ -138,6 +144,8 @@ spec:
     value:
       interfaces:
       - interface: eth0
+        dhcp: true
+      - interface: eth1
         dhcp: true
   qualifiers:
     cpu:
