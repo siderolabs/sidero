@@ -9,7 +9,7 @@ Any field of the [Talos machine config](https://www.talos.dev/docs/v0.13/referen
 can be overridden on a per-machine basis using this method.
 The format of these patches is based on [JSON 6902](http://jsonpatch.com/) that you may be used to in tools like kustomize.
 
-Any patches specified in the server resource are processed by the Metal Metadata Server before it returns a Talos machine config for a given server at boot time.
+Any patches specified in the server resource are processed by the Sidero controller before it returns a Talos machine config for a given server at boot time.
 
 A set of patches may look like this:
 
@@ -53,5 +53,5 @@ If it doesn't exist, create it with the `op: add` above the `op: replace` patch.
 
 ## Combining Patches from Multiple Sources
 
-Config patches might be combined from multiple sources (`Server`, `ServerClass`), which is explained in details
+Config patches might be combined from multiple sources (`Server`, `ServerClass`, `TalosControlPlane`, `TalosConfigTemplate`), which is explained in details
 in [Metadata](../../resource-configuration/metadata/) section.

@@ -13,15 +13,145 @@ which is used during the automated installation.
 
 The configuration of each machine is constructed from a number of sources:
 
-- The Talos bootstrap provider.
-- The `Cluster` of which the `Machine` is a member.
+- The `TalosControlPlane` custom resource for control plane nodes.
+- The `TalosConfigTemplate` custom resource.
 - The `ServerClass` which was used to select the `Server` into the `Cluster`.
 - Any `Server`-specific patches.
 
-The base template is constructed from the Talos bootstrap provider, using data from the associated `Cluster` manifest.
+An example usage of setting a virtual IP for the control plane nodes and adding extra `node-labels` to nodes is shown below:
+
+*TalosControlPlane* custom resource:
+
+```yaml
+apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
+kind: TalosControlPlane
+metadata:
+  name: workload-cluster
+  namespace: default
+spec:
+  controlPlaneConfig:
+    controlplane:
+      configPatches:
+      - op: add
+        path: /machine/network
+        value:
+          interfaces:
+          - vip:
+              ip: 172.16.200.52
+      generateType: controlplane
+      talosVersion: v0.13
+    init:
+      configPatches:
+      - op: add
+        path: /machine/network
+        value:
+          interfaces:
+          - vip:
+              ip: 172.16.200.52
+      generateType: init
+      talosVersion: v0.13
+  infrastructureTemplate:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+    kind: MetalMachineTemplate
+    name: workload-cluster
+  replicas: 3
+  version: v1.23.0
+```
+
+*TalosConfigTemplate* custom resource:
+
+```yaml
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
+kind: TalosConfigTemplate
+metadata:
+  name: workload-cluster
+  namespace: default
+spec:
+  template:
+    spec:
+      generateType: join
+      talosVersion: v0.13
+      configPatches:
+      - op: add
+        path: /machine/kubelet
+        value:
+          extraArgs:
+            node-labels:
+              talos.dev/part-of: cluster/workload-cluster
+```
+
+and finally in the control plane `ServerClass` custom resource we augment the network information for the nodes:
+
+```yaml
+---
+apiVersion: metal.sidero.dev/v1alpha1
+kind: ServerClass
+metadata:
+  name: cp.small.x86
+spec:
+  configPatches:
+  - op: replace
+    path: /machine/install/disk
+    value: /dev/nvme0n1
+  - op: add
+    path: /machine/install/extraKernelArgs
+    value:
+    - console=tty0
+    - console=ttyS1,115200n8
+  - op: add
+    # the vip spec is defined in the TalosControlPlane CR
+    path: /machine/network/interfaces/0
+    value:
+      interface: eth0
+      dhcp: true
+  qualifiers:
+    cpu:
+    - version: Intel(R) Xeon(R) E-2124G CPU @ 3.40GHz
+    systemInformation:
+    - manufacturer: Supermicro
+  selector:
+    matchLabels:
+      metal.sidero.dev/serverclass: cp.small.x86
+```
+
+the workload `ServerClass` defines the complete networking config
+
+```yaml
+---
+apiVersion: metal.sidero.dev/v1alpha1
+kind: ServerClass
+metadata:
+  name: general.medium.x86
+spec:
+  configPatches:
+  - op: replace
+    path: /machine/install/disk
+    value: /dev/nvme1n1
+  - op: add
+    path: /machine/install/extraKernelArgs
+    value:
+    - console=tty0
+    - console=ttyS1,115200n8
+  - op: add
+    path: /machine/network
+    value:
+      interfaces:
+      - interface: eth0
+        dhcp: true
+  qualifiers:
+    cpu:
+    - version: Intel(R) Xeon(R) E-2136 CPU @ 3.30GHz
+    systemInformation:
+    - manufacturer: Supermicro
+  selector:
+    matchLabels:
+      metal.sidero.dev/serverclass: general.medium.x86
+```
+
+The base template is constructed from the Talos bootstrap provider, using data from the associated `TalosControlPlane` and `TalosConfigTemplate` manifest.
 Then, any configuration patches are applied from the `ServerClass` and `Server`.
 
-Only configuration patches are allowed in the `ServerClass` and `Server` resources.
 These patches take the form of an [RFC 6902](https://tools.ietf.org/html/rfc6902) JSON (or YAML) patch.
 An example of the use of this patch method can be found in [Patching Guide](../../guides/patching/).
 
