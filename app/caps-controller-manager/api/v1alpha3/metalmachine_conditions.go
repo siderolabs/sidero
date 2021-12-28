@@ -18,3 +18,29 @@ const (
 	// to set ProviderID labels on all nodes.
 	ProviderUpdateFailedReason = "ProviderUpdateFailed"
 )
+
+const (
+	// TalosConfigValidatedCondition reports when talos has loaded and validated the config
+	// for the machine.
+	TalosConfigValidatedCondition clusterv1.ConditionType = "TalosConfigValidated"
+
+	// TalosConfigValidationFailedReason (Severity=Error) documents that Talos config validation has failed.
+	TalosConfigValidationFailedReason = "TalosConfigValidationFailed"
+)
+
+const (
+	// TalosConfigLoadedCondition reports when talos has loaded the config
+	// for the machine.
+	TalosConfigLoadedCondition clusterv1.ConditionType = "TalosConfigLoaded"
+
+	// TalosConfigLoadedationFailedReason (Severity=Error) documents that Talos config validation has failed.
+	TalosConfigLoadFailedReason = "TalosConfigLoadFailed"
+)
+
+const (
+	// TalosInstalledCondition reports when Talos OS was successfully installed on the node.
+	TalosInstalledCondition clusterv1.ConditionType = "TalosInstalled"
+
+	// TalosInstallationFailedReason (Severity=Error) documents that Talos installer has failed.
+	TalosInstallationFailedReason = "TalosInstallationFailed"
+)

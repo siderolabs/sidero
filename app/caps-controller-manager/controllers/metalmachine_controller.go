@@ -187,6 +187,11 @@ func (r *MetalMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 		metalMachine.Status.Addresses = addresses
 		metalMachine.Status.Ready = true
+
+		// copy conditions from the server binding
+		for _, condition := range serverBinding.GetConditions() {
+			conditions.Set(metalMachine, &condition)
+		}
 	}
 
 	err = r.patchProviderID(ctx, cluster, metalMachine)

@@ -19,6 +19,8 @@ import (
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -93,15 +95,32 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 	case *machine.AddressEvent:
 		fields = append(fields, zap.String("hostname", event.GetHostname()), zap.String("addresses", strings.Join(event.GetAddresses(), ",")))
 
-		if err = a.updateAddresses(ctx, ip, event); err != nil {
+		err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
+			serverbinding.Spec.Addresses = event.Addresses
+			serverbinding.Spec.Hostname = event.Hostname
+		})
+
+		if err != nil {
 			a.logger.Error("failed to update server address", zap.Error(err))
 
 			return err
 		}
 	case *machine.ConfigValidationErrorEvent:
 		fields = append(fields, zap.Error(fmt.Errorf(event.GetError())))
+
+		if err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
+			conditions.MarkFalse(serverbinding, sidero.TalosConfigValidatedCondition, sidero.TalosConfigValidationFailedReason, clusterv1.ConditionSeverityError, event.GetError())
+		}); err != nil {
+			return err
+		}
 	case *machine.ConfigLoadErrorEvent:
 		fields = append(fields, zap.Error(fmt.Errorf(event.GetError())))
+
+		if err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
+			conditions.MarkFalse(serverbinding, sidero.TalosConfigLoadedCondition, sidero.TalosConfigLoadFailedReason, clusterv1.ConditionSeverityError, event.GetError())
+		}); err != nil {
+			return err
+		}
 	case *machine.PhaseEvent:
 		fields = append(fields, zap.String("phase", event.GetPhase()), zap.String("action", event.GetAction().String()))
 	case *machine.TaskEvent:
@@ -118,13 +137,25 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 
 		if event.GetSequence() == "install" &&
 			event.GetAction() == machine.SequenceEvent_STOP {
+			var callback func(*sidero.ServerBinding)
+
 			if event.GetError() != nil {
 				message = "failed to install Talos"
-
-				break
+				callback = func(serverbinding *sidero.ServerBinding) {
+					conditions.MarkFalse(serverbinding, sidero.TalosInstalledCondition, sidero.TalosInstallationFailedReason, clusterv1.ConditionSeverityError, event.GetError().GetMessage())
+				}
+			} else {
+				message = "successfully installed Talos"
+				callback = func(serverbinding *sidero.ServerBinding) {
+					conditions.MarkTrue(serverbinding, sidero.TalosInstalledCondition)
+					conditions.MarkTrue(serverbinding, sidero.TalosConfigValidatedCondition)
+					conditions.MarkTrue(serverbinding, sidero.TalosConfigLoadedCondition)
+				}
 			}
 
-			message = "successfully installed Talos"
+			if e := a.patchServerBinding(ctx, ip, callback); e != nil {
+				return e
+			}
 		}
 	}
 
@@ -141,7 +172,7 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 	return nil
 }
 
-func (a *Adapter) updateAddresses(ctx context.Context, ip string, event *machine.AddressEvent) error {
+func (a *Adapter) patchServerBinding(ctx context.Context, ip string, callback func(serverbinding *sidero.ServerBinding)) error {
 	a.nodesMu.Lock()
 	defer a.nodesMu.Unlock()
 
@@ -160,8 +191,7 @@ func (a *Adapter) updateAddresses(ctx context.Context, ip string, event *machine
 		return err
 	}
 
-	serverbinding.Spec.Addresses = event.Addresses
-	serverbinding.Spec.Hostname = event.Hostname
+	callback(&serverbinding)
 
 	return patchHelper.Patch(ctx, &serverbinding)
 }

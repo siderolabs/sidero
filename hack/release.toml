@@ -54,3 +54,15 @@ Which is then propagated to CAPI `Machine` resources.
 
 Requires Talos >= v0.14.
 """
+
+    [notes.conditions]
+        title = "New `MetalMachines` Conditions"
+        description = """\
+New set of conditions is now available which can simplify cluster troubleshooting:
+
+- `TalosConfigLoaded` is set to false when the config load has failed.
+- `TalosConfigValidated` is set to false when the config validation
+fails on the node.
+- `TalosInstalled` is set to true/false when talos installer finishes.
+"""
+

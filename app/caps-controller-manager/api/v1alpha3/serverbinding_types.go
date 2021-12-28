@@ -7,6 +7,7 @@ package v1alpha3
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 )
 
 // ServerBindingMetalMachineRefField is a reference to a field matching server binding to a metal machine.
@@ -43,6 +44,10 @@ type ServerBindingState struct {
 	// Ready is true when matching server is found.
 	// +optional
 	Ready bool `json:"ready"`
+
+	// Conditions defines current state of the ServerBinding.
+	// +optional
+	Conditions clusterv1.Conditions `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -66,6 +71,16 @@ type ServerBinding struct {
 
 	Spec   ServerBindingSpec  `json:"spec,omitempty"`
 	Status ServerBindingState `json:"status,omitempty"`
+}
+
+// GetConditions returns the set of conditions for this object.
+func (in *ServerBinding) GetConditions() clusterv1.Conditions {
+	return in.Status.Conditions
+}
+
+// SetConditions sets the conditions on this object.
+func (in *ServerBinding) SetConditions(conditions clusterv1.Conditions) {
+	in.Status.Conditions = conditions
 }
 
 // +kubebuilder:object:root=true
