@@ -21,14 +21,19 @@ import (
 	talosconfig "github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1"
 	"gopkg.in/yaml.v3"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	metalv1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	"github.com/talos-systems/sidero/sfyra/pkg/capi"
 	"github.com/talos-systems/sidero/sfyra/pkg/constants"
+	"github.com/talos-systems/sidero/sfyra/pkg/talos"
 	"github.com/talos-systems/sidero/sfyra/pkg/vm"
 )
 
@@ -474,6 +479,78 @@ func TestServersDiscoveredIPs(ctx context.Context, metalClient client.Client) Te
 
 			return nil
 		}))
+	}
+}
+
+const (
+	pxeTestClusterName   = "pxe-test-cluster"
+	pxeTestClusterLBPort = 10002
+)
+
+// TestServerPXEBoot verifies that PXE boot is retried when the server gets incorrect configuration.
+func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster talos.Cluster, vmSet *vm.Set, capiManager *capi.Manager, talosRelease, kubernetesVersion string) TestFunc {
+	return func(t *testing.T) {
+		pxeTestServerClass := "pxe-test-server"
+
+		classSpec := v1alpha1.ServerClassSpec{
+			Qualifiers: v1alpha1.Qualifiers{
+				CPU: []v1alpha1.CPUInformation{
+					{
+						Manufacturer: "QEMU",
+					},
+				},
+			},
+			EnvironmentRef: &v1.ObjectReference{
+				Name: environmentName,
+			},
+			ConfigPatches: []v1alpha1.ConfigPatches{
+				{
+					Op:    "add",
+					Path:  "/fake",
+					Value: apiextensions.JSON{Raw: []byte("\":|\"")},
+				},
+			},
+		}
+
+		serverClass, err := createServerClass(ctx, metalClient, pxeTestServerClass, classSpec)
+		require.NoError(t, err)
+
+		loadbalancer := createCluster(ctx, t, metalClient, cluster, vmSet, capiManager, pxeTestClusterName, pxeTestServerClass, pxeTestClusterLBPort, 1, 0, talosRelease, kubernetesVersion)
+
+		retry.Constant(time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+			var machines metalv1.MetalMachineList
+
+			labelSelector, err := labels.Parse(fmt.Sprintf("cluster.x-k8s.io/cluster-name=%s", pxeTestClusterName))
+			require.NoError(t, err)
+
+			err = metalClient.List(ctx, &machines, client.MatchingLabelsSelector{Selector: labelSelector})
+			if err != nil {
+				return fmt.Errorf("failed refetching dummy server: %w", err)
+			}
+
+			if len(machines.Items) == 0 {
+				return retry.ExpectedErrorf("no metal machines detected yet")
+			}
+
+			if !conditions.IsFalse(&machines.Items[0], metalv1.TalosConfigLoadedCondition) || !conditions.IsFalse(&machines.Items[0], metalv1.TalosConfigValidatedCondition) {
+				return retry.ExpectedErrorf("the machine doesn't have any config failure conditions yet")
+			}
+
+			return nil
+		})
+
+		patchHelper, err := patch.NewHelper(&serverClass, metalClient)
+		require.NoError(t, err)
+
+		serverClass.Spec.ConfigPatches = nil
+
+		err = patchHelper.Patch(ctx, &serverClass)
+		require.NoError(t, err)
+
+		waitForClusterReady(ctx, t, metalClient, vmSet, pxeTestClusterName)
+
+		deleteCluster(ctx, t, metalClient, pxeTestClusterName)
+		loadbalancer.Close() //nolint:errcheck
 	}
 }
 

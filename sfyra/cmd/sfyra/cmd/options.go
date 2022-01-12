@@ -42,7 +42,8 @@ type Options struct {
 
 	DefaultBootOrder string
 
-	TalosctlPath string
+	TalosctlPath     string
+	PrevTalosRelease string
 
 	PowerSimulatedExplicitFailureProb float64
 	PowerSimulatedSilentFailureProb   float64

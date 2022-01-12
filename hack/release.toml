@@ -66,3 +66,9 @@ fails on the node.
 - `TalosInstalled` is set to true/false when talos installer finishes.
 """
 
+    [notes.pxeboot]
+        title = "Retry PXE Boot"
+        description = """\
+Sidero server controller now keeps track of Talos installation progress.
+Now the node will be PXE booted until Talos installation succeeds.
+"""

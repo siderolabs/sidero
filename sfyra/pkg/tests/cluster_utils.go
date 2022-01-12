@@ -31,9 +31,27 @@ import (
 	"github.com/talos-systems/sidero/sfyra/pkg/vm"
 )
 
-func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, vmSet *vm.Set,
-	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string) (*loadbalancer.ControlPlane, *capi.Cluster) {
+type clusterOptions struct {
+	configURL string
+}
+
+type clusterOption func(o *clusterOptions)
+
+func withConfigURL(value string) clusterOption {
+	return func(o *clusterOptions) {
+		o.configURL = value
+	}
+}
+
+// createCluster without waiting for it to become ready.
+func createCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, vmSet *vm.Set,
+	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string, options ...clusterOption) *loadbalancer.ControlPlane {
 	t.Logf("deploying cluster %q from server class %q with loadbalancer port %d", clusterName, serverClassName, loadbalancerPort)
+
+	var opts clusterOptions
+	for _, o := range options {
+		o(&opts)
+	}
 
 	kubeconfig, err := capiManager.GetKubeconfig(ctx)
 	require.NoError(t, err)
@@ -58,6 +76,12 @@ func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 		ClusterName:              clusterName,
 		ControlPlaneMachineCount: &controlPlaneNodes,
 		WorkerMachineCount:       &workerNodes,
+	}
+
+	if opts.configURL != "" {
+		templateOptions.URLSource = &capiclient.URLSourceOptions{
+			URL: opts.configURL,
+		}
 	}
 
 	template, err := capiClient.GetClusterTemplate(templateOptions)
@@ -109,6 +133,11 @@ func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 		require.NoError(t, err)
 	}
 
+	return loadbalancer
+}
+
+// waitForClusterReady waits for cluster to become ready.
+func waitForClusterReady(ctx context.Context, t *testing.T, metalClient client.Client, vmSet *vm.Set, clusterName string) *capi.Cluster {
 	t.Log("waiting for the cluster to be provisioned")
 
 	require.NoError(t, retry.Constant(10*time.Minute, retry.WithUnits(10*time.Second), retry.WithErrorLogging(true)).Retry(func() error {
@@ -122,7 +151,16 @@ func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 
 	require.NoError(t, deployedCluster.Health(ctx))
 
-	return loadbalancer, deployedCluster
+	return deployedCluster
+}
+
+func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, vmSet *vm.Set,
+	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string, options ...clusterOption) *loadbalancer.ControlPlane {
+	loadbalancer := createCluster(ctx, t, metalClient, capiCluster, vmSet, capiManager, clusterName, serverClassName, loadbalancerPort, controlPlaneNodes, workerNodes, talosVersion, kubernetesVersion, options...)
+
+	waitForClusterReady(ctx, t, metalClient, vmSet, clusterName)
+
+	return loadbalancer
 }
 
 func deleteCluster(ctx context.Context, t *testing.T, metalClient client.Client, clusterName string) {

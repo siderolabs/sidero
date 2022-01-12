@@ -162,19 +162,26 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 }
 
 func (a *Adapter) handleSequenceEvent(ctx context.Context, ip string, event *machine.SequenceEvent) error {
-	if event.GetSequence() == "install" &&
-		event.GetAction() == machine.SequenceEvent_STOP {
+	if event.GetSequence() == "install" {
 		var callback func(*sidero.ServerBinding)
 
-		if event.GetError() != nil {
-			callback = func(serverbinding *sidero.ServerBinding) {
-				conditions.MarkFalse(serverbinding, sidero.TalosInstalledCondition, sidero.TalosInstallationFailedReason, clusterv1.ConditionSeverityError, event.GetError().GetMessage())
+		if event.GetAction() == machine.SequenceEvent_STOP {
+			if event.GetError() != nil {
+				callback = func(serverbinding *sidero.ServerBinding) {
+					conditions.MarkFalse(serverbinding, sidero.TalosInstalledCondition, sidero.TalosInstallationFailedReason, clusterv1.ConditionSeverityError, event.GetError().GetMessage())
+				}
+			} else {
+				callback = func(serverbinding *sidero.ServerBinding) {
+					conditions.MarkTrue(serverbinding, sidero.TalosInstalledCondition)
+					conditions.MarkTrue(serverbinding, sidero.TalosConfigValidatedCondition)
+					conditions.MarkTrue(serverbinding, sidero.TalosConfigLoadedCondition)
+				}
 			}
-		} else {
+		} else if event.GetAction() == machine.SequenceEvent_START {
 			callback = func(serverbinding *sidero.ServerBinding) {
-				conditions.MarkTrue(serverbinding, sidero.TalosInstalledCondition)
-				conditions.MarkTrue(serverbinding, sidero.TalosConfigValidatedCondition)
-				conditions.MarkTrue(serverbinding, sidero.TalosConfigLoadedCondition)
+				conditions.MarkFalse(serverbinding, sidero.TalosInstalledCondition, sidero.TalosInstallationInProgressReason, clusterv1.ConditionSeverityInfo, "")
+				conditions.MarkFalse(serverbinding, sidero.TalosConfigValidatedCondition, sidero.TalosInstallationInProgressReason, clusterv1.ConditionSeverityInfo, "")
+				conditions.MarkFalse(serverbinding, sidero.TalosConfigLoadedCondition, sidero.TalosInstallationInProgressReason, clusterv1.ConditionSeverityInfo, "")
 			}
 		}
 

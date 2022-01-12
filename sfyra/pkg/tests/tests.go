@@ -28,6 +28,7 @@ type Options struct {
 	RunTestPattern string
 
 	TalosRelease      string
+	PrevTalosRelease  string
 	KubernetesVersion string
 }
 
@@ -92,6 +93,14 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		{
 			"TestServerClassPatch",
 			TestServerClassPatch(ctx, metalClient, cluster, capiManager),
+		},
+		{
+			"TestCompatibilityCluster",
+			TestCompatibilityCluster(ctx, metalClient, cluster, vmSet, capiManager, options.PrevTalosRelease, options.KubernetesVersion),
+		},
+		{
+			"TestServerPXEBoot",
+			TestServerPXEBoot(ctx, metalClient, cluster, vmSet, capiManager, options.TalosRelease, options.KubernetesVersion),
 		},
 		{
 			"TestManagementCluster",

@@ -112,6 +112,7 @@ var testIntegrationCmd = &cobra.Command{
 				RunTestPattern: runTestPattern,
 
 				TalosRelease:      TalosRelease,
+				PrevTalosRelease:  options.PrevTalosRelease,
 				KubernetesVersion: KubernetesVersion,
 			}); !ok {
 				return fmt.Errorf("test failure")
@@ -144,4 +145,5 @@ func init() {
 	testIntegrationCmd.Flags().Float64Var(&options.PowerSimulatedExplicitFailureProb, "power-simulated-explicit-failure-prob", options.PowerSimulatedExplicitFailureProb, "simulated power management explicit failure probability")
 	testIntegrationCmd.Flags().Float64Var(&options.PowerSimulatedSilentFailureProb, "power-simulated-silent-failure-prob", options.PowerSimulatedSilentFailureProb, "simulated power management silent failure probability")
 	testIntegrationCmd.Flags().StringVar(&runTestPattern, "test.run", "", "tests to run (regular expression)")
+	testIntegrationCmd.Flags().StringVar(&options.PrevTalosRelease, "prev-talos-release", options.PrevTalosRelease, "Talos version to run compatibility tests against")
 }

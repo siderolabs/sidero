@@ -114,7 +114,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		return result, nil
 	}
 
-	allocated, serverBindingPresent, err := r.checkBinding(ctx, req)
+	allocated, serverBinding, err := r.getServerBinding(ctx, req)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -132,9 +132,14 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		s.Status.InUse = true
 		s.Status.IsClean = false
 
-		if serverBindingPresent {
+		if serverBinding != nil {
 			// clear any leftover ownerreferences, they were transferred by serverbinding controller
 			s.OwnerReferences = []v1.OwnerReference{}
+
+			// Talos installation was successful, so mark the server as PXE booted.
+			if conditions.IsTrue(serverBinding, infrav1.TalosInstalledCondition) {
+				conditions.MarkTrue(serverBinding, metalv1alpha1.ConditionPXEBooted)
+			}
 		}
 	}
 
@@ -285,23 +290,26 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	return f(false, ctrl.Result{})
 }
 
-func (r *ServerReconciler) checkBinding(ctx context.Context, req ctrl.Request) (allocated, serverBindingPresent bool, err error) {
-	var serverBinding infrav1.ServerBinding
+func (r *ServerReconciler) getServerBinding(ctx context.Context, req ctrl.Request) (bool, *infrav1.ServerBinding, error) {
+	var (
+		serverBinding infrav1.ServerBinding
+		err           error
+	)
 
 	err = r.Get(ctx, req.NamespacedName, &serverBinding)
 	if err == nil {
-		return true, true, nil
+		return true, &serverBinding, nil
 	}
 
 	if err != nil && !apierrors.IsNotFound(err) {
-		return false, false, err
+		return false, nil, err
 	}
 
 	// double-check metalmachines to make sure we don't have a missing serverbinding
 	var metalMachineList infrav1.MetalMachineList
 
 	if err := r.List(ctx, &metalMachineList, client.MatchingFields(fields.Set{infrav1.MetalMachineServerRefField: req.Name})); err != nil {
-		return false, false, err
+		return false, nil, err
 	}
 
 	for _, metalMachine := range metalMachineList.Items {
@@ -311,12 +319,12 @@ func (r *ServerReconciler) checkBinding(ctx context.Context, req ctrl.Request) (
 
 		if metalMachine.Spec.ServerRef != nil {
 			if metalMachine.Spec.ServerRef.Namespace == req.Namespace && metalMachine.Spec.ServerRef.Name == req.Name {
-				return true, false, nil
+				return true, nil, nil
 			}
 		}
 	}
 
-	return false, false, nil
+	return false, nil, nil
 }
 
 func (r *ServerReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager, options controller.Options) error {

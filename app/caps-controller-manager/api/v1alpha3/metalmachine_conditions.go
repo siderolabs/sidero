@@ -41,6 +41,9 @@ const (
 	// TalosInstalledCondition reports when Talos OS was successfully installed on the node.
 	TalosInstalledCondition clusterv1.ConditionType = "TalosInstalled"
 
+	// TalosInstallationInProgressReason (Severity=Info) documents that Talos installation is in progress.
+	TalosInstallationInProgressReason = "TalosInstallationInProgress"
+
 	// TalosInstallationFailedReason (Severity=Error) documents that Talos installer has failed.
 	TalosInstallationFailedReason = "TalosInstallationFailed"
 )

@@ -220,7 +220,15 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// This code is left here only for backward compatibility with Talos <= v0.13.
 	if !strings.HasPrefix(env.ObjectMeta.Name, "agent") {
+		// Do not mark as PXE booted here if SideroLink events are available and Talos installation is in progress.
+		// SideroLink events handler will mark the machine with TalosInstalledCondition condition,
+		// then server controller will reconcile this status and mark server as PXEBooted.
+		if conditions.Has(serverBinding, infrav1.TalosInstalledCondition) {
+			return
+		}
+
 		if err = markAsPXEBooted(server); err != nil {
 			log.Printf("error marking server as PXE booted: %s", err)
 		}
