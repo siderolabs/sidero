@@ -5,14 +5,17 @@
         <div class="flex flex-col items-center mb-2 text-ui-primary">
           <Logo :width="80" />
           <h2 class="text-3xl text-6xl font-black tracking-tighter border-none">
-            Sidero
+            Sidero Metal
           </h2>
         </div>
         <h1 class="text-4xl text-center lg:text-5xl">
-          Bare Metal Lifecycle Management.
+          Kubernetes Bare Metal Lifecycle Management.
         </h1>
-        <p class="text-xl font-medium text-center">Automated. Secure.</p>
-
+        <p class="text-xl font-medium text-center">Automated. Secure. Simple.</p>
+<p class="text-xl font-medium text-center" style="width: 50%;">Sidero Metal uses Cluster API to automate bare metal server provisioning and lifecycle management.
+Clusters are provisioned (or re-provisioned) automatically, delivering a secure Kubernetes deployment.</p>
+<p class="text-xl font-medium text-center" style="width: 50%;">
+Sidero includes a metadata service, PXE and TFTP servers, as well as BMC and IPMI management for automation.</p>
         <div class="flex justify-center mt-8">
           <g-link
             :to="latestDocs()"
@@ -49,7 +52,7 @@
             Inventory Management
           </h3>
           <p class="text-lg text-left">
-            Register your servers. Classify them. Provision them.
+            Register your servers. Classify them. Deploy them.
           </p>
         </div>
 
@@ -61,10 +64,12 @@
             Certified Kubernetes
           </h3>
           <p class="text-lg text-left">
-            Get a certified Kubernetes cluster that is secure with Talos.
+            Sidero Metal installs certified Kubernetes clusters secured with Talos Linux.
           </p>
         </div>
       </div>
+      <p class="text-xl font-medium text-center items-center ">Sidero Metal is an Open Source project from the Sidero Labs team.
+</p>
     </div>
   </Layout>
 </template>
