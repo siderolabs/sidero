@@ -28,7 +28,7 @@ require (
 	github.com/talos-systems/net v0.3.1
 	github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0
 	github.com/talos-systems/talos/pkg/machinery v0.14.0
-	go.uber.org/zap v1.19.0
+	go.uber.org/zap v1.20.0
 	golang.org/x/net v0.0.0-20211201190559-0a0e4e1bb54c
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20211124211545-fe61309f8881
