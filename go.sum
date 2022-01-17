@@ -628,8 +628,8 @@ github.com/talos-systems/capi-utils v0.0.0-20211126110629-e8c3bf93e75f/go.mod h1
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.0/go.mod h1:WXR/HRu/tOUv59ybYNclTJj1moaJvnSzJ1vnjXZLX48=
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.1 h1:wmYgDU8tUeyA+mUvv4jKOKr3zkzZqnuYeWvXKMJ4H0I=
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.1/go.mod h1:70my9JLD5KCVnr70tBXUqXEVCLygYmbGHSRFuqdwEMY=
-github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.1 h1:eqe9LH2N9yjvWAsADVP3XIaB87nKpo2DwYz7NDlAP1o=
-github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.1/go.mod h1:23Ox/jMERly3P1OoemRbEaStpimShDFQ5pjQVCFFdIw=
+github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.3 h1:4GrSLs4calCJNfK+6p9SEkxPYLLzAj3ysaDEuHWeEhs=
+github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.3/go.mod h1:23Ox/jMERly3P1OoemRbEaStpimShDFQ5pjQVCFFdIw=
 github.com/talos-systems/crypto v0.3.2/go.mod h1:xaNCB2/Bxaj+qrkdeodhRv5eKQVvKOGBBMj58MrIPY8=
 github.com/talos-systems/crypto v0.3.4 h1:bg4N27CH1MvUBasr70BlZObPXQYEhUTwOOm/jhCRFxg=
 github.com/talos-systems/crypto v0.3.4/go.mod h1:xaNCB2/Bxaj+qrkdeodhRv5eKQVvKOGBBMj58MrIPY8=

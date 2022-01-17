@@ -17,7 +17,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
 	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.1
-	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.1
+	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.3
 	github.com/talos-systems/go-blockdevice v0.2.5
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-kmsg v0.1.1
