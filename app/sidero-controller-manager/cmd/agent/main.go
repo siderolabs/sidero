@@ -28,6 +28,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sys/unix"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/api"
@@ -208,7 +209,10 @@ func connect(ctx context.Context, endpoint string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	return grpc.DialContext(ctx, endpoint, grpc.WithInsecure())
+	return grpc.DialContext(ctx,
+		endpoint,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 }
 
 func mainFunc() error {
