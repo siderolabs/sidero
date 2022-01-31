@@ -1,0 +1,27 @@
+apiVersion: metal.sidero.dev/v1alpha2
+kind: ServerClass
+metadata:
+  name: serverclass-sample
+spec:
+  selector:
+    matchLabels:
+      common-label: "true"
+    matchExpressions:
+      - key: zone
+        operator: In
+        values:
+          - central
+          - east
+      - key: environment
+        operator: NotIn
+        values:
+          - prod
+  qualifiers:
+    - system:
+        manufacturer: Dell Inc.
+      compute:
+        processors:
+          - manufacturer: "Intel"
+            productName: "Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz"
+      memory:
+        totalSize: 32 GB

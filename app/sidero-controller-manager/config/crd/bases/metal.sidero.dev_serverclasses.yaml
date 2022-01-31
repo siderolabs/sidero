@@ -210,6 +210,321 @@ spec:
             type: object
         type: object
     served: true
+    storage: false
+    subresources:
+      status: {}
+  - additionalPrinterColumns:
+    - description: the number of available servers
+      jsonPath: .status.serversAvailable
+      name: Available
+      type: string
+    - description: the number of servers in use
+      jsonPath: .status.serversInUse
+      name: In Use
+      type: string
+    - description: The age of this resource
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha2
+    schema:
+      openAPIV3Schema:
+        description: ServerClass is the Schema for the serverclasses API.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ServerClassSpec defines the desired state of ServerClass.
+            properties:
+              bootFromDiskMethod:
+                description: "BootFromDiskMethod specifies the method to exit iPXE
+                  to force boot from disk. \n If not set, controller default is used.
+                  Valid values: ipxe-exit, http-404, ipxe-sanboot."
+                type: string
+              configPatches:
+                description: Set of config patches to apply to the machine configuration
+                  to the servers provisioned via this server class.
+                items:
+                  properties:
+                    op:
+                      type: string
+                    path:
+                      type: string
+                    value:
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                  - op
+                  - path
+                  type: object
+                type: array
+              environmentRef:
+                description: Reference to the environment which should be used to
+                  provision the servers via this server class.
+                properties:
+                  apiVersion:
+                    description: API version of the referent.
+                    type: string
+                  fieldPath:
+                    description: 'If referring to a piece of an object instead of
+                      an entire object, this string should contain a valid JSON/Go
+                      field access statement, such as desiredState.manifest.containers[2].
+                      For example, if the object reference is to a container within
+                      a pod, this would take on a value like: "spec.containers{name}"
+                      (where "name" refers to the name of the container that triggered
+                      the event) or if no container name is specified "spec.containers[2]"
+                      (container with index 2 in this pod). This syntax is chosen
+                      only to have some well-defined way of referencing a part of
+                      an object. TODO: this design is not final and this field is
+                      subject to change in the future.'
+                    type: string
+                  kind:
+                    description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                    type: string
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                    type: string
+                  namespace:
+                    description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                    type: string
+                  resourceVersion:
+                    description: 'Specific resourceVersion to which this reference
+                      is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                    type: string
+                  uid:
+                    description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                    type: string
+                type: object
+              qualifiers:
+                description: "Qualifiers to match on the server spec. \n If qualifiers
+                  are empty, they match all servers. Server should match both qualifiers
+                  and selector conditions to be included into the server class."
+                properties:
+                  hardware:
+                    items:
+                      properties:
+                        compute:
+                          properties:
+                            processorCount:
+                              format: int32
+                              type: integer
+                            processors:
+                              items:
+                                properties:
+                                  coreCount:
+                                    format: int32
+                                    type: integer
+                                  manufacturer:
+                                    type: string
+                                  productName:
+                                    type: string
+                                  serialNumber:
+                                    type: string
+                                  speed:
+                                    description: Speed is in megahertz (Mhz)
+                                    format: int32
+                                    type: integer
+                                  threadCount:
+                                    format: int32
+                                    type: integer
+                                type: object
+                              type: array
+                            totalCoreCount:
+                              format: int32
+                              type: integer
+                            totalThreadCount:
+                              format: int32
+                              type: integer
+                          type: object
+                        memory:
+                          properties:
+                            moduleCount:
+                              format: int32
+                              type: integer
+                            modules:
+                              items:
+                                properties:
+                                  manufacturer:
+                                    type: string
+                                  productName:
+                                    type: string
+                                  serialNumber:
+                                    type: string
+                                  size:
+                                    description: Size is in megabytes (MB)
+                                    format: int32
+                                    type: integer
+                                  speed:
+                                    description: Speed is in megatransfers per second
+                                      (MT/S)
+                                    format: int32
+                                    type: integer
+                                  type:
+                                    type: string
+                                type: object
+                              type: array
+                            totalSize:
+                              type: string
+                          type: object
+                        network:
+                          properties:
+                            interfaceCount:
+                              format: int32
+                              type: integer
+                            interfaces:
+                              items:
+                                properties:
+                                  addresses:
+                                    items:
+                                      type: string
+                                    type: array
+                                  flags:
+                                    type: string
+                                  index:
+                                    format: int32
+                                    type: integer
+                                  mac:
+                                    type: string
+                                  mtu:
+                                    format: int32
+                                    type: integer
+                                  name:
+                                    type: string
+                                type: object
+                              type: array
+                          type: object
+                        storage:
+                          properties:
+                            deviceCount:
+                              format: int32
+                              type: integer
+                            devices:
+                              items:
+                                properties:
+                                  deviceName:
+                                    type: string
+                                  name:
+                                    type: string
+                                  productName:
+                                    type: string
+                                  serialNumber:
+                                    type: string
+                                  size:
+                                    description: Size is in bytes
+                                    format: int64
+                                    type: integer
+                                  type:
+                                    type: string
+                                  uuid:
+                                    type: string
+                                  wwid:
+                                    type: string
+                                type: object
+                              type: array
+                            totalSize:
+                              type: string
+                          type: object
+                        system:
+                          properties:
+                            family:
+                              type: string
+                            manufacturer:
+                              type: string
+                            productName:
+                              type: string
+                            serialNumber:
+                              type: string
+                            skuNumber:
+                              type: string
+                            uuid:
+                              type: string
+                            version:
+                              type: string
+                          type: object
+                      type: object
+                    type: array
+                  labelSelectors:
+                    items:
+                      additionalProperties:
+                        type: string
+                      type: object
+                    type: array
+                type: object
+              selector:
+                description: Label selector to filter the matching servers based on
+                  labels. A label selector is a label query over a set of resources.
+                  The result of matchLabels and matchExpressions are ANDed. An empty
+                  label selector matches all objects. A null label selector matches
+                  no objects.
+                properties:
+                  matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
+                    items:
+                      description: A label selector requirement is a selector that
+                        contains values, a key, and an operator that relates the key
+                        and values.
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
+                          type: string
+                        operator:
+                          description: operator represents a key's relationship to
+                            a set of values. Valid operators are In, NotIn, Exists
+                            and DoesNotExist.
+                          type: string
+                        values:
+                          description: values is an array of string values. If the
+                            operator is In or NotIn, the values array must be non-empty.
+                            If the operator is Exists or DoesNotExist, the values
+                            array must be empty. This array is replaced during a strategic
+                            merge patch.
+                          items:
+                            type: string
+                          type: array
+                      required:
+                      - key
+                      - operator
+                      type: object
+                    type: array
+                  matchLabels:
+                    additionalProperties:
+                      type: string
+                    description: matchLabels is a map of {key,value} pairs. A single
+                      {key,value} in the matchLabels map is equivalent to an element
+                      of matchExpressions, whose key field is "key", the operator
+                      is "In", and the values array contains only "value". The requirements
+                      are ANDed.
+                    type: object
+                type: object
+            type: object
+          status:
+            description: ServerClassStatus defines the observed state of ServerClass.
+            properties:
+              serversAvailable:
+                items:
+                  type: string
+                type: array
+              serversInUse:
+                items:
+                  type: string
+                type: array
+            required:
+            - serversAvailable
+            - serversInUse
+            type: object
+        type: object
+    served: true
     storage: true
     subresources:
       status: {}

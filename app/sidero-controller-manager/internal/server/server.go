@@ -6,6 +6,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"reflect"
 	"time"
@@ -25,7 +26,7 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 	controllerclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/api"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 )
@@ -46,8 +47,9 @@ type server struct {
 // CreateServer implements api.AgentServer.
 func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) (*api.CreateServerResponse, error) {
 	obj := &metalv1.Server{}
+	uuid := in.GetHardware().GetSystem().GetUuid()
 
-	if err := s.c.Get(ctx, types.NamespacedName{Name: in.GetSystemInformation().GetUuid()}, obj); err != nil {
+	if err := s.c.Get(ctx, types.NamespacedName{Name: uuid}, obj); err != nil {
 		if !apierrors.IsNotFound(err) {
 			return nil, err
 		}
@@ -58,22 +60,11 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 				APIVersion: metalv1.GroupVersion.Version,
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name: in.GetSystemInformation().GetUuid(),
+				Name: uuid,
 			},
 			Spec: metalv1.ServerSpec{
+				Hardware: MapHardwareInformation(in.GetHardware()),
 				Hostname: in.GetHostname(),
-				SystemInformation: &metalv1.SystemInformation{
-					Manufacturer: in.GetSystemInformation().GetManufacturer(),
-					ProductName:  in.GetSystemInformation().GetProductName(),
-					Version:      in.GetSystemInformation().GetVersion(),
-					SerialNumber: in.GetSystemInformation().GetSerialNumber(),
-					SKUNumber:    in.GetSystemInformation().GetSkuNumber(),
-					Family:       in.GetSystemInformation().GetFamily(),
-				},
-				CPU: &metalv1.CPUInformation{
-					Manufacturer: in.GetCpu().GetManufacturer(),
-					Version:      in.GetCpu().GetVersion(),
-				},
 				Accepted: s.autoAccept,
 			},
 		}
@@ -89,7 +80,7 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 
 		s.recorder.Event(ref, corev1.EventTypeNormal, "Server Registration", "Server auto-registered via API.")
 
-		log.Printf("Added %s", in.GetSystemInformation().GetUuid())
+		log.Printf("Added %s", uuid)
 	}
 
 	resp := &api.CreateServerResponse{}
@@ -399,4 +390,88 @@ func CreateServer(c controllerclient.Client, recorder record.EventRecorder, sche
 	})
 
 	return s
+}
+
+func MapHardwareInformation(hw *api.HardwareInformation) *metalv1.HardwareInformation {
+	processors := make([]*metalv1.Processor, hw.GetCompute().GetProcessorCount())
+	for i, v := range hw.GetCompute().GetProcessors() {
+		processors[i] = &metalv1.Processor{
+			Manufacturer: v.GetManufacturer(),
+			ProductName:  v.GetProductName(),
+			SerialNumber: v.GetSerialNumber(),
+			Speed:        v.GetSpeed(),
+			CoreCount:    v.GetCoreCount(),
+			ThreadCount:  v.GetThreadCount(),
+		}
+	}
+
+	memoryModules := make([]*metalv1.MemoryModule, hw.GetMemory().GetModuleCount())
+	for i, v := range hw.GetMemory().GetModules() {
+		memoryModules[i] = &metalv1.MemoryModule{
+			Manufacturer: v.GetManufacturer(),
+			ProductName:  v.GetProductName(),
+			SerialNumber: v.GetSerialNumber(),
+			Type:         v.GetType(),
+			Size:         v.GetSize(),
+			Speed:        v.GetSpeed(),
+		}
+	}
+
+	storageDevices := make([]*metalv1.StorageDevice, hw.GetStorage().GetDeviceCount())
+	for i, v := range hw.GetStorage().GetDevices() {
+		storageDevices[i] = &metalv1.StorageDevice{
+			Type:       v.GetType().String(),
+			Size:       v.GetSize(),
+			Model:      v.GetModel(),
+			Serial:     v.GetSerial(),
+			Name:       v.GetName(),
+			DeviceName: v.GetDeviceName(),
+			UUID:       v.GetUuid(),
+			WWID:       v.GetWwid(),
+		}
+	}
+
+	networkInterfaces := make([]*metalv1.NetworkInterface, hw.GetNetwork().GetInterfaceCount())
+	for i, v := range hw.GetNetwork().GetInterfaces() {
+		networkInterfaces[i] = &metalv1.NetworkInterface{
+			Index:     v.GetIndex(),
+			Name:      v.GetName(),
+			Flags:     v.GetFlags(),
+			MTU:       v.GetMtu(),
+			MAC:       v.GetMac(),
+			Addresses: v.GetAddresses(),
+		}
+	}
+
+	return &metalv1.HardwareInformation{
+		System: &metalv1.SystemInformation{
+			Uuid:         hw.GetSystem().GetUuid(),
+			Manufacturer: hw.GetSystem().GetManufacturer(),
+			ProductName:  hw.GetSystem().GetProductName(),
+			Version:      hw.GetSystem().GetVersion(),
+			SerialNumber: hw.GetSystem().GetSerialNumber(),
+			SKUNumber:    hw.GetSystem().GetSkuNumber(),
+			Family:       hw.GetSystem().GetFamily(),
+		},
+		Compute: &metalv1.ComputeInformation{
+			TotalCoreCount:   hw.GetCompute().GetTotalCoreCount(),
+			TotalThreadCount: hw.GetCompute().GetTotalThreadCount(),
+			ProcessorCount:   hw.GetCompute().GetProcessorCount(),
+			Processors:       processors,
+		},
+		Memory: &metalv1.MemoryInformation{
+			TotalSize:   fmt.Sprintf("%d GB", hw.GetMemory().GetTotalSize()/1024),
+			ModuleCount: hw.GetMemory().GetModuleCount(),
+			Modules:     memoryModules,
+		},
+		Storage: &metalv1.StorageInformation{
+			TotalSize:   fmt.Sprintf("%d GB", hw.GetStorage().GetTotalSize()/1024/1024/1024),
+			DeviceCount: hw.GetStorage().GetDeviceCount(),
+			Devices:     storageDevices,
+		},
+		Network: &metalv1.NetworkInformation{
+			InterfaceCount: hw.GetNetwork().GetInterfaceCount(),
+			Interfaces:     networkInterfaces,
+		},
+	}
 }

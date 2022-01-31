@@ -16,15 +16,14 @@ The [Kubernetes documentation][label-selector-docs] has more information on how 
 
 ## `qualifiers`
 
-There are currently two keys: `cpu`, `systemInformation`.
-Each of these keys accepts a list of entries.
-The top level keys are a "logical `AND`", while the lists under each key are a "logical `OR`".
+A list of hardware criteria, where each entry in the list is interpreted as a logical `OR`.
+All criteria inside each entry is interpreted as a logical `AND`.
 Qualifiers that are not specified are not evaluated.
 
 An example:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: ServerClass
 metadata:
   name: serverclass-sample
@@ -43,20 +42,28 @@ spec:
         values:
           - prod
   qualifiers:
-    cpu:
-      - manufacturer: "Intel(R) Corporation"
-        version: "Intel(R) Atom(TM) CPU C3558 @ 2.20GHz"
-      - manufacturer: Advanced Micro Devices, Inc.
-        version: AMD Ryzen 7 2700X Eight-Core Processor
-    systemInformation:
-      - manufacturer: Dell Inc.
+    hardware:
+      - system:
+          manufacturer: Dell Inc.
+        compute:
+          processors:
+            - manufacturer: Advanced Micro Devices, Inc.
+              productName: AMD Ryzen 7 2700X Eight-Core Processor
+      - compute:
+          processors:
+            - manufacturer: "Intel(R) Corporation"
+              productName: "Intel(R) Atom(TM) CPU C3558 @ 2.20GHz"
+        memory:
+          totalSize: "8 GB"
 ```
 
 Servers would only be added to the above class if they:
 
-- had _EITHER_ CPU info
-- _AND_ the label key/value in `matchLabels`
+- have the label `common-label` with value `true`
 - _AND_ match the `matchExpressions`
+- _AND_ match either 1 of the following criteria:
+  - has a system manufactured by `Dell Inc.` _AND_ has at least 1 processor that is an `AMD Ryzen 7 2700X Eight-Core Processor`
+  - has at least 1 processor that is an `Intel(R) Atom(TM) CPU C3558 @ 2.20GHz` _AND_ has exactly 8 GB of total memory
 
 Additionally, Sidero automatically creates and maintains a server class called `"any"` that includes all (accepted) servers.
 Attempts to add qualifiers to it will be reverted.
@@ -71,7 +78,7 @@ See [patching](../guides/patching) for more information on how this works.
 An example of settings the default install disk for all servers matching a server class:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: ServerClass
 ...
 spec:

@@ -32,7 +32,7 @@ import (
 	"github.com/talos-systems/talos/pkg/machinery/kernel"
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"

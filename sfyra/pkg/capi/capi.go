@@ -123,6 +123,7 @@ func (clusterAPI *Manager) Install(ctx context.Context) error {
 
 	// set template environment variables
 	os.Setenv("SIDERO_CONTROLLER_MANAGER_HOST_NETWORK", "true")
+	os.Setenv("SIDERO_CONTROLLER_MANAGER_DEPLOYMENT_STRATEGY", "Recreate")
 	os.Setenv("SIDERO_CONTROLLER_MANAGER_API_ENDPOINT", clusterAPI.cluster.SideroComponentsIP().String())
 	os.Setenv("SIDERO_CONTROLLER_MANAGER_SERVER_REBOOT_TIMEOUT", "30s") // wiping/reboot is fast in the test environment
 	os.Setenv("SIDERO_CONTROLLER_MANAGER_TEST_POWER_EXPLICIT_FAILURE", fmt.Sprintf("%f", clusterAPI.options.PowerSimulatedExplicitFailureProb))

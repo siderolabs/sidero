@@ -17,4 +17,4 @@ const MTU = 1500
 const BootstrapMaster = "bootstrap-master"
 
 // SideroAPIVersion is a string we need for creating Sidero resources.
-const SideroAPIVersion = "metal.sidero.dev/v1alpha1"
+const SideroAPIVersion = "metal.sidero.dev/v1alpha2"

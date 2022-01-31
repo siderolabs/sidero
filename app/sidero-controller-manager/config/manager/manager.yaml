@@ -49,6 +49,8 @@ spec:
     matchLabels:
       control-plane: sidero-controller-manager
   replicas: 1
+  strategy:
+    type: ${SIDERO_CONTROLLER_MANAGER_DEPLOYMENT_STRATEGY:=RollingUpdate}
   template:
     metadata:
       labels:
@@ -56,7 +58,10 @@ spec:
     spec:
       hostNetwork: ${SIDERO_CONTROLLER_MANAGER_HOST_NETWORK:=false}
       containers:
-        - command:
+        - name: manager
+          image: controller:latest
+          imagePullPolicy: Always
+          command:
             - /manager
           args:
             - --metrics-bind-addr=127.0.0.1:8080
@@ -72,9 +77,6 @@ spec:
             - --ipmi-pxe-method=${SIDERO_CONTROLLER_MANAGER_IPMI_PXE_METHOD:=uefi}
             - --test-power-simulated-explicit-failure-prob=${SIDERO_CONTROLLER_MANAGER_TEST_POWER_EXPLICIT_FAILURE:=0}
             - --test-power-simulated-silent-failure-prob=${SIDERO_CONTROLLER_MANAGER_TEST_POWER_SILENT_FAILURE:=0}
-          image: controller:latest
-          imagePullPolicy: Always
-          name: manager
           ports:
             - name: tftp
               containerPort: 69
@@ -105,14 +107,14 @@ spec:
             httpGet:
               path: /healthz
               port: healthz
-        - command:
+        - name: siderolink
+          image: controller:latest
+          imagePullPolicy: Always
+          command:
             - /siderolink-manager
           args:
             - --wireguard-endpoint=${SIDERO_CONTROLLER_MANAGER_SIDEROLINK_ENDPOINT:=-}
             - --wireguard-port=${SIDERO_CONTROLLER_MANAGER_SIDEROLINK_PORT:=51821}
-          image: controller:latest
-          imagePullPolicy: Always
-          name: siderolink
           env:
             - name: API_ENDPOINT
               valueFrom:
@@ -137,11 +139,11 @@ spec:
           volumeMounts:
             - mountPath: /dev/net/tun
               name: dev-tun
-        - command:
-            - /log-receiver
+        - name: serverlogs
           image: controller:latest
           imagePullPolicy: Always
-          name: serverlogs
+          command:
+            - /log-receiver
           resources:
             limits:
               cpu: 256m
@@ -149,11 +151,11 @@ spec:
             requests:
               cpu: 50m
               memory: 128Mi
-        - command:
-            - /events-manager
+        - name: serverevents
           image: controller:latest
           imagePullPolicy: Always
-          name: serverevents
+          command:
+            - /events-manager
           resources:
             limits:
               cpu: 256m
@@ -162,8 +164,9 @@ spec:
               cpu: 50m
               memory: 128Mi
       volumes:
-        - hostPath:
+        - name: dev-tun
+          hostPath:
             path: /dev/net/tun
             type: CharDevice
-          name: dev-tun
+
       terminationGracePeriodSeconds: 10

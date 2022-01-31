@@ -10,7 +10,7 @@ These are created by PXE booting the servers and allowing them to send a registr
 An example server may look like the following:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: Server
 metadata:
   name: 00000000-0000-0000-0000-d05099d333e0
@@ -27,11 +27,66 @@ spec:
         name: custom
         urls:
           - http://192.168.1.199/assets/cilium.yaml
-  cpu:
-    manufacturer: Intel(R) Corporation
-    version: Intel(R) Atom(TM) CPU C3558 @ 2.20GHz
-  system:
-    manufacturer: Dell Inc.
+  hardware:
+    system:
+      manufacturer: Dell Inc.
+      productName: PowerEdge R630
+      serialNumber: 790H8D2
+    compute:
+      totalCoreCount: 8
+      totalThreadCount: 16
+      processorCount: 1
+      processors:
+        - manufacturer: Intel
+          productName: Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+          speed: 2400
+          coreCount: 8
+          threadCount: 16
+    memory:
+      totalSize: 32 GB
+      moduleCount: 2
+      modules:
+        - manufacturer: 002C00B3002C
+          productName: 18ASF2G72PDZ-2G3B1
+          serialNumber: 12BDC045
+          type: LPDDR3
+          size: 16384
+          speed: 2400
+        - manufacturer: 002C00B3002C
+          productName: 18ASF2G72PDZ-2G3B1
+          serialNumber: 12BDBF5D
+          type: LPDDR3
+          size: 16384
+          speed: 2400
+    storage:
+      totalSize: 1116 GB
+      deviceCount: 1
+      devices:
+        - productName: PERC H730 Mini
+          type: HDD
+          name: sda
+          deviceName: /dev/sda
+          size: 1199101181952
+          wwid: naa.61866da055de070028d8e83307cc6df2
+    network:
+      interfaceCount: 2
+      interfaces:
+        - index: 1
+          name: lo
+          flags: up|loopback
+          mtu: 65536
+          mac: ""
+          addresses:
+            - 127.0.0.1/8
+            - ::1/128
+        - index: 2
+          name: enp3s0
+          flags: up|broadcast|multicast
+          mtu: 1500
+          mac: "40:8d:5c:86:5a:14"
+          addresses:
+            - 192.168.2.8/24
+            - fe80::dcb3:295c:755b:91bb/64
 ```
 
 ## Installation Disk
@@ -40,7 +95,7 @@ An installation disk is required by Talos on bare metal.
 This can be specified in a `configPatch`:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: Server
 ...
 spec:
@@ -54,7 +109,7 @@ spec:
 The install disk patch can also be set on the `ServerClass`:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: ServerClass
 ...
 spec:
@@ -96,7 +151,7 @@ Users wishing to turn off this feature can pass the `--auto-bmc-setup=false` fla
 IMPI connection information can also be set manually in the `Server` spec after initial registration:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: Server
 ...
 spec:
@@ -115,7 +170,7 @@ Without IPMI info, Sidero can still register servers, wipe them and provision cl
 Sidero can also fetch IPMI credentials via the `Secret` reference:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: Server
 ...
 spec:

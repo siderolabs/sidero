@@ -14,7 +14,7 @@ Any patches specified in the server resource are processed by the Sidero control
 A set of patches may look like this:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: Server
 metadata:
   name: 00000000-0000-0000-0000-d05099d33360

@@ -92,7 +92,7 @@ and finally in the control plane `ServerClass` custom resource we augment the ne
 
 ```yaml
 ---
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: ServerClass
 metadata:
   name: cp.small.x86
@@ -112,10 +112,13 @@ spec:
       interface: eth1
       dhcp: true
   qualifiers:
-    cpu:
-    - version: Intel(R) Xeon(R) E-2124G CPU @ 3.40GHz
-    systemInformation:
-    - manufacturer: Supermicro
+    - system:
+        manufacturer: Supermicro
+      compute:
+        processors:
+          - productName: Intel(R) Xeon(R) E-2124G CPU @ 3.40GHz
+      memory:
+        totalSize: 8 GB
   selector:
     matchLabels:
       metal.sidero.dev/serverclass: cp.small.x86
@@ -125,7 +128,7 @@ the workload `ServerClass` defines the complete networking config
 
 ```yaml
 ---
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: ServerClass
 metadata:
   name: general.medium.x86
@@ -148,10 +151,13 @@ spec:
       - interface: eth1
         dhcp: true
   qualifiers:
-    cpu:
-    - version: Intel(R) Xeon(R) E-2136 CPU @ 3.30GHz
-    systemInformation:
-    - manufacturer: Supermicro
+    - system:
+        manufacturer: Supermicro
+      compute:
+        processors:
+          - productName: Intel(R) Xeon(R) E-2136 CPU @ 3.30GHz
+      memory:
+        totalSize: 16 GB
   selector:
     matchLabels:
       metal.sidero.dev/serverclass: general.medium.x86

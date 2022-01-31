@@ -1,5 +1,4 @@
-# the following config is for teaching kustomize where to look at when substituting vars.
-# It requires kustomize v2.1.0 or newer to work properly.
+# This configuration is for teaching kustomize how to update name ref and var substitution
 nameReference:
   - kind: Service
     version: v1
@@ -22,4 +21,5 @@ namespace:
     create: true
 
 varReference:
-  - path: metadata/annotations
+  - kind: Deployment
+    path: spec/template/spec/volumes/secret/secretName

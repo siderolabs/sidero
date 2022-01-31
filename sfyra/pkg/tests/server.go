@@ -30,7 +30,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
 	"github.com/talos-systems/sidero/sfyra/pkg/capi"
 	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
@@ -191,8 +191,14 @@ func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet 
 
 		// create dummy servers to test with
 		dummySpec := metalv1.ServerSpec{
-			CPU: &metalv1.CPUInformation{
-				Manufacturer: "DummyCPU",
+			Hardware: &metalv1.HardwareInformation{
+				Compute: &metalv1.ComputeInformation{
+					Processors: []*metalv1.Processor{
+						{
+							Manufacturer: "DummyCPU",
+						},
+					},
+				},
 			},
 		}
 
@@ -271,8 +277,14 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client, vmSet *v
 
 		// create dummy servers to test with
 		dummySpec := metalv1.ServerSpec{
-			CPU: &metalv1.CPUInformation{
-				Manufacturer: "DummyManufacturer",
+			Hardware: &metalv1.HardwareInformation{
+				Compute: &metalv1.ComputeInformation{
+					Processors: []*metalv1.Processor{
+						{
+							Manufacturer: "DummyManufacturer",
+						},
+					},
+				},
 			},
 		}
 
@@ -494,9 +506,11 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 
 		classSpec := metalv1.ServerClassSpec{
 			Qualifiers: metalv1.Qualifiers{
-				CPU: []metalv1.CPUInformation{
+				Hardware: []metalv1.HardwareInformation{
 					{
-						Manufacturer: "QEMU",
+						System: &metalv1.SystemInformation{
+							Manufacturer: "QEMU",
+						},
 					},
 				},
 			},

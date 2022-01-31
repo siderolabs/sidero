@@ -9,7 +9,7 @@ import (
 
 	goipmi "github.com/pensando/goipmi"
 
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
 )
 
