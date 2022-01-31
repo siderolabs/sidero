@@ -20,6 +20,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	clusterctl "sigs.k8s.io/cluster-api/cmd/clusterctl/api/v1alpha3"
 	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	controllerclient "sigs.k8s.io/controller-runtime/pkg/client"
@@ -301,8 +302,8 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 		credsSecret := &corev1.Secret{}
 		exists := true
 
-		// For auto-created BMC info, we will *always* drop the creds in default namespace
-		// This ensures they'll come along for the ride in a "default" clusterctl move based on our cluster templates.
+		// For auto-created BMC info, we will add the "move" label from clusterctl's labels.
+		// This ensures they'll come along for the ride in a clusterctl move.
 		bmcSecretName := in.GetUuid() + "-bmc"
 
 		if err := s.c.Get(ctx, types.NamespacedName{Namespace: corev1.NamespaceDefault, Name: bmcSecretName}, credsSecret); err != nil {
@@ -317,6 +318,9 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 				Name:      bmcSecretName,
 				OwnerReferences: []metav1.OwnerReference{
 					*metav1.NewControllerRef(obj, metalv1alpha1.GroupVersion.WithKind("Server")),
+				},
+				Labels: map[string]string{
+					clusterctl.ClusterctlMoveLabelName: "",
 				},
 			}
 
