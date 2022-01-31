@@ -11,7 +11,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.17.0
+	github.com/onsi/gomega v1.18.1
 	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
