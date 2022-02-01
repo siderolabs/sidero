@@ -9,12 +9,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,9 +25,11 @@ import (
 	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/healthz"
 
 	"github.com/talos-systems/go-procfs/procfs"
 	talosconstants "github.com/talos-systems/talos/pkg/machinery/constants"
+	"github.com/talos-systems/talos/pkg/machinery/kernel"
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
@@ -369,23 +373,15 @@ func newEnvironment(server *metalv1alpha1.Server, serverBinding *infrav1.ServerB
 }
 
 func newAgentEnvironment(arch string) *metalv1alpha1.Environment {
-	args := []string{
+	args := append([]string(nil), kernel.DefaultArgs...)
+	args = append(args,
 		"console=tty0",
 		"console=ttyS0",
-		"ima_appraise=fix",
-		"ima_hash=sha512",
-		"ima_template=ima-ng",
 		"initrd=initramfs.xz",
 		"ip=dhcp",
-		"page_poison=1",
 		"panic=30",
-		"printk.devkmsg=on",
-		"pti=on",
-		"random.trust_cpu=on",
-		"slab_nomerge=",
-		"slub_debug=P",
 		fmt.Sprintf("%s=%s:%d", constants.AgentEndpointArg, apiEndpoint, apiPort),
-	}
+	)
 
 	cmdline := procfs.NewCmdline(strings.Join(args, " "))
 	extra := procfs.NewCmdline(extraAgentKernelArgs)
@@ -512,4 +508,34 @@ func markAsPXEBooted(server *metalv1alpha1.Server) error {
 	return patchHelper.Patch(context.Background(), server, patch.WithOwnedConditions{
 		Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPXEBooted},
 	})
+}
+
+func Check(addr string) healthz.Checker {
+	return func(_ *http.Request) error {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("http://%s/boot.ipxe", addr), nil)
+		if err != nil {
+			return err
+		}
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return err
+		}
+
+		defer func() {
+			if resp.Body != nil {
+				io.Copy(io.Discard, resp.Body) //nolint:errcheck
+				resp.Body.Close()              //nolint:errcheck
+			}
+		}()
+
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("unexpected code %d", resp.StatusCode)
+		}
+
+		return nil
+	}
 }

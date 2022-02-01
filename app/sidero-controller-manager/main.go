@@ -32,7 +32,6 @@ import (
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/controllers"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/healthz"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/ipxe"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/metadata"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/api"
@@ -71,6 +70,7 @@ func init() {
 func main() {
 	var (
 		metricsAddr          string
+		healthAddr           string
 		apiEndpoint          string
 		apiPort              int
 		httpPort             int
@@ -91,6 +91,7 @@ func main() {
 	flag.IntVar(&apiPort, "api-port", 8081, "The TCP port Sidero components can be reached at from the servers.")
 	flag.IntVar(&httpPort, "http-port", 8081, "The TCP port Sidero controller manager HTTP server is running.")
 	flag.StringVar(&metricsAddr, "metrics-bind-addr", ":8081", "The address the metric endpoint binds to.")
+	flag.StringVar(&healthAddr, "health-addr", ":9440", "The address the health endpoint binds to.")
 	flag.StringVar(&extraAgentKernelArgs, "extra-agent-kernel-args", "", "A list of Linux kernel command line arguments to add to the agent environment kernel parameters (e.g. 'console=tty1 console=ttyS1').")
 	flag.StringVar(&bootFromDiskMethod, "boot-from-disk-method", string(ipxe.BootIPXEExit), "Default method to use to boot server from disk if it hits iPXE endpoint after install.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", true, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
@@ -150,11 +151,12 @@ func main() {
 	api.DefaultDice = api.NewFailureDice(testPowerSimulatedExplicitFailureProb, testPowerSimulatedSilentFailureProb)
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
-		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "controller-leader-election-sidero-controller-manager",
-		Port:               9443,
+		Scheme:                 scheme,
+		MetricsBindAddress:     metricsAddr,
+		LeaderElection:         enableLeaderElection,
+		LeaderElectionID:       "controller-leader-election-sidero-controller-manager",
+		Port:                   9443,
+		HealthProbeBindAddress: healthAddr,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -177,7 +179,7 @@ func main() {
 		mgr.GetScheme(),
 		corev1.EventSource{Component: "sidero-controller-manager"})
 
-	ctx := context.Background()
+	ctx := ctrl.SetupSignalHandler()
 
 	if err = (&controllers.EnvironmentReconciler{
 		Client:       mgr.GetClient(),
@@ -212,6 +214,9 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "ServerClass")
 		os.Exit(1)
 	}
+
+	setupChecks(mgr, httpPort)
+
 	// +kubebuilder:scaffold:builder
 
 	errCh := make(chan error)
@@ -239,13 +244,6 @@ func main() {
 
 	if err := metadata.RegisterServer(httpMux, mgr.GetClient()); err != nil {
 		setupLog.Error(err, "unable to start metadata server", "controller", "Environment")
-		os.Exit(1)
-	}
-
-	setupLog.Info("starting healthz server")
-
-	if err := healthz.RegisterServer(httpMux); err != nil {
-		setupLog.Error(err, "unable to start healthz server", "controller", "Environment")
 		os.Exit(1)
 	}
 
@@ -283,7 +281,7 @@ func main() {
 	setupLog.Info("starting manager and HTTP server")
 
 	go func() {
-		err := mgr.Start(ctrl.SetupSignalHandler())
+		err := mgr.Start(ctx)
 		if err != nil {
 			setupLog.Error(err, "problem running manager")
 		}
@@ -324,5 +322,19 @@ func main() {
 		if err != nil {
 			os.Exit(1)
 		}
+	}
+}
+
+func setupChecks(mgr ctrl.Manager, httpPort int) {
+	addr := fmt.Sprintf("127.0.0.1:%d", httpPort)
+
+	if err := mgr.AddReadyzCheck("ipxe", ipxe.Check(addr)); err != nil {
+		setupLog.Error(err, "unable to create ready check")
+		os.Exit(1)
+	}
+
+	if err := mgr.AddHealthzCheck("webhook", ipxe.Check(addr)); err != nil {
+		setupLog.Error(err, "unable to create health check")
+		os.Exit(1)
 	}
 }

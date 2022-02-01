@@ -82,6 +82,9 @@ spec:
             - name: http
               containerPort: ${SIDERO_CONTROLLER_MANAGER_CONTAINER_API_PORT:=8081}
               protocol: TCP
+            - containerPort: 9440
+              name: healthz
+              protocol: TCP
           env:
             - name: API_ENDPOINT
               valueFrom:
@@ -96,14 +99,12 @@ spec:
               memory: 128Mi
           readinessProbe:
             httpGet:
-              path: /healthz
-              port: http
-            initialDelaySeconds: 15
+              path: /readyz
+              port: healthz
           livenessProbe:
             httpGet:
               path: /healthz
-              port: http
-            initialDelaySeconds: 15
+              port: healthz
         - command:
             - /siderolink-manager
           args:

@@ -30,4 +30,16 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
+          ports:
+            - containerPort: 9440
+              name: healthz
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: healthz
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: healthz
       terminationGracePeriodSeconds: 10

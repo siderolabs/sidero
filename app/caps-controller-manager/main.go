@@ -51,11 +51,13 @@ func init() {
 func main() {
 	var (
 		metricsAddr          string
+		healthAddr           string
 		enableLeaderElection bool
 		webhookPort          int
 	)
 
 	flag.StringVar(&metricsAddr, "metrics-bind-addr", ":8080", "The address the metric endpoint binds to.")
+	flag.StringVar(&healthAddr, "health-addr", ":9440", "The address the health endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", true,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.IntVar(&webhookPort, "webhook-port", 9443, "Webhook Server port, disabled by default. When enabled, the manager will only work as webhook server, no reconcilers are installed.")
@@ -82,12 +84,13 @@ func main() {
 	})
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
-		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "controller-leader-election-capm",
-		Port:               webhookPort,
-		EventBroadcaster:   broadcaster,
+		Scheme:                 scheme,
+		MetricsBindAddress:     metricsAddr,
+		LeaderElection:         enableLeaderElection,
+		LeaderElectionID:       "controller-leader-election-capm",
+		Port:                   webhookPort,
+		EventBroadcaster:       broadcaster,
+		HealthProbeBindAddress: healthAddr,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -110,7 +113,7 @@ func main() {
 		mgr.GetScheme(),
 		corev1.EventSource{Component: "caps-controller-manager"})
 
-	ctx := context.Background()
+	ctx := ctrl.SetupSignalHandler()
 
 	if err = (&controllers.MetalClusterReconciler{
 		Client: mgr.GetClient(),
@@ -162,10 +165,24 @@ func main() {
 	}
 	// +kubebuilder:scaffold:builder
 
+	setupChecks(mgr)
+
 	setupLog.Info("starting manager")
 
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
+		os.Exit(1)
+	}
+}
+
+func setupChecks(mgr ctrl.Manager) {
+	if err := mgr.AddReadyzCheck("webhook", mgr.GetWebhookServer().StartedChecker()); err != nil {
+		setupLog.Error(err, "unable to create ready check")
+		os.Exit(1)
+	}
+
+	if err := mgr.AddHealthzCheck("webhook", mgr.GetWebhookServer().StartedChecker()); err != nil {
+		setupLog.Error(err, "unable to create health check")
 		os.Exit(1)
 	}
 }
