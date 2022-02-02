@@ -25,28 +25,13 @@ import (
 
 const environmentName = "sfyra"
 
-func isEnvironmentReady(env *v1alpha1.Environment) bool {
-	assetURLs := map[string]struct{}{
-		env.Spec.Kernel.URL: {},
-		env.Spec.Initrd.URL: {},
-	}
-
-	for _, cond := range env.Status.Conditions {
-		if cond.Status == "True" && cond.Type == "Ready" {
-			delete(assetURLs, cond.URL)
-		}
-	}
-
-	return len(assetURLs) == 0
-}
-
 // TestEnvironmentDefault verifies environment "default".
 func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, cluster talos.Cluster, kernelURL, initrdURL string) TestFunc {
 	return func(t *testing.T) {
 		var environment v1alpha1.Environment
 		err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.EnvironmentDefault}, &environment)
 		require.NoError(t, err)
-		assert.True(t, isEnvironmentReady(&environment))
+		assert.True(t, environment.IsReady())
 
 		// delete environment to see it being recreated
 		err = metalClient.Delete(ctx, &environment)
@@ -61,14 +46,14 @@ func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, clus
 				return err
 			}
 
-			if !isEnvironmentReady(&environment) {
+			if !environment.IsReady() {
 				return retry.ExpectedErrorf("some assets are not ready")
 			}
 
 			return nil
 		})
 		require.NoError(t, err)
-		assert.True(t, isEnvironmentReady(&environment))
+		assert.True(t, environment.IsReady())
 	}
 }
 
@@ -109,7 +94,7 @@ func TestEnvironmentCreate(ctx context.Context, metalClient client.Client, clust
 				return err
 			}
 
-			if !isEnvironmentReady(&environment) {
+			if !environment.IsReady() {
 				return retry.ExpectedErrorf("some assets are not ready")
 			}
 

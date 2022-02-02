@@ -96,6 +96,27 @@ func EnvironmentDefaultSpec(talosRelease, apiEndpoint string, apiPort uint16) *E
 	}
 }
 
+// IsReady returns aggregated Environment readiness.
+func (env *Environment) IsReady() bool {
+	assetURLs := map[string]struct{}{}
+
+	if env.Spec.Kernel.URL != "" {
+		assetURLs[env.Spec.Kernel.URL] = struct{}{}
+	}
+
+	if env.Spec.Initrd.URL != "" {
+		assetURLs[env.Spec.Initrd.URL] = struct{}{}
+	}
+
+	for _, cond := range env.Status.Conditions {
+		if cond.Status == "True" && cond.Type == "Ready" {
+			delete(assetURLs, cond.URL)
+		}
+	}
+
+	return len(assetURLs) == 0
+}
+
 func init() {
 	SchemeBuilder.Register(&Environment{}, &EnvironmentList{})
 }

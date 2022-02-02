@@ -74,7 +74,7 @@ func TestCompatibilityCluster(ctx context.Context, metalClient client.Client, cl
 				return err
 			}
 
-			if !isEnvironmentReady(&environment) {
+			if !environment.IsReady() {
 				return retry.ExpectedErrorf("some assets are not ready")
 			}
 

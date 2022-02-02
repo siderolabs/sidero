@@ -191,6 +191,15 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !env.IsReady() {
+		log.Printf("Environment not ready: %q", env.Name)
+
+		w.WriteHeader(http.StatusPreconditionFailed)
+		fmt.Fprintf(w, "environment %q is not ready", env.Name)
+
+		return
+	}
+
 	if server != nil {
 		log.Printf("Using %q environment for %q", env.Name, server.Name)
 	} else {
