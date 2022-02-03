@@ -36,7 +36,7 @@ func run() error {
 	zap.ReplaceGlobals(logger)
 	zap.RedirectStdLog(logger)
 
-	metalclient, _, err := getMetalClient()
+	metalclient, kubeconfig, err := getMetalClient()
 	if err != nil {
 		return fmt.Errorf("error building runtime client: %w", err)
 	}
@@ -51,10 +51,16 @@ func run() error {
 		return fmt.Errorf("error listening for log endpoint: %w", err)
 	}
 
-	srv, err := logreceiver.NewServer(logger, listener, logHandler(metalclient, logger))
+	annotator := siderolink.NewAnnotator(metalclient, kubeconfig, logger)
+
+	srv, err := logreceiver.NewServer(logger, listener, logHandler(logger, annotator))
 	if err != nil {
 		return fmt.Errorf("error initializing log receiver: %w", err)
 	}
+
+	eg.Go(func() error {
+		return annotator.Run(ctx)
+	})
 
 	eg.Go(func() error {
 		return srv.Serve()

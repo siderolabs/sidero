@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -135,6 +136,8 @@ func (clusterAPI *Manager) Install(ctx context.Context) error {
 		InfrastructureProviders: clusterAPI.options.InfrastructureProviders,
 		TargetNamespace:         "",
 		LogUsageInstructions:    false,
+		WaitProviders:           true,
+		WaitProviderTimeout:     5 * time.Minute,
 	}
 
 	_, err = clusterAPI.clientset.CoreV1().Namespaces().Get(ctx, "sidero-system", metav1.GetOptions{})

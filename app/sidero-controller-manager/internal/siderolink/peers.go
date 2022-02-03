@@ -40,6 +40,8 @@ func NewPeerState(kubeconfig *rest.Config, logger *zap.Logger) *PeerState {
 }
 
 // Run the watch loop reporting peer state changes.
+//
+//nolint:dupl
 func (peers *PeerState) Run(ctx context.Context) error {
 	dc, err := dynamic.NewForConfig(peers.kubeconfig)
 	if err != nil {

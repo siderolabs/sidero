@@ -60,8 +60,10 @@ func run() error {
 		return fmt.Errorf("error getting metal client: %w", err)
 	}
 
+	annotator := siderolink.NewAnnotator(client, kubeconfig, logger)
+
 	adapter := NewAdapter(client,
-		kubeconfig,
+		annotator,
 		logger.With(zap.String("component", "sink")),
 	)
 
@@ -70,7 +72,7 @@ func run() error {
 	events.RegisterEventSinkServiceServer(s, srv)
 
 	eg.Go(func() error {
-		return adapter.Run(ctx)
+		return annotator.Run(ctx)
 	})
 
 	eg.Go(func() error {
