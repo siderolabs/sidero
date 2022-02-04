@@ -72,3 +72,9 @@ fails on the node.
 Sidero server controller now keeps track of Talos installation progress.
 Now the node will be PXE booted until Talos installation succeeds.
 """
+
+    [notes.bootfromdisk]
+        title = "iPXE Boot From Disk Method"
+        description = """\
+iPXE boot from disk method can now be set not only on the global level, but also in the Server and ServerClass specs.
+"""

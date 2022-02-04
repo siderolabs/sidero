@@ -14,6 +14,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 // BMC defines data about how to talk to the node via ipmitool.
@@ -155,6 +157,13 @@ type ServerSpec struct {
 	Accepted          bool                    `json:"accepted"`
 	Cordoned          bool                    `json:"cordoned,omitempty"`
 	PXEBootAlways     bool                    `json:"pxeBootAlways,omitempty"`
+	// BootFromDiskMethod specifies the method to exit iPXE to force boot from disk.
+	//
+	// If not set, controller default is used.
+	// Valid values: ipxe-exit, http-404, ipxe-sanboot.
+	//
+	// +optional
+	BootFromDiskMethod siderotypes.BootFromDisk `json:"bootFromDiskMethod,omitempty"`
 }
 
 const (

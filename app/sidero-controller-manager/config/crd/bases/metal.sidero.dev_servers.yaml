@@ -142,6 +142,11 @@ spec:
                 required:
                 - endpoint
                 type: object
+              bootFromDiskMethod:
+                description: "BootFromDiskMethod specifies the method to exit iPXE
+                  to force boot from disk. \n If not set, controller default is used.
+                  Valid values: ipxe-exit, http-404, ipxe-sanboot."
+                type: string
               configPatches:
                 items:
                   properties:

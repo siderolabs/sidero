@@ -35,6 +35,7 @@ import (
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
+	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 var ErrBootFromDisk = errors.New("boot from disk")
@@ -110,20 +111,11 @@ const ipxeBootFromDiskSanboot = `#!ipxe
 sanboot --no-describe --drive 0x80
 `
 
-// BootFromDisk defines a way to boot from disk.
-type BootFromDisk string
-
-const (
-	BootIPXEExit BootFromDisk = "ipxe-exit"    // Use iPXE script with `exit` command.
-	Boot404      BootFromDisk = "http-404"     // Return HTTP 404 response to iPXE.
-	BootSANDisk  BootFromDisk = "ipxe-sanboot" // Use iPXE script with `sanboot` command.
-)
-
 var (
 	apiEndpoint               string
 	apiPort                   int
 	extraAgentKernelArgs      string
-	defaultBootFromDiskMethod BootFromDisk
+	defaultBootFromDiskMethod siderotypes.BootFromDisk
 	c                         client.Client
 )
 
@@ -132,13 +124,13 @@ func bootFileHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 //nolint:unparam
-func bootFromDiskHandler(method BootFromDisk, w http.ResponseWriter, r *http.Request) {
-	switch method { //nolint:exhaustive
-	case Boot404:
+func bootFromDiskHandler(method siderotypes.BootFromDisk, w http.ResponseWriter, r *http.Request) {
+	switch method {
+	case siderotypes.Boot404:
 		w.WriteHeader(http.StatusNotFound)
-	case BootSANDisk:
+	case siderotypes.BootSANDisk:
 		fmt.Fprint(w, ipxeBootFromDiskSanboot)
-	case BootIPXEExit:
+	case siderotypes.BootIPXEExit:
 		fallthrough
 	default:
 		fmt.Fprint(w, ipxeBootFromDiskExit)
@@ -173,7 +165,16 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, ErrBootFromDisk) {
 			log.Printf("Server %q booting from disk", uuid)
-			bootFromDiskHandler(defaultBootFromDiskMethod, w, r)
+
+			method, err := getBootFromDiskMethod(server, serverBinding)
+			if err != nil {
+				log.Printf("%v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+
+				return
+			}
+
+			bootFromDiskHandler(method, w, r)
 
 			return
 		}
@@ -248,9 +249,36 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getBootFromDiskMethod(server *metalv1alpha1.Server, serverBinding *infrav1.ServerBinding) (siderotypes.BootFromDisk, error) {
+	method := defaultBootFromDiskMethod
+
+	if server.Spec.BootFromDiskMethod != "" {
+		method = server.Spec.BootFromDiskMethod
+	} else if serverBinding.Spec.ServerClassRef != nil {
+		var serverClass metalv1alpha1.ServerClass
+
+		if err := c.Get(
+			context.TODO(),
+			types.NamespacedName{
+				Namespace: serverBinding.Spec.ServerClassRef.Namespace,
+				Name:      serverBinding.Spec.ServerClassRef.Name,
+			},
+			&serverClass,
+		); err != nil {
+			return "", err
+		}
+
+		if serverClass.Spec.BootFromDiskMethod != "" {
+			method = serverClass.Spec.BootFromDiskMethod
+		}
+	}
+
+	return method, nil
+}
+
 var embeddedScriptBuf bytes.Buffer
 
-func RegisterIPXE(mux *http.ServeMux, endpoint string, port int, args string, bootMethod BootFromDisk, iPXEPort int, mgrClient client.Client) error {
+func RegisterIPXE(mux *http.ServeMux, endpoint string, port int, args string, bootMethod siderotypes.BootFromDisk, iPXEPort int, mgrClient client.Client) error {
 	apiEndpoint = endpoint
 	apiPort = port
 	extraAgentKernelArgs = args

@@ -7,6 +7,8 @@ package v1alpha1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 // ServerClassAny is an automatically created ServerClass that includes all Servers.
@@ -37,6 +39,13 @@ type ServerClassSpec struct {
 	// Set of config patches to apply to the machine configuration to the servers provisioned via this server class.
 	// +optional
 	ConfigPatches []ConfigPatches `json:"configPatches,omitempty"`
+	// BootFromDiskMethod specifies the method to exit iPXE to force boot from disk.
+	//
+	// If not set, controller default is used.
+	// Valid values: ipxe-exit, http-404, ipxe-sanboot.
+	//
+	// +optional
+	BootFromDiskMethod siderotypes.BootFromDisk `json:"bootFromDiskMethod,omitempty"`
 }
 
 // ServerClassStatus defines the observed state of ServerClass.

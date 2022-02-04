@@ -49,6 +49,11 @@ spec:
           spec:
             description: ServerClassSpec defines the desired state of ServerClass.
             properties:
+              bootFromDiskMethod:
+                description: "BootFromDiskMethod specifies the method to exit iPXE
+                  to force boot from disk. \n If not set, controller default is used.
+                  Valid values: ipxe-exit, http-404, ipxe-sanboot."
+                type: string
               configPatches:
                 description: Set of config patches to apply to the machine configuration
                   to the servers provisioned via this server class.

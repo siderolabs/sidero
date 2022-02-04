@@ -40,6 +40,7 @@ import (
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/tftp"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
+	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
 	"github.com/talos-systems/sidero/internal/client"
 	// +kubebuilder:scaffold:imports
 )
@@ -93,7 +94,7 @@ func main() {
 	flag.StringVar(&metricsAddr, "metrics-bind-addr", ":8081", "The address the metric endpoint binds to.")
 	flag.StringVar(&healthAddr, "health-addr", ":9440", "The address the health endpoint binds to.")
 	flag.StringVar(&extraAgentKernelArgs, "extra-agent-kernel-args", "", "A list of Linux kernel command line arguments to add to the agent environment kernel parameters (e.g. 'console=tty1 console=ttyS1').")
-	flag.StringVar(&bootFromDiskMethod, "boot-from-disk-method", string(ipxe.BootIPXEExit), "Default method to use to boot server from disk if it hits iPXE endpoint after install.")
+	flag.StringVar(&bootFromDiskMethod, "boot-from-disk-method", string(siderotypes.BootIPXEExit), "Default method to use to boot server from disk if it hits iPXE endpoint after install.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", true, "Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&autoAcceptServers, "auto-accept-servers", false, "Add servers as 'accepted' when they register with Sidero API.")
 	flag.BoolVar(&insecureWipe, "insecure-wipe", true, "Wipe head of the disk only (if false, wipe whole disk).")
@@ -235,7 +236,7 @@ func main() {
 
 	setupLog.Info("starting iPXE server")
 
-	if err := ipxe.RegisterIPXE(httpMux, apiEndpoint, apiPort, extraAgentKernelArgs, ipxe.BootFromDisk(bootFromDiskMethod), apiPort, mgr.GetClient()); err != nil {
+	if err := ipxe.RegisterIPXE(httpMux, apiEndpoint, apiPort, extraAgentKernelArgs, siderotypes.BootFromDisk(bootFromDiskMethod), apiPort, mgr.GetClient()); err != nil {
 		setupLog.Error(err, "unable to start iPXE server", "controller", "Environment")
 		os.Exit(1)
 	}

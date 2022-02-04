@@ -80,3 +80,38 @@ spec:
       path: /machine/install/disk
       value: /dev/sda
 ```
+
+## Other Settings
+
+### `environmentRef`
+
+Servers from a `ServerClass` can be set to use the specific `Environment` by linking the `Environment` from the `ServerClass`:
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: ServerClass
+...
+spec:
+  environmentRef:
+    name: production-env
+```
+
+### `bootFromDiskMethod`
+
+The method to exit iPXE network boot to force boot from disk can be configured for all `Server` resources belonging to the `ServerClass`:
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: ServerClass
+...
+spec:
+  bootFromDiskMethod: ipxe-sanboot
+```
+
+Valid values are:
+
+- `ipxe-exit`
+- `http-404`
+- `ipxe-sanboot`
+
+If not set, the default boot from disk method is used (`SIDERO_CONTROLLER_MANAGER_BOOT_FROM_DISK_METHOD`).

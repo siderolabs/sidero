@@ -132,3 +132,52 @@ spec:
 ```
 
 As the `Server` resource is not namespaced, `Secret` should be created in the `default` namespace.
+
+## Other Settings
+
+### `cordoned`
+
+If `cordoned` is set to `true`, `Server` gets excluded from any `ServerClass` it might match based on qualifiers.
+This means that the `Server` will not be allocated automatically.
+
+`Server` might be `cordoned` to temporarily take it out of the `ServerClass` to perform for example hardware maintenance.
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: Server
+...
+spec:
+  cordoned: true
+```
+
+### `pxeBootAlways`
+
+`Server` might be forced to boot from the network even if the OS is already installed with `pxeBootAlways: true`:
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: Server
+...
+spec:
+  pxeBootAlways: true
+```
+
+### `bootFromDiskMethod`
+
+The method to exit iPXE network boot to force boot from disk can be configured for the `Server`:
+
+```yaml
+apiVersion: metal.sidero.dev/v1alpha1
+kind: Server
+...
+spec:
+  bootFromDiskMethod: ipxe-sanboot
+```
+
+Valid values are:
+
+- `ipxe-exit`
+- `http-404`
+- `ipxe-sanboot`
+
+If not set, the `ServerClass.spec.bootFromDiskMethod` value is used with the fallback to the default boot from disk method  (`SIDERO_CONTROLLER_MANAGER_BOOT_FROM_DISK_METHOD`).
