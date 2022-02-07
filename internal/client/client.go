@@ -6,8 +6,6 @@
 package client
 
 import (
-	cabpt "github.com/talos-systems/cluster-api-bootstrap-provider-talos/api/v1alpha3"
-	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -47,14 +45,6 @@ func NewClient(kubeconfig *string) (client.Client, error) {
 	}
 
 	if err = capi.AddToScheme(scheme); err != nil {
-		return nil, err
-	}
-
-	if err = cacpt.AddToScheme(scheme); err != nil {
-		return nil, err
-	}
-
-	if err = cabpt.AddToScheme(scheme); err != nil {
 		return nil, err
 	}
 

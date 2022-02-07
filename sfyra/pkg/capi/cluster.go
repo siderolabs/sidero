@@ -12,7 +12,6 @@ import (
 	"os"
 	"time"
 
-	cabpt "github.com/talos-systems/cluster-api-bootstrap-provider-talos/api/v1alpha3"
 	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
 	"github.com/talos-systems/go-retry/retry"
 	taloscluster "github.com/talos-systems/talos/pkg/cluster"
@@ -49,7 +48,6 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 		controlPlane       cacpt.TalosControlPlane
 		machines           capiv1.MachineList
 		machineDeployments capiv1.MachineDeploymentList
-		talosConfig        cabpt.TalosConfig
 		talosSecret        v1.Secret
 	)
 
@@ -72,12 +70,6 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 
 	if len(machines.Items) < 1 {
 		return nil, fmt.Errorf("not enough machines found")
-	}
-
-	configRef := machines.Items[0].Spec.Bootstrap.ConfigRef
-
-	if err = metalClient.Get(ctx, types.NamespacedName{Namespace: configRef.Namespace, Name: configRef.Name}, &talosConfig); err != nil {
-		return nil, err
 	}
 
 	if err = metalClient.Get(ctx, types.NamespacedName{Namespace: cluster.Namespace, Name: fmt.Sprintf("%s-talosconfig", cluster.Name)}, &talosSecret); err != nil {
