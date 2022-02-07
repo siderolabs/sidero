@@ -631,8 +631,8 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/talos-systems/capi-utils v0.0.0-20211126110629-e8c3bf93e75f/go.mod h1:aVPVu5QD40PTYpSE2V6IbKf79AZyh4SQqP7Q+uO/lf8=
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.0/go.mod h1:WXR/HRu/tOUv59ybYNclTJj1moaJvnSzJ1vnjXZLX48=
-github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.1 h1:wmYgDU8tUeyA+mUvv4jKOKr3zkzZqnuYeWvXKMJ4H0I=
-github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.1/go.mod h1:70my9JLD5KCVnr70tBXUqXEVCLygYmbGHSRFuqdwEMY=
+github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.2 h1:GGmaJBiIhlgfrbMOX1taqmFQdMV+u7qGAikBveFGlHc=
+github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.2/go.mod h1:DginhfL+6rcRqXTzDzTDxjTQBHBLwnxOwhCvGwTCh28=
 github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.3 h1:4GrSLs4calCJNfK+6p9SEkxPYLLzAj3ysaDEuHWeEhs=
 github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.3/go.mod h1:23Ox/jMERly3P1OoemRbEaStpimShDFQ5pjQVCFFdIw=
 github.com/talos-systems/crypto v0.3.2/go.mod h1:xaNCB2/Bxaj+qrkdeodhRv5eKQVvKOGBBMj58MrIPY8=
