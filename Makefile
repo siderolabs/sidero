@@ -14,7 +14,7 @@ PREVIOUS_TALOS_RELEASE ?= v0.13.4
 DEFAULT_K8S_VERSION ?= v1.22.3
 
 TOOLS ?= ghcr.io/talos-systems/tools:v0.9.0
-PKGS ?= v0.10.0-alpha.0-1-gb22723d
+PKGS ?= v0.10.0-alpha.0-21-g2b8cd88
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
