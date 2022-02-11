@@ -122,7 +122,7 @@ Issue the following to create a single-node cluster:
 ```bash
 talosctl cluster create \
  --kubernetes-version 1.22.2 \
-  -p 69:69/udp,8081:8081/tcp \
+  -p 69:69/udp,8081:8081/tcp,51821:51821/udp \
   --workers 0 \
   --endpoint $PUBLIC_IP
 ```
@@ -142,8 +142,6 @@ kubectl taint node talos-default-master-1 node-role.kubernetes.io/master:NoSched
 ```
 
 ## Install Sidero
-
-As of Cluster API version 0.3.9, Sidero is included as a default infrastructure provider in clusterctl.
 
 To install Sidero and the other Talos providers, simply issue:
 

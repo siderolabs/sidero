@@ -94,15 +94,16 @@ they are ready.
 
 In order to interact with the new machines (outside of Kubernetes), you will
 need to obtain the `talosctl` client configuration, or `talosconfig`.
-You can do this by retrieving the resource of the same type from the Sidero
+You can do this by retrieving the secret from the Sidero
 management cluster:
 
 ```bash
 kubectl --context=sidero-demo \
-  get talosconfig \
-  -l cluster.x-k8s.io/cluster-name=cluster-0 \
-  -o jsonpath='{.items[0].status.talosConfig}' \
-  > cluster-0-talosconfig.yaml
+    get secret \
+    cluster-0-talosconfig \
+    -o jsonpath='{.data.talosconfig}' \
+  | base64 -d \
+   > cluster-0-talosconfig
 ```
 
 ## Retrieve the Kubeconfig
@@ -110,7 +111,7 @@ kubectl --context=sidero-demo \
 With the talosconfig obtained, the workload cluster's kubeconfig can be retrieved in the normal Talos way:
 
 ```bash
-talosctl --talosconfig cluster-0.yaml kubeconfig
+talosctl --talosconfig cluster-0-talosconfig --nodes <CONTROL_PLANE_IP> kubeconfig
 ```
 
 ## Check access

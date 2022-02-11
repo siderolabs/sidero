@@ -39,12 +39,13 @@ The main article for installing `clusterctl` can be found
 
 ```bash
 sudo curl -Lo /usr/local/bin/clusterctl \
-  "https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.4.4/clusterctl-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64" \
+  "https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.4.7/clusterctl-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64" \
 sudo chmod +x /usr/local/bin/clusterctl
 ```
 
 > Note: This version of Sidero is only compatible with CAPI v1alpha4,
 > so versions of `clusterctl` above v0.4.x will not work.
+> Please use the latest v0.4.x version of `clusterctl` from the [release page](https://github.com/kubernetes-sigs/cluster-api/releases/).
 
 ## Install `talosctl`
 

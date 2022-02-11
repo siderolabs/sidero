@@ -1,6 +1,6 @@
 ---
 description: ""
-weight: 4
+weight: 5
 title: Resources
 ---
 
@@ -72,6 +72,42 @@ This resource corresponds to the `infrastructureRef` section of Cluster API's `C
 
 A `MetalMachine` is Sidero's view of a machine.
 Allows for reference of a single server or a server class from which a physical server will be picked to bootstrap.
+
+`MetalMachine` provides a set of statuses describing the state (available with SideroLink, requires Talos >= 0.14):
+
+```yaml
+status:
+  addresses:
+    - address: 172.25.0.5
+        type: InternalIP
+    - address: pxe-2
+        type: Hostname
+  conditions:
+    - lastTransitionTime: "2022-02-11T14:20:42Z"
+      message: 'Get ... connection refused'
+      reason: ProviderUpdateFailed
+      severity: Warning
+      status: "False"
+      type: ProviderSet
+    - lastTransitionTime: "2022-02-11T12:48:35Z"
+      status: "True"
+      type: TalosConfigLoaded
+    - lastTransitionTime: "2022-02-11T12:48:35Z"
+      status: "True"
+      type: TalosConfigValidated
+    - lastTransitionTime: "2022-02-11T12:48:35Z"
+      status: "True"
+      type: TalosInstalled
+```
+
+Statuses:
+
+- `addresses` lists the current IP addresses and hostname of the node, `addresses` are updated when the node addresses are changed
+- `conditions`:
+  - `ProviderSet`: captures the moment infrastrucutre provider ID is set in the `Node` specification; depends on workload cluster control plane availability
+  - `TalosConfigLoaded`: Talos successfully loaded machine configuration from Sidero; if this condition indicates a failure, check `sidero-controller-manager` logs
+  - `TalosConfigValidated`: Talos successfully validated machine configuration; a failure in this condition indicates that the machine config is malformed
+  - `TalosInstalled`: Talos was successfully installed to disk
 
 #### `MetalMachineTemplates`
 

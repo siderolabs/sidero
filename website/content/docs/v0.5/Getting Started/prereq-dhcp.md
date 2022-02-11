@@ -20,12 +20,14 @@ We need only set up our DHCP server to point to it.
 The tricky bit is that at different phases, we need to serve different assets,
 but they all use the same DHCP metadata key.
 
-In fact, for each architecture, we have as many as four different client types:
+In fact, we have as many as six different client types:
 
 - Legacy BIOS-based PXE boot (undionly.kpxe via TFTP)
 - UEFI-based PXE boot (ipxe.efi via TFTP)
 - UEFI HTTP boot (ipxe.efi via HTTP URL)
 - iPXE (boot.ipxe via HTTP URL)
+- UEFI-based PXE arm64 boot (ipxe-arm64.efi via TFTP)
+- UEFI HTTP boot on arm64 (ipxe-arm64.efi via HTTP URL)
 
 ## Common client types
 
@@ -39,6 +41,8 @@ options:
   - UEFI-based PXE boot: `ipxe.efi`
   - UEFI HTTP boot: `http://sidero-server-url/tftp/ipxe.efi`
   - iPXE boot: `http://sidero-server-url/boot.ipxe`
+  - arm64 UEFI PXE boot: `ipxe-arm64.efi`
+  - arm64 UEFI HTTP boot: `http://sidero-server-url/tftp/ipxe-arm64.efi`
 
 In the ISC DHCP server, these options look like:
 

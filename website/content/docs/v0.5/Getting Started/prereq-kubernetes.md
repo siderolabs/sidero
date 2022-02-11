@@ -15,8 +15,8 @@ It can be, for example:
 
 Two important things are needed in this cluster:
 
-- Kubernetes `v1.18` or later
-- Ability to expose tcp and udp Services to the workload cluster machines
+- Kubernetes `v1.19` or later
+- Ability to expose TCP and UDP Services to the workload cluster machines
 
 For the purposes of this tutorial, we will create this cluster in Docker on a
 workstation, perhaps a laptop.
@@ -35,7 +35,7 @@ export HOST_IP="192.168.1.150"
 
 talosctl cluster create \
   --name sidero-demo \
-  -p 69:69/udp,8081:8081/tcp \
+  -p 69:69/udp,8081:8081/tcp,51821:51821/udp \
   --workers 0 \
   --config-patch '[{"op": "add", "path": "/cluster/allowSchedulingOnMasters", "value": true}]' \
   --endpoint $HOST_IP
@@ -46,11 +46,12 @@ host.
 This is _not_ the Docker bridge IP but the standard IP address of the
 workstation.
 
-Note that there are two ports mentioned in the command above.
+Note that there are three ports mentioned in the command above.
 The first (69) is
 for TFTP.
 The second (8081) is for the web server (which serves netboot
 artifacts and configuration).
+The third (51821) is for the SideroLink Wireguard network.
 
 Exposing them here allows us to access the services that will get deployed on this node.
 In turn, we will be running our Sidero services with `hostNetwork: true`,

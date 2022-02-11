@@ -14,6 +14,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	clusterctl "sigs.k8s.io/cluster-api/cmd/clusterctl/api/v1alpha3"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/talos-systems/siderolink/pkg/wireguard"
@@ -96,6 +97,9 @@ func (cfg *Config) save(ctx context.Context, metalClient runtimeclient.Client) e
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: corev1.NamespaceDefault,
 			Name:      SecretName,
+			Labels: map[string]string{
+				clusterctl.ClusterctlMoveLabelName: "",
+			},
 		},
 		Data: map[string][]byte{
 			secretInstallationID: []byte(cfg.InstallationID),

@@ -19,6 +19,7 @@ the _new_ management cluster first.
 
 ```bash
 export SIDERO_CONTROLLER_MANAGER_API_ENDPOINT=sidero.mydomain.com
+export SIDERO_CONTROLLER_MANAGER_SIDEROLINK_ENDPOINT=sidero.mydomain.com
 
 clusterctl init \
   --kubeconfig-context=management
