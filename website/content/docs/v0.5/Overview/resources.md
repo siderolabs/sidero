@@ -1,6 +1,6 @@
 ---
 description: ""
-weight: 5
+weight: 50
 title: Resources
 ---
 
