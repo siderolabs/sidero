@@ -23,7 +23,7 @@ require (
 	github.com/talos-systems/go-retry v0.3.1
 	github.com/talos-systems/go-smbios v0.1.1
 	github.com/talos-systems/grpc-proxy v0.2.0
-	github.com/talos-systems/net v0.3.1
+	github.com/talos-systems/net v0.3.2
 	github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0
 	github.com/talos-systems/talos/pkg/machinery v0.14.2
 	go.uber.org/zap v1.21.0

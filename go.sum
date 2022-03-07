@@ -685,8 +685,9 @@ github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67/go.mod h1:Vr1
 github.com/talos-systems/grpc-proxy v0.2.0 h1:DN75bLfaW4xfhq0r0mwFRnfGhSB+HPhK1LNzuMEs9Pw=
 github.com/talos-systems/grpc-proxy v0.2.0/go.mod h1:sm97Vc/z2cok3pu6ruNeszQej4KDxFrDgfWs4C1mtC4=
 github.com/talos-systems/net v0.3.1-0.20211112122313-0abe5bdae8f8/go.mod h1:zhcGixNJz9dgwFiUwc7gkkAqdVqXagU1SNNoIVXYKGo=
-github.com/talos-systems/net v0.3.1 h1:F9mlDgKE4XVfgpoRmacVUTEAMAeQ5xuOaeCl+A9a0Ok=
 github.com/talos-systems/net v0.3.1/go.mod h1:zhcGixNJz9dgwFiUwc7gkkAqdVqXagU1SNNoIVXYKGo=
+github.com/talos-systems/net v0.3.2 h1:IMseRyuha8fNsv/3FbQPRE9hLVRBEFR+9sxcoETQ5vI=
+github.com/talos-systems/net v0.3.2/go.mod h1:zhcGixNJz9dgwFiUwc7gkkAqdVqXagU1SNNoIVXYKGo=
 github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0 h1:O3qNq62Zl930/1jZQY1TUERSkmU8QVj+FcHQiOVPGbE=
 github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0/go.mod h1:bEGwDYl9QgC3oZ4kdnJTuR2HX/XlUhxZjx/QAakKuBc=
 github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.1.0.20211118180932-1ffa8e048008/go.mod h1:D8NT4Aj+X2OpA6yK6RAtpw1wcgkDS7oD23vqOQWRiP8=
