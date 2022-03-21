@@ -13,7 +13,7 @@ replace (
 
 require (
 	github.com/spf13/cobra v1.3.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.4
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-loadbalancer v0.1.1
