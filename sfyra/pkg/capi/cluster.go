@@ -27,8 +27,8 @@ import (
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // Cluster attaches to the provisioned CAPI cluster and provides talos.Cluster.
@@ -100,7 +100,7 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 				continue
 			}
 
-			var metalMachine sidero.MetalMachine
+			var metalMachine infrav1.MetalMachine
 
 			if err = metalClient.Get(ctx,
 				types.NamespacedName{Namespace: machine.Spec.InfrastructureRef.Namespace, Name: machine.Spec.InfrastructureRef.Name},
@@ -116,7 +116,7 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 				continue
 			}
 
-			var server metal.Server
+			var server metalv1.Server
 
 			if err := metalClient.Get(ctx, types.NamespacedName{Namespace: metalMachine.Spec.ServerRef.Namespace, Name: metalMachine.Spec.ServerRef.Name}, &server); err != nil {
 				return nil, err

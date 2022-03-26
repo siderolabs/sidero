@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
@@ -65,7 +65,7 @@ type ServerReconciler struct {
 func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := r.Log.WithValues("server", req.NamespacedName)
 
-	s := metalv1alpha1.Server{}
+	s := metalv1.Server{}
 
 	if err := r.APIReader.Get(ctx, req.NamespacedName, &s); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
@@ -106,7 +106,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		s.Status.Ready = ready
 
 		if err := patchHelper.Patch(ctx, &s, patch.WithOwnedConditions{
-			Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPowerCycle, metalv1alpha1.ConditionPXEBooted},
+			Conditions: []clusterv1.ConditionType{metalv1.ConditionPowerCycle, metalv1.ConditionPXEBooted},
 		}); err != nil {
 			return result, errors.WithStack(err)
 		}
@@ -127,7 +127,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 		s.Status.InUse = false
 
-		conditions.Delete(&s, metalv1alpha1.ConditionPXEBooted)
+		conditions.Delete(&s, metalv1.ConditionPXEBooted)
 	} else {
 		s.Status.InUse = true
 		s.Status.IsClean = false
@@ -138,7 +138,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 			// Talos installation was successful, so mark the server as PXE booted.
 			if conditions.IsTrue(serverBinding, infrav1.TalosInstalledCondition) {
-				conditions.MarkTrue(serverBinding, metalv1alpha1.ConditionPXEBooted)
+				conditions.MarkTrue(serverBinding, metalv1.ConditionPXEBooted)
 			}
 		}
 	}
@@ -232,9 +232,9 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		//
 		// we check LastTransitionTime to see if the server is in the wiping state for too long and
 		// it's time to retry the IPMI sequence
-		if conditions.Has(&s, metalv1alpha1.ConditionPowerCycle) &&
-			conditions.IsFalse(&s, metalv1alpha1.ConditionPowerCycle) &&
-			time.Since(conditions.GetLastTransitionTime(&s, metalv1alpha1.ConditionPowerCycle).Time) < r.RebootTimeout {
+		if conditions.Has(&s, metalv1.ConditionPowerCycle) &&
+			conditions.IsFalse(&s, metalv1.ConditionPowerCycle) &&
+			time.Since(conditions.GetLastTransitionTime(&s, metalv1.ConditionPowerCycle).Time) < r.RebootTimeout {
 			// already powercycled, reboot/heartbeat timeout not elapsed, wait more
 			return f(false, ctrl.Result{RequeueAfter: r.RebootTimeout / 3})
 		}
@@ -280,7 +280,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 			}
 
 			// make sure message is updated in case condition was already set to make sure LastTransitionTime will be updated
-			conditions.MarkFalse(&s, metalv1alpha1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, fmt.Sprintf("Server power cycled for wiping at %s.", time.Now().Format(time.RFC3339)))
+			conditions.MarkFalse(&s, metalv1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, fmt.Sprintf("Server power cycled for wiping at %s.", time.Now().Format(time.RFC3339)))
 		}
 
 		// requeue to check for wipe timeout
@@ -354,7 +354,7 @@ func (r *ServerReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manage
 
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(options).
-		For(&metalv1alpha1.Server{}).
+		For(&metalv1.Server{}).
 		Watches(
 			&source.Kind{Type: &infrav1.ServerBinding{}},
 			handler.EnqueueRequestsFromMapFunc(mapRequests),

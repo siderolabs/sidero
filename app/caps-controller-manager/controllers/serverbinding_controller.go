@@ -23,7 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // ServerBindingReconciler reconciles a ServerBinding object.
@@ -75,7 +75,7 @@ func (r *ServerBindingReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		}
 	}()
 
-	var server metalv1alpha1.Server
+	var server metalv1.Server
 
 	err = r.Get(ctx, req.NamespacedName, &server)
 	if err != nil {
@@ -190,7 +190,7 @@ func (r *ServerBindingReconciler) reconcileTransition(ctx context.Context, logge
 		return ctrl.Result{}, nil
 	}
 
-	var server metalv1alpha1.Server
+	var server metalv1.Server
 
 	if err = r.Get(ctx, req.NamespacedName, &server); err != nil {
 		if apierrors.IsNotFound(err) {

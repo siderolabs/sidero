@@ -25,7 +25,7 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 	controllerclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/api"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 )
@@ -45,24 +45,24 @@ type server struct {
 
 // CreateServer implements api.AgentServer.
 func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) (*api.CreateServerResponse, error) {
-	obj := &metalv1alpha1.Server{}
+	obj := &metalv1.Server{}
 
 	if err := s.c.Get(ctx, types.NamespacedName{Name: in.GetSystemInformation().GetUuid()}, obj); err != nil {
 		if !apierrors.IsNotFound(err) {
 			return nil, err
 		}
 
-		obj = &metalv1alpha1.Server{
+		obj = &metalv1.Server{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Server",
-				APIVersion: metalv1alpha1.GroupVersion.Version,
+				APIVersion: metalv1.GroupVersion.Version,
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name: in.GetSystemInformation().GetUuid(),
 			},
-			Spec: metalv1alpha1.ServerSpec{
+			Spec: metalv1.ServerSpec{
 				Hostname: in.GetHostname(),
-				SystemInformation: &metalv1alpha1.SystemInformation{
+				SystemInformation: &metalv1.SystemInformation{
 					Manufacturer: in.GetSystemInformation().GetManufacturer(),
 					ProductName:  in.GetSystemInformation().GetProductName(),
 					Version:      in.GetSystemInformation().GetVersion(),
@@ -70,7 +70,7 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 					SKUNumber:    in.GetSystemInformation().GetSkuNumber(),
 					Family:       in.GetSystemInformation().GetFamily(),
 				},
-				CPU: &metalv1alpha1.CPUInformation{
+				CPU: &metalv1.CPUInformation{
 					Manufacturer: in.GetCpu().GetManufacturer(),
 					Version:      in.GetCpu().GetVersion(),
 				},
@@ -121,7 +121,7 @@ func (s *server) CreateServer(ctx context.Context, in *api.CreateServerRequest) 
 
 // MarkServerAsWiped implements api.AgentServer.
 func (s *server) MarkServerAsWiped(ctx context.Context, in *api.MarkServerAsWipedRequest) (*api.MarkServerAsWipedResponse, error) {
-	obj := &metalv1alpha1.Server{}
+	obj := &metalv1.Server{}
 
 	if err := s.c.Get(ctx, types.NamespacedName{Name: in.GetUuid()}, obj); err != nil {
 		return nil, err
@@ -134,10 +134,10 @@ func (s *server) MarkServerAsWiped(ctx context.Context, in *api.MarkServerAsWipe
 
 	obj.Status.IsClean = true
 
-	conditions.MarkTrue(obj, metalv1alpha1.ConditionPowerCycle)
+	conditions.MarkTrue(obj, metalv1.ConditionPowerCycle)
 
 	if err := patchHelper.Patch(ctx, obj, patch.WithOwnedConditions{
-		Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPowerCycle},
+		Conditions: []clusterv1.ConditionType{metalv1.ConditionPowerCycle},
 	}); err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (s *server) MarkServerAsWiped(ctx context.Context, in *api.MarkServerAsWipe
 
 // ReconcileServerAddresses implements api.AgentServer.
 func (s *server) ReconcileServerAddresses(ctx context.Context, in *api.ReconcileServerAddressesRequest) (*api.ReconcileServerAddressesResponse, error) {
-	obj := &metalv1alpha1.Server{}
+	obj := &metalv1.Server{}
 
 	if err := s.c.Get(ctx, types.NamespacedName{Name: in.GetUuid()}, obj); err != nil {
 		return nil, err
@@ -242,7 +242,7 @@ func (s *server) ReconcileServerAddresses(ctx context.Context, in *api.Reconcile
 
 // Heartbeat implements api.AgentServer.
 func (s *server) Heartbeat(ctx context.Context, in *api.HeartbeatRequest) (*api.HeartbeatResponse, error) {
-	obj := &metalv1alpha1.Server{}
+	obj := &metalv1.Server{}
 
 	if err := s.c.Get(ctx, types.NamespacedName{Name: in.GetUuid()}, obj); err != nil {
 		return nil, err
@@ -254,11 +254,11 @@ func (s *server) Heartbeat(ctx context.Context, in *api.HeartbeatRequest) (*api.
 	}
 
 	// remove the condition in case it was already set to make sure LastTransitionTime will be updated
-	conditions.Delete(obj, metalv1alpha1.ConditionPowerCycle)
-	conditions.MarkFalse(obj, metalv1alpha1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, "Server wipe in progress.")
+	conditions.Delete(obj, metalv1.ConditionPowerCycle)
+	conditions.MarkFalse(obj, metalv1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, "Server wipe in progress.")
 
 	if err := patchHelper.Patch(ctx, obj, patch.WithOwnedConditions{
-		Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPowerCycle},
+		Conditions: []clusterv1.ConditionType{metalv1.ConditionPowerCycle},
 	}); err != nil {
 		return nil, err
 	}
@@ -272,7 +272,7 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 	bmcInfo := in.GetBmcInfo()
 
 	// Fetch corresponding server
-	obj := &metalv1alpha1.Server{}
+	obj := &metalv1.Server{}
 
 	if err := s.c.Get(ctx, types.NamespacedName{Name: in.GetUuid()}, obj); err != nil {
 		return nil, err
@@ -280,7 +280,7 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 
 	// Create a BMC struct if non-existent
 	if obj.Spec.BMC == nil {
-		obj.Spec.BMC = &metalv1alpha1.BMC{}
+		obj.Spec.BMC = &metalv1.BMC{}
 	}
 
 	// Update bmc info with IP if we've got it.
@@ -317,7 +317,7 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 				Namespace: corev1.NamespaceDefault,
 				Name:      bmcSecretName,
 				OwnerReferences: []metav1.OwnerReference{
-					*metav1.NewControllerRef(obj, metalv1alpha1.GroupVersion.WithKind("Server")),
+					*metav1.NewControllerRef(obj, metalv1.GroupVersion.WithKind("Server")),
 				},
 				Labels: map[string]string{
 					clusterctl.ClusterctlMoveLabelName: "",
@@ -343,16 +343,16 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 		}
 
 		// Update server spec with pointers to endpoint and creds secret
-		obj.Spec.BMC.UserFrom = &metalv1alpha1.CredentialSource{
-			SecretKeyRef: &metalv1alpha1.SecretKeyRef{
+		obj.Spec.BMC.UserFrom = &metalv1.CredentialSource{
+			SecretKeyRef: &metalv1.SecretKeyRef{
 				Namespace: corev1.NamespaceDefault,
 				Name:      bmcSecretName,
 				Key:       "user",
 			},
 		}
 
-		obj.Spec.BMC.PassFrom = &metalv1alpha1.CredentialSource{
-			SecretKeyRef: &metalv1alpha1.SecretKeyRef{
+		obj.Spec.BMC.PassFrom = &metalv1.CredentialSource{
+			SecretKeyRef: &metalv1.SecretKeyRef{
 				Namespace: corev1.NamespaceDefault,
 				Name:      bmcSecretName,
 				Key:       "pass",

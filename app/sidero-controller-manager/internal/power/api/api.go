@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"time"
 
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
 )
 
@@ -24,7 +24,7 @@ type Client struct {
 }
 
 // NewClient returns new API client to manage metal machine.
-func NewClient(spec metalv1alpha1.ManagementAPI) (*Client, error) {
+func NewClient(spec metalv1.ManagementAPI) (*Client, error) {
 	return &Client{
 		endpoint: spec.Endpoint,
 	}, nil

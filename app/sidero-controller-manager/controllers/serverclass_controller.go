@@ -20,7 +20,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // ServerClassReconciler reconciles a ServerClass object.
@@ -42,7 +42,7 @@ func (r *ServerClassReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	//nolint:godox
 	// TODO: We probably should use admission webhooks instead (or in additional) to prevent
 	// unwanted edits instead of "fixing" the resource after the fact.
-	if req.Name == metalv1alpha1.ServerClassAny {
+	if req.Name == metalv1.ServerClassAny {
 		if err := ReconcileServerClassAny(ctx, r.Client); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -50,7 +50,7 @@ func (r *ServerClassReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		// do not return; re-reconcile it to update status
 	} //nolint:wsl
 
-	sc := metalv1alpha1.ServerClass{}
+	sc := metalv1.ServerClass{}
 
 	if err := r.Get(ctx, req.NamespacedName, &sc); err != nil {
 		l.Error(err, "failed fetching resource")
@@ -62,15 +62,15 @@ func (r *ServerClassReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, err
 	}
 
-	sl := &metalv1alpha1.ServerList{}
+	sl := &metalv1.ServerList{}
 
 	if err := r.List(ctx, sl); err != nil {
 		return ctrl.Result{}, fmt.Errorf("unable to get serverclass: %w", err)
 	}
 
-	results, err := metalv1alpha1.FilterServers(sl.Items,
-		metalv1alpha1.AcceptedServerFilter,
-		metalv1alpha1.NotCordonedServerFilter,
+	results, err := metalv1.FilterServers(sl.Items,
+		metalv1.AcceptedServerFilter,
+		metalv1.NotCordonedServerFilter,
 		sc.SelectorFilter(),
 		sc.QualifiersFilter(),
 	)
@@ -103,15 +103,15 @@ func (r *ServerClassReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 // ReconcileServerClassAny ensures that ServerClass "any" exist and is in desired state.
 func ReconcileServerClassAny(ctx context.Context, c client.Client) error {
 	key := types.NamespacedName{
-		Name: metalv1alpha1.ServerClassAny,
+		Name: metalv1.ServerClassAny,
 	}
 
-	sc := metalv1alpha1.ServerClass{}
+	sc := metalv1.ServerClass{}
 	err := c.Get(ctx, key, &sc)
 
 	switch {
 	case apierrors.IsNotFound(err):
-		sc.Name = metalv1alpha1.ServerClassAny
+		sc.Name = metalv1.ServerClassAny
 
 		return c.Create(ctx, &sc)
 
@@ -121,7 +121,7 @@ func ReconcileServerClassAny(ctx context.Context, c client.Client) error {
 			return err
 		}
 
-		sc.Spec.Qualifiers = metalv1alpha1.Qualifiers{}
+		sc.Spec.Qualifiers = metalv1.Qualifiers{}
 
 		return patchHelper.Patch(ctx, &sc)
 
@@ -137,7 +137,7 @@ func (r *ServerClassReconciler) SetupWithManager(ctx context.Context, mgr ctrl.M
 	mapRequests := func(a client.Object) []reconcile.Request {
 		reqList := []reconcile.Request{}
 
-		scList := &metalv1alpha1.ServerClassList{}
+		scList := &metalv1.ServerClassList{}
 
 		if err := r.List(ctx, scList); err != nil {
 			return reqList
@@ -160,9 +160,9 @@ func (r *ServerClassReconciler) SetupWithManager(ctx context.Context, mgr ctrl.M
 
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(options).
-		For(&metalv1alpha1.ServerClass{}).
+		For(&metalv1.ServerClass{}).
 		Watches(
-			&source.Kind{Type: &metalv1alpha1.Server{}},
+			&source.Kind{Type: &metalv1.Server{}},
 			handler.EnqueueRequestsFromMapFunc(mapRequests),
 		).
 		Complete(r)

@@ -19,8 +19,8 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // TestMachineDeploymentReconcile verifies that machine deployment can reconcile delete machines.
@@ -95,7 +95,7 @@ func TestMachineDeploymentReconcile(ctx context.Context, metalClient client.Clie
 // TestServerBindingReconcile verifies that server binding controller can reconcile missing ServerBindings.
 func TestServerBindingReconcile(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
-		var serverBindingList sidero.ServerBindingList
+		var serverBindingList infrav1.ServerBindingList
 
 		require.NoError(t, metalClient.List(ctx, &serverBindingList))
 
@@ -112,7 +112,7 @@ func TestServerBindingReconcile(ctx context.Context, metalClient client.Client) 
 		start := time.Now()
 
 		for time.Since(start) < time.Minute {
-			var server metal.Server
+			var server metalv1.Server
 
 			require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: serverBindingToDelete.Name}, &server))
 
@@ -120,7 +120,7 @@ func TestServerBindingReconcile(ctx context.Context, metalClient client.Client) 
 		}
 
 		// server binding should have been re-created
-		var serverBinding sidero.ServerBinding
+		var serverBinding infrav1.ServerBinding
 
 		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: serverBindingToDelete.Name}, &serverBinding))
 
@@ -141,7 +141,7 @@ func TestServerBindingReconcile(ctx context.Context, metalClient client.Client) 
 // ref wasn't set.
 func TestMetalMachineServerRefReconcile(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
-		var serverBindingList sidero.ServerBindingList
+		var serverBindingList infrav1.ServerBindingList
 
 		require.NoError(t, metalClient.List(ctx, &serverBindingList))
 
@@ -153,7 +153,7 @@ func TestMetalMachineServerRefReconcile(ctx context.Context, metalClient client.
 		serverBinding := serverBindingList.Items[0]
 
 		// get matching metalmachine
-		var metalMachine sidero.MetalMachine
+		var metalMachine infrav1.MetalMachine
 
 		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Namespace: serverBinding.Spec.MetalMachineRef.Namespace, Name: serverBinding.Spec.MetalMachineRef.Name}, &metalMachine))
 

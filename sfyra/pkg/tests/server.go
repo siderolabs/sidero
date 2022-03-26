@@ -29,8 +29,8 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	metalv1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/sfyra/pkg/capi"
 	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
@@ -42,11 +42,11 @@ func TestServerRegistration(ctx context.Context, metalClient client.Client, vmSe
 	return func(t *testing.T) {
 		numNodes := len(vmSet.Nodes())
 
-		var servers *v1alpha1.ServerList
+		var servers *metalv1.ServerList
 
 		// wait for all the servers to be registered
 		require.NoError(t, retry.Constant(5*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
-			servers = &v1alpha1.ServerList{}
+			servers = &metalv1.ServerList{}
 
 			if err := metalClient.List(ctx, servers); err != nil {
 				return err
@@ -101,14 +101,14 @@ func TestServerMgmtAPI(ctx context.Context, metalClient client.Client, vmSet *vm
 		bridgeIP := vmSet.BridgeIP()
 
 		for _, vm := range vmSet.Nodes() {
-			server := v1alpha1.Server{}
+			server := metalv1.Server{}
 
 			require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: vm.UUID.String()}, &server))
 
 			patchHelper, err := patch.NewHelper(&server, metalClient)
 			require.NoError(t, err)
 
-			server.Spec.ManagementAPI = &v1alpha1.ManagementAPI{
+			server.Spec.ManagementAPI = &metalv1.ManagementAPI{
 				Endpoint: net.JoinHostPort(bridgeIP.String(), strconv.Itoa(vm.APIPort)),
 			}
 
@@ -120,7 +120,7 @@ func TestServerMgmtAPI(ctx context.Context, metalClient client.Client, vmSet *vm
 // TestServerPatch patches all the servers for the config.
 func TestServerPatch(ctx context.Context, metalClient client.Client, registryMirrors []string) TestFunc {
 	return func(t *testing.T) {
-		servers := &v1alpha1.ServerList{}
+		servers := &metalv1.ServerList{}
 
 		require.NoError(t, metalClient.List(ctx, servers))
 
@@ -165,14 +165,14 @@ func TestServerPatch(ctx context.Context, metalClient client.Client, registryMir
 			patchHelper, err := patch.NewHelper(&server, metalClient)
 			require.NoError(t, err)
 
-			server.Spec.ConfigPatches = append(server.Spec.ConfigPatches, v1alpha1.ConfigPatches{
+			server.Spec.ConfigPatches = append(server.Spec.ConfigPatches, metalv1.ConfigPatches{
 				Op:    "replace",
 				Path:  "/machine/install",
 				Value: apiextensions.JSON{Raw: installPatch},
 			})
 
 			if mirrorsPatch != nil {
-				server.Spec.ConfigPatches = append(server.Spec.ConfigPatches, v1alpha1.ConfigPatches{
+				server.Spec.ConfigPatches = append(server.Spec.ConfigPatches, metalv1.ConfigPatches{
 					Op:    "add",
 					Path:  "/machine/registries",
 					Value: apiextensions.JSON{Raw: mirrorsPatch},
@@ -190,8 +190,8 @@ func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet 
 		const numDummies = 3
 
 		// create dummy servers to test with
-		dummySpec := v1alpha1.ServerSpec{
-			CPU: &v1alpha1.CPUInformation{
+		dummySpec := metalv1.ServerSpec{
+			CPU: &metalv1.CPUInformation{
 				Manufacturer: "DummyCPU",
 			},
 		}
@@ -202,7 +202,7 @@ func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet 
 			require.NoError(t, err)
 		}
 
-		dummyServers := &v1alpha1.ServerList{}
+		dummyServers := &metalv1.ServerList{}
 
 		labelSelector, err := labels.Parse("dummy-server=")
 		require.NoError(t, err)
@@ -222,7 +222,7 @@ func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet 
 		}))
 
 		// verify servers originally registered as non-accepted
-		acceptedServers := []v1alpha1.Server{}
+		acceptedServers := []metalv1.Server{}
 
 		for _, server := range dummyServers.Items {
 			if server.Spec.Accepted {
@@ -246,7 +246,7 @@ func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet 
 		// verify all servers are now accepted
 		require.NoError(t, metalClient.List(ctx, dummyServers, client.MatchingLabelsSelector{Selector: labelSelector}))
 
-		acceptedServers = []v1alpha1.Server{}
+		acceptedServers = []metalv1.Server{}
 
 		for _, server := range dummyServers.Items {
 			if server.Spec.Accepted {
@@ -270,8 +270,8 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client, vmSet *v
 		const numDummies = 3
 
 		// create dummy servers to test with
-		dummySpec := v1alpha1.ServerSpec{
-			CPU: &v1alpha1.CPUInformation{
+		dummySpec := metalv1.ServerSpec{
+			CPU: &metalv1.CPUInformation{
 				Manufacturer: "DummyManufacturer",
 			},
 		}
@@ -282,7 +282,7 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client, vmSet *v
 			require.NoError(t, err)
 		}
 
-		dummyServers := &v1alpha1.ServerList{}
+		dummyServers := &metalv1.ServerList{}
 
 		labelSelector, err := labels.Parse("dummy-server=")
 		require.NoError(t, err)
@@ -310,8 +310,8 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client, vmSet *v
 
 		// verify that all servers shows up as available in `any` serverclass
 		require.NoError(t, retry.Constant(30*time.Second, retry.WithUnits(5*time.Second)).Retry(func() error {
-			var serverClass v1alpha1.ServerClass
-			err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass)
+			var serverClass metalv1.ServerClass
+			err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.ServerClassAny}, &serverClass)
 			if err != nil {
 				return err
 			}
@@ -327,7 +327,7 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client, vmSet *v
 		// // cordon a single server and marked as paused
 		serverName := dummyServers.Items[0].Name
 
-		var server v1alpha1.Server
+		var server metalv1.Server
 
 		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: serverName}, &server))
 		patchHelper, err := patch.NewHelper(&server, metalClient)
@@ -338,8 +338,8 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client, vmSet *v
 		require.NoError(t, patchHelper.Patch(ctx, &server))
 
 		require.NoError(t, retry.Constant(30*time.Second, retry.WithUnits(5*time.Second)).Retry(func() error {
-			var serverClass v1alpha1.ServerClass
-			err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass)
+			var serverClass metalv1.ServerClass
+			err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.ServerClassAny}, &serverClass)
 			if err != nil {
 				return err
 			}
@@ -353,7 +353,7 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client, vmSet *v
 		}))
 
 		// patch the server and marked as not cordoned
-		var pausedServer v1alpha1.Server
+		var pausedServer metalv1.Server
 
 		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: serverName}, &pausedServer))
 		patchHelperPausedServer, err := patch.NewHelper(&pausedServer, metalClient)
@@ -364,8 +364,8 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client, vmSet *v
 		require.NoError(t, patchHelperPausedServer.Patch(ctx, &pausedServer))
 
 		require.NoError(t, retry.Constant(30*time.Second, retry.WithUnits(5*time.Second)).Retry(func() error {
-			var serverClass v1alpha1.ServerClass
-			err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass)
+			var serverClass metalv1.ServerClass
+			err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.ServerClassAny}, &serverClass)
 			if err != nil {
 				return err
 			}
@@ -383,12 +383,12 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client, vmSet *v
 // TestServerResetOnAcceptance tests that servers are reset when accepted.
 func TestServerResetOnAcceptance(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
-		serverList := &v1alpha1.ServerList{}
+		serverList := &metalv1.ServerList{}
 
 		err := metalClient.List(ctx, serverList)
 		require.NoError(t, err)
 
-		servers := []v1alpha1.Server{}
+		servers := []metalv1.Server{}
 
 		for _, server := range serverList.Items {
 			server := server
@@ -412,7 +412,7 @@ func TestServerResetOnAcceptance(ctx context.Context, metalClient client.Client)
 
 		require.NoError(t, retry.Constant(5*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
 			for _, server := range servers {
-				var s v1alpha1.Server
+				var s metalv1.Server
 
 				if err := metalClient.Get(ctx, types.NamespacedName{Name: server.Name, Namespace: server.Namespace}, &s); err != nil {
 					return err
@@ -434,7 +434,7 @@ func TestServerResetOnAcceptance(ctx context.Context, metalClient client.Client)
 func TestServersReady(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
 		require.NoError(t, retry.Constant(time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
-			servers := v1alpha1.ServerList{}
+			servers := metalv1.ServerList{}
 
 			if err := metalClient.List(ctx, &servers); err != nil {
 				return err
@@ -455,7 +455,7 @@ func TestServersReady(ctx context.Context, metalClient client.Client) TestFunc {
 func TestServersDiscoveredIPs(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
 		require.NoError(t, retry.Constant(time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
-			servers := v1alpha1.ServerList{}
+			servers := metalv1.ServerList{}
 
 			if err := metalClient.List(ctx, &servers); err != nil {
 				return err
@@ -492,9 +492,9 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 	return func(t *testing.T) {
 		pxeTestServerClass := "pxe-test-server"
 
-		classSpec := v1alpha1.ServerClassSpec{
-			Qualifiers: v1alpha1.Qualifiers{
-				CPU: []v1alpha1.CPUInformation{
+		classSpec := metalv1.ServerClassSpec{
+			Qualifiers: metalv1.Qualifiers{
+				CPU: []metalv1.CPUInformation{
 					{
 						Manufacturer: "QEMU",
 					},
@@ -503,7 +503,7 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 			EnvironmentRef: &v1.ObjectReference{
 				Name: environmentName,
 			},
-			ConfigPatches: []v1alpha1.ConfigPatches{
+			ConfigPatches: []metalv1.ConfigPatches{
 				{
 					Op:    "add",
 					Path:  "/fake",
@@ -518,7 +518,7 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 		loadbalancer := createCluster(ctx, t, metalClient, cluster, vmSet, capiManager, pxeTestClusterName, pxeTestServerClass, pxeTestClusterLBPort, 1, 0, talosRelease, kubernetesVersion)
 
 		retry.Constant(time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
-			var machines metalv1.MetalMachineList
+			var machines infrav1.MetalMachineList
 
 			labelSelector, err := labels.Parse(fmt.Sprintf("cluster.x-k8s.io/cluster-name=%s", pxeTestClusterName))
 			require.NoError(t, err)
@@ -532,7 +532,7 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 				return retry.ExpectedErrorf("no metal machines detected yet")
 			}
 
-			if !conditions.IsFalse(&machines.Items[0], metalv1.TalosConfigLoadedCondition) || !conditions.IsFalse(&machines.Items[0], metalv1.TalosConfigValidatedCondition) {
+			if !conditions.IsFalse(&machines.Items[0], infrav1.TalosConfigLoadedCondition) || !conditions.IsFalse(&machines.Items[0], infrav1.TalosConfigValidatedCondition) {
 				return retry.ExpectedErrorf("the machine doesn't have any config failure conditions yet")
 			}
 
@@ -557,8 +557,8 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 // createDummyServers will submit servers with dummy info that are not tied to QEMU VMs.
 // These can be targeted by the spec passed in or the label "dummy-server".
 // Dummy servers are patched after creation to ensure they're marked as clean.
-func createDummyServer(ctx context.Context, metalClient client.Client, name string, spec v1alpha1.ServerSpec) (v1alpha1.Server, error) {
-	var server v1alpha1.Server
+func createDummyServer(ctx context.Context, metalClient client.Client, name string, spec metalv1.ServerSpec) (metalv1.Server, error) {
+	var server metalv1.Server
 
 	server.APIVersion = constants.SideroAPIVersion
 	server.Name = name
@@ -572,7 +572,7 @@ func createDummyServer(ctx context.Context, metalClient client.Client, name stri
 
 	return server, retry.Constant(time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
 		// refetch dummy server to make sure we're synced up before patching
-		server = v1alpha1.Server{}
+		server = metalv1.Server{}
 
 		err = metalClient.Get(ctx, types.NamespacedName{Name: name}, &server)
 		if err != nil {
@@ -598,7 +598,7 @@ func createDummyServer(ctx context.Context, metalClient client.Client, name stri
 }
 
 // getAvailableServersFromServerClass returns a list of servers that are available as part of a serverclass.
-func getAvailableServersFromServerClass(serverClass v1alpha1.ServerClass, serverList *v1alpha1.ServerList) []string {
+func getAvailableServersFromServerClass(serverClass metalv1.ServerClass, serverList *metalv1.ServerList) []string {
 	var foundServers []string
 
 	for _, server := range serverList.Items {

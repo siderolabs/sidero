@@ -32,7 +32,7 @@ import (
 	"github.com/talos-systems/talos/pkg/machinery/kernel"
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
@@ -208,7 +208,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	args := struct {
-		Env         *metalv1alpha1.Environment
+		Env         *metalv1.Environment
 		KernelAsset string
 		InitrdAsset string
 	}{
@@ -249,13 +249,13 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getBootFromDiskMethod(server *metalv1alpha1.Server, serverBinding *infrav1.ServerBinding) (siderotypes.BootFromDisk, error) {
+func getBootFromDiskMethod(server *metalv1.Server, serverBinding *infrav1.ServerBinding) (siderotypes.BootFromDisk, error) {
 	method := defaultBootFromDiskMethod
 
 	if server.Spec.BootFromDiskMethod != "" {
 		method = server.Spec.BootFromDiskMethod
 	} else if serverBinding.Spec.ServerClassRef != nil {
-		var serverClass metalv1alpha1.ServerClass
+		var serverClass metalv1.ServerClass
 
 		if err := c.Get(
 			context.TODO(),
@@ -343,12 +343,12 @@ func parseMAC(s string) (net.HardwareAddr, error) {
 	return macAddr, err
 }
 
-func lookupServer(uuid string) (*metalv1alpha1.Server, *infrav1.ServerBinding, error) {
+func lookupServer(uuid string) (*metalv1.Server, *infrav1.ServerBinding, error) {
 	key := client.ObjectKey{
 		Name: uuid,
 	}
 
-	s := &metalv1alpha1.Server{}
+	s := &metalv1.Server{}
 
 	if err := c.Get(context.Background(), key, s); err != nil {
 		if apierrors.IsNotFound(err) {
@@ -373,7 +373,7 @@ func lookupServer(uuid string) (*metalv1alpha1.Server, *infrav1.ServerBinding, e
 
 // newEnvironment handles which env CRD we'll respect for a given server.
 // specied in the server spec overrides everything, specified in the server class overrides default, default is default :).
-func newEnvironment(server *metalv1alpha1.Server, serverBinding *infrav1.ServerBinding, arch string) (env *metalv1alpha1.Environment, err error) {
+func newEnvironment(server *metalv1.Server, serverBinding *infrav1.ServerBinding, arch string) (env *metalv1.Environment, err error) {
 	// NB: The order of this switch statement is important. It defines the
 	// precedence of which environment to boot.
 	switch {
@@ -381,7 +381,7 @@ func newEnvironment(server *metalv1alpha1.Server, serverBinding *infrav1.ServerB
 		return newAgentEnvironment(arch), nil
 	case serverBinding == nil:
 		return newAgentEnvironment(arch), nil
-	case conditions.Has(server, metalv1alpha1.ConditionPXEBooted) && !server.Spec.PXEBootAlways:
+	case conditions.Has(server, metalv1.ConditionPXEBooted) && !server.Spec.PXEBootAlways:
 		return nil, ErrBootFromDisk
 	case server.Spec.EnvironmentRef != nil:
 		env, err = newEnvironmentFromServer(server)
@@ -409,7 +409,7 @@ func newEnvironment(server *metalv1alpha1.Server, serverBinding *infrav1.ServerB
 	return env, nil
 }
 
-func newAgentEnvironment(arch string) *metalv1alpha1.Environment {
+func newAgentEnvironment(arch string) *metalv1.Environment {
 	args := append([]string(nil), kernel.DefaultArgs...)
 	args = append(args,
 		"console=tty0",
@@ -428,12 +428,12 @@ func newAgentEnvironment(arch string) *metalv1alpha1.Environment {
 		cmdline.Set(p.Key(), p)
 	}
 
-	env := &metalv1alpha1.Environment{
+	env := &metalv1.Environment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: fmt.Sprintf("agent-%s", arch),
 		},
-		Spec: metalv1alpha1.EnvironmentSpec{
-			Kernel: metalv1alpha1.Kernel{
+		Spec: metalv1.EnvironmentSpec{
+			Kernel: metalv1.Kernel{
 				Args: cmdline.Strings(),
 			},
 		},
@@ -442,10 +442,10 @@ func newAgentEnvironment(arch string) *metalv1alpha1.Environment {
 	return env
 }
 
-func newDefaultEnvironment() (env *metalv1alpha1.Environment, err error) {
-	env = &metalv1alpha1.Environment{}
+func newDefaultEnvironment() (env *metalv1.Environment, err error) {
+	env = &metalv1.Environment{}
 
-	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: metalv1alpha1.EnvironmentDefault}, env); err != nil {
+	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: metalv1.EnvironmentDefault}, env); err != nil {
 		return nil, err
 	}
 
@@ -454,8 +454,8 @@ func newDefaultEnvironment() (env *metalv1alpha1.Environment, err error) {
 	return env, nil
 }
 
-func newEnvironmentFromServer(server *metalv1alpha1.Server) (env *metalv1alpha1.Environment, err error) {
-	env = &metalv1alpha1.Environment{}
+func newEnvironmentFromServer(server *metalv1.Server) (env *metalv1.Environment, err error) {
+	env = &metalv1.Environment{}
 
 	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: server.Spec.EnvironmentRef.Name}, env); err != nil {
 		return nil, err
@@ -466,8 +466,8 @@ func newEnvironmentFromServer(server *metalv1alpha1.Server) (env *metalv1alpha1.
 	return env, nil
 }
 
-func newEnvironmentFromServerClass(serverBinding *infrav1.ServerBinding) (env *metalv1alpha1.Environment, err error) {
-	serverClassResource := &metalv1alpha1.ServerClass{}
+func newEnvironmentFromServerClass(serverBinding *infrav1.ServerBinding) (env *metalv1.Environment, err error) {
+	serverClassResource := &metalv1.ServerClass{}
 
 	if err := c.Get(context.Background(), types.NamespacedName{Namespace: serverBinding.Spec.ServerClassRef.Namespace, Name: serverBinding.Spec.ServerClassRef.Name}, serverClassResource); err != nil {
 		return nil, err
@@ -477,7 +477,7 @@ func newEnvironmentFromServerClass(serverBinding *infrav1.ServerBinding) (env *m
 		return env, nil
 	}
 
-	env = &metalv1alpha1.Environment{}
+	env = &metalv1.Environment{}
 
 	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: serverClassResource.Spec.EnvironmentRef.Name}, env); err != nil {
 		return nil, err
@@ -488,7 +488,7 @@ func newEnvironmentFromServerClass(serverBinding *infrav1.ServerBinding) (env *m
 	return env, nil
 }
 
-func appendTalosArguments(env *metalv1alpha1.Environment) {
+func appendTalosArguments(env *metalv1.Environment) {
 	args := env.Spec.Kernel.Args
 
 	talosConfigPrefix := talosconstants.KernelParamConfig + "="
@@ -534,16 +534,16 @@ func appendTalosArguments(env *metalv1alpha1.Environment) {
 	}
 }
 
-func markAsPXEBooted(server *metalv1alpha1.Server) error {
+func markAsPXEBooted(server *metalv1.Server) error {
 	patchHelper, err := patch.NewHelper(server, c)
 	if err != nil {
 		return err
 	}
 
-	conditions.MarkTrue(server, metalv1alpha1.ConditionPXEBooted)
+	conditions.MarkTrue(server, metalv1.ConditionPXEBooted)
 
 	return patchHelper.Patch(context.Background(), server, patch.WithOwnedConditions{
-		Conditions: []clusterv1.ConditionType{metalv1alpha1.ConditionPXEBooted},
+		Conditions: []clusterv1.ConditionType{metalv1.ConditionPXEBooted},
 	})
 }
 

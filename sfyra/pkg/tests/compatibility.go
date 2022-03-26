@@ -23,7 +23,7 @@ import (
 	"github.com/talos-systems/go-retry/retry"
 	"github.com/talos-systems/talos/pkg/machinery/kernel"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/sfyra/pkg/capi"
 	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
@@ -42,7 +42,7 @@ func TestCompatibilityCluster(ctx context.Context, metalClient client.Client, cl
 			t.Skip("--prev-talos-release is not set, skipped compatibility check")
 		}
 
-		var environment v1alpha1.Environment
+		var environment metalv1.Environment
 
 		envName := fmt.Sprintf("talos-%s", strings.ReplaceAll(talosRelease, ".", "-"))
 
@@ -82,9 +82,9 @@ func TestCompatibilityCluster(ctx context.Context, metalClient client.Client, cl
 		}))
 
 		serverClassName := envName
-		classSpec := v1alpha1.ServerClassSpec{
-			Qualifiers: v1alpha1.Qualifiers{
-				CPU: []v1alpha1.CPUInformation{
+		classSpec := metalv1.ServerClassSpec{
+			Qualifiers: metalv1.Qualifiers{
+				CPU: []metalv1.CPUInformation{
 					{
 						Manufacturer: "QEMU",
 					},

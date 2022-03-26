@@ -25,8 +25,8 @@ import (
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // ControlPlane implements dynamic loadbalancer for the control plane.
@@ -153,13 +153,13 @@ func (cp *ControlPlane) reconcile() error {
 	var upstreams []string
 
 	for _, machine := range machines.Items {
-		var metalMachine sidero.MetalMachine
+		var metalMachine infrav1.MetalMachine
 
 		if err := cp.client.Get(cp.ctx, types.NamespacedName{Namespace: machine.Spec.InfrastructureRef.Namespace, Name: machine.Spec.InfrastructureRef.Name}, &metalMachine); err != nil {
 			continue
 		}
 
-		var server metal.Server
+		var server metalv1.Server
 
 		if metalMachine.Spec.ServerRef == nil {
 			continue

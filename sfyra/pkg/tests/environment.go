@@ -18,7 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
 )
@@ -28,8 +28,8 @@ const environmentName = "sfyra"
 // TestEnvironmentDefault verifies environment "default".
 func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, cluster talos.Cluster, kernelURL, initrdURL string) TestFunc {
 	return func(t *testing.T) {
-		var environment v1alpha1.Environment
-		err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.EnvironmentDefault}, &environment)
+		var environment metalv1.Environment
+		err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.EnvironmentDefault}, &environment)
 		require.NoError(t, err)
 		assert.True(t, environment.IsReady())
 
@@ -37,9 +37,9 @@ func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, clus
 		err = metalClient.Delete(ctx, &environment)
 		require.NoError(t, err)
 
-		environment = v1alpha1.Environment{}
+		environment = metalv1.Environment{}
 		err = retry.Constant(60 * time.Second).Retry(func() error {
-			if err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.EnvironmentDefault}, &environment); err != nil {
+			if err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.EnvironmentDefault}, &environment); err != nil {
 				if apierrors.IsNotFound(err) {
 					return retry.ExpectedError(err)
 				}
@@ -60,7 +60,7 @@ func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, clus
 // TestEnvironmentCreate verifies environment creation.
 func TestEnvironmentCreate(ctx context.Context, metalClient client.Client, cluster talos.Cluster, kernelURL, initrdURL string) TestFunc {
 	return func(t *testing.T) {
-		var environment v1alpha1.Environment
+		var environment metalv1.Environment
 
 		if err := metalClient.Get(ctx, types.NamespacedName{Name: environmentName}, &environment); err != nil {
 			if !apierrors.IsNotFound(err) {

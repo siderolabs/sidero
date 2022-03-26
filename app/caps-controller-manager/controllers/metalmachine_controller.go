@@ -35,7 +35,7 @@ import (
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	"github.com/talos-systems/sidero/app/caps-controller-manager/pkg/constants"
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 var ErrNoServersInServerClass = errors.New("no servers available in serverclass")
@@ -265,7 +265,7 @@ func (r *MetalMachineReconciler) SetupWithManager(ctx context.Context, mgr ctrl.
 		Complete(r)
 }
 
-func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, logger logr.Logger, classRef *corev1.ObjectReference, metalMachine *infrav1.MetalMachine) (*metalv1alpha1.Server, error) {
+func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, logger logr.Logger, classRef *corev1.ObjectReference, metalMachine *infrav1.MetalMachine) (*metalv1.Server, error) {
 	// First, check if there is already existing serverBinding for this metalmachine
 	var serverBindingList infrav1.ServerBindingList
 
@@ -276,7 +276,7 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, logge
 	for _, serverBinding := range serverBindingList.Items {
 		if serverBinding.Spec.MetalMachineRef.Namespace == metalMachine.Namespace && serverBinding.Spec.MetalMachineRef.Name == metalMachine.Name {
 			// found existing serverBinding for this metalMachine
-			var server metalv1alpha1.Server
+			var server metalv1.Server
 
 			if err := r.Get(ctx, types.NamespacedName{Namespace: serverBinding.Namespace, Name: serverBinding.Name}, &server); err != nil {
 				return nil, err
@@ -302,7 +302,7 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, logge
 	// NB: we added this loop to double check that an available server isn't "in use" because
 	//     we saw raciness between server selection and it being removed from the ServersAvailable list.
 	for _, availServer := range serverClassResource.Status.ServersAvailable {
-		serverObj := &metalv1alpha1.Server{}
+		serverObj := &metalv1.Server{}
 
 		namespacedName := types.NamespacedName{
 			Namespace: "",
@@ -408,7 +408,7 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 }
 
 // createServerBinding updates a server to mark it as "in use" via ServerBinding resource.
-func (r *MetalMachineReconciler) createServerBinding(ctx context.Context, serverClass *metalv1alpha1.ServerClass, serverObj *metalv1alpha1.Server, metalMachine *infrav1.MetalMachine) error {
+func (r *MetalMachineReconciler) createServerBinding(ctx context.Context, serverClass *metalv1.ServerClass, serverObj *metalv1.Server, metalMachine *infrav1.MetalMachine) error {
 	serverRef, err := reference.GetReference(r.Scheme, serverObj)
 	if err != nil {
 		return err
@@ -445,8 +445,8 @@ func (r *MetalMachineReconciler) createServerBinding(ctx context.Context, server
 	return err
 }
 
-func (r *MetalMachineReconciler) fetchServerClass(ctx context.Context, classRef *corev1.ObjectReference) (*metalv1alpha1.ServerClass, error) {
-	serverClassResource := &metalv1alpha1.ServerClass{}
+func (r *MetalMachineReconciler) fetchServerClass(ctx context.Context, classRef *corev1.ObjectReference) (*metalv1.ServerClass, error) {
+	serverClassResource := &metalv1.ServerClass{}
 
 	namespacedName := types.NamespacedName{
 		Namespace: classRef.Namespace,

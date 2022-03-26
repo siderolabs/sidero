@@ -31,7 +31,7 @@ import (
 	capiclient "sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/sfyra/pkg/capi"
 	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
@@ -48,8 +48,8 @@ func TestServerClassAny(ctx context.Context, metalClient client.Client, vmSet *v
 	return func(t *testing.T) {
 		numNodes := len(vmSet.Nodes())
 
-		var serverClass v1alpha1.ServerClass
-		err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass)
+		var serverClass metalv1.ServerClass
+		err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.ServerClassAny}, &serverClass)
 		require.NoError(t, err)
 		assert.Empty(t, serverClass.Spec.Qualifiers)
 		assert.Len(t, append(serverClass.Status.ServersAvailable, serverClass.Status.ServersInUse...), numNodes)
@@ -58,9 +58,9 @@ func TestServerClassAny(ctx context.Context, metalClient client.Client, vmSet *v
 		err = metalClient.Delete(ctx, &serverClass)
 		require.NoError(t, err)
 
-		serverClass = v1alpha1.ServerClass{}
+		serverClass = metalv1.ServerClass{}
 		err = retry.Constant(10 * time.Second).Retry(func() error {
-			if err := metalClient.Get(ctx, types.NamespacedName{Name: v1alpha1.ServerClassAny}, &serverClass); err != nil {
+			if err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.ServerClassAny}, &serverClass); err != nil {
 				if apierrors.IsNotFound(err) {
 					return retry.ExpectedError(err)
 				}
@@ -82,9 +82,9 @@ func TestServerClassAny(ctx context.Context, metalClient client.Client, vmSet *v
 // TestServerClassCreate verifies server class creation.
 func TestServerClassCreate(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
 	return func(t *testing.T) {
-		classSpec := v1alpha1.ServerClassSpec{
-			Qualifiers: v1alpha1.Qualifiers{
-				CPU: []v1alpha1.CPUInformation{
+		classSpec := metalv1.ServerClassSpec{
+			Qualifiers: metalv1.Qualifiers{
+				CPU: []metalv1.CPUInformation{
 					{
 						Manufacturer: "QEMU",
 					},
@@ -138,8 +138,8 @@ func TestServerClassCreate(ctx context.Context, metalClient client.Client, vmSet
 func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluster talos.Cluster, capiManager *capi.Manager) TestFunc {
 	return func(t *testing.T) {
 		// Create dummy serverclass + a server
-		dummySpec := v1alpha1.ServerSpec{
-			CPU: &v1alpha1.CPUInformation{
+		dummySpec := metalv1.ServerSpec{
+			CPU: &metalv1.CPUInformation{
 				Manufacturer: "DummyCPU",
 			},
 			Accepted: true,
@@ -159,16 +159,16 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 
 		installPatch := configPatchToJSON(t, &installConfig)
 
-		classSpec := v1alpha1.ServerClassSpec{
-			ConfigPatches: []v1alpha1.ConfigPatches{
+		classSpec := metalv1.ServerClassSpec{
+			ConfigPatches: []metalv1.ConfigPatches{
 				{
 					Op:    "replace",
 					Path:  "/machine/install",
 					Value: apiextensions.JSON{Raw: installPatch},
 				},
 			},
-			Qualifiers: v1alpha1.Qualifiers{
-				CPU: []v1alpha1.CPUInformation{
+			Qualifiers: metalv1.Qualifiers{
+				CPU: []metalv1.CPUInformation{
 					{
 						Manufacturer: "DummyCPU",
 					},
@@ -279,7 +279,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 
 		time.Sleep(time.Second * 10)
 
-		response := &v1alpha1.Server{}
+		response := &metalv1.Server{}
 
 		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: dummyServer.Name}, response))
 		require.Greater(t, len(response.Finalizers), 0)
@@ -303,8 +303,8 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 	}
 }
 
-func createServerClass(ctx context.Context, metalClient client.Client, name string, spec v1alpha1.ServerClassSpec) (v1alpha1.ServerClass, error) {
-	var retClass v1alpha1.ServerClass
+func createServerClass(ctx context.Context, metalClient client.Client, name string, spec metalv1.ServerClassSpec) (metalv1.ServerClass, error) {
+	var retClass metalv1.ServerClass
 
 	if err := metalClient.Get(ctx, types.NamespacedName{Name: name}, &retClass); err != nil {
 		if !apierrors.IsNotFound(err) {

@@ -12,8 +12,8 @@ import (
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // GetMetalClient builds k8s client with schemes required to access all the CAPI/Sidero/Talos components.
@@ -32,11 +32,11 @@ func GetMetalClient(config *rest.Config) (runtimeclient.Client, error) {
 		return nil, err
 	}
 
-	if err := sidero.AddToScheme(scheme); err != nil {
+	if err := infrav1.AddToScheme(scheme); err != nil {
 		return nil, err
 	}
 
-	if err := metal.AddToScheme(scheme); err != nil {
+	if err := metalv1.AddToScheme(scheme); err != nil {
 		return nil, err
 	}
 

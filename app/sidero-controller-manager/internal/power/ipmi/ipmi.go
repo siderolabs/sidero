@@ -9,7 +9,7 @@ import (
 
 	goipmi "github.com/pensando/goipmi"
 
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
 )
 
@@ -23,7 +23,7 @@ type Client struct {
 }
 
 // NewClient creates an ipmi client to use.
-func NewClient(bmcInfo metalv1alpha1.BMC) (*Client, error) {
+func NewClient(bmcInfo metalv1.BMC) (*Client, error) {
 	conn := &goipmi.Connection{
 		Hostname:  bmcInfo.Endpoint,
 		Port:      int(bmcInfo.Port),

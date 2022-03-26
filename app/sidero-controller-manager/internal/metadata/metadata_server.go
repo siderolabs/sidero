@@ -21,8 +21,8 @@ import (
 	"sigs.k8s.io/cluster-api/util"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 type errorWithCode struct {
@@ -141,7 +141,7 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 
 	// Get the server resource by the UUID that was passed in.
 	// We do this to fetch serverclass and any configPatches in the server resource that we need to handle.
-	serverObj := &metalv1alpha1.Server{}
+	serverObj := &metalv1.Server{}
 
 	err = m.client.Get(
 		ctx,
@@ -169,7 +169,7 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 
 	// Given a server object, see if it came from a serverclass (it will have an ownerref)
 	// If so, fetch the serverclass so we can use configPatches from it.
-	serverClassObj := &metalv1alpha1.ServerClass{}
+	serverClassObj := &metalv1.ServerClass{}
 
 	if serverBinding.Spec.ServerClassRef != nil {
 		err = m.client.Get(
@@ -245,7 +245,7 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // patchConfigs is responsible for applying a set of configPatches to the bootstrap data.
-func patchConfigs(decodedData []byte, patches []metalv1alpha1.ConfigPatches) ([]byte, errorWithCode) {
+func patchConfigs(decodedData []byte, patches []metalv1.ConfigPatches) ([]byte, errorWithCode) {
 	marshalledPatches, err := json.Marshal(patches)
 	if err != nil {
 		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure marshaling config patches from server: %s", err)}
@@ -289,7 +289,7 @@ func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
 			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unable to case config")}
 		}
 
-		patch := metalv1alpha1.ConfigPatches{
+		patch := metalv1.ConfigPatches{
 			Path: "/machine/kubelet/extraArgs",
 			Op:   "replace",
 		}
@@ -313,33 +313,33 @@ func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
 
 		patch.Value.Raw = value
 
-		return patchConfigs(decodedData, []metalv1alpha1.ConfigPatches{patch})
+		return patchConfigs(decodedData, []metalv1.ConfigPatches{patch})
 	default:
 		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unknown config type")}
 	}
 }
 
 // findMetalMachineServerBinding is responsible for looking up ServerBinding and MetalMachine.
-func (m *metadataConfigs) findMetalMachineServerBinding(ctx context.Context, serverName string) (v1alpha3.MetalMachine, v1alpha3.ServerBinding, errorWithCode) {
-	var serverBinding v1alpha3.ServerBinding
+func (m *metadataConfigs) findMetalMachineServerBinding(ctx context.Context, serverName string) (infrav1.MetalMachine, infrav1.ServerBinding, errorWithCode) {
+	var serverBinding infrav1.ServerBinding
 
 	err := m.client.Get(ctx, types.NamespacedName{Name: serverName}, &serverBinding)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			return v1alpha3.MetalMachine{}, v1alpha3.ServerBinding{}, errorWithCode{http.StatusNotFound, fmt.Errorf("server is not allocated (missing serverbinding): %w", err)}
+			return infrav1.MetalMachine{}, infrav1.ServerBinding{}, errorWithCode{http.StatusNotFound, fmt.Errorf("server is not allocated (missing serverbinding): %w", err)}
 		}
 
-		return v1alpha3.MetalMachine{}, v1alpha3.ServerBinding{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure getting server binding: %w", err)}
+		return infrav1.MetalMachine{}, infrav1.ServerBinding{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure getting server binding: %w", err)}
 	}
 
-	var metalMachine v1alpha3.MetalMachine
+	var metalMachine infrav1.MetalMachine
 
 	if err = m.client.Get(ctx, types.NamespacedName{
 		// XXX: where is the namespace in owner refs?
 		Namespace: serverBinding.Spec.MetalMachineRef.Namespace,
 		Name:      serverBinding.Spec.MetalMachineRef.Name,
 	}, &metalMachine); err != nil {
-		return v1alpha3.MetalMachine{}, v1alpha3.ServerBinding{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure getting metalmachine: %w", err)}
+		return infrav1.MetalMachine{}, infrav1.ServerBinding{}, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure getting metalmachine: %w", err)}
 	}
 
 	return metalMachine, serverBinding, errorWithCode{}

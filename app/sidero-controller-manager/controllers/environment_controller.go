@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
 )
 
@@ -48,7 +48,7 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	//nolint:godox
 	// TODO: We probably should use admission webhooks instead (or in additional) to prevent
 	// unwanted edits instead of "fixing" the resource after the fact.
-	if req.Name == metalv1alpha1.EnvironmentDefault {
+	if req.Name == metalv1.EnvironmentDefault {
 		if err := ReconcileEnvironmentDefault(ctx, r.Client, r.TalosRelease, r.APIEndpoint, r.APIPort); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -56,7 +56,7 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		// do not return; re-reconcile it to update status
 	} //nolint:wsl
 
-	var env metalv1alpha1.Environment
+	var env metalv1.Environment
 
 	if err := r.Get(ctx, req.NamespacedName, &env); err != nil {
 		l.Error(err, "failed fetching resource")
@@ -72,7 +72,7 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 
 	var (
-		conditions = []metalv1alpha1.AssetCondition{}
+		conditions = []metalv1.AssetCondition{}
 		wg         sync.WaitGroup
 		mu         sync.Mutex
 		result     *multierror.Error
@@ -80,7 +80,7 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	for _, assetTask := range []struct {
 		BaseName string
-		Asset    metalv1alpha1.Asset
+		Asset    metalv1.Asset
 	}{
 		{
 			BaseName: constants.KernelAsset,
@@ -101,7 +101,7 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 				status = "True"
 			}
 
-			condition := metalv1alpha1.AssetCondition{
+			condition := metalv1.AssetCondition{
 				Asset:  assetTask.Asset,
 				Status: status,
 				Type:   "Ready",
@@ -183,15 +183,15 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 // ReconcileEnvironmentDefault ensures that Environment "default" exist.
 func ReconcileEnvironmentDefault(ctx context.Context, c client.Client, talosRelease, apiEndpoint string, apiPort uint16) error {
 	key := types.NamespacedName{
-		Name: metalv1alpha1.EnvironmentDefault,
+		Name: metalv1.EnvironmentDefault,
 	}
 
-	env := metalv1alpha1.Environment{}
+	env := metalv1.Environment{}
 	err := c.Get(ctx, key, &env)
 
 	if apierrors.IsNotFound(err) {
-		env.Name = metalv1alpha1.EnvironmentDefault
-		env.Spec = *metalv1alpha1.EnvironmentDefaultSpec(talosRelease, apiEndpoint, apiPort)
+		env.Name = metalv1.EnvironmentDefault
+		env.Spec = *metalv1.EnvironmentDefaultSpec(talosRelease, apiEndpoint, apiPort)
 
 		err = c.Create(ctx, &env)
 	}
@@ -206,11 +206,11 @@ func (r *EnvironmentReconciler) SetupWithManager(ctx context.Context, mgr ctrl.M
 
 	return ctrl.NewControllerManagedBy(mgr).
 		WithOptions(options).
-		For(&metalv1alpha1.Environment{}).
+		For(&metalv1.Environment{}).
 		Complete(r)
 }
 
-func save(ctx context.Context, asset metalv1alpha1.Asset, file string) error {
+func save(ctx context.Context, asset metalv1.Asset, file string) error {
 	url := asset.URL
 
 	if url == "" {

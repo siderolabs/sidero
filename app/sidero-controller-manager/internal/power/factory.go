@@ -10,7 +10,7 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/api"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/ipmi"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
@@ -18,7 +18,7 @@ import (
 )
 
 // NewManagementClient builds ManagementClient from the server spec.
-func NewManagementClient(ctx context.Context, client client.Client, spec *v1alpha1.ServerSpec) (metal.ManagementClient, error) {
+func NewManagementClient(ctx context.Context, client client.Client, spec *metalv1.ServerSpec) (metal.ManagementClient, error) {
 	switch {
 	case spec.BMC != nil:
 		var err error

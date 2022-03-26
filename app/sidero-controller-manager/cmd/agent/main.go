@@ -19,8 +19,8 @@ import (
 
 	"github.com/talos-systems/go-blockdevice/blockdevice"
 	"github.com/talos-systems/go-blockdevice/blockdevice/util/disk"
-	debug "github.com/talos-systems/go-debug"
-	kmsg "github.com/talos-systems/go-kmsg"
+	"github.com/talos-systems/go-debug"
+	"github.com/talos-systems/go-kmsg"
 	"github.com/talos-systems/go-procfs/procfs"
 	"github.com/talos-systems/go-retry/retry"
 	"github.com/talos-systems/go-smbios/smbios"
@@ -30,7 +30,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/api"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/ipmi"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
@@ -404,7 +404,7 @@ func attemptBMCIP(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS)
 	bmcInfo := &api.BMCInfo{}
 
 	// Create "open" client
-	bmcSpec := v1alpha1.BMC{
+	bmcSpec := metalv1.BMC{
 		Interface: "open",
 	}
 
@@ -466,7 +466,7 @@ func attemptBMCUserSetup(ctx context.Context, client api.AgentClient, s *smbios.
 	bmcInfo := &api.BMCInfo{}
 
 	// Create "open" client
-	bmcSpec := v1alpha1.BMC{
+	bmcSpec := metalv1.BMC{
 		Interface: "open",
 	}
 

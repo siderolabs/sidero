@@ -13,7 +13,7 @@ import (
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // TestMatchServersMetalMachines verifies that number of metal machines and servers match.
@@ -23,7 +23,7 @@ func TestMatchServersMetalMachines(ctx context.Context, metalClient client.Clien
 
 		require.NoError(t, metalClient.List(ctx, &machines))
 
-		var servers metal.ServerList
+		var servers metalv1.ServerList
 
 		require.NoError(t, metalClient.List(ctx, &servers))
 

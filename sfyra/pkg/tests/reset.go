@@ -15,14 +15,14 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	metal "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	sidero "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // TestServerReset verifies that all the servers got reset.
 func TestServerReset(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
-		var machines metal.MetalMachineList
+		var machines infrav1.MetalMachineList
 
 		labelSelector, err := labels.Parse("cluster.x-k8s.io/cluster-name=management-cluster,cluster.x-k8s.io/deployment-name=management-cluster-workers")
 		require.NoError(t, err)
@@ -44,7 +44,7 @@ func TestServerReset(ctx context.Context, metalClient client.Client) TestFunc {
 		require.NoError(t, err)
 
 		err = retry.Constant(5*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
-			var servers sidero.ServerList
+			var servers metalv1.ServerList
 
 			err = metalClient.List(ctx, &servers)
 			if err != nil {

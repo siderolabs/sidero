@@ -29,7 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
-	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	infrav1alpha3 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/controllers"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/ipxe"
@@ -64,7 +64,7 @@ func init() {
 	_ = capi.AddToScheme(scheme)
 
 	_ = metalv1alpha1.AddToScheme(scheme)
-	_ = infrav1.AddToScheme(scheme)
+	_ = infrav1alpha3.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
 }
 
