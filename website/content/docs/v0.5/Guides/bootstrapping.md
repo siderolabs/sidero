@@ -147,6 +147,7 @@ To install Sidero and the other Talos providers, simply issue:
 
 ```bash
 SIDERO_CONTROLLER_MANAGER_HOST_NETWORK=true \
+  SIDERO_CONTROLLER_MANAGER_DEPLOYMENT_STRATEGY=Recreate \
   SIDERO_CONTROLLER_MANAGER_API_ENDPOINT=$PUBLIC_IP \
   clusterctl init -b talos -c talos -i sidero
 ```
