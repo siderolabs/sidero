@@ -49,6 +49,8 @@ spec:
     matchLabels:
       control-plane: sidero-controller-manager
   replicas: 1
+  strategy:
+    type: ${SIDERO_CONTROLLER_MANAGER_DEPLOYMENT_STRATEGY:=RollingUpdate}
   template:
     metadata:
       labels:

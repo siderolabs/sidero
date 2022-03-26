@@ -104,7 +104,7 @@ kubectl get nodes
 Install Sidero with host network mode, exposing the endpoints on the node's address:
 
 ```bash
-SIDERO_CONTROLLER_MANAGER_HOST_NETWORK=true SIDERO_CONTROLLER_MANAGER_API_ENDPOINT=${SIDERO_IP} clusterctl init -i sidero -b talos -c talos
+SIDERO_CONTROLLER_MANAGER_HOST_NETWORK=true SIDERO_CONTROLLER_MANAGER_DEPLOYMENT_STRATEGY=Recreate SIDERO_CONTROLLER_MANAGER_API_ENDPOINT=${SIDERO_IP} clusterctl init -i sidero -b talos -c talos
 ```
 
 Watch the progress of installation with:
