@@ -1,9 +1,8 @@
 resources:
   - namespace.yaml
-
-bases:
+  - ../app/webhook-server/config/default
   - ../app/caps-controller-manager/config/default
-  - ../app/sidero-controller-manager/config
+  - ../app/sidero-controller-manager/config/default
 
 commonLabels:
   app: sidero

@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-service
+  namespace: system
+spec:
+  ports:
+    - port: 443
+      targetPort: 9443
+  selector:
+    control-plane: webhook-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-server
+  namespace: system
+  labels:
+    control-plane: webhook-server
+spec:
+  selector:
+    matchLabels:
+      control-plane: webhook-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        control-plane: webhook-server
+    spec:
+      containers:
+        - name: webhook-server
+          image: controller:latest
+          imagePullPolicy: Always
+          command:
+            - /webhook-server
+          args:
+            - --metrics-bind-addr=127.0.0.1:8080
+            - --webhook-port=9443
+          ports:
+            - containerPort: 9443
+              name: webhook-server
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 256m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          volumeMounts:
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: cert
+              readOnly: true
+      volumes:
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: $(WEBHOOK_SERVICE_NAME)-cert

@@ -70,6 +70,7 @@ RUN --mount=type=cache,target=/.cache controller-gen \
 FROM scratch AS manifests
 COPY --from=manifests-build /src/app/caps-controller-manager/config ./app/caps-controller-manager/config
 COPY --from=manifests-build /src/app/sidero-controller-manager/config ./app/sidero-controller-manager/config
+COPY --from=manifests-build /src/app/webhook-server/config ./app/webhook-server/config
 
 FROM base AS generate-build
 COPY ./app/sidero-controller-manager/internal/api/api.proto \
@@ -94,12 +95,15 @@ COPY ./config ./config
 COPY ./templates ./templates
 COPY ./app/caps-controller-manager/config ./app/caps-controller-manager/config
 COPY ./app/sidero-controller-manager/config ./app/sidero-controller-manager/config
+COPY ./app/webhook-server/config ./app/webhook-server/config
 ARG REGISTRY_AND_USERNAME
 ARG TAG
 RUN cd ./app/caps-controller-manager/config/manager \
   && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/caps-controller-manager:${TAG}
 RUN cd ./app/sidero-controller-manager/config/manager \
   && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/sidero-controller-manager:${TAG}
+RUN cd ./app/webhook-server/config/webhook-server \
+  && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/webhook-server:${TAG}
 RUN kustomize build config > /infrastructure-components.yaml \
   && cp ./config/metadata/metadata.yaml /metadata.yaml \
   && cp ./templates/cluster-template.yaml /cluster-template.yaml
@@ -216,6 +220,23 @@ COPY --from=build-events-manager /events-manager /events-manager
 FROM sidero-controller-manager-image AS sidero-controller-manager
 LABEL org.opencontainers.image.source https://github.com/siderolabs/sidero
 ENTRYPOINT [ "/manager" ]
+
+FROM base AS build-webhook-server
+ARG TALOS_RELEASE
+ARG TARGETARCH
+ARG GO_BUILDFLAGS
+ARG GO_LDFLAGS
+RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X main.TalosRelease=${TALOS_RELEASE}" -o /webhook-server ./app/webhook-server
+RUN chmod +x /webhook-server
+
+FROM scratch AS webhook-server
+COPY --from=pkg-ca-certificates / /
+COPY --from=pkg-fhs / /
+COPY --from=pkg-musl / /
+COPY --from=pkg-libressl / /
+COPY --from=build-webhook-server /webhook-server /webhook-server
+LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
+ENTRYPOINT [ "/webhook-server" ]
 
 FROM base AS unit-tests-runner
 ARG TEST_PKGS

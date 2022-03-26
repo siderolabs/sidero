@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: sidero-system
+
+namePrefix: sidero-
+
+# Labels to add to all resources and selectors.
+commonLabels:
+  cluster.x-k8s.io/provider: "infrastructure-sidero"
+
+resources:
+  - ../crd
+  - ../rbac
+  - ../manager
+# [PROMETHEUS] To enable prometheus monitor, uncomment all sections with 'PROMETHEUS'.
+#- ../prometheus
+
+#patchesStrategicMerge:
+    # Protect the /metrics endpoint by putting it behind auth.
+    # Only one of manager_auth_proxy_patch.yaml and
+    # manager_prometheus_metrics_patch.yaml should be enabled.
+    #- manager_auth_proxy_patch.yaml
+    # If you want your controller-manager to expose the /metrics
+    # endpoint w/o any authn/z, uncomment the following line and
+    # comment manager_auth_proxy_patch.yaml.
+    # Only one of manager_auth_proxy_patch.yaml and
+    # manager_prometheus_metrics_patch.yaml should be enabled.
+    #- manager_prometheus_metrics_patch.yaml

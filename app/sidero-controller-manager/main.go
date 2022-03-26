@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	debug "github.com/talos-systems/go-debug"
+	"github.com/talos-systems/go-debug"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	corev1 "k8s.io/api/core/v1"
@@ -23,7 +23,7 @@ import (
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/tools/record"
-	capi "sigs.k8s.io/cluster-api/api/v1beta1"
+	capiv1beta1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -61,7 +61,7 @@ var (
 //nolint:wsl
 func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
-	_ = capi.AddToScheme(scheme)
+	_ = capiv1beta1.AddToScheme(scheme)
 
 	_ = metalv1alpha1.AddToScheme(scheme)
 	_ = infrav1alpha3.AddToScheme(scheme)
@@ -334,7 +334,7 @@ func setupChecks(mgr ctrl.Manager, httpPort int) {
 		os.Exit(1)
 	}
 
-	if err := mgr.AddHealthzCheck("webhook", ipxe.Check(addr)); err != nil {
+	if err := mgr.AddHealthzCheck("ipxe", ipxe.Check(addr)); err != nil {
 		setupLog.Error(err, "unable to create health check")
 		os.Exit(1)
 	}

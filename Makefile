@@ -56,7 +56,7 @@ COMMON_ARGS += --build-arg=CGO_ENABLED=$(CGO_ENABLED)
 COMMON_ARGS += --build-arg=GO_BUILDFLAGS="$(GO_BUILDFLAGS)"
 COMMON_ARGS += --build-arg=GO_LDFLAGS="$(GO_LDFLAGS)"
 
-all: manifests generate caps-controller-manager sidero-controller-manager sfyra
+all: manifests generate caps-controller-manager sidero-controller-manager webhook-server sfyra
 
 
 # Help Menu
@@ -137,6 +137,10 @@ caps-controller-manager: ## Build the CAPI provider container image.
 
 .PHONY: sidero-controller-manager
 sidero-controller-manager: ## Build the CAPI provider container image.
+	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
+
+.PHONY: webhook-server
+webhook-server: ## Build the webhook server container image.
 	@$(MAKE) docker-$@ TARGET_ARGS="--push=$(PUSH)" NAME="$@"
 
 .PHONY: release-notes

@@ -8,15 +8,16 @@ import (
 	"context"
 	"flag"
 	"os"
+	"sigs.k8s.io/controller-runtime/pkg/healthz"
 
-	debug "github.com/talos-systems/go-debug"
+	"github.com/talos-systems/go-debug"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	cgrecord "k8s.io/client-go/tools/record"
-	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	capiv1beta1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -41,7 +42,7 @@ var (
 //nolint:wsl
 func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
-	_ = capiv1.AddToScheme(scheme)
+	_ = capiv1beta1.AddToScheme(scheme)
 	_ = infrav1alpha2.AddToScheme(scheme)
 	_ = infrav1alpha3.AddToScheme(scheme)
 	_ = metalv1alpha1.AddToScheme(scheme)
@@ -53,14 +54,12 @@ func main() {
 		metricsAddr          string
 		healthAddr           string
 		enableLeaderElection bool
-		webhookPort          int
 	)
 
 	flag.StringVar(&metricsAddr, "metrics-bind-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&healthAddr, "health-addr", ":9440", "The address the health endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", true,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
-	flag.IntVar(&webhookPort, "webhook-port", 9443, "Webhook Server port, disabled by default. When enabled, the manager will only work as webhook server, no reconcilers are installed.")
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(func(o *zap.Options) {
@@ -88,7 +87,7 @@ func main() {
 		MetricsBindAddress:     metricsAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "controller-leader-election-capm",
-		Port:                   webhookPort,
+		Port:                   9443,
 		EventBroadcaster:       broadcaster,
 		HealthProbeBindAddress: healthAddr,
 	})
@@ -143,26 +142,6 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "ServerBinding")
 		os.Exit(1)
 	}
-
-	if err = (&infrav1alpha3.MetalCluster{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "MetalCluster")
-		os.Exit(1)
-	}
-
-	if err = (&infrav1alpha3.MetalMachine{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "MetalMachine")
-		os.Exit(1)
-	}
-
-	if err = (&infrav1alpha3.MetalMachineTemplate{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "MetalMachineTemplate")
-		os.Exit(1)
-	}
-
-	if err = (&infrav1alpha3.ServerBinding{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "ServerBinding")
-		os.Exit(1)
-	}
 	// +kubebuilder:scaffold:builder
 
 	setupChecks(mgr)
@@ -176,12 +155,12 @@ func main() {
 }
 
 func setupChecks(mgr ctrl.Manager) {
-	if err := mgr.AddReadyzCheck("webhook", mgr.GetWebhookServer().StartedChecker()); err != nil {
+	if err := mgr.AddReadyzCheck("ping", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to create ready check")
 		os.Exit(1)
 	}
 
-	if err := mgr.AddHealthzCheck("webhook", mgr.GetWebhookServer().StartedChecker()); err != nil {
+	if err := mgr.AddHealthzCheck("ping", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to create health check")
 		os.Exit(1)
 	}
