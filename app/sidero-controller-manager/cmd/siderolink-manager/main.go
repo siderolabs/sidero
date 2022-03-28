@@ -13,6 +13,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -57,6 +58,17 @@ func main() {
 	}
 
 	if err := run(); err != nil {
+		if strings.Contains(err.Error(), "netlink receive: permission denied") {
+			log.Printf("SideroLink is not available: failed to set up wireguard connection: %s. CAPI machines won't have address information. Please use init nodes to set up the cluster. Sleeping forever.", err)
+
+			ctx := context.Background()
+
+			signal.NotifyContext(ctx, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
+			<-ctx.Done()
+
+			return
+		}
+
 		fmt.Fprintf(os.Stderr, "error: %s", err)
 		os.Exit(1)
 	}

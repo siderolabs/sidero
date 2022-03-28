@@ -48,10 +48,10 @@ sudo chmod +x /usr/local/bin/clusterctl
 The `talosctl` tool is used to interact with the Talos (our Kubernetes-focused
 operating system) API.
 The latest version can be found on our
-[Releases](https://github.com/talos-systems/talos/releases) page.
+[Releases](https://github.com/siderolabs/talos/releases) page.
 
 ```bash
 sudo curl -Lo /usr/local/bin/talosctl \
- "https://github.com/talos-systems/talos/releases/latest/download/talosctl-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64"
+ "https://github.com/siderolabs/talos/releases/latest/download/talosctl-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64"
 chmod +x /usr/local/bin/talosctl
 ```

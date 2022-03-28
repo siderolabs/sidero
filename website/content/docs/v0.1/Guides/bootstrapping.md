@@ -18,7 +18,7 @@ Talos Systems and the Cluster API community have created tools to help make this
 First, you need to install the latest `talosctl` by running the following script:
 
 ```bash
-curl -Lo /usr/local/bin/talosctl https://github.com/talos-systems/talos/releases/latest/download/talosctl-$(uname -s | tr "[:upper:]" "[:lower:]")-amd64
+curl -Lo /usr/local/bin/talosctl https://github.com/siderolabs/talos/releases/latest/download/talosctl-$(uname -s | tr "[:upper:]" "[:lower:]")-amd64
 chmod +x /usr/local/bin/talosctl
 ```
 
@@ -196,7 +196,7 @@ metadata:
   name: default
 spec:
   kernel:
-    url: "https://github.com/talos-systems/talos/releases/latest/download/vmlinuz-amd64"
+    url: "https://github.com/siderolabs/talos/releases/latest/download/vmlinuz-amd64"
     sha512: ""
     args:
       - initrd=initramfs.xz
@@ -216,7 +216,7 @@ spec:
       - talos.platform=metal
       - talos.config=http://$PUBLIC_IP:9091/configdata?uuid=
   initrd:
-    url: "https://github.com/talos-systems/talos/releases/latest/download/initramfs-amd64.xz"
+    url: "https://github.com/siderolabs/talos/releases/latest/download/initramfs-amd64.xz"
     sha512: ""
 EOF
 ```

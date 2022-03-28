@@ -6,7 +6,7 @@ title: Resources
 
 Sidero, the Talos bootstrap/controlplane providers, and Cluster API each provide several custom resources (CRDs) to Kubernetes.
 These CRDs are crucial to understanding the connections between each provider and in troubleshooting problems.
-It may also help to look at the [cluster template](https://github.com/talos-systems/sidero/blob/master/templates/cluster-template.yaml) to get an idea of the relationships between these.
+It may also help to look at the [cluster template](https://github.com/siderolabs/sidero/blob/master/templates/cluster-template.yaml) to get an idea of the relationships between these.
 
 ---
 

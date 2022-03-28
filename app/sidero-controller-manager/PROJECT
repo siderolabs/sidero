@@ -1,5 +1,5 @@
 domain: sidero.dev
-repo: github.com/talos-systems/sidero/app/sidero-controller-manager
+repo: github.com/siderolabs/sidero/app/sidero-controller-manager
 resources:
 - group: metal
   kind: Environment

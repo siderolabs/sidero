@@ -61,12 +61,12 @@ func DefaultOptions() Options {
 		BootstrapClusterName:    "sfyra",
 		BootstrapTalosVmlinuz:   fmt.Sprintf("_out/%s/vmlinuz-amd64", TalosRelease),
 		BootstrapTalosInitramfs: fmt.Sprintf("_out/%s/initramfs-amd64.xz", TalosRelease),
-		BootstrapTalosInstaller: fmt.Sprintf("ghcr.io/talos-systems/installer:%s", TalosRelease),
-		BootstrapCNIBundleURL:   fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/talosctl-cni-bundle-%s.tar.gz", TalosRelease, "amd64"),
+		BootstrapTalosInstaller: fmt.Sprintf("ghcr.io/siderolabs/installer:%s", TalosRelease),
+		BootstrapCNIBundleURL:   fmt.Sprintf("https://github.com/siderolabs/talos/releases/download/%s/talosctl-cni-bundle-%s.tar.gz", TalosRelease, "amd64"),
 		BootstrapCIDR:           "172.24.0.0/24",
 
-		TalosKernelURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz-amd64", TalosRelease),
-		TalosInitrdURL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs-amd64.xz", TalosRelease),
+		TalosKernelURL: fmt.Sprintf("https://github.com/siderolabs/talos/releases/download/%s/vmlinuz-amd64", TalosRelease),
+		TalosInitrdURL: fmt.Sprintf("https://github.com/siderolabs/talos/releases/download/%s/initramfs-amd64.xz", TalosRelease),
 
 		CoreProvider:            "cluster-api",
 		BootstrapProviders:      []string{"talos"},

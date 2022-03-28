@@ -16,7 +16,7 @@ module.exports = {
     description: "A bare metal provisioning system for managing Kubernetes clusters",
     web: process.env.URL_WEB || false,
     twitter: "https://twitter.com/SideroLabs",
-    github: "https://github.com/talos-systems/sidero",
+    github: "https://github.com/siderolabs/sidero",
     nav: {
       links: [{ path: "", title: "Docs" }],
     },

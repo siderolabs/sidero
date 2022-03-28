@@ -61,9 +61,9 @@ first line under the Pi logo will be something like the following:
 
 Write down the 8 character serial.
 
-### talos-systems/pkg
+### siderolabs/pkg
 
-Clone the [talos-systems/pkg](https://github.com/talos-systems/pkgs) repo.
+Clone the [siderolabs/pkg](https://github.com/siderolabs/pkgs) repo.
 Create a new folder called `raspberrypi4-uefi` and `raspberrypi4-uefi/serials`.
 Create a file `raspberrypi4-uefi/pkg.yaml` containing the following:
 

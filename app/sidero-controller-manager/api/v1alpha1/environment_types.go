@@ -84,13 +84,13 @@ func EnvironmentDefaultSpec(talosRelease, apiEndpoint string, apiPort uint16) *E
 	return &EnvironmentSpec{
 		Kernel: Kernel{
 			Asset: Asset{
-				URL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz-amd64", talosRelease),
+				URL: fmt.Sprintf("https://github.com/siderolabs/talos/releases/download/%s/vmlinuz-amd64", talosRelease),
 			},
 			Args: args,
 		},
 		Initrd: Initrd{
 			Asset: Asset{
-				URL: fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs-amd64.xz", talosRelease),
+				URL: fmt.Sprintf("https://github.com/siderolabs/talos/releases/download/%s/initramfs-amd64.xz", talosRelease),
 			},
 		},
 	}

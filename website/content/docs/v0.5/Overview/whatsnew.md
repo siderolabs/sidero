@@ -14,7 +14,7 @@ Sidero ships with new cluster template without `init` nodes.
 This template is only compatible with Talos >= 0.14 (it requires SideroLink feature which was introduced in Talos 0.14).
 
 On upgrade, Sidero supports clusters running Talos < 0.14 if they were created before the upgrade.
-Use [legacy template](https://github.com/talos-systems/sidero/blob/release-0.4/templates/cluster-template.yaml) to deploy clusters with Talos < 0.14.
+Use [legacy template](https://github.com/siderolabs/sidero/blob/release-0.4/templates/cluster-template.yaml) to deploy clusters with Talos < 0.14.
 
 ### New `MetalMachines` Conditions
 

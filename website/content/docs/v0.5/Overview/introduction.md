@@ -22,8 +22,8 @@ Sidero Metal is currently made up of two components:
 Sidero Metal also needs these co-requisites in order to be useful:
 
 - [Cluster API](https://github.com/kubernetes-sigs/cluster-api)
-- [Cluster API Control Plane Provider Talos](https://github.com/talos-systems/cluster-api-control-plane-provider-talos)
-- [Cluster API Bootstrap Provider Talos](https://github.com/talos-systems/cluster-api-bootstrap-provider-talos)
+- [Cluster API Control Plane Provider Talos](https://github.com/siderolabs/cluster-api-control-plane-provider-talos)
+- [Cluster API Bootstrap Provider Talos](https://github.com/siderolabs/cluster-api-bootstrap-provider-talos)
 
 All components mentioned above can be installed using Cluster API's `clusterctl` tool.
 See the [Getting Started](../../getting-started/) for more details.

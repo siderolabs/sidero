@@ -1,5 +1,5 @@
 REGISTRY ?= ghcr.io
-USERNAME ?= talos-systems
+USERNAME ?= siderolabs
 SHA ?= $(shell git describe --match=none --always --abbrev=8 --dirty)
 TAG ?= $(shell git describe --tag --always --dirty)
 BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
@@ -13,7 +13,7 @@ TALOS_RELEASE ?= v0.14.1
 PREVIOUS_TALOS_RELEASE ?= v0.13.4
 DEFAULT_K8S_VERSION ?= v1.22.3
 
-TOOLS ?= ghcr.io/talos-systems/tools:v0.10.0-alpha.0-3-g4c9e7a4
+TOOLS ?= ghcr.io/siderolabs/tools:v1.0.0
 PKGS ?= v0.10.0-alpha.0-24-g6019223
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
@@ -148,7 +148,7 @@ release-notes:
 
 $(ARTIFACTS)/$(TALOS_RELEASE)/%:
 	@mkdir -p $(ARTIFACTS)/$(TALOS_RELEASE)/
-	@curl -L -o "$(ARTIFACTS)/$(TALOS_RELEASE)/$*" "https://github.com/talos-systems/talos/releases/download/$(TALOS_RELEASE)/$*"
+	@curl -L -o "$(ARTIFACTS)/$(TALOS_RELEASE)/$*" "https://github.com/siderolabs/talos/releases/download/$(TALOS_RELEASE)/$*"
 
 .PHONY: $(ARTIFACTS)/$(TALOS_RELEASE)
 $(ARTIFACTS)/$(TALOS_RELEASE): $(ARTIFACTS)/$(TALOS_RELEASE)/vmlinuz-amd64 $(ARTIFACTS)/$(TALOS_RELEASE)/initramfs-amd64.xz $(ARTIFACTS)/$(TALOS_RELEASE)/talosctl-linux-amd64
@@ -224,7 +224,7 @@ unit-tests-race: ## Performs unit tests with race detection enabled.
 
 .PHONY: conformance
 conformance: ## Performs policy checks against the commit and source code.
-	docker run --rm -it -v $(PWD):/src -w /src ghcr.io/talos-systems/conform:v0.1.0-alpha.22 enforce
+	docker run --rm -it -v $(PWD):/src -w /src ghcr.io/siderolabs/conform:v0.1.0-alpha.22 enforce
 
 .PHONY: clean
 clean:

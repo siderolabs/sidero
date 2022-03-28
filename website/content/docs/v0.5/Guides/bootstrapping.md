@@ -18,7 +18,7 @@ Talos Systems and the Cluster API community have created tools to help make this
 First, you need to install the latest `talosctl` by running the following script:
 
 ```bash
-curl -Lo /usr/local/bin/talosctl https://github.com/talos-systems/talos/releases/latest/download/talosctl-$(uname -s | tr "[:upper:]" "[:lower:]")-amd64
+curl -Lo /usr/local/bin/talosctl https://github.com/siderolabs/talos/releases/latest/download/talosctl-$(uname -s | tr "[:upper:]" "[:lower:]")-amd64
 chmod +x /usr/local/bin/talosctl
 ```
 
@@ -115,6 +115,8 @@ We're really looking for the IP of your machine, not the IP of the node on the d
 ```bash
 export PUBLIC_IP="192.168.1.150"
 ```
+
+> Note: Before you create the local cluster you should ensure that wireguard module is installed on your host OS.
 
 We can now create our Docker cluster.
 Issue the following to create a single-node cluster:

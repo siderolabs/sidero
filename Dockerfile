@@ -7,25 +7,25 @@ ARG PKGS
 
 # Resolve package images using ${PKGS} to be used later in COPY --from=.
 
-FROM ghcr.io/talos-systems/ca-certificates:${PKGS} AS pkg-ca-certificates
-FROM ghcr.io/talos-systems/fhs:${PKGS} AS pkg-fhs
-FROM ghcr.io/talos-systems/ipmitool:${PKGS} AS pkg-ipmitool
-FROM --platform=amd64 ghcr.io/talos-systems/ipmitool:${PKGS} AS pkg-ipmitool-amd64
-FROM --platform=arm64 ghcr.io/talos-systems/ipmitool:${PKGS} AS pkg-ipmitool-arm64
-FROM ghcr.io/talos-systems/libressl:${PKGS} AS pkg-libressl
-FROM --platform=amd64 ghcr.io/talos-systems/libressl:${PKGS} AS pkg-libressl-amd64
-FROM --platform=arm64 ghcr.io/talos-systems/libressl:${PKGS} AS pkg-libressl-arm64
-FROM --platform=amd64 ghcr.io/talos-systems/linux-firmware:${PKGS} AS pkg-linux-firmware-amd64
-FROM --platform=arm64 ghcr.io/talos-systems/linux-firmware:${PKGS} AS pkg-linux-firmware-arm64
-FROM ghcr.io/talos-systems/musl:${PKGS} AS pkg-musl
-FROM --platform=amd64 ghcr.io/talos-systems/musl:${PKGS} AS pkg-musl-amd64
-FROM --platform=arm64 ghcr.io/talos-systems/musl:${PKGS} AS pkg-musl-arm64
-FROM --platform=amd64 ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel-amd64
-FROM --platform=arm64 ghcr.io/talos-systems/kernel:${PKGS} AS pkg-kernel-arm64
-FROM ghcr.io/talos-systems/liblzma:${PKGS} AS pkg-liblzma
-FROM ghcr.io/talos-systems/ipxe:${PKGS} AS pkg-ipxe
-FROM --platform=amd64 ghcr.io/talos-systems/ipxe:${PKGS} AS pkg-ipxe-amd64
-FROM --platform=arm64 ghcr.io/talos-systems/ipxe:${PKGS} AS pkg-ipxe-arm64
+FROM ghcr.io/siderolabs/ca-certificates:${PKGS} AS pkg-ca-certificates
+FROM ghcr.io/siderolabs/fhs:${PKGS} AS pkg-fhs
+FROM ghcr.io/siderolabs/ipmitool:${PKGS} AS pkg-ipmitool
+FROM --platform=amd64 ghcr.io/siderolabs/ipmitool:${PKGS} AS pkg-ipmitool-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/ipmitool:${PKGS} AS pkg-ipmitool-arm64
+FROM ghcr.io/siderolabs/libressl:${PKGS} AS pkg-libressl
+FROM --platform=amd64 ghcr.io/siderolabs/libressl:${PKGS} AS pkg-libressl-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/libressl:${PKGS} AS pkg-libressl-arm64
+FROM --platform=amd64 ghcr.io/siderolabs/linux-firmware:${PKGS} AS pkg-linux-firmware-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/linux-firmware:${PKGS} AS pkg-linux-firmware-arm64
+FROM ghcr.io/siderolabs/musl:${PKGS} AS pkg-musl
+FROM --platform=amd64 ghcr.io/siderolabs/musl:${PKGS} AS pkg-musl-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/musl:${PKGS} AS pkg-musl-arm64
+FROM --platform=amd64 ghcr.io/siderolabs/kernel:${PKGS} AS pkg-kernel-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/kernel:${PKGS} AS pkg-kernel-arm64
+FROM ghcr.io/siderolabs/liblzma:${PKGS} AS pkg-liblzma
+FROM ghcr.io/siderolabs/ipxe:${PKGS} AS pkg-ipxe
+FROM --platform=amd64 ghcr.io/siderolabs/ipxe:${PKGS} AS pkg-ipxe-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/ipxe:${PKGS} AS pkg-ipxe-arm64
 
 # The base target provides the base for running various tasks against the source
 # code
@@ -117,7 +117,7 @@ ARG GO_LDFLAGS
 RUN --mount=type=cache,target=/.cache GOOS=linux GOARCH=${TARGETARCH} go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS}" -o /manager ./app/caps-controller-manager
 RUN chmod +x /manager
 
-## TODO(rsmitty): make bmc pkg and move to talos-systems image
+## TODO(rsmitty): make bmc pkg and move to siderolabs image
 FROM scratch AS caps-controller-manager
 COPY --from=pkg-ca-certificates / /
 COPY --from=pkg-fhs / /
@@ -125,7 +125,7 @@ COPY --from=pkg-musl / /
 COPY --from=pkg-libressl / /
 COPY --from=pkg-ipmitool / /
 COPY --from=build-caps-controller-manager /manager /manager
-LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
+LABEL org.opencontainers.image.source https://github.com/siderolabs/sidero
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS build-sidero-controller-manager
@@ -214,7 +214,7 @@ COPY --from=build-log-receiver /log-receiver /log-receiver
 COPY --from=build-events-manager /events-manager /events-manager
 
 FROM sidero-controller-manager-image AS sidero-controller-manager
-LABEL org.opencontainers.image.source https://github.com/talos-systems/sidero
+LABEL org.opencontainers.image.source https://github.com/siderolabs/sidero
 ENTRYPOINT [ "/manager" ]
 
 FROM base AS unit-tests-runner

@@ -6,7 +6,7 @@ Welcome to the Sidero documentation.
 
 ## Community
 
-- Slack: Join our [slack channel](https://slack.dev.talos-systems.io)
+- Slack: Join our [slack channel](https://slack.dev.siderolabs.io)
 - Forum: [community](https://groups.google.com/a/SideroLabs.com/forum/#!forum/community)
 - Twitter: [@SideroLabs](https://twitter.com/SideroLabs)
 - Email: [info@SideroLabs.com](mailto:info@SideroLabs.com)

@@ -1,5 +1,5 @@
 domain: cluster.x-k8s.io
-repo: github.com/talos-systems/sidero/app/caps-controller-manager
+repo: github.com/siderolabs/sidero/app/caps-controller-manager
 resources:
 - group: infrastructure
   kind: MetalCluster

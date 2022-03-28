@@ -6,10 +6,10 @@ Welcome to the Sidero documentation.
 
 ## Community
 
-- Slack: Join our [slack channel](https://slack.dev.talos-systems.io)
+- Slack: Join our [slack channel](https://slack.dev.siderolabs.io)
 - Forum: [community](https://groups.google.com/a/SideroLabs.com/forum/#!forum/community)
 - Twitter: [@talossystems](https://twitter.com/SideroLabs)
-- Email: [info@talos-systems.com](mailto:info@SideroLabs.com)
+- Email: [info@siderolabs.com](mailto:info@SideroLabs.com)
 
 If you're interested in this project and would like to help in engineering efforts, or have general usage questions, we are happy to have you!
 We hold a weekly meeting that all audiences are welcome to attend.
