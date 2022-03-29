@@ -1,0 +1,55 @@
+<!--- https://aaronluna.dev/blog/add-copy-button-to-code-blocks-hugo-chroma/ -->
+{{ if (findRE "<pre" .Content 1) }}
+    <script src="/js/clipboard.js"></script>
+{{ end }}
+
+{{ $currentVersion := index (split .Page.File.Dir "/" ) 0 }}
+{{ $currentVersionDir := $currentVersion | printf "/%s"}}
+
+<script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
+
+<!--
+this targets the facets of algolia search to only return the version you're actively looking at
+except in the case of not having a version (being on the main page) and then it'll return "latest".
+-->
+{{ if ne $currentVersion "" }}
+<script>
+  docsearch({
+    appId: "D72DGJBSSA",
+    apiKey: "49ca9541d72f7814b88a3a9204988360",
+    indexName: "talos",
+    container: '#algolia-search',
+    debug: true,
+    searchParameters: {
+      facetFilters: ['version:{{ $currentVersion}}'],
+    },
+  });
+</script>
+{{ else }}
+<script>
+  docsearch({
+    appId: "D72DGJBSSA",
+    apiKey: "49ca9541d72f7814b88a3a9204988360",
+    indexName: "talos",
+    container: '#algolia-search',
+    debug: true,
+    searchParameters: {
+      facetFilters: ['version:latest'],
+    },
+  });
+</script>
+{{ end }}
+
+
+<!--
+tag all content with its corresponding version.
+the "not equal" handles the case where there is no version on the main landing page 
+the "equal" handles whether we also tag this content as "latest"
+-->
+{{ if ne $currentVersion "" }}
+{{ if eq $currentVersionDir site.Params.url_latest_version }}
+<meta name="docsearch:version" content="latest,{{ $currentVersion }}" />
+{{else}}
+<meta name="docsearch:version" content="{{ $currentVersion }}" />
+{{end}}
+{{ end }}

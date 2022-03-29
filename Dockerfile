@@ -262,21 +262,23 @@ RUN npm i -g textlint-rule-one-sentence-per-line@1.0.2
 WORKDIR /src
 COPY . .
 RUN markdownlint \
-  --ignore '**/LICENCE.md' \
-  --ignore '**/CHANGELOG.md' \
-  --ignore '**/CODE_OF_CONDUCT.md' \
-  --ignore '**/node_modules/**' \
-  --ignore '**/hack/chglog/**' \
-  .
+    --ignore '**/LICENCE.md' \
+    --ignore '**/CHANGELOG.md' \
+    --ignore '**/CODE_OF_CONDUCT.md' \
+    --ignore '**/node_modules/**' \
+    --ignore '**/hack/chglog/**' \
+    --ignore 'website/themes/**' \
+    .
 RUN find . \
-  -name '*.md' \
-  -not -path './LICENCE.md' \
-  -not -path './CHANGELOG.md' \
-  -not -path './CODE_OF_CONDUCT.md' \
-  -not -path '*/node_modules/*' \
-  -not -path './hack/chglog/**' \
-  -print0 \
-  | xargs -0 textlint
+    -name '*.md' \
+    -not -path './LICENCE.md' \
+    -not -path './CHANGELOG.md' \
+    -not -path './CODE_OF_CONDUCT.md' \
+    -not -path '*/node_modules/*' \
+    -not -path './hack/chglog/**' \
+    -not -path './website/themes/**' \
+    -print0 \
+    | xargs -0 textlint
 
 #
 # The sfyra-build target builds the Sfyra source.
