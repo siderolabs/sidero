@@ -14,8 +14,11 @@ This provider's versions are compatible with the following versions of Cluster A
 
 |                              | v1alpha3 (v0.3) | v1alpha4 (v0.4) | v1beta1 (v1.0) |
 | ---------------------------- | --------------- | --------------- | -------------- |
-| Sidero Provider v1alpha3 (v0.3) | ✓               |                 |                |
-| Sidero Provider v1alpha3 (v0.4) |                 | ✓               |                |
+|                        | v1alpha3 (v0.3) | v1alpha4 (v0.4) | v1beta1 (v1.x) |
+| ---------------------- | --------------- | --------------- | -------------- |
+| Sidero Provider (v0.3) | ✓               |                 |                |
+| Sidero Provider (v0.4) |                 | ✓               |                |
+| Sidero Provider (v0.5) |                 |                 | ✓              |
 
 This provider's versions are able to install and manage the following versions of Kubernetes:
 
@@ -26,10 +29,13 @@ This provider's versions are able to install and manage the following versions o
 
 This provider's versions are compatible with the following versions of Talos:
 
-|                              | v0.11 | v 0.12 | v0.13 |
-| ---------------------------- | ----- | ------ | ----- |
-| Sidero Provider v1alpha3 (v0.3) | ✓     | ✓      |       |
-| Sidero Provider v1alpha3 (v0.4) | ✓     | ✓      | ✓     |
+|                        | v0.11 | v0.12  | v0.13 | v0.14 | v1.0  |
+| ---------------------- | ----- | ------ | ----- | ----- | ----- |
+| Sidero Provider (v0.3) | ✓     | ✓      |       |       |       |
+| Sidero Provider (v0.4) | ✓     | ✓      | ✓     | ✓     |       |
+| Sidero Provider (v0.5) |       | ✓ (+)  | ✓ (+) | ✓     | ✓     |
+
+> (+): Some Sidero 0.5 features (SideroLink) are only available with Talos v0.14+.
 
 ## Support
 
