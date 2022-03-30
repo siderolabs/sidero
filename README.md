@@ -12,7 +12,7 @@ Visit the project [site](https://www.sidero.dev).
 
 This provider's versions are compatible with the following versions of Cluster API:
 
-|                        | v1alpha3 (v0.3) | v1alpha4 (v0.4) | v1beta1 (v1.0) |
+|                        | v1alpha3 (v0.3) | v1alpha4 (v0.4) | v1beta1 (v1.x) |
 | ---------------------- | --------------- | --------------- | -------------- |
 | Sidero Provider (v0.3) | ✓               |                 |                |
 | Sidero Provider (v0.4) |                 | ✓               |                |
@@ -28,11 +28,11 @@ This provider's versions are able to install and manage the following versions o
 
 This provider's versions are compatible with the following versions of Talos:
 
-|                        | v0.11 | v 0.12 | v0.13 | v0.14 |
-| ---------------------- | ----- | ------ | ----- | ----- |
-| Sidero Provider (v0.3) | ✓     | ✓      |       |       |
-| Sidero Provider (v0.4) | ✓     | ✓      | ✓     | ✓     |
-| Sidero Provider (v0.5) |       | ✓ (+)  | ✓ (+) | ✓     |
+|                        | v0.11 | v0.12  | v0.13 | v0.14 | v1.0  |
+| ---------------------- | ----- | ------ | ----- | ----- | ----- |
+| Sidero Provider (v0.3) | ✓     | ✓      |       |       |       |
+| Sidero Provider (v0.4) | ✓     | ✓      | ✓     | ✓     |       |
+| Sidero Provider (v0.5) |       | ✓ (+)  | ✓ (+) | ✓     | ✓     |
 
 > (+): Some Sidero 0.5 features (SideroLink) are only available with Talos v0.14+.
 

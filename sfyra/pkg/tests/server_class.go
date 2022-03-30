@@ -286,9 +286,9 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 
 		switch configProvider.Version() {
 		case "v1alpha1":
-			config, ok := configProvider.(*talosconfig.Config)
+			config, ok := configProvider.Raw().(*talosconfig.Config)
 			if !ok {
-				t.Error("unable to case config")
+				t.Error("unable to cast config")
 			}
 
 			require.Len(t, config.MachineConfig.MachineInstall.InstallExtraKernelArgs, 1)

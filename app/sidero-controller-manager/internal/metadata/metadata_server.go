@@ -284,7 +284,7 @@ func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
 
 	switch configProvider.Version() {
 	case "v1alpha1":
-		config, ok := configProvider.(*v1alpha1.Config)
+		config, ok := configProvider.Raw().(*v1alpha1.Config)
 		if !ok {
 			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unable to case config")}
 		}
