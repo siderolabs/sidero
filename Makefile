@@ -14,7 +14,7 @@ PREVIOUS_TALOS_RELEASE ?= v0.13.4
 DEFAULT_K8S_VERSION ?= v1.22.3
 
 TOOLS ?= ghcr.io/siderolabs/tools:v1.0.0-1-g4c77d96
-PKGS ?= v1.0.0-6-g7c293d5
+PKGS ?= v1.1.0-alpha.0-17-g4dace49
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 
