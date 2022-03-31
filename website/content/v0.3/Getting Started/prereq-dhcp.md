@@ -42,7 +42,7 @@ options:
 
 In the ISC DHCP server, these options look like:
 
-```config
+```text
 next-server 172.16.199.50;
 filename "ipxe.efi";
 ```
@@ -64,7 +64,7 @@ In our example below, `172.16.199.50` is the IP address of our Sidero service.
 
 `ipxe-metal.conf`:
 
-```config
+```text
 allow bootp;
 allow booting;
 
@@ -100,7 +100,7 @@ class "httpclients" {
 Once this file is created, we can include it from our main `dhcpd.conf` inside a
 `subnet` section.
 
-```config
+```text
 shared-network sidero {
   subnet 172.16.199.0 netmask 255.255.255.0 {
     option domain-name-servers 8.8.8.8, 1.1.1.1;
@@ -118,7 +118,7 @@ Essentially, the quotes around the path need to be entered as HTML entities:
 
 Ubiquiti EdgeRouter configuration statement:
 
-```config
+```text
 set service dhcp-server shared-network-name sidero \
   subnet 172.16.199.1 \
   subnet-parameters "include &quote;/config/ipxe-metal.conf&quot;;"
