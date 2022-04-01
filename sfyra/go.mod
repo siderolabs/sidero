@@ -12,9 +12,9 @@ replace (
 )
 
 require (
-	github.com/spf13/cobra v1.3.0
-	github.com/stretchr/testify v1.7.0
-	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.4
+	github.com/spf13/cobra v1.4.0
+	github.com/stretchr/testify v1.7.1
+	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.5
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-loadbalancer v0.1.1
 	github.com/talos-systems/go-procfs v0.1.0
@@ -23,7 +23,7 @@ require (
 	github.com/talos-systems/sidero v0.0.0-00010101000000-000000000000
 	github.com/talos-systems/talos v1.0.0
 	github.com/talos-systems/talos/pkg/machinery v1.0.0
-	google.golang.org/grpc v1.44.0
+	google.golang.org/grpc v1.45.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/api v0.23.5
 	k8s.io/apiextensions-apiserver v0.23.1
@@ -147,10 +147,10 @@ require (
 	github.com/valyala/fastjson v1.6.3 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220208050332-20e1d8d225ab // indirect
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
+	golang.org/x/net v0.0.0-20220325170049-de3da57026de // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
+	golang.org/x/sys v0.0.0-20220330033206-e17cdc41300f // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
@@ -159,7 +159,7 @@ require (
 	google.golang.org/api v0.70.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220228155957-1da8797a5878 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

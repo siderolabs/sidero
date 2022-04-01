@@ -15,24 +15,24 @@ require (
 	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/talos-systems/go-blockdevice v0.3.1
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-kmsg v0.1.1
 	github.com/talos-systems/go-procfs v0.1.0
 	github.com/talos-systems/go-retry v0.3.1
 	github.com/talos-systems/go-smbios v0.1.1
-	github.com/talos-systems/grpc-proxy v0.2.0
+	github.com/talos-systems/grpc-proxy v0.3.0
 	github.com/talos-systems/net v0.3.2
 	github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0
 	github.com/talos-systems/talos/pkg/machinery v1.0.0
 	go.uber.org/zap v1.21.0
-	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
+	golang.org/x/net v0.0.0-20220325170049-de3da57026de
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20220209214540-3681064d5158
-	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20220208144051-fde48d68ee68
-	google.golang.org/grpc v1.44.0
-	google.golang.org/protobuf v1.27.1
+	golang.org/x/sys v0.0.0-20220330033206-e17cdc41300f
+	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20220330030906-9490840b0b01
+	google.golang.org/grpc v1.45.0
+	google.golang.org/protobuf v1.28.0
 	inet.af/netaddr v0.0.0-20211027220019-c74959edd3b6
 	k8s.io/api v0.23.0
 	k8s.io/apiextensions-apiserver v0.23.0
