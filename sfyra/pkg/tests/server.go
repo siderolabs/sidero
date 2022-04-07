@@ -31,6 +31,7 @@ import (
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
 	"github.com/talos-systems/sidero/sfyra/pkg/capi"
 	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
@@ -114,6 +115,36 @@ func TestServerMgmtAPI(ctx context.Context, metalClient client.Client, vmSet *vm
 
 			require.NoError(t, patchHelper.Patch(ctx, &server))
 		}
+	}
+}
+
+// TestServerValidation checks that server validation webhook works.
+func TestServerValidation(ctx context.Context, metalClient client.Client) TestFunc {
+	return func(t *testing.T) {
+		servers := &metalv1.ServerList{}
+
+		require.NoError(t, metalClient.List(ctx, servers))
+
+		installPatch := configPatchToJSON(t, map[string]interface{}{"test": 1})
+
+		server := servers.Items[0]
+
+		patchHelper, err := patch.NewHelper(&server, metalClient)
+		require.NoError(t, err)
+
+		server.Spec.ConfigPatches = append(server.Spec.ConfigPatches, metalv1.ConfigPatches{
+			Op:    "error",
+			Path:  "/machine/install",
+			Value: apiextensions.JSON{Raw: installPatch},
+		})
+
+		require.ErrorContains(t, patchHelper.Patch(ctx, &server), "Invalid value: \"error\"")
+
+		server.Spec.ConfigPatches = nil
+
+		server.Spec.BootFromDiskMethod = siderotypes.BootFromDisk("explode")
+
+		require.ErrorContains(t, patchHelper.Patch(ctx, &server), "Invalid value: \"explode\"")
 	}
 }
 

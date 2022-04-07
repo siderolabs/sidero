@@ -1,4 +1,5 @@
 resources:
+  - manifests.yaml
   - service.yaml
 
 configurations:

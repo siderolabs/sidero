@@ -144,6 +144,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	// +kubebuilder:scaffold:builder
+
+	setupWebhooks(mgr)
+	setupChecks(mgr)
+
+	setupLog.Info("starting manager")
+
+	if err := mgr.Start(ctx); err != nil {
+		setupLog.Error(err, "problem running manager")
+		os.Exit(1)
+	}
+}
+
+func setupWebhooks(mgr ctrl.Manager) {
+	var err error
+
 	if err = (&infrav1alpha3.MetalCluster{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "MetalCluster")
 		os.Exit(1)
@@ -161,16 +177,6 @@ func main() {
 
 	if err = (&infrav1alpha3.ServerBinding{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "ServerBinding")
-		os.Exit(1)
-	}
-	// +kubebuilder:scaffold:builder
-
-	setupChecks(mgr)
-
-	setupLog.Info("starting manager")
-
-	if err := mgr.Start(ctx); err != nil {
-		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
 }

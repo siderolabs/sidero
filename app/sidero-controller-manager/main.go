@@ -30,6 +30,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	infrav1alpha3 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/controllers"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/ipxe"
@@ -216,6 +217,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	setupWebhooks(mgr)
 	setupChecks(mgr, httpPort)
 
 	// +kubebuilder:scaffold:builder
@@ -323,6 +325,23 @@ func main() {
 		if err != nil {
 			os.Exit(1)
 		}
+	}
+}
+
+func setupWebhooks(mgr ctrl.Manager) {
+	if err := (&v1alpha1.ServerClass{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "ServerClass")
+		os.Exit(1)
+	}
+
+	if err := (&v1alpha1.Environment{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Environment")
+		os.Exit(1)
+	}
+
+	if err := (&v1alpha1.Server{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Server")
+		os.Exit(1)
 	}
 }
 
