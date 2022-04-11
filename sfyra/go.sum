@@ -1259,8 +1259,9 @@ github.com/talos-systems/talos v1.0.0/go.mod h1:wxXOiKmoNb9Tjo2d3iJ9Yfg2rmOubRuY
 github.com/talos-systems/talos/pkg/machinery v0.12.3/go.mod h1:qX77JMZawrDTQaJucqecdlFsHy+dbnZ9YL8Kw4qL7d4=
 github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.1.0.20211118180932-1ffa8e048008/go.mod h1:D8NT4Aj+X2OpA6yK6RAtpw1wcgkDS7oD23vqOQWRiP8=
 github.com/talos-systems/talos/pkg/machinery v0.14.0/go.mod h1:ctbMKkPJv8aiGfXT2NuWaoHch7fx62GaU81OVOyNVbc=
-github.com/talos-systems/talos/pkg/machinery v1.0.0 h1:pt8PMy2xaudTuR3egKOYN1SHydS9lJyWdriOrevmWQw=
 github.com/talos-systems/talos/pkg/machinery v1.0.0/go.mod h1:cJ/031WJGDnGQLW+zp+0lwkEn47orpJdfsJDf0BQVGM=
+github.com/talos-systems/talos/pkg/machinery v1.0.1 h1:f4t3f2j44Qpg/Z4vyNnguT7Qkyd/77KqPvElGiXu7to=
+github.com/talos-systems/talos/pkg/machinery v1.0.1/go.mod h1:cJ/031WJGDnGQLW+zp+0lwkEn47orpJdfsJDf0BQVGM=
 github.com/tchap/go-patricia v2.2.6+incompatible/go.mod h1:bmLyhP68RS6kStMGxByiQ23RP/odRBOTVjwp2cDyi6I=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
