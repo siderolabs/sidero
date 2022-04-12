@@ -14,7 +14,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
@@ -301,30 +300,11 @@ func (r *ServerReconciler) getServerBinding(ctx context.Context, req ctrl.Reques
 		return true, &serverBinding, nil
 	}
 
-	if err != nil && !apierrors.IsNotFound(err) {
-		return false, nil, err
+	if apierrors.IsNotFound(err) {
+		return false, nil, nil
 	}
 
-	// double-check metalmachines to make sure we don't have a missing serverbinding
-	var metalMachineList infrav1.MetalMachineList
-
-	if err := r.List(ctx, &metalMachineList, client.MatchingFields(fields.Set{infrav1.MetalMachineServerRefField: req.Name})); err != nil {
-		return false, nil, err
-	}
-
-	for _, metalMachine := range metalMachineList.Items {
-		if !metalMachine.DeletionTimestamp.IsZero() {
-			continue
-		}
-
-		if metalMachine.Spec.ServerRef != nil {
-			if metalMachine.Spec.ServerRef.Namespace == req.Namespace && metalMachine.Spec.ServerRef.Name == req.Name {
-				return true, nil, nil
-			}
-		}
-	}
-
-	return false, nil, nil
+	return false, nil, err
 }
 
 func (r *ServerReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager, options controller.Options) error {

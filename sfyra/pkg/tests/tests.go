@@ -135,10 +135,6 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 			TestMachineDeploymentReconcile(ctx, metalClient),
 		},
 		{
-			"TestServerBindingReconcile",
-			TestServerBindingReconcile(ctx, metalClient),
-		},
-		{
 			"TestMetalMachineServerRefReconcile",
 			TestMetalMachineServerRefReconcile(ctx, metalClient),
 		},

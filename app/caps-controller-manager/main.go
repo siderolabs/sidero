@@ -10,14 +10,13 @@ import (
 	"os"
 
 	debug "github.com/talos-systems/go-debug"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/kubernetes"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	cgrecord "k8s.io/client-go/tools/record"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	"sigs.k8s.io/cluster-api/controllers/remote"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
@@ -97,23 +96,29 @@ func main() {
 		os.Exit(1)
 	}
 
-	clientset, err := kubernetes.NewForConfig(mgr.GetConfig())
+	ctx := ctrl.SetupSignalHandler()
+
+	// Set up a ClusterCacheTracker to provide to controllers
+	// requiring a connection to a remote cluster
+	tracker, err := remote.NewClusterCacheTracker(mgr, remote.ClusterCacheTrackerOptions{
+		Indexes:               remote.DefaultIndexes,
+		ClientUncachedObjects: []client.Object{},
+	})
 	if err != nil {
-		setupLog.Error(err, "unable to create k8s client")
+		setupLog.Error(err, "unable to create cluster cache tracker")
 		os.Exit(1)
 	}
 
-	eventBroadcaster := cgrecord.NewBroadcaster()
-	eventBroadcaster.StartRecordingToSink(
-		&typedcorev1.EventSinkImpl{
-			Interface: clientset.CoreV1().Events(""),
-		})
+	if err := (&remote.ClusterCacheReconciler{
+		Client:  mgr.GetClient(),
+		Log:     ctrl.Log.WithName("remote").WithName("ClusterCacheReconciler"),
+		Tracker: tracker,
+	}).SetupWithManager(ctx, mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ClusterCacheReconciler")
+		os.Exit(1)
+	}
 
-	recorder := eventBroadcaster.NewRecorder(
-		mgr.GetScheme(),
-		corev1.EventSource{Component: "caps-controller-manager"})
-
-	ctx := ctrl.SetupSignalHandler()
+	recorder := mgr.GetEventRecorderFor("caps-controller-manager")
 
 	if err = (&controllers.MetalClusterReconciler{
 		Client: mgr.GetClient(),
@@ -129,6 +134,7 @@ func main() {
 		Log:      ctrl.Log.WithName("controllers").WithName("MetalMachine"),
 		Scheme:   mgr.GetScheme(),
 		Recorder: recorder,
+		Tracker:  tracker,
 	}).SetupWithManager(ctx, mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MetalMachine")
 		os.Exit(1)

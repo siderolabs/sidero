@@ -12,16 +12,14 @@ import (
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
 	"k8s.io/utils/pointer"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	"sigs.k8s.io/cluster-api/controllers/remote"
 	"sigs.k8s.io/cluster-api/util"
 	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
@@ -46,6 +44,7 @@ type MetalMachineReconciler struct {
 	Log      logr.Logger
 	Scheme   *runtime.Scheme
 	Recorder record.EventRecorder
+	Tracker  *remote.ClusterCacheTracker
 }
 
 // +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=metalmachines,verbs=get;list;watch;create;update;patch;delete
@@ -133,7 +132,14 @@ func (r *MetalMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 	controllerutil.AddFinalizer(metalMachine, infrav1.MachineFinalizer)
 
-	// If server ref is already provided, server binding controller is going to reconcile matching server binding
+	// TODO (smira):
+	// This is really weird that .Spec.ServerRef is used both to set the manual link to the server by the user
+	// and a way to store current binding when server is picked up automatically
+	//
+	// This should be refactored to keep _current_ binding ref in the .Status, while
+	// .spec should be reserved for manually chosen server only.
+	// This opens a question what to do if the `.Status` is lost after pivoting, how to reconcile it correctly?
+
 	// if server binding is missing, need to pick up a server
 	if metalMachine.Spec.ServerRef == nil {
 		if metalMachine.Spec.ServerClassRef == nil {
@@ -153,11 +159,45 @@ func (r *MetalMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request
 			Kind: serverResource.Kind,
 			Name: serverResource.Name,
 		}
+	} else {
+		// If server ref is set, it could have been set by "us", or by the user.
+		// In any case, check if we need to create server binding
+		var serverBinding infrav1.ServerBinding
+
+		err = r.Get(ctx, types.NamespacedName{Namespace: metalMachine.Spec.ServerRef.Namespace, Name: metalMachine.Spec.ServerRef.Name}, &serverBinding)
+		if err != nil {
+			if apierrors.IsNotFound(err) {
+				var serverObj metalv1.Server
+
+				namespacedName := types.NamespacedName{
+					Namespace: "",
+					Name:      metalMachine.Spec.ServerRef.Name,
+				}
+
+				if err := r.Get(ctx, namespacedName, &serverObj); err != nil {
+					return ctrl.Result{}, err
+				}
+
+				serverRef, err := reference.GetReference(r.Scheme, &serverObj)
+				if err != nil {
+					return ctrl.Result{}, err
+				}
+
+				if err = r.createServerBinding(ctx, nil, &serverObj, metalMachine); err != nil {
+					return ctrl.Result{}, err
+				}
+
+				r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Assignment", fmt.Sprintf("Server as assigned via serverRef for metal machine %q.", metalMachine.Name))
+			}
+
+			return ctrl.Result{}, err
+		}
 	}
 
 	// Set the providerID, as its required in upstream capi for machine lifecycle
 	metalMachine.Spec.ProviderID = pointer.StringPtr(fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name))
 
+	// Copy over statuses from ServerBinding to MetalMachine
 	if metalMachine.Spec.ServerRef != nil {
 		var serverBinding infrav1.ServerBinding
 
@@ -298,6 +338,11 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, logge
 		return nil, ErrNoServersInServerClass
 	}
 
+	serverClassRef, err := reference.GetReference(r.Scheme, serverClassResource)
+	if err != nil {
+		return nil, err
+	}
+
 	// Fetch server from available list
 	// NB: we added this loop to double check that an available server isn't "in use" because
 	//     we saw raciness between server selection and it being removed from the ServersAvailable list.
@@ -313,6 +358,11 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, logge
 			return nil, err
 		}
 
+		serverRef, err := reference.GetReference(r.Scheme, serverObj)
+		if err != nil {
+			return nil, err
+		}
+
 		if serverObj.Status.InUse {
 			continue
 		}
@@ -321,7 +371,7 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, logge
 			continue
 		}
 
-		if err := r.createServerBinding(ctx, serverClassResource, serverObj, metalMachine); err != nil {
+		if err := r.createServerBinding(ctx, serverClassRef, serverObj, metalMachine); err != nil {
 			// the server we picked was updated by another metalmachine before we finished.
 			// move on to the next one.
 			if apierrors.IsAlreadyExists(err) {
@@ -330,6 +380,8 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, logge
 
 			return nil, err
 		}
+
+		r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Allocation", fmt.Sprintf("Server is allocated via serverclass %q for metal machine %q.", serverClassResource.Name, metalMachine.Name))
 
 		logger.Info("allocated new server", "metalmachine", metalMachine.Name, "server", serverObj.Name, "serverclass", serverClassResource.Name)
 
@@ -340,40 +392,14 @@ func (r *MetalMachineReconciler) fetchServerFromClass(ctx context.Context, logge
 }
 
 func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *capiv1.Cluster, metalMachine *infrav1.MetalMachine) error {
-	kubeconfigSecret := &corev1.Secret{}
-
-	err := r.Client.Get(ctx,
-		types.NamespacedName{
-			Namespace: cluster.Namespace,
-			Name:      cluster.Name + "-kubeconfig",
-		},
-		kubeconfigSecret,
-	)
+	workloadClient, err := r.Tracker.GetClient(ctx, client.ObjectKeyFromObject(cluster))
 	if err != nil {
 		return err
 	}
 
-	config, err := clientcmd.RESTConfigFromKubeConfig(kubeconfigSecret.Data["value"])
-	if err != nil {
-		return err
-	}
+	var nodes corev1.NodeList
 
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return err
-	}
-
-	label := fmt.Sprintf("metal.sidero.dev/uuid=%s", metalMachine.Spec.ServerRef.Name)
-
-	r.Log.Info("Searching for node", "label", label)
-
-	nodes, err := clientset.CoreV1().Nodes().List(
-		ctx,
-		metav1.ListOptions{
-			LabelSelector: label,
-		},
-	)
-	if err != nil {
+	if err = workloadClient.List(ctx, &nodes, client.MatchingLabels{"metal.sidero.dev/uuid": metalMachine.Spec.ServerRef.Name}); err != nil {
 		return err
 	}
 
@@ -387,33 +413,26 @@ func (r *MetalMachineReconciler) patchProviderID(ctx context.Context, cluster *c
 
 	providerID := fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name)
 
-	r.Log.Info("Setting provider ID", "id", providerID)
+	node := nodes.Items[0]
 
-	for _, node := range nodes.Items {
-		node := node
-
-		if node.Spec.ProviderID == providerID {
-			continue
-		}
-
-		node.Spec.ProviderID = providerID
-
-		_, err = clientset.CoreV1().Nodes().Update(ctx, &node, metav1.UpdateOptions{})
-		if err != nil {
-			return err
-		}
+	if node.Spec.ProviderID == providerID {
+		return nil
 	}
 
-	return nil
-}
-
-// createServerBinding updates a server to mark it as "in use" via ServerBinding resource.
-func (r *MetalMachineReconciler) createServerBinding(ctx context.Context, serverClass *metalv1.ServerClass, serverObj *metalv1.Server, metalMachine *infrav1.MetalMachine) error {
-	serverRef, err := reference.GetReference(r.Scheme, serverObj)
+	patchHelper, err := patch.NewHelper(&node, workloadClient)
 	if err != nil {
 		return err
 	}
 
+	r.Log.Info("Setting provider ID", "id", providerID)
+
+	node.Spec.ProviderID = providerID
+
+	return patchHelper.Patch(ctx, &node)
+}
+
+// createServerBinding updates a server to mark it as "in use" via ServerBinding resource.
+func (r *MetalMachineReconciler) createServerBinding(ctx context.Context, serverClassRef *corev1.ObjectReference, serverObj *metalv1.Server, metalMachine *infrav1.MetalMachine) error {
 	var serverBinding infrav1.ServerBinding
 
 	serverBinding.Namespace = serverObj.Namespace
@@ -426,23 +445,13 @@ func (r *MetalMachineReconciler) createServerBinding(ctx context.Context, server
 		Name:      metalMachine.Name,
 	}
 
-	if serverClass != nil {
-		serverBinding.Spec.ServerClassRef = &corev1.ObjectReference{
-			Kind: serverClass.Kind,
-			Name: serverClass.Name,
-		}
-	}
+	serverBinding.Spec.ServerClassRef = serverClassRef.DeepCopy()
 
 	for label, value := range metalMachine.Labels {
 		serverBinding.Labels[label] = value
 	}
 
-	err = r.Create(ctx, &serverBinding)
-	if err == nil {
-		r.Recorder.Event(serverRef, corev1.EventTypeNormal, "Server Allocation", fmt.Sprintf("Server as allocated via serverclass %q for metal machine %q.", serverClass.Name, metalMachine.Name))
-	}
-
-	return err
+	return r.Create(ctx, &serverBinding)
 }
 
 func (r *MetalMachineReconciler) fetchServerClass(ctx context.Context, classRef *corev1.ObjectReference) (*metalv1.ServerClass, error) {

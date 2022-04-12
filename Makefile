@@ -9,9 +9,9 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 TEST_PKGS ?= ./...
-TALOS_RELEASE ?= v1.0.0
+TALOS_RELEASE ?= v1.0.1
 PREVIOUS_TALOS_RELEASE ?= v0.13.4
-DEFAULT_K8S_VERSION ?= v1.22.3
+DEFAULT_K8S_VERSION ?= v1.23.5
 
 TOOLS ?= ghcr.io/siderolabs/tools:v1.0.0-1-g4c77d96
 PKGS ?= v1.1.0-alpha.0-17-g4dace49

@@ -20,7 +20,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // TestMachineDeploymentReconcile verifies that machine deployment can reconcile delete machines.
@@ -89,49 +88,6 @@ func TestMachineDeploymentReconcile(ctx context.Context, metalClient client.Clie
 			return nil
 		})
 		require.NoError(t, err)
-	}
-}
-
-// TestServerBindingReconcile verifies that server binding controller can reconcile missing ServerBindings.
-func TestServerBindingReconcile(ctx context.Context, metalClient client.Client) TestFunc {
-	return func(t *testing.T) {
-		var serverBindingList infrav1.ServerBindingList
-
-		require.NoError(t, metalClient.List(ctx, &serverBindingList))
-
-		if len(serverBindingList.Items) < 1 {
-			t.Fatal("no serverbindings found")
-		}
-
-		// pick any serverbinding and delete it
-		serverBindingToDelete := serverBindingList.Items[0]
-
-		require.NoError(t, metalClient.Delete(ctx, &serverBindingToDelete))
-
-		// verify that matching server doesn't become unallocated for 1 minute
-		start := time.Now()
-
-		for time.Since(start) < time.Minute {
-			var server metalv1.Server
-
-			require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: serverBindingToDelete.Name}, &server))
-
-			require.True(t, server.Status.InUse)
-		}
-
-		// server binding should have been re-created
-		var serverBinding infrav1.ServerBinding
-
-		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: serverBindingToDelete.Name}, &serverBinding))
-
-		assert.Equal(t, serverBinding.Spec.MetalMachineRef, serverBindingToDelete.Spec.MetalMachineRef)
-		assert.Equal(t, serverBinding.Labels, serverBindingToDelete.Labels)
-
-		if serverBindingToDelete.Spec.ServerClassRef == nil {
-			assert.Nil(t, serverBinding.Spec.ServerClassRef)
-		} else {
-			assert.Equal(t, serverBindingToDelete.Spec.ServerClassRef.Name, serverBinding.Spec.ServerClassRef.Name)
-		}
 	}
 }
 
