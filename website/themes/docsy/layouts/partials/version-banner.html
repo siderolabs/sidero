@@ -7,8 +7,8 @@
   {{ $color := "primary" }}
   <div class="pageinfo pageinfo-{{ $color }}">
     {{ with $current_version }}<p>Version {{ trim . "/" | markdownify }} of the
-      documentation is for the Talos version being developed.
-      {{ with $latest_version }}For the latest stable version of Talos, see the
+      documentation is for the Sidero version being developed.
+      {{ with $latest_version }}For the latest stable version of Sidero, see the
         <a href="{{ $latest_version | safeURL }}">latest version</a>.</p>
       {{ end }}
     {{ end }}
