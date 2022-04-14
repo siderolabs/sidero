@@ -23,7 +23,7 @@ import (
 	"github.com/talos-systems/go-retry/retry"
 	"github.com/talos-systems/talos/pkg/machinery/kernel"
 
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
 	"github.com/talos-systems/sidero/sfyra/pkg/capi"
 	"github.com/talos-systems/sidero/sfyra/pkg/constants"
 	"github.com/talos-systems/sidero/sfyra/pkg/talos"
@@ -84,9 +84,15 @@ func TestCompatibilityCluster(ctx context.Context, metalClient client.Client, cl
 		serverClassName := envName
 		classSpec := metalv1.ServerClassSpec{
 			Qualifiers: metalv1.Qualifiers{
-				CPU: []metalv1.CPUInformation{
+				Hardware: []metalv1.HardwareInformation{
 					{
-						Manufacturer: "QEMU",
+						Compute: &metalv1.ComputeInformation{
+							Processors: []*metalv1.Processor{
+								{
+									Manufacturer: "QEMU",
+								},
+							},
+						},
 					},
 				},
 			},

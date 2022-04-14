@@ -20,7 +20,7 @@ The hierarchy from most to least respected is:
 A sample environment definition looks like this:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: Environment
 metadata:
   name: default
@@ -52,7 +52,7 @@ spec:
 Example of overriding `"default"` `Environment` at the `Server` level:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: Server
 ...
 spec:
@@ -65,7 +65,7 @@ spec:
 Example of overriding `"default"` `Environment` at the `ServerClass` level:
 
 ```yaml
-apiVersion: metal.sidero.dev/v1alpha1
+apiVersion: metal.sidero.dev/v1alpha2
 kind: ServerClass
 ...
 spec:

@@ -32,14 +32,86 @@ message SystemInformation {
   string family = 7;
 }
 
-message CPU {
+message Processor {
   string manufacturer = 1;
-  string version = 2;
+  string product_name = 2;
+  string serial_number = 3;
+  uint32 speed = 4;
+  uint32 core_count = 5;
+  uint32 thread_count = 6;
+}
+
+message ComputeInformation {
+  uint32 total_core_count = 1;
+  uint32 total_thread_count = 2;
+  uint32 processor_count = 3;
+  repeated Processor processors = 4;
+}
+
+message MemoryModule {
+  string manufacturer = 1;
+  string product_name = 2;
+  string serial_number = 3;
+  string type = 4;
+  uint32 size = 5;
+  uint32 speed = 6;
+}
+
+message MemoryInformation {
+  uint32 total_size = 1;
+  uint32 module_count = 2;
+  repeated MemoryModule modules = 3;
+}
+
+enum StorageType {
+  Unknown = 0;
+  SSD = 1;
+  HDD = 2;
+  NVMe = 3;
+  SD = 4;
+}
+
+message StorageDevice {
+  StorageType type = 1;
+  uint64 size = 2;
+  string model = 3;
+  string serial = 4;
+  string name = 5;
+  string device_name = 6;
+  string uuid = 7;
+  string wwid = 8;
+}
+
+message StorageInformation {
+  uint64 total_size = 1;
+  uint32 device_count = 2;
+  repeated StorageDevice devices = 3;
+}
+
+message NetworkInterface {
+  uint32 index = 1;
+  string name = 2;
+  string flags = 3;
+  uint32 mtu = 4;
+  string mac = 5;
+  repeated string addresses = 6;
+}
+
+message NetworkInformation {
+  uint32 interface_count = 1;
+  repeated NetworkInterface interfaces = 2;
+}
+
+message HardwareInformation {
+  SystemInformation system = 1;
+  ComputeInformation compute = 2;
+  MemoryInformation memory = 3;
+  StorageInformation storage = 4;
+  NetworkInformation network = 5;
 }
 
 message CreateServerRequest {
-  SystemInformation system_information = 1;
-  CPU cpu = 2;
+  HardwareInformation hardware = 1;
   string hostname = 3;
 }
 
@@ -55,8 +127,8 @@ message CreateServerResponse {
   double reboot_timeout = 4;
 }
 
-message MarkServerAsWipedRequest { string uuid = 1; }
-message HeartbeatRequest { string uuid = 1; }
+message MarkServerAsWipedRequest {string uuid = 1;}
+message HeartbeatRequest {string uuid = 1;}
 
 message MarkServerAsWipedResponse {}
 message HeartbeatResponse {}

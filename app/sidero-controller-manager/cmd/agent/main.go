@@ -30,7 +30,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/api"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/ipmi"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
@@ -94,25 +94,19 @@ func setup() error {
 }
 
 func create(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) (*api.CreateServerResponse, error) {
-	uuid, err := s.SystemInformation().UUID()
+	disks, err := disk.List()
 	if err != nil {
-		return nil, err
+		log.Printf("encountered error fetching disks: %q", err)
+	}
+
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		log.Printf("encountered error fetching network interfaces: %q", err)
 	}
 
 	req := &api.CreateServerRequest{
-		SystemInformation: &api.SystemInformation{
-			Uuid:         uuid.String(),
-			Manufacturer: s.SystemInformation().Manufacturer(),
-			ProductName:  s.SystemInformation().ProductName(),
-			Version:      s.SystemInformation().Version(),
-			SerialNumber: s.SystemInformation().SerialNumber(),
-			SkuNumber:    s.SystemInformation().SKUNumber(),
-			Family:       s.SystemInformation().Family(),
-		},
-		Cpu: &api.CPU{
-			Manufacturer: s.ProcessorInformation().ProcessorManufacturer(),
-			Version:      s.ProcessorInformation().ProcessorVersion(),
-		},
+		Hardware: MapHardwareInformation(s, disks, interfaces),
+		Hostname: "",
 	}
 
 	hostname, err := os.Hostname()
@@ -140,16 +134,11 @@ func create(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) (*api
 }
 
 func wipe(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) error {
-	uuid, err := s.SystemInformation().UUID()
-	if err != nil {
-		return err
-	}
-
 	return retry.Constant(5*time.Minute, retry.WithUnits(30*time.Second), retry.WithErrorLogging(true)).Retry(func() error {
 		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 		defer cancel()
 
-		_, err = client.MarkServerAsWiped(ctx, &api.MarkServerAsWipedRequest{Uuid: uuid.String()})
+		_, err := client.MarkServerAsWiped(ctx, &api.MarkServerAsWipedRequest{Uuid: s.SystemInformation.UUID})
 		if err != nil {
 			return retry.ExpectedError(err)
 		}
@@ -159,11 +148,6 @@ func wipe(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) error {
 }
 
 func reconcileIPs(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS, ips []net.IP) error {
-	uuid, err := s.SystemInformation().UUID()
-	if err != nil {
-		return err
-	}
-
 	addresses := make([]*api.Address, len(ips))
 	for i := range addresses {
 		addresses[i] = &api.Address{
@@ -176,8 +160,8 @@ func reconcileIPs(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS,
 		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 		defer cancel()
 
-		_, err = client.ReconcileServerAddresses(ctx, &api.ReconcileServerAddressesRequest{
-			Uuid:    uuid.String(),
+		_, err := client.ReconcileServerAddresses(ctx, &api.ReconcileServerAddressesRequest{
+			Uuid:    s.SystemInformation.UUID,
 			Address: addresses,
 		})
 		if err != nil {
@@ -281,11 +265,6 @@ func mainFunc() error {
 			shutdown(err)
 		}
 
-		uuid, err := s.SystemInformation().UUID()
-		if err != nil {
-			shutdown(err)
-		}
-
 		var (
 			eg errgroup.Group
 			wg sync.WaitGroup
@@ -305,7 +284,7 @@ func mainFunc() error {
 			for {
 				callCtx, cancel := context.WithTimeout(ctx, heartbeatInterval)
 
-				if _, err := client.Heartbeat(callCtx, &api.HeartbeatRequest{Uuid: uuid.String()}); err != nil {
+				if _, err := client.Heartbeat(callCtx, &api.HeartbeatRequest{Uuid: s.SystemInformation.UUID}); err != nil {
 					log.Printf("Failed to send wipe heartbeat %s", err)
 				}
 
@@ -396,11 +375,6 @@ func main() {
 }
 
 func attemptBMCIP(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) error {
-	uuid, err := s.SystemInformation().UUID()
-	if err != nil {
-		return err
-	}
-
 	bmcInfo := &api.BMCInfo{}
 
 	// Create "open" client
@@ -442,7 +416,7 @@ func attemptBMCIP(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS)
 		_, err = client.UpdateBMCInfo(
 			ctx,
 			&api.UpdateBMCInfoRequest{
-				Uuid:    uuid.String(),
+				Uuid:    s.SystemInformation.UUID,
 				BmcInfo: bmcInfo,
 			},
 		)
@@ -458,11 +432,6 @@ func attemptBMCIP(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS)
 }
 
 func attemptBMCUserSetup(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) error {
-	uuid, err := s.SystemInformation().UUID()
-	if err != nil {
-		return err
-	}
-
 	bmcInfo := &api.BMCInfo{}
 
 	// Create "open" client
@@ -575,7 +544,7 @@ func attemptBMCUserSetup(ctx context.Context, client api.AgentClient, s *smbios.
 		_, err = client.UpdateBMCInfo(
 			ctx,
 			&api.UpdateBMCInfoRequest{
-				Uuid:    uuid.String(),
+				Uuid:    s.SystemInformation.UUID,
 				BmcInfo: bmcInfo,
 			},
 		)
@@ -608,4 +577,184 @@ func genPass16() (string, error) {
 	}
 
 	return string(b), nil
+}
+
+func MapHardwareInformation(s *smbios.SMBIOS, disks []*disk.Disk, interfaces []net.Interface) *api.HardwareInformation {
+	if s != nil {
+		return &api.HardwareInformation{
+			System:  MapSystemInformation(s),
+			Compute: MapComputeInformation(s),
+			Memory:  MapMemoryInformation(s),
+			Storage: MapStorageInformation(disks),
+			Network: MapNetworkInformation(interfaces),
+		}
+	}
+
+	return &api.HardwareInformation{
+		Storage: MapStorageInformation(disks),
+	}
+}
+
+func MapSystemInformation(s *smbios.SMBIOS) *api.SystemInformation {
+	return &api.SystemInformation{
+		Manufacturer: s.SystemInformation.Manufacturer,
+		ProductName:  s.SystemInformation.ProductName,
+		SerialNumber: s.SystemInformation.SerialNumber,
+		Uuid:         s.SystemInformation.UUID,
+		SkuNumber:    s.SystemInformation.SKUNumber,
+		Family:       s.SystemInformation.Family,
+	}
+}
+
+func MapComputeInformation(s *smbios.SMBIOS) *api.ComputeInformation {
+	var (
+		totalCoreCount   = 0
+		totalThreadCount = 0
+		processors       []*api.Processor
+	)
+
+	for _, v := range s.ProcessorInformation {
+		if v.Status.SocketPopulated() {
+			totalCoreCount += int(v.CoreCount)
+			totalThreadCount += int(v.ThreadCount)
+
+			processor := &api.Processor{
+				Manufacturer: v.ProcessorManufacturer,
+				ProductName:  v.ProcessorVersion,
+				SerialNumber: v.SerialNumber,
+				Speed:        uint32(v.CurrentSpeed),
+				CoreCount:    uint32(v.CoreCount),
+				ThreadCount:  uint32(v.ThreadCount),
+			}
+
+			processors = append(processors, processor)
+		}
+	}
+
+	return &api.ComputeInformation{
+		TotalCoreCount:   uint32(totalCoreCount),
+		TotalThreadCount: uint32(totalThreadCount),
+		ProcessorCount:   uint32(len(processors)),
+		Processors:       processors,
+	}
+}
+
+func MapMemoryInformation(s *smbios.SMBIOS) *api.MemoryInformation {
+	var (
+		totalSize = 0
+		modules   []*api.MemoryModule
+	)
+
+	for _, v := range s.MemoryDevices {
+		if v.Size != 0 && v.Size != 0xFFFF {
+			var size uint32
+
+			if v.Size == 0x7FFF {
+				totalSize += int(v.ExtendedSize)
+				size = uint32(v.ExtendedSize)
+			} else {
+				totalSize += v.Size.Megabytes()
+				size = uint32(v.Size)
+			}
+
+			memoryModule := &api.MemoryModule{
+				Manufacturer: v.Manufacturer,
+				ProductName:  v.PartNumber,
+				SerialNumber: v.SerialNumber,
+				Type:         v.MemoryType.String(),
+				Size:         size,
+				Speed:        uint32(v.Speed),
+			}
+
+			modules = append(modules, memoryModule)
+		}
+	}
+
+	return &api.MemoryInformation{
+		TotalSize:   uint32(totalSize),
+		ModuleCount: uint32(len(modules)),
+		Modules:     modules,
+	}
+}
+
+func MapStorageInformation(s []*disk.Disk) *api.StorageInformation {
+	totalSize := uint64(0)
+	devices := make([]*api.StorageDevice, 0, len(s))
+
+	for _, v := range s {
+		totalSize += v.Size
+
+		var storageType api.StorageType
+
+		switch v.Type.String() {
+		case "ssd":
+			storageType = api.StorageType_SSD
+		case "hdd":
+			storageType = api.StorageType_HDD
+		case "nvme":
+			storageType = api.StorageType_NVMe
+		case "sd":
+			storageType = api.StorageType_SD
+		default:
+			storageType = api.StorageType_Unknown
+		}
+
+		storageDevice := &api.StorageDevice{
+			Model:      v.Model,
+			Serial:     v.Serial,
+			Type:       storageType,
+			Size:       v.Size,
+			Name:       v.Name,
+			DeviceName: v.DeviceName,
+			Uuid:       v.UUID,
+			Wwid:       v.WWID,
+		}
+
+		devices = append(devices, storageDevice)
+	}
+
+	return &api.StorageInformation{
+		TotalSize:   totalSize,
+		DeviceCount: uint32(len(devices)),
+		Devices:     devices,
+	}
+}
+
+func MapNetworkInformation(s []net.Interface) *api.NetworkInformation {
+	interfaces := make([]*api.NetworkInterface, 0, len(s))
+
+	for _, v := range s {
+		if len(v.HardwareAddr) == 0 {
+			continue // skip interfaces without a hardware address
+		}
+
+		addrs, err := v.Addrs()
+		if err != nil {
+			log.Printf("encountered error fetching addresses of network interface %q: %q", v.Name, err)
+
+			addrs = make([]net.Addr, 0)
+		}
+
+		var addresses []string
+
+		for _, a := range addrs {
+			addresses = append(addresses, a.String())
+		}
+
+		networkInterface := &api.NetworkInterface{
+			Index:     uint32(v.Index),
+			Name:      v.Name,
+			Flags:     v.Flags.String(),
+			Mtu:       uint32(v.MTU),
+			Mac:       v.HardwareAddr.String(),
+			Addresses: addresses,
+		}
+
+		interfaces = append(interfaces, networkInterface)
+	}
+
+	return &api.NetworkInformation{
+		InterfaceCount: uint32(len(interfaces)),
+		Interfaces:     interfaces,
+	}
 }

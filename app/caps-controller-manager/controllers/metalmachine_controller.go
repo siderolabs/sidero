@@ -33,7 +33,7 @@ import (
 
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	"github.com/talos-systems/sidero/app/caps-controller-manager/pkg/constants"
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
 var ErrNoServersInServerClass = errors.New("no servers available in serverclass")

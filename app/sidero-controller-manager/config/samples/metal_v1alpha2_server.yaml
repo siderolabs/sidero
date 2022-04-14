@@ -1,0 +1,77 @@
+apiVersion: metal.sidero.dev/v1alpha2
+kind: Server
+metadata:
+  name: 00000000-0000-0000-0000-d05099d333e0
+  labels:
+    common-label: "true"
+    zone: east
+    environment: test
+spec:
+  accepted: false
+  configPatches:
+    - op: replace
+      path: /cluster/network/cni
+      value:
+        name: custom
+        urls:
+          - http://192.168.1.199/assets/cilium.yaml
+  hardware:
+    system:
+      manufacturer: Dell Inc.
+      productName: PowerEdge R630
+      serialNumber: 790H8D2
+    compute:
+      totalCoreCount: 8
+      totalThreadCount: 16
+      processorCount: 1
+      processors:
+        - manufacturer: Intel
+          productName: Intel(R) Xeon(R) CPU E5-2630 v3 @ 2.40GHz
+          speed: 2400
+          coreCount: 8
+          threadCount: 16
+    memory:
+      totalSize: 32 GB
+      moduleCount: 2
+      modules:
+        - manufacturer: 002C00B3002C
+          productName: 18ASF2G72PDZ-2G3B1
+          serialNumber: 12BDC045
+          type: LPDDR3
+          size: 16384
+          speed: 2400
+        - manufacturer: 002C00B3002C
+          productName: 18ASF2G72PDZ-2G3B1
+          serialNumber: 12BDBF5D
+          type: LPDDR3
+          size: 16384
+          speed: 2400
+    storage:
+      totalSize: 1116 GB
+      deviceCount: 1
+      devices:
+        - productName: PERC H730 Mini
+          type: HDD
+          name: sda
+          deviceName: /dev/sda
+          size: 1199101181952
+          wwid: naa.61866da055de070028d8e83307cc6df2
+    network:
+      interfaceCount: 2
+      interfaces:
+        - index: 1
+          name: lo
+          flags: up|loopback
+          mtu: 65536
+          mac: ""
+          addresses:
+            - 127.0.0.1/8
+            - ::1/128
+        - index: 2
+          name: enp3s0
+          flags: up|broadcast|multicast
+          mtu: 1500
+          mac: "40:8d:5c:86:5a:14"
+          addresses:
+            - 192.168.2.8/24
+            - fe80::dcb3:295c:755b:91bb/64
