@@ -15,5 +15,5 @@ spec:
         caBundle: Cg==
         service:
           namespace: system
-          name: webhook-service
+          name: sidero-webhook-service
           path: /convert

@@ -79,6 +79,7 @@ RUN protoc -I/src/app/sidero-controller-manager/internal/api \
   api.proto
 RUN --mount=type=cache,target=/.cache controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
 RUN --mount=type=cache,target=/.cache conversion-gen --input-dirs="./app/caps-controller-manager/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
+RUN --mount=type=cache,target=/.cache conversion-gen --input-dirs="./app/sidero-controller-manager/api/v1alpha1" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
 ARG MODULE
 RUN --mount=type=cache,target=/.cache gofumports -w -local ${MODULE} .
 

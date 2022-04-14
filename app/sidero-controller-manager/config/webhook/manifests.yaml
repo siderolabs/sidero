@@ -11,6 +11,27 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
+      path: /validate-metal-sidero-dev-v1alpha2-server
+  failurePolicy: Fail
+  name: vservers.metal.sidero.dev
+  rules:
+  - apiGroups:
+    - metal.sidero.dev
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    resources:
+    - servers
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
       path: /validate-metal-sidero-dev-v1alpha1-server
   failurePolicy: Fail
   name: vservers.metal.sidero.dev

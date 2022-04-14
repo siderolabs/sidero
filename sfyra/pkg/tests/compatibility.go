@@ -59,10 +59,10 @@ func TestCompatibilityCluster(ctx context.Context, metalClient client.Client, cl
 
 			environment.APIVersion = constants.SideroAPIVersion
 			environment.Name = envName
-			environment.Spec.Kernel.URL = fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/vmlinuz-amd64", talosRelease)
+			environment.Spec.Kernel.URL = fmt.Sprintf("https://github.com/siderolabs/talos/releases/download/%s/vmlinuz-amd64", talosRelease)
 			environment.Spec.Kernel.SHA512 = ""
 			environment.Spec.Kernel.Args = cmdline.Strings()
-			environment.Spec.Initrd.URL = fmt.Sprintf("https://github.com/talos-systems/talos/releases/download/%s/initramfs-amd64.xz", talosRelease)
+			environment.Spec.Initrd.URL = fmt.Sprintf("https://github.com/siderolabs/talos/releases/download/%s/initramfs-amd64.xz", talosRelease)
 			environment.Spec.Initrd.SHA512 = ""
 
 			require.NoError(t, metalClient.Create(ctx, &environment))

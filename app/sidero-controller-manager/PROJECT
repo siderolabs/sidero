@@ -10,4 +10,13 @@ resources:
 - group: metal
   kind: ServerClass
   version: v1alpha1
+- group: metal
+  kind: Environment
+  version: v1alpha2
+- group: metal
+  kind: Server
+  version: v1alpha2
+- group: metal
+  kind: ServerClass
+  version: v1alpha2
 version: "2"
