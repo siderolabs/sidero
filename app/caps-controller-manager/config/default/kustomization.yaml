@@ -15,7 +15,7 @@ bases:
 
 patchesStrategicMerge:
   - manager_webhook_patch.yaml
-#  - webhookcainjection_patch.yaml
+  - webhookcainjection_patch.yaml
 
 vars:
   - name: CERTIFICATE_NAMESPACE # namespace of the certificate CR
