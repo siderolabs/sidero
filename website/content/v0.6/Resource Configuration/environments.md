@@ -8,7 +8,7 @@ Environments are a custom resource provided by the Metal Controller Manager.
 An environment is a codified description of what should be returned by the PXE server when a physical server attempts to PXE boot.
 
 Especially important in the environment types are the kernel args.
-From here, one can tweak the IP to the metadata server as well as various other kernel options that [Talos](https://www.talos.dev/docs/v0.13/reference/kernel/#commandline-parameters) and/or the Linux kernel supports.
+From here, one can tweak the IP to the metadata server as well as various other kernel options that [Talos](hhttps://www.talos.dev/latest/reference/kernel/) and/or the Linux kernel supports.
 
 Environments can be supplied to a given server either at the Server or the ServerClass level.
 The hierarchy from most to least respected is:

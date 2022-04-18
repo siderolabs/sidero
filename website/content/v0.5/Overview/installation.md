@@ -14,7 +14,6 @@ Sidero supports several variables to configure the installation, these variables
 variables or as variables in the `clusterctl` configuration:
 
 - `SIDERO_CONTROLLER_MANAGER_HOST_NETWORK` (`false`): run `sidero-controller-manager` on host network
-`SIDERO_CONTROLLER_MANAGER_HOST_NETWORK` is `true`
 - `SIDERO_CONTROLLER_MANAGER_API_ENDPOINT` (empty): specifies the IP address controller manager API service can be reached on, defaults to the node IP (TCP)
 - `SIDERO_CONTROLLER_MANAGER_API_PORT` (8081): specifies the port controller manager can be reached on
 - `SIDERO_CONTROLLER_MANAGER_CONTAINER_API_PORT` (8081): specifies the controller manager internal container port

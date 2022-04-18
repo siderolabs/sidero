@@ -6,9 +6,9 @@ weight: 5
 
 Upgrading a running workload cluster or management plane is the same process as describe in the Talos documentation.
 
-To upgrade the Talos OS, see [here](https://www.talos.dev/docs/v0.13/guides/upgrading-talos).
+To upgrade the Talos OS, see [here](https://www.talos.dev/latest/talos-guides/upgrading-talos/).
 
-In order to upgrade Kubernetes itself, see [here](https://www.talos.dev/docs/v0.13/guides/upgrading-kubernetes/).
+In order to upgrade Kubernetes itself, see [here](https://www.talos.dev/latest/kubernetes-guides/upgrading-kubernetes/).
 
 ## Upgrading Talos 0.8 -> 0.9
 

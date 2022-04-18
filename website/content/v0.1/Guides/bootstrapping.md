@@ -22,7 +22,7 @@ curl -Lo /usr/local/bin/talosctl https://github.com/talos-systems/talos/releases
 chmod +x /usr/local/bin/talosctl
 ```
 
-You can read more about Talos and `talosctl` at [talos.dev](https://www.talos.dev/docs/latest).
+You can read more about Talos and `talosctl` at [talos.dev](https://www.talos.dev/latest).
 
 Next, there are two big prerequisites involved with bootstrapping Sidero: routing and DHCP setup.
 

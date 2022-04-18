@@ -12,7 +12,7 @@ For folks who are willing to take care of their management plane in other ways, 
 
 The rough outline of this process is very short and sweet, as it relies on other documentation:
 
-- For each management plane node, boot the ISO and install Talos using the "apply-config" process mentioned in our Talos [Getting Started](https://www.talos.dev/docs/v0.10/introduction/getting-started/) docs.
+- For each management plane node, boot the ISO and install Talos using the "apply-config" process mentioned in our Talos [Getting Started](https://www.talos.dev/latest/introduction/getting-started/) docs.
   These docs go into heavy detail on using the ISO, so they will not be recreated here.
 
 - With a Kubernetes cluster now in hand (and with access to it via `talosctl` and `kubectl`), you can simply pickup the Getting Started tutorial at the "Install Sidero" section [here](../../getting-started/install-clusterapi).
@@ -20,4 +20,4 @@ The rough outline of this process is very short and sweet, as it relies on other
 
 > Note: It may also be of interest to view the prereq guides on [CLI](../../getting-started/prereq-cli-tools) and [DHCP](../../getting-started/prereq-dhcp) setup, as they will still apply to this method.
 
-- For long-term maintenance of a management plane created in this way, refer to the Talos documentation for upgrading [Kubernetes](https://www.talos.dev/docs/v0.10/guides/upgrading-kubernetes/) and [Talos](https://www.talos.dev/docs/v0.10/guides/upgrading-talos/) itself.
+- For long-term maintenance of a management plane created in this way, refer to the Talos documentation for upgrading [Kubernetes](https://www.talos.dev/latest/kubernetes-guides/upgrading-kubernetes/) and [Talos](https://www.talos.dev/latest/talos-guides/upgrading-talos/) itself.

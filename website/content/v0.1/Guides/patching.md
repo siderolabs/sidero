@@ -5,7 +5,7 @@ title: Patching
 ---
 
 Server resources can be updated by using the `configPatches` section of the custom resource.
-Any field of the [Talos machine config](https://www.talos.dev/docs/v0.8/reference/configuration/)
+Any field of the [Talos machine config](https://www.talos.dev/latest/reference/configuration/)
 can be overridden on a per-machine basis using this method.
 The format of these patches is based on [JSON 6902](http://jsonpatch.com/) that you may be used to in tools like kustomize.
 
