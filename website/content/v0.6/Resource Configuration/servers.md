@@ -148,7 +148,7 @@ In this design, a "sidero" user will be added to the IPMI user list and a random
 This information is then squirreled away in a Kubernetes secret in the `sidero-system` namespace, with a name format of `<server-uuid>-bmc`.
 Users wishing to turn off this feature can pass the `--auto-bmc-setup=false` flag to `sidero-controller-manager`
 
-IMPI connection information can also be set manually in the `Server` spec after initial registration:
+IPMI connection information can also be set manually in the `Server` spec after initial registration:
 
 ```yaml
 apiVersion: metal.sidero.dev/v1alpha2

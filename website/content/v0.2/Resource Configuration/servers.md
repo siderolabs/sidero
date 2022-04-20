@@ -89,7 +89,7 @@ its exit.
 
 Sidero can use IPMI information to control `Server` power state, reboot servers and set boot order.
 
-IMPI connection information can be set in the `Server` spec after initial registration:
+IPMI connection information can be set in the `Server` spec after initial registration:
 
 ```yaml
 apiVersion: metal.sidero.dev/v1alpha1

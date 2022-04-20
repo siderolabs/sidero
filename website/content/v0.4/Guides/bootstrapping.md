@@ -174,7 +174,7 @@ Sidero can use IPMI information to control Server power state, reboot servers an
 IPMI information will be, by default, setup automatically if possible as part of the acceptance process.
 See [IPMI](../../resource-configuration/servers/#ipmi) for more information.
 
-IMPI connection information can also be set manually in the Server spec after initial registration:
+IPMI connection information can also be set manually in the Server spec after initial registration:
 
 ```bash
 kubectl patch server 00000000-0000-0000-0000-d05099d33360 --type='json' -p='[{"op": "add", "path": "/spec/bmc", "value": {"endpoint": "192.168.88.9", "user": "ADMIN", "pass":"ADMIN"}}]'
