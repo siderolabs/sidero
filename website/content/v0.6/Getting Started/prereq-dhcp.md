@@ -8,8 +8,8 @@ In order to network boot Talos, we need to set up our DHCP server to supply the
 network boot parameters to our servers.
 For maximum flexibility, Sidero makes use of iPXE to be able to reference
 artifacts via HTTP.
-Some modern servers support direct UEFI HTTP boot, but most existing servers
-still rely on the old, slow TFTP-based PXE boot first.
+Some modern servers support direct UEFI HTTP boot, but most servers
+still rely on the old TFTP-based PXE boot first.
 Therefore, we need to tell our DHCP server to find the iPXE binary on a TFTP
 server.
 
@@ -53,16 +53,9 @@ filename "ipxe.efi";
 
 ## Multiple client types
 
-Any given server will usually use only one of those, but if you have a mix of
-machines, you may need a combination of them.
-In this case, you would need a way to provide different images for different
-client or machine types.
+If you have a mix of machines, you may need a way to provide different images for different machine types.
 
-Both ISC DHCP server and dnsmasq provide ways to supply such conditional responses.
-In this tutorial, we are working with ISC DHCP.
-
-For modularity, we are breaking the conditional statements into a separate file
-and using the `include` statement to load them into the main `dhcpd.conf` file.
+Most DHCP servers provide ways to supply such conditional responses: the examples below are for ISC DHCP.
 
 In our example below, `172.16.199.50` is the IP address of our Sidero service.
 
@@ -114,8 +107,8 @@ shared-network sidero {
 }
 ```
 
-Since we use a number of Ubiquiti EdgeRouter devices especially in our home test
-networks, it is worth mentioning the curious syntax gymnastics we must go
+Since we use a number of Ubiquiti EdgeRouter devices in our home test
+networks, it is worth mentioning the syntax gymnastics we must go
 through there.
 Essentially, the quotes around the path need to be entered as HTML entities:
 `&quot;`.
@@ -133,13 +126,8 @@ The first is part of the HTML-encoded **"** (`&quot;`) and the second is the act
 
 ## Troubleshooting
 
-Getting the netboot environment is tricky and debugging it is difficult.
-Once running, it will generally stay running;
-the problem is nearly always one of a missing or incorrect configuration, since
+Getting the netboot environment correct is tricky and debugging it is difficult:
+ the problem is nearly always one of a missing or incorrect configuration, since
 the process involves several different components.
-
-We are working toward integrating as much as possible into Sidero, to provide as
-much intelligence and automation as can be had, but until then, you will likely
-need to figure out how to begin hunting down problems.
 
 See the Sidero [Troubleshooting](../troubleshooting) guide for more assistance.
