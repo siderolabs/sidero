@@ -1,3 +1,102 @@
+## [Sidero 0.5.1](https://github.com/talos-systems/sidero/releases/tag/v0.5.1) (2022-05-18)
+
+Welcome to the v0.5.1 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Sidero Deployment Strategy Configuration
+
+Allow configuring deployment strategy. Setting the deployment strategy to `Recreate` when running a single instance of Sidero
+makes it possible to upgrade the pod (but with a small amount of downtime).
+
+
+### Contributors
+
+* Andrey Smirnov
+* Artem Chernyshev
+* Andrey Smirnov
+* Noel Georgi
+* Spencer Smith
+* Gerard de Leeuw
+
+### Changes
+<details><summary>14 commits</summary>
+<p>
+
+* [`75bd1b5`](https://github.com/talos-systems/sidero/commit/75bd1b5aa82dc9786febb0b38f2dd02396e77f92) release(v0.5.1): prepare release
+* [`aba63be`](https://github.com/talos-systems/sidero/commit/aba63bef0c087d8a403d51efb226f75f4b309553) chore: allow several commits
+* [`a9bd3e8`](https://github.com/talos-systems/sidero/commit/a9bd3e879a28222daf04a57a631c4ea27c06c321) fix: append Talos default kernel args even if there is something defined
+* [`7d56bf5`](https://github.com/talos-systems/sidero/commit/7d56bf53ad705d804362dc3e51aece830648a458) chore: bump dependencies
+* [`73c10e0`](https://github.com/talos-systems/sidero/commit/73c10e0161ba44378e042103fa2774ffe83031ab) chore: bump dependencies
+* [`bd8310e`](https://github.com/talos-systems/sidero/commit/bd8310ef905db2f5dfe1847b96b997ed6bb55f01) chore: bump dependencies
+* [`a2ac959`](https://github.com/talos-systems/sidero/commit/a2ac95940f23ddbaabf36c613850d1af789fae5d) chore: bump dependencies
+* [`65e9a79`](https://github.com/talos-systems/sidero/commit/65e9a79575db0850130f72c3a7c3a06534267b21) fix: ipxe prompt on ARM64
+* [`4bd507c`](https://github.com/talos-systems/sidero/commit/4bd507c5231e69814464e1a6e18405aa7cd0f0ed) feat: update to Talos 1.0
+* [`3e9379e`](https://github.com/talos-systems/sidero/commit/3e9379ebd87207a9042785540f8e4ce743b74879) chore: update more registries
+* [`294fd62`](https://github.com/talos-systems/sidero/commit/294fd62354b980c2ade3e856cb6710779d76a883) feat: allow configuring Sidero deployment strategy
+* [`41880ed`](https://github.com/talos-systems/sidero/commit/41880ed359ad0bbbd0dbcaf3d1f70e18f3345a10) chore: fix gpg check and sfyra build
+* [`0c95d0a`](https://github.com/talos-systems/sidero/commit/0c95d0a144761a2a72f3e78e7f4ca2cb5e20e282) chore: bump cert-manager to v1
+* [`4bb5a42`](https://github.com/talos-systems/sidero/commit/4bb5a4252ec80a836d52df26dae285c67fa2ea75) chore: bump dependencies
+</p>
+</details>
+
+### Changes from talos-systems/go-blockdevice
+<details><summary>4 commits</summary>
+<p>
+
+* [`ec428fe`](https://github.com/talos-systems/go-blockdevice/commit/ec428fed2ecd5a389833a88f8dc333762816db99) fix: lookup filesystem labels on the actual device path
+* [`7b9de26`](https://github.com/talos-systems/go-blockdevice/commit/7b9de26bc6bc3d54b95bd8e8fb3aade4b45adc6c) feat: read symlink fullpath in block device list function
+* [`6928ee4`](https://github.com/talos-systems/go-blockdevice/commit/6928ee43c3034549e32f000f8b7bc16a6ebb7ed4) refactor: rewrite GPT serialize/deserialize functions
+* [`0c7e429`](https://github.com/talos-systems/go-blockdevice/commit/0c7e4296e01b3df815a935db3e30de6b9d4cc1d1) refactor: simplify middle endian functions
+</p>
+</details>
+
+### Changes from talos-systems/grpc-proxy
+<details><summary>4 commits</summary>
+<p>
+
+* [`b076302`](https://github.com/talos-systems/grpc-proxy/commit/b076302cc46ec6742e71fe1d49f6ec2d5d3a15dc) fix: use io.EOF error when no backend connections are available
+* [`82daca0`](https://github.com/talos-systems/grpc-proxy/commit/82daca0322a4293bd27071ae1ba8dd5097509d21) docs: update README
+* [`fa6843a`](https://github.com/talos-systems/grpc-proxy/commit/fa6843ae5b64500d481a1d031790406ed9df77d7) chore: fix spelling
+* [`c0a87d9`](https://github.com/talos-systems/grpc-proxy/commit/c0a87d95be9c62b0c4fd1fa694ef768e1f8e2391) chore: major cleanup of the code and build
+</p>
+</details>
+
+### Changes from talos-systems/net
+<details><summary>1 commit</summary>
+<p>
+
+* [`409926a`](https://github.com/talos-systems/net/commit/409926aec1c3e659d6c245db4c0b90b0eaa4fdbc) fix: parse correctly some IPv6 CIDRs
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/go-logr/logr**                  v0.4.0 -> v1.2.3
+* **github.com/onsi/gomega**                   v1.18.1 -> v1.19.0
+* **github.com/stretchr/testify**              v1.7.0 -> v1.7.1
+* **github.com/talos-systems/go-blockdevice**  v0.2.5 -> v0.3.1
+* **github.com/talos-systems/grpc-proxy**      v0.2.0 -> v0.3.0
+* **github.com/talos-systems/net**             v0.3.1 -> v0.3.2
+* **go.uber.org/zap**                          v1.20.0 -> v1.21.0
+* **golang.org/x/net**                         cd36cc0744dd -> 2871e0cb64e4
+* **golang.org/x/sys**                         99c3d69c2c27 -> b6088ccd6cba
+* **golang.zx2c4.com/wireguard/wgctrl**        daad0b7ba671 -> 9490840b0b01
+* **google.golang.org/grpc**                   v1.44.0 -> v1.45.0
+* **google.golang.org/protobuf**               v1.27.1 -> v1.28.0
+* **k8s.io/api**                               v0.22.2 -> v0.23.6
+* **k8s.io/apiextensions-apiserver**           v0.22.2 -> v0.23.6
+* **k8s.io/apimachinery**                      v0.22.2 -> v0.23.6
+* **k8s.io/client-go**                         v0.22.2 -> v0.23.6
+* **k8s.io/utils**                             cb0fa318a74b -> 3a6ce19ff2f9
+* **sigs.k8s.io/cluster-api**                  v1.0.4 -> v1.1.3
+* **sigs.k8s.io/controller-runtime**           v0.10.3 -> v0.11.2
+
+Previous release can be found at [v0.5.0](https://github.com/talos-systems/sidero/releases/tag/v0.5.0)
+
 ## [Sidero 0.5.0](https://github.com/talos-systems/sidero/releases/tag/v0.5.0) (2022-02-14)
 
 Welcome to the v0.5.0 release of Sidero!  
