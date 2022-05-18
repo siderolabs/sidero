@@ -496,6 +496,7 @@ func appendTalosArguments(env *metalv1alpha1.Environment) {
 	logDeliveryPrefix := talosconstants.KernelParamLoggingKernel + "="
 	eventsSinkPrefix := talosconstants.KernelParamEventsSink + "="
 
+outer:
 	for _, prefix := range []string{
 		talosConfigPrefix,
 		sideroLinkPrefix,
@@ -505,7 +506,7 @@ func appendTalosArguments(env *metalv1alpha1.Environment) {
 		for _, arg := range args {
 			if strings.HasPrefix(arg, prefix) {
 				// Environment already has variable, skip it
-				return
+				continue outer
 			}
 		}
 
