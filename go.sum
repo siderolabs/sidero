@@ -707,8 +707,8 @@ github.com/talos-systems/go-procfs v0.1.0/go.mod h1:ATyUGFQIW8OnbnmvqefZWVPgL9g+
 github.com/talos-systems/go-retry v0.1.1-0.20201113203059-8c63d290a688/go.mod h1:HiXQqyVStZ35uSY/MTLWVvQVmC3lIW2MS5VdDaMtoKM=
 github.com/talos-systems/go-retry v0.3.1 h1:GjjyHB8i1CJpb1O5qYPMljq74cRQ5uiDoyMaWddA5FA=
 github.com/talos-systems/go-retry v0.3.1/go.mod h1:HiXQqyVStZ35uSY/MTLWVvQVmC3lIW2MS5VdDaMtoKM=
-github.com/talos-systems/go-smbios v0.1.2-0.20220202124743-3f1e775b7e3e h1:z2ig8zuE00kbVhyWmTQdDWbDIN5HnCKaouyjiTHCMxs=
-github.com/talos-systems/go-smbios v0.1.2-0.20220202124743-3f1e775b7e3e/go.mod h1:vk76naUSZaWE8Z95wbDn51FgH0goECM4oK3KY2hYSMU=
+github.com/talos-systems/go-smbios v0.1.1 h1:Au6obB/Pp0i0JHhvPlzONk5aoNseosO2BUsmvWWi7y8=
+github.com/talos-systems/go-smbios v0.1.1/go.mod h1:vk76naUSZaWE8Z95wbDn51FgH0goECM4oK3KY2hYSMU=
 github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67 h1:1MyiKkPFn0OnpOnmMMVlvFtmeUB/HIRzDVL66DQBOXg=
 github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67/go.mod h1:Vr1Oadtcem03hG2RUT/dpSQS5md9d6rJ9nA0lUBC91Q=
 github.com/talos-systems/grpc-proxy v0.3.0 h1:pM4P6GqzjmZzq6jAxeP2mzjuTbx9B2E5peVdi2bufM4=

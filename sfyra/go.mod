@@ -26,7 +26,7 @@ require (
 	google.golang.org/grpc v1.46.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/api v0.23.6
-	k8s.io/apiextensions-apiserver v0.23.5
+	k8s.io/apiextensions-apiserver v0.23.6
 	k8s.io/apimachinery v0.23.6
 	k8s.io/client-go v0.23.6
 	sigs.k8s.io/cluster-api v1.1.3
@@ -111,7 +111,7 @@ require (
 	github.com/mdlayher/ethtool v0.0.0-20220213132912-856bd6cb8a38 // indirect
 	github.com/mdlayher/genetlink v1.2.0 // indirect
 	github.com/mdlayher/netlink v1.6.0 // indirect
-	github.com/mdlayher/socket v0.2.1 // indirect
+	github.com/mdlayher/socket v0.2.3 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.0.0 // indirect
