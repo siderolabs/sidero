@@ -45,7 +45,7 @@ ENV GOMODCACHE /.cache/mod
 RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.8.0
 RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.23.1
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
-RUN curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b /toolchain/bin v1.43.0
+RUN curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.43.0/install.sh | bash -s -- -b /toolchain/bin v1.43.0
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
