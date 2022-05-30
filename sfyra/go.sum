@@ -288,8 +288,9 @@ github.com/containerd/fifo v1.0.0/go.mod h1:ocF/ME1SX5b1AOlWi9r677YJmCPSwwWnQ9O1
 github.com/containerd/go-cni v1.0.1/go.mod h1:+vUpYxKvAF72G9i1WoDOiPGRtQpqsNW/ZHtSlv++smU=
 github.com/containerd/go-cni v1.0.2/go.mod h1:nrNABBHzu0ZwCug9Ije8hL2xBCYh/pjfMb1aZGrrohk=
 github.com/containerd/go-cni v1.1.0/go.mod h1:Rflh2EJ/++BA2/vY5ao3K6WJRR/bZKsX123aPk+kUtA=
-github.com/containerd/go-cni v1.1.3 h1:t0MQwrtM96SH71Md8tH0uKrVE9v+jxkDTbvFSm3B9VE=
 github.com/containerd/go-cni v1.1.3/go.mod h1:Rflh2EJ/++BA2/vY5ao3K6WJRR/bZKsX123aPk+kUtA=
+github.com/containerd/go-cni v1.1.5 h1:WUkuZ6kDkmECdd/qEPetq1czj6ivDkAoaOpL8yv8vO8=
+github.com/containerd/go-cni v1.1.5/go.mod h1:Rf2ZrMycr1El589IyuRzn7RkfdRZVKaFGaxSDHVAjj0=
 github.com/containerd/go-runc v0.0.0-20180907222934-5a6d9f37cfa3/go.mod h1:IV7qH3hrUgRmyYrtgEeGWJfWbgcHL9CSRruz2Vqcph0=
 github.com/containerd/go-runc v0.0.0-20190911050354-e029b79d8cda/go.mod h1:IV7qH3hrUgRmyYrtgEeGWJfWbgcHL9CSRruz2Vqcph0=
 github.com/containerd/go-runc v0.0.0-20200220073739-7016d3ce2328/go.mod h1:PpyHrqVs8FTi9vpyHwPwiNEGaACDxT/N/pLcvMSRA9g=
@@ -322,8 +323,9 @@ github.com/containerd/zfs v1.0.0/go.mod h1:m+m51S1DvAP6r3FcmYCp54bQ34pyOwTieQDNR
 github.com/containernetworking/cni v0.7.1/go.mod h1:LGwApLUm2FpoOfxTDEeq8T9ipbpZ61X79hmU3w8FmsY=
 github.com/containernetworking/cni v0.8.0/go.mod h1:LGwApLUm2FpoOfxTDEeq8T9ipbpZ61X79hmU3w8FmsY=
 github.com/containernetworking/cni v0.8.1/go.mod h1:LGwApLUm2FpoOfxTDEeq8T9ipbpZ61X79hmU3w8FmsY=
-github.com/containernetworking/cni v1.0.1 h1:9OIL/sZmMYDBe+G8svzILAlulUpaDTUjeAbtH/JNLBo=
 github.com/containernetworking/cni v1.0.1/go.mod h1:AKuhXbN5EzmD4yTNtfSsX3tPcmtrBI6QcRV0NiNt15Y=
+github.com/containernetworking/cni v1.1.0 h1:T00oIz4hef+/p9gpRZa57SnIN+QnbmAHBjbxaOSFo9U=
+github.com/containernetworking/cni v1.1.0/go.mod h1:sDpYKmGVENF3s6uvMvGgldDWeG8dMxakj/u+i9ht9vw=
 github.com/containernetworking/plugins v0.8.6/go.mod h1:qnw5mN19D8fIwkqW7oHHYDHVlzhJpcY6TQxn/fUyDDM=
 github.com/containernetworking/plugins v0.9.1/go.mod h1:xP/idU2ldlzN6m4p5LmGiwRDjeJr6FLK6vuiUwoH7P8=
 github.com/containernetworking/plugins v1.0.1/go.mod h1:QHCfGpaTwYTbbH+nZXKVTxNBDZcxSOplJT5ico8/FLE=
@@ -1251,8 +1253,9 @@ github.com/talos-systems/talos v1.0.4 h1:VfieSk5Ajm+otYY/IyhGDEf/Hvm2X+roA6bowtP
 github.com/talos-systems/talos v1.0.4/go.mod h1:y3Po+Pjge7Ai5GghIWDY5OLU2vOaz7H2xGLWwglg55E=
 github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.1.0.20211118180932-1ffa8e048008/go.mod h1:D8NT4Aj+X2OpA6yK6RAtpw1wcgkDS7oD23vqOQWRiP8=
 github.com/talos-systems/talos/pkg/machinery v1.0.0/go.mod h1:cJ/031WJGDnGQLW+zp+0lwkEn47orpJdfsJDf0BQVGM=
-github.com/talos-systems/talos/pkg/machinery v1.0.4 h1:zUZgIRSxAXOI6LygMDUqgS0rtFTf4DpDCL35UpW/6s4=
 github.com/talos-systems/talos/pkg/machinery v1.0.4/go.mod h1:cJ/031WJGDnGQLW+zp+0lwkEn47orpJdfsJDf0BQVGM=
+github.com/talos-systems/talos/pkg/machinery v1.0.5 h1:f+szjO23sDPhxKIxHM5Dk++Vvb5m5JYrbqHGPlglqgs=
+github.com/talos-systems/talos/pkg/machinery v1.0.5/go.mod h1:6+EuH7Eu9MaMC61wVOma0wqOiNZoLaB7wluMMy0BbZA=
 github.com/tchap/go-patricia v2.2.6+incompatible/go.mod h1:bmLyhP68RS6kStMGxByiQ23RP/odRBOTVjwp2cDyi6I=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20170815181823-89b8d40f7ca8/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
