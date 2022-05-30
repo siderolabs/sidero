@@ -137,10 +137,11 @@ github.com/cockroachdb/datadriven v0.0.0-20200714090401-bf6692d28da5/go.mod h1:h
 github.com/cockroachdb/errors v1.2.4/go.mod h1:rQD95gz6FARkaKkQXUksEje/d9a6wBJoCr5oaCLELYA=
 github.com/cockroachdb/logtags v0.0.0-20190617123548-eb05cc24525f/go.mod h1:i/u985jwjWRlyHXQbwatDASoW0RMlZ/3i9yJHE2xLkI=
 github.com/containerd/go-cni v1.1.0/go.mod h1:Rflh2EJ/++BA2/vY5ao3K6WJRR/bZKsX123aPk+kUtA=
-github.com/containerd/go-cni v1.1.3 h1:t0MQwrtM96SH71Md8tH0uKrVE9v+jxkDTbvFSm3B9VE=
-github.com/containerd/go-cni v1.1.3/go.mod h1:Rflh2EJ/++BA2/vY5ao3K6WJRR/bZKsX123aPk+kUtA=
-github.com/containernetworking/cni v1.0.1 h1:9OIL/sZmMYDBe+G8svzILAlulUpaDTUjeAbtH/JNLBo=
+github.com/containerd/go-cni v1.1.5 h1:WUkuZ6kDkmECdd/qEPetq1czj6ivDkAoaOpL8yv8vO8=
+github.com/containerd/go-cni v1.1.5/go.mod h1:Rf2ZrMycr1El589IyuRzn7RkfdRZVKaFGaxSDHVAjj0=
 github.com/containernetworking/cni v1.0.1/go.mod h1:AKuhXbN5EzmD4yTNtfSsX3tPcmtrBI6QcRV0NiNt15Y=
+github.com/containernetworking/cni v1.1.0 h1:T00oIz4hef+/p9gpRZa57SnIN+QnbmAHBjbxaOSFo9U=
+github.com/containernetworking/cni v1.1.0/go.mod h1:sDpYKmGVENF3s6uvMvGgldDWeG8dMxakj/u+i9ht9vw=
 github.com/coredns/caddy v1.1.0 h1:ezvsPrT/tA/7pYDBZxu0cT0VmWk75AfIaf6GSYCNMf0=
 github.com/coredns/caddy v1.1.0/go.mod h1:A6ntJQlAWuQfFlsd9hvigKbo2WS0VUs2l1e2F+BawD4=
 github.com/coredns/corefile-migration v1.0.14 h1:Tz3WZhoj2NdP8drrQH86NgnCng+VrPjNeg2Oe1ALKag=
@@ -719,8 +720,8 @@ github.com/talos-systems/net v0.3.2/go.mod h1:zhcGixNJz9dgwFiUwc7gkkAqdVqXagU1SN
 github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0 h1:O3qNq62Zl930/1jZQY1TUERSkmU8QVj+FcHQiOVPGbE=
 github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0/go.mod h1:bEGwDYl9QgC3oZ4kdnJTuR2HX/XlUhxZjx/QAakKuBc=
 github.com/talos-systems/talos/pkg/machinery v0.14.0-alpha.1.0.20211118180932-1ffa8e048008/go.mod h1:D8NT4Aj+X2OpA6yK6RAtpw1wcgkDS7oD23vqOQWRiP8=
-github.com/talos-systems/talos/pkg/machinery v1.0.4 h1:zUZgIRSxAXOI6LygMDUqgS0rtFTf4DpDCL35UpW/6s4=
-github.com/talos-systems/talos/pkg/machinery v1.0.4/go.mod h1:cJ/031WJGDnGQLW+zp+0lwkEn47orpJdfsJDf0BQVGM=
+github.com/talos-systems/talos/pkg/machinery v1.0.5 h1:f+szjO23sDPhxKIxHM5Dk++Vvb5m5JYrbqHGPlglqgs=
+github.com/talos-systems/talos/pkg/machinery v1.0.5/go.mod h1:6+EuH7Eu9MaMC61wVOma0wqOiNZoLaB7wluMMy0BbZA=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20201229170055-e5319fda7802/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
