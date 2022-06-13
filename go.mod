@@ -26,7 +26,7 @@ require (
 	github.com/talos-systems/grpc-proxy v0.3.0
 	github.com/talos-systems/net v0.3.2
 	github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0
-	github.com/talos-systems/talos/pkg/machinery v1.0.4
+	github.com/talos-systems/talos/pkg/machinery v1.0.6
 	go.uber.org/zap v1.21.0
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
@@ -51,8 +51,8 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/containerd/go-cni v1.1.3 // indirect
-	github.com/containernetworking/cni v1.0.1 // indirect
+	github.com/containerd/go-cni v1.1.5 // indirect
+	github.com/containernetworking/cni v1.1.0 // indirect
 	github.com/cosi-project/runtime v0.0.0-20211216175730-264f8fcd1a4f // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/digitalocean/go-smbios v0.0.0-20180907143718-390a4f403a8e // indirect
