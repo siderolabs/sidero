@@ -21,8 +21,8 @@ require (
 	github.com/talos-systems/go-retry v0.3.1
 	github.com/talos-systems/net v0.3.2
 	github.com/talos-systems/sidero v0.0.0-00010101000000-000000000000
-	github.com/talos-systems/talos v1.0.4
-	github.com/talos-systems/talos/pkg/machinery v1.0.4
+	github.com/talos-systems/talos v1.0.6
+	github.com/talos-systems/talos/pkg/machinery v1.0.6
 	google.golang.org/grpc v1.46.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/api v0.23.6
@@ -53,10 +53,10 @@ require (
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/containerd/containerd v1.6.2 // indirect
-	github.com/containerd/go-cni v1.1.3 // indirect
-	github.com/containernetworking/cni v1.0.1 // indirect
-	github.com/containernetworking/plugins v1.1.0 // indirect
+	github.com/containerd/containerd v1.6.6 // indirect
+	github.com/containerd/go-cni v1.1.6 // indirect
+	github.com/containernetworking/cni v1.1.1 // indirect
+	github.com/containernetworking/plugins v1.1.1 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
 	github.com/cosi-project/runtime v0.0.0-20211216175730-264f8fcd1a4f // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
