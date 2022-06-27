@@ -13,7 +13,7 @@ replace (
 
 require (
 	github.com/spf13/cobra v1.4.0
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.7.5
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.6
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-loadbalancer v0.1.2
@@ -24,7 +24,7 @@ require (
 	github.com/talos-systems/talos v1.0.4
 	github.com/talos-systems/talos/pkg/machinery v1.0.4
 	google.golang.org/grpc v1.46.0
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.23.6
 	k8s.io/apiextensions-apiserver v0.23.6
 	k8s.io/apimachinery v0.23.6
