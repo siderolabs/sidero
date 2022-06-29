@@ -120,7 +120,7 @@ var (
 )
 
 func bootFileHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, embeddedScriptBuf.Bytes())
+	w.Write(embeddedScriptBuf.Bytes())
 }
 
 //nolint:unparam
