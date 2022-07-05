@@ -73,7 +73,7 @@ Attempts to add qualifiers to it will be reverted.
 ## `configPatches`
 
 Server configs of servers matching a server class can be updated by using the `configPatches` section of the custom resource.
-See [patching](../guides/patching) for more information on how this works.
+See [patching](../../guides/patching) for more information on how this works.
 
 An example of settings the default install disk for all servers matching a server class:
 
