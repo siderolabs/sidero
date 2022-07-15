@@ -96,7 +96,16 @@ func run() error {
 		return fmt.Errorf("error listening for gRPC API: %w", err)
 	}
 
-	siderolink.Cfg.WireguardEndpoint = fmt.Sprintf("%s:%d", wireguardEndpoint, wireguardPort)
+	wireguardEndpointIP, err := getIPForHost(wireguardEndpoint)
+	if err != nil {
+		return err
+	}
+
+	if wireguardEndpoint != wireguardEndpointIP {
+		logger.Sugar().Infof("resolved wireguard endpoint %s to %s", wireguardEndpoint, wireguardEndpointIP)
+	}
+
+	siderolink.Cfg.WireguardEndpoint = fmt.Sprintf("%s:%d", wireguardEndpointIP, wireguardPort)
 
 	if err = siderolink.Cfg.LoadOrCreate(ctx, metalclient); err != nil {
 		return err
@@ -163,4 +172,22 @@ func run() error {
 	}
 
 	return nil
+}
+
+func getIPForHost(host string) (string, error) {
+	parsedIP, err := netaddr.ParseIP(host)
+	if err == nil {
+		return parsedIP.String(), nil
+	}
+
+	resolvedIPs, err := net.LookupIP(host)
+	if err != nil {
+		return "", err
+	}
+
+	if len(resolvedIPs) == 0 {
+		return "", fmt.Errorf("no IPs found for %s", host)
+	}
+
+	return resolvedIPs[0].String(), nil
 }
