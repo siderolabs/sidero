@@ -1,3 +1,40 @@
+## [Sidero 0.5.2](https://github.com/talos-systems/sidero/releases/tag/v0.5.2) (2022-07-18)
+
+Welcome to the v0.5.2 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Hostname Resolution for Siderolink Wireguard Endpoint
+
+It is now possible to specify a hostname as the wireguard endpoint (`SIDERO_CONTROLLER_MANAGER_SIDEROLINK_ENDPOINT`).
+Sidero will attempt to resolve the hostname to an IP address on startup and use the resolved IP.
+
+
+### Contributors
+
+* Utku Ozdemir
+* Andrey Smirnov
+* bzub
+
+### Changes
+<details><summary>4 commits</summary>
+<p>
+
+* [`acba599`](https://github.com/talos-systems/sidero/commit/acba59984bb4a791484f3b909ad0a95f33167668) fix: resolve wireguard endpoint to IP
+* [`a5cd4e9`](https://github.com/talos-systems/sidero/commit/a5cd4e9b40d4a002eee2e089d9bb164132b5e020) fix: use http response writer directly
+* [`bee6536`](https://github.com/talos-systems/sidero/commit/bee6536db6f70b5a47d9a0174b644f708c04c86b) test: integrate new controlplane loadbalancer
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.5.1](https://github.com/talos-systems/sidero/releases/tag/v0.5.1)
+
 ## [Sidero 0.5.1](https://github.com/talos-systems/sidero/releases/tag/v0.5.1) (2022-05-18)
 
 Welcome to the v0.5.1 release of Sidero!

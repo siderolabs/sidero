@@ -6,7 +6,7 @@ github_repo = "talos-systems/sidero"
 match_deps = "^github.com/(talos-systems/[a-zA-Z0-9-]+)$"
 
 # previous release
-previous = "v0.5.0"
+previous = "v0.5.1"
 
 pre_release = false
 
@@ -15,9 +15,9 @@ preface = """\
 
 [notes]
 
-    [notes.config]
-        title = "Sidero Deployment Strategy Configuration"
+    [notes.wg-endpoint-resolution]
+        title = "Hostname Resolution for Siderolink Wireguard Endpoint"
         description = """\
-Allow configuring deployment strategy. Setting the deployment strategy to `Recreate` when running a single instance of Sidero
-makes it possible to upgrade the pod (but with a small amount of downtime).
-""" 
+It is now possible to specify a hostname as the wireguard endpoint (`SIDERO_CONTROLLER_MANAGER_SIDEROLINK_ENDPOINT`).
+Sidero will attempt to resolve the hostname to an IP address on startup and use the resolved IP.
+"""
