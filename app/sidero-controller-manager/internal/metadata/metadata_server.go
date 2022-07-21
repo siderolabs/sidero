@@ -14,7 +14,7 @@ import (
 	jsonpatch "github.com/evanphx/json-patch"
 	"github.com/ghodss/yaml"
 	"github.com/talos-systems/talos/pkg/machinery/config/configloader"
-	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1"
+	talosv1alpha1 "github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1" //nolint:typecheck
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -284,7 +284,7 @@ func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
 
 	switch configProvider.Version() {
 	case "v1alpha1":
-		config, ok := configProvider.Raw().(*v1alpha1.Config)
+		config, ok := configProvider.Raw().(*talosv1alpha1.Config)
 		if !ok {
 			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unable to case config")}
 		}

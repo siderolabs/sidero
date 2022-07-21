@@ -13,6 +13,7 @@ import (
 	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
+//nolint:maintidx
 func TestFilterAcceptedServers(t *testing.T) {
 	t.Parallel()
 

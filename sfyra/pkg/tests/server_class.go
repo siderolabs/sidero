@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"sort"
 	"testing"
@@ -264,7 +265,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 		}
 
 		// Wait for metadata server to return a 200 for that UUID, then verify it has patch.
-		metadataEndpoint := fmt.Sprintf("http://%s:8081/configdata?uuid=dummyserver-0", cluster.SideroComponentsIP())
+		metadataEndpoint := fmt.Sprintf("http://%s/configdata?uuid=dummyserver-0", net.JoinHostPort(cluster.SideroComponentsIP().String(), "8081"))
 
 		var metadataBytes []byte
 
