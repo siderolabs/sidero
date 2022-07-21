@@ -140,7 +140,7 @@ require (
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.2 // indirect
 	github.com/talos-systems/crypto v0.3.5 // indirect
-	github.com/talos-systems/go-blockdevice v0.3.1 // indirect
+	github.com/talos-systems/go-blockdevice v0.3.4 // indirect
 	github.com/talos-systems/go-cmd v0.1.0 // indirect
 	github.com/u-root/uio v0.0.0-20210528114334-82958018845c // indirect
 	github.com/ulikunitz/xz v0.5.8 // indirect

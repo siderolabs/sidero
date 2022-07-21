@@ -328,6 +328,12 @@ func mainFunc() error {
 		for _, disk := range disks {
 			func(path string) {
 				eg.Go(func() error {
+					if disk.ReadOnly {
+						log.Printf("Skipping read-only disk %s", path)
+
+						return nil
+					}
+
 					log.Printf("Resetting %s", path)
 
 					bd, err := blockdevice.Open(path)

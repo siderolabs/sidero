@@ -16,7 +16,7 @@ require (
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.1
-	github.com/talos-systems/go-blockdevice v0.3.1
+	github.com/talos-systems/go-blockdevice v0.3.4
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-kmsg v0.1.1
 	github.com/talos-systems/go-procfs v0.1.0
