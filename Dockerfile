@@ -55,7 +55,6 @@ COPY ./app/ ./app/
 COPY ./internal/ ./internal/
 COPY ./hack/ ./hack/
 RUN --mount=type=cache,target=/.cache go list -mod=readonly all >/dev/null
-RUN --mount=type=cache,target=/.cache ! go mod tidy -v 2>&1 | grep .
 
 FROM base AS manifests-build
 RUN --mount=type=cache,target=/.cache controller-gen \
@@ -292,7 +291,6 @@ RUN --mount=type=cache,target=/.cache go mod download
 RUN --mount=type=cache,target=/.cache go mod verify
 COPY ./sfyra/ ./
 RUN --mount=type=cache,target=/.cache go list -mod=readonly all >/dev/null
-RUN --mount=type=cache,target=/.cache ! go mod tidy -v 2>&1 | grep .
 
 FROM sfyra-base AS lint-sfyra
 COPY .golangci.yml .
