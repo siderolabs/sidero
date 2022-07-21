@@ -96,7 +96,7 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		},
 		{
 			"TestCompatibilityCluster",
-			TestCompatibilityCluster(ctx, metalClient, cluster, vmSet, capiManager, options.PrevTalosRelease, options.KubernetesVersion),
+			TestCompatibilityCluster(ctx, metalClient, cluster, vmSet, capiManager, options.PrevTalosRelease, "v1.22.12"),
 		},
 		{
 			"TestServerPXEBoot",
@@ -166,5 +166,5 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		}
 	}
 
-	return testing.MainStart(matchStringOnly(func(pat, str string) (bool, error) { return true, nil }), testsToRun, nil, nil).Run() == 0
+	return testing.MainStart(matchStringOnly(func(pat, str string) (bool, error) { return true, nil }), testsToRun, nil, nil, nil).Run() == 0
 }

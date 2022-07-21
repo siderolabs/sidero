@@ -45,7 +45,8 @@ func withConfigURL(value string) clusterOption {
 
 // createCluster without waiting for it to become ready.
 func createCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, vmSet *vm.Set,
-	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string, options ...clusterOption) *loadbalancer.ControlPlane {
+	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string, options ...clusterOption,
+) *loadbalancer.ControlPlane {
 	t.Logf("deploying cluster %q from server class %q with loadbalancer port %d", clusterName, serverClassName, loadbalancerPort)
 
 	var opts clusterOptions
@@ -155,7 +156,8 @@ func waitForClusterReady(ctx context.Context, t *testing.T, metalClient client.C
 }
 
 func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, vmSet *vm.Set,
-	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string, options ...clusterOption) *loadbalancer.ControlPlane {
+	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string, options ...clusterOption,
+) *loadbalancer.ControlPlane {
 	loadbalancer := createCluster(ctx, t, metalClient, capiCluster, vmSet, capiManager, clusterName, serverClassName, loadbalancerPort, controlPlaneNodes, workerNodes, talosVersion, kubernetesVersion, options...)
 
 	waitForClusterReady(ctx, t, metalClient, vmSet, clusterName)

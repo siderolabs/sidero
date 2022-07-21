@@ -71,9 +71,9 @@ func (a *Annotator) Run(ctx context.Context) error {
 	informer := informerFactory.Informer()
 
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    func(new interface{}) { a.notify(nil, new) }, //nolint:contextcheck
+		AddFunc:    func(new interface{}) { a.notify(nil, new) },
 		UpdateFunc: a.notify,
-		DeleteFunc: func(old interface{}) { a.notify(old, nil) }, //nolint:contextcheck
+		DeleteFunc: func(old interface{}) { a.notify(old, nil) },
 	})
 
 	informer.Run(ctx.Done())
@@ -145,7 +145,7 @@ func (a *Annotator) notify(old, new interface{}) {
 			delete(a.nodes, oldServerBinding.Spec.SideroLink.NodeAddress)
 		}
 
-		annotation, err := a.buildAnnotation(newServerBinding) //nolint:contextcheck
+		annotation, err := a.buildAnnotation(newServerBinding)
 		if err != nil {
 			a.logger.Error("failure building annotation", zap.Error(err))
 		}

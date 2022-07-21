@@ -154,6 +154,9 @@ linters:
     - tagliatelle
     - varnamelen
     - gomoddirectives
+    - exhaustruct
+    - nosnakecase
+    - nonamedreturns
     # abandoned linters for which golangci shows the warning that the repo is archived by the owner
     - interfacer
     - maligned

@@ -213,7 +213,7 @@ func (cluster *Cluster) create(ctx context.Context) error {
 	configBundle, err := bundle.NewConfigBundle(bundle.WithInputOptions(
 		&bundle.InputOptions{
 			ClusterName: cluster.options.Name,
-			Endpoint:    fmt.Sprintf("https://%s:6443", defaultInternalLB),
+			Endpoint:    fmt.Sprintf("https://%s", net.JoinHostPort(defaultInternalLB, "6443")),
 			GenOptions: append(
 				genOptions,
 				generate.WithEndpointList([]string{masterEndpoint}),

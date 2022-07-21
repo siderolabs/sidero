@@ -42,10 +42,10 @@ ARG CGO_ENABLED
 ENV CGO_ENABLED ${CGO_ENABLED}
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
-RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.8.0
+RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2
 RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.23.1
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
-RUN curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.43.0/install.sh | bash -s -- -b /toolchain/bin v1.43.0
+RUN curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.47.2/install.sh | bash -s -- -b /toolchain/bin v1.47.2
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
