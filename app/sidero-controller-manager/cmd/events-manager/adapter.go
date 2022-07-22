@@ -89,8 +89,22 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 	case *machine.AddressEvent:
 		fields = append(fields, zap.String("hostname", event.GetHostname()), zap.String("addresses", strings.Join(event.GetAddresses(), ",")))
 
+		// filter out SideroLink address from the list
+		addresses := event.Addresses
+
+		n := 0
+
+		for _, addr := range addresses {
+			if addr != ip {
+				addresses[n] = addr
+				n++
+			}
+		}
+
+		addresses = addresses[:n]
+
 		err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
-			serverbinding.Spec.Addresses = event.Addresses
+			serverbinding.Spec.Addresses = addresses
 			serverbinding.Spec.Hostname = event.Hostname
 		})
 
