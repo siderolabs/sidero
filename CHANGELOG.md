@@ -1,3 +1,59 @@
+## [Sidero 0.5.3](https://github.com/talos-systems/sidero/releases/tag/v0.5.3) (2022-07-25)
+
+Welcome to the v0.5.3 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Sidero Agent and Read-Only Blockdevices
+
+Sidero Agent now correctly skips read-only blockdevices when resetting the machine.
+
+
+### Talos 1.1.x Support
+
+This release of Sidero brings compatibility with Talos v1.1.x release series.
+
+
+### Contributors
+
+* Andrey Smirnov
+* Seán C McCord
+* Spencer Smith
+
+### Changes
+<details><summary>3 commits</summary>
+<p>
+
+* [`df1d0c2`](https://github.com/talos-systems/sidero/commit/df1d0c277245f87e26fd9c4004834db6fc8f0c3e) fix: filter out SideroLink address from Machine addresses
+* [`0008b0d`](https://github.com/talos-systems/sidero/commit/0008b0db562af21148f9040c454bff2f44cc4b51) feat: update base Talos to 1.1.1
+* [`fd6497f`](https://github.com/talos-systems/sidero/commit/fd6497fd0198d8aa177f589e14cf94289b42eb21) fix: skip read-only block devices on wiping
+</p>
+</details>
+
+### Changes from talos-systems/go-blockdevice
+<details><summary>5 commits</summary>
+<p>
+
+* [`74ea471`](https://github.com/talos-systems/go-blockdevice/commit/74ea47109c4525bec139640fed6354ad3097f5fb) feat: add freebsd stubs
+* [`9fa801c`](https://github.com/talos-systems/go-blockdevice/commit/9fa801cf4da184e3560b9a18ba43d13316f172f9) feat: add ReadOnly attribute to Disk
+* [`fccee8b`](https://github.com/talos-systems/go-blockdevice/commit/fccee8bb082b105cb60db40cb01636efc3241b5f) chore: rekres the source, fix issues
+* [`d9c3a27`](https://github.com/talos-systems/go-blockdevice/commit/d9c3a273886113e24809ef1e9930fc982318217d) feat: support probing FAT12/FAT16 filesystems
+* [`b374eb4`](https://github.com/talos-systems/go-blockdevice/commit/b374eb48148dc92a82d8bf9540432bb8531f73f3) fix: align partition to 1M boundary by default
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/talos-systems/go-blockdevice**  v0.3.1 -> v0.3.4
+* **golang.org/x/sync**                        036812b2e83c -> 0976fa681c29
+* **google.golang.org/grpc**                   v1.45.0 -> v1.46.2
+* **sigs.k8s.io/cluster-api**                  v1.1.3 -> v1.1.5
+
+Previous release can be found at [v0.5.2](https://github.com/talos-systems/sidero/releases/tag/v0.5.2)
+
 ## [Sidero 0.5.2](https://github.com/talos-systems/sidero/releases/tag/v0.5.2) (2022-07-18)
 
 Welcome to the v0.5.2 release of Sidero!

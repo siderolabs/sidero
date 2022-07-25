@@ -6,7 +6,7 @@ github_repo = "talos-systems/sidero"
 match_deps = "^github.com/(talos-systems/[a-zA-Z0-9-]+)$"
 
 # previous release
-previous = "v0.5.1"
+previous = "v0.5.2"
 
 pre_release = false
 
@@ -15,9 +15,14 @@ preface = """\
 
 [notes]
 
-    [notes.wg-endpoint-resolution]
-        title = "Hostname Resolution for Siderolink Wireguard Endpoint"
+    [notes.talos]
+        title = "Talos 1.1.x Support"
         description = """\
-It is now possible to specify a hostname as the wireguard endpoint (`SIDERO_CONTROLLER_MANAGER_SIDEROLINK_ENDPOINT`).
-Sidero will attempt to resolve the hostname to an IP address on startup and use the resolved IP.
+This release of Sidero brings compatibility with Talos v1.1.x release series.
+"""
+
+    [notes.bdro]
+        title = "Sidero Agent and Read-Only Blockdevices"
+        description = """\
+Sidero Agent now correctly skips read-only blockdevices when resetting the machine.
 """
