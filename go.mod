@@ -27,7 +27,7 @@ require (
 	github.com/talos-systems/net v0.3.2
 	github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0
 	github.com/talos-systems/talos/pkg/machinery v1.1.1
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.22.0
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29
 	golang.org/x/sys v0.0.0-20220502124256-b6088ccd6cba
@@ -108,7 +108,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/cluster-bootstrap v0.23.0 // indirect
 	k8s.io/component-base v0.23.6 // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
