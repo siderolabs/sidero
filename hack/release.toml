@@ -6,7 +6,7 @@ github_repo = "talos-systems/sidero"
 match_deps = "^github.com/(talos-systems/[a-zA-Z0-9-]+)$"
 
 # previous release
-previous = "v0.5.2"
+previous = "v0.5.3"
 
 pre_release = false
 
@@ -14,15 +14,3 @@ preface = """\
 """
 
 [notes]
-
-    [notes.talos]
-        title = "Talos 1.1.x Support"
-        description = """\
-This release of Sidero brings compatibility with Talos v1.1.x release series.
-"""
-
-    [notes.bdro]
-        title = "Sidero Agent and Read-Only Blockdevices"
-        description = """\
-Sidero Agent now correctly skips read-only blockdevices when resetting the machine.
-"""

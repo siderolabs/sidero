@@ -1,3 +1,30 @@
+## [Sidero 0.5.4](https://github.com/talos-systems/sidero/releases/tag/v0.5.4) (2022-08-24)
+
+Welcome to the v0.5.4 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`7b050e5`](https://github.com/talos-systems/sidero/commit/7b050e5e060b7c256c1bf077436abaf783eb8219) fix: properly inspect readonly flag of the disk
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.5.3](https://github.com/talos-systems/sidero/releases/tag/v0.5.3)
+
 ## [Sidero 0.5.3](https://github.com/talos-systems/sidero/releases/tag/v0.5.3) (2022-07-25)
 
 Welcome to the v0.5.3 release of Sidero!
