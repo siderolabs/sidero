@@ -194,7 +194,7 @@ services:
     commands:
     - --dns=8.8.8.8
     - --dns=8.8.4.4
-    - --mtu=1500
+    - --mtu=1450
     - --log-level=error
     privileged: true
     volumes:
@@ -240,6 +240,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: be731588cd395016c6bf2c73f6266d491916a5e41a5fc2745e77aa99d1e014c2
+hmac: 6425fcd833ae7569c74776f815d8c5be3e3df1fca97908cb2bccf38dcb3f04af
 
 ...
