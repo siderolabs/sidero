@@ -11,7 +11,7 @@ import "net"
 var Nameservers = []net.IP{net.ParseIP("8.8.8.8"), net.ParseIP("1.1.1.1")}
 
 // MTU default setting.
-const MTU = 1500
+const MTU = 1440
 
 // BootstrapMaster is a bootstrap cluster master node name.
 const BootstrapMaster = "bootstrap-master"

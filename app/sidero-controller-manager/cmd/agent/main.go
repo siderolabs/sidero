@@ -304,9 +304,11 @@ func mainFunc() error {
 			wg.Wait()
 		}()
 
-		for _, disk := range disks {
-			func(path string) {
+		for _, d := range disks {
+			func(disk *disk.Disk) {
 				eg.Go(func() error {
+					path := disk.DeviceName
+
 					if disk.ReadOnly {
 						log.Printf("Skipping read-only disk %s", path)
 
@@ -339,7 +341,7 @@ func mainFunc() error {
 
 					return bd.Close()
 				})
-			}(disk.DeviceName)
+			}(d)
 		}
 
 		if err := eg.Wait(); err != nil {
