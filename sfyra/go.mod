@@ -16,7 +16,7 @@ require (
 	github.com/stretchr/testify v1.7.1
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.6
 	github.com/talos-systems/go-debug v0.2.1
-	github.com/talos-systems/go-loadbalancer v0.1.2
+	github.com/talos-systems/go-loadbalancer v0.1.3
 	github.com/talos-systems/go-procfs v0.1.0
 	github.com/talos-systems/go-retry v0.3.1
 	github.com/talos-systems/net v0.3.2
