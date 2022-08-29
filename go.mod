@@ -26,7 +26,7 @@ require (
 	github.com/talos-systems/grpc-proxy v0.3.0
 	github.com/talos-systems/net v0.3.2
 	github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0
-	github.com/talos-systems/talos/pkg/machinery v1.1.1
+	github.com/talos-systems/talos/pkg/machinery v1.1.2
 	go.uber.org/zap v1.21.0
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29
