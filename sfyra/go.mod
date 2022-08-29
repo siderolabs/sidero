@@ -12,7 +12,7 @@ replace (
 )
 
 require (
-	github.com/spf13/cobra v1.4.0
+	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.7.1
 	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.6
 	github.com/talos-systems/go-debug v0.2.1
