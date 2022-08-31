@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/siderolabs/go-pointer"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/talos-systems/go-retry/retry"
@@ -157,7 +158,7 @@ func TestServerPatch(ctx context.Context, metalClient client.Client, registryMir
 
 		installConfig := talosconfig.InstallConfig{
 			InstallDisk:       "/dev/vda",
-			InstallBootloader: true,
+			InstallBootloader: pointer.To(true),
 			InstallExtraKernelArgs: []string{
 				"console=ttyS0",
 				"reboot=k",

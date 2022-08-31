@@ -7,7 +7,7 @@ package tests
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"sort"
@@ -282,7 +282,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 			}
 
 			defer response.Body.Close()
-			metadataBytes, err = ioutil.ReadAll(response.Body)
+			metadataBytes, err = io.ReadAll(response.Body)
 			if err != nil {
 				return err
 			}

@@ -86,11 +86,6 @@ func NewCluster(ctx context.Context, options Options) (*Cluster, error) {
 func (cluster *Cluster) Setup(ctx context.Context) error {
 	var err error
 
-	cluster.configPath, err = clientconfig.GetDefaultPath()
-	if err != nil {
-		return err
-	}
-
 	defaultStateDir, err := clientconfig.GetTalosDirectory()
 	if err != nil {
 		return err
