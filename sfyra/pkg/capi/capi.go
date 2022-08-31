@@ -8,7 +8,6 @@ package capi
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -77,7 +76,7 @@ func (clusterAPI *Manager) GetKubeconfig(ctx context.Context) (client.Kubeconfig
 		return client.Kubeconfig{}, err
 	}
 
-	tmpFile, err := ioutil.TempFile("", "kubeconfig")
+	tmpFile, err := os.CreateTemp("", "kubeconfig")
 	if err != nil {
 		return client.Kubeconfig{}, err
 	}

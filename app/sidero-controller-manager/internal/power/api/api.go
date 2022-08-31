@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -61,7 +60,7 @@ func (c *Client) postRequest(path string) error {
 
 	if resp.Body != nil {
 		defer func() {
-			_, _ = io.Copy(ioutil.Discard, resp.Body)
+			_, _ = io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 		}()
 	}
@@ -120,7 +119,7 @@ func (c *Client) IsPoweredOn() (bool, error) {
 
 	if resp.Body != nil {
 		defer func() {
-			_, _ = io.Copy(ioutil.Discard, resp.Body)
+			_, _ = io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 		}()
 	}

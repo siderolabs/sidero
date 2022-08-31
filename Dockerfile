@@ -43,9 +43,10 @@ ENV CGO_ENABLED ${CGO_ENABLED}
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
 RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2
-RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.23.1
+RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.24.2
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
-RUN curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/v1.47.2/install.sh | bash -s -- -b /toolchain/bin v1.47.2
+RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.2 \
+	&& mv /go/bin/golangci-lint /toolchain/bin/golangci-lint
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
@@ -86,7 +87,7 @@ COPY --from=generate-build /src/app/caps-controller-manager/api ./app/caps-contr
 COPY --from=generate-build /src/app/sidero-controller-manager/api ./app/sidero-controller-manager/api
 COPY --from=generate-build /src/app/sidero-controller-manager/internal/api ./app/sidero-controller-manager/internal/api
 
-FROM --platform=${BUILDPLATFORM} alpine:3.15.4 AS release-build
+FROM --platform=${BUILDPLATFORM} alpine:3.16.2 AS release-build
 ADD https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.1.0/kustomize_v4.1.0_linux_amd64.tar.gz .
 RUN  tar -xf kustomize_v4.1.0_linux_amd64.tar.gz -C /usr/local/bin && rm kustomize_v4.1.0_linux_amd64.tar.gz
 COPY ./config ./config
@@ -252,7 +253,7 @@ COPY --from=fmt-build /src /
 #
 # The markdownlint target performs linting on Markdown files.
 #
-FROM node:17.9.0-alpine AS lint-markdown
+FROM node:18.8.0-alpine AS lint-markdown
 RUN apk add --no-cache findutils
 RUN npm i -g markdownlint-cli@0.23.2
 RUN npm i -g textlint@11.7.6

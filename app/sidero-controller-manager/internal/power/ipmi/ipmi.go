@@ -151,9 +151,10 @@ func (c *Client) GetUserSummary() (*goipmi.GetUserSummaryResponse, error) {
 }
 
 // GetUserName fetches a un string given a uid. This is how we check if a user slot is available.
+//
 // nb: a "failure" here can actually mean that the slot is just open for use
-//     or you can also have a user with "" as the name which won't
-//     fail this check and is still open for use.
+// or you can also have a user with "" as the name which won't
+// fail this check and is still open for use.
 // (see 22.29).
 func (c *Client) GetUserName(uid byte) (*goipmi.GetUserNameResponse, error) {
 	req := &goipmi.Request{
@@ -197,7 +198,8 @@ func (c *Client) SetUserName(uid byte, name string) (*goipmi.SetUserNameResponse
 
 // SetUserPass sets the password for a given uid (see 22.30).
 // nb: This naively assumes you'll pass a 16 char or less pw string.
-//     The goipmi function does not support longer right now.
+//
+//	The goipmi function does not support longer right now.
 func (c *Client) SetUserPass(uid byte, pass string) (*goipmi.SetUserPassResponse, error) {
 	req := &goipmi.Request{
 		NetworkFunction: goipmi.NetworkFunctionApp,

@@ -8,7 +8,7 @@ package loadbalancer
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net"
 	"reflect"
@@ -53,7 +53,7 @@ func NewControlPlane(client client.Client, address net.IP, port int, clusterName
 
 	logWriter := log.Writer()
 	if !verboseLog {
-		logWriter = ioutil.Discard
+		logWriter = io.Discard
 	}
 
 	var err error
