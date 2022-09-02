@@ -1,3 +1,58 @@
+## [Sidero 0.5.5](https://github.com/talos-systems/sidero/releases/tag/v0.5.5) (2022-09-02)
+
+Welcome to the v0.5.5 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Talos 1.2.x Support
+
+This release of Sidero brings compatibility with Talos v1.2.x release series.
+
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>2 commits</summary>
+<p>
+
+* [`2bfc499`](https://github.com/talos-systems/sidero/commit/2bfc49922662fead02effe4df4351d57463f5a66) feat: finalize update to Talos 1.2.0
+* [`f23aec5`](https://github.com/talos-systems/sidero/commit/f23aec548eabfd65b61160a0439c3cbb9a57e2ec) feat: update Talos to 1.2.0-beta.2
+</p>
+</details>
+
+### Changes from talos-systems/grpc-proxy
+<details><summary>1 commit</summary>
+<p>
+
+* [`6dfa2cc`](https://github.com/talos-systems/grpc-proxy/commit/6dfa2cc80b6195844cae2dc2b2bc0b9b62246d8d) fix: ignore errors on duplicate `SetHeader` calls
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/stretchr/testify**          v1.7.1 -> v1.8.0
+* **github.com/talos-systems/grpc-proxy**  v0.3.0 -> v0.3.1
+* **go.uber.org/zap**                      v1.21.0 -> v1.23.0
+* **golang.org/x/net**                     2871e0cb64e4 -> 07c6da5e1ced
+* **golang.org/x/sync**                    0976fa681c29 -> 886fb9371eb4
+* **golang.org/x/sys**                     b6088ccd6cba -> 1c4a2a72c664
+* **google.golang.org/grpc**               v1.46.2 -> v1.49.0
+* **google.golang.org/protobuf**           v1.28.0 -> v1.28.1
+* **inet.af/netaddr**                      c74959edd3b6 -> 502d2d690317
+* **k8s.io/api**                           v0.23.6 -> v0.24.2
+* **k8s.io/apiextensions-apiserver**       v0.23.6 -> v0.24.2
+* **k8s.io/apimachinery**                  v0.23.6 -> v0.24.2
+* **k8s.io/client-go**                     v0.23.6 -> v0.24.2
+* **sigs.k8s.io/cluster-api**              v1.1.5 -> v1.2.1
+* **sigs.k8s.io/controller-runtime**       v0.11.2 -> v0.12.3
+
+Previous release can be found at [v0.5.4](https://github.com/talos-systems/sidero/releases/tag/v0.5.4)
+
 ## [Sidero 0.5.4](https://github.com/talos-systems/sidero/releases/tag/v0.5.4) (2022-08-24)
 
 Welcome to the v0.5.4 release of Sidero!
