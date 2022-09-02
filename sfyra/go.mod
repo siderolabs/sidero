@@ -15,15 +15,15 @@ require (
 	github.com/siderolabs/go-pointer v1.0.0
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
-	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.6
+	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.9
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-loadbalancer v0.1.3
 	github.com/talos-systems/go-procfs v0.1.0
 	github.com/talos-systems/go-retry v0.3.1
 	github.com/talos-systems/net v0.3.2
 	github.com/talos-systems/sidero v0.0.0-00010101000000-000000000000
-	github.com/talos-systems/talos v1.2.0-beta.2
-	github.com/talos-systems/talos/pkg/machinery v1.2.0-beta.2
+	github.com/talos-systems/talos v1.2.0
+	github.com/talos-systems/talos/pkg/machinery v1.2.0
 	google.golang.org/grpc v1.49.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.25.0
@@ -144,7 +144,7 @@ require (
 	github.com/spf13/viper v1.12.0 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
-	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.3 // indirect
+	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.5 // indirect
 	github.com/talos-systems/crypto v0.3.6 // indirect
 	github.com/talos-systems/go-blockdevice v0.3.4 // indirect
 	github.com/u-root/uio v0.0.0-20220204230159-dac05f7d2cb4 // indirect
@@ -160,7 +160,7 @@ require (
 	golang.org/x/net v0.0.0-20220812174116-3211cb980234 // indirect
 	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
-	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
+	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect

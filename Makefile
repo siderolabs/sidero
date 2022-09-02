@@ -9,7 +9,7 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 TEST_PKGS ?= ./...
-TALOS_RELEASE ?= v1.2.0-beta.2
+TALOS_RELEASE ?= v1.2.0
 PREVIOUS_TALOS_RELEASE ?= v0.13.4
 DEFAULT_K8S_VERSION ?= v1.25.0
 
