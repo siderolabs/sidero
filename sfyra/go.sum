@@ -719,8 +719,8 @@ github.com/talos-systems/net v0.3.2 h1:IMseRyuha8fNsv/3FbQPRE9hLVRBEFR+9sxcoETQ5
 github.com/talos-systems/net v0.3.2/go.mod h1:zhcGixNJz9dgwFiUwc7gkkAqdVqXagU1SNNoIVXYKGo=
 github.com/talos-systems/talos v1.2.0 h1:9hUhk3d2ZZO4Yb0nVilC8uyKvsshCaDhI6+qb/+P5Bw=
 github.com/talos-systems/talos v1.2.0/go.mod h1:2ENVqXEZCDDla75UaDRQcso/tDQGF9Nd04mpOT7ORyU=
-github.com/talos-systems/talos/pkg/machinery v1.2.0 h1:xIXeAhFe6dNPfnGJfE5ykeFbmpNu9kZQ1Ou+tGN0oHM=
-github.com/talos-systems/talos/pkg/machinery v1.2.0/go.mod h1:COX/MYTdrp/P5x0asCXVz5lySAJGe+Cqq7zUaW6FUXA=
+github.com/talos-systems/talos/pkg/machinery v1.2.1 h1:q2ifaBG4Pke/w3q5U6i0mq8OJpeBqg9FfhPgtlADPbc=
+github.com/talos-systems/talos/pkg/machinery v1.2.1/go.mod h1:COX/MYTdrp/P5x0asCXVz5lySAJGe+Cqq7zUaW6FUXA=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20201229170055-e5319fda7802/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/u-root/uio v0.0.0-20210528114334-82958018845c/go.mod h1:LpEX5FO/cB+WF4TYGY1V5qktpaZLkKkSegbr0V4eYXA=
