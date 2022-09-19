@@ -551,8 +551,8 @@ github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PKk=
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
-github.com/talos-systems/crypto v0.3.6 h1:aq1uADaF71P2/K35igWx8u/ivHOYp3vHQ/kAzqu83vk=
-github.com/talos-systems/crypto v0.3.6/go.mod h1:jbt9CspHnhdwyKmXQQEIiFSHz1cfsCJjsd0iNat1wEA=
+github.com/talos-systems/crypto v0.3.7 h1:q3YTgo+eA+7jxRmnaJFKSr9358AnOa3eP+cApMb2/vE=
+github.com/talos-systems/crypto v0.3.7/go.mod h1:jbt9CspHnhdwyKmXQQEIiFSHz1cfsCJjsd0iNat1wEA=
 github.com/talos-systems/go-blockdevice v0.3.4 h1:LP2hgIcd5qbympxYFlWbHYTPyD/f/sZjBMma01soniQ=
 github.com/talos-systems/go-blockdevice v0.3.4/go.mod h1:qnn/zDc09I1DA2BUDDCOSA2D0P8pIDjN8pGiRoRaQig=
 github.com/talos-systems/go-cmd v0.0.0-20210216164758-68eb0067e0f0/go.mod h1:kf+rZzTEmlDiYQ6ulslvRONnKLQH8x83TowltGMhO+k=
@@ -575,8 +575,8 @@ github.com/talos-systems/net v0.3.2 h1:IMseRyuha8fNsv/3FbQPRE9hLVRBEFR+9sxcoETQ5
 github.com/talos-systems/net v0.3.2/go.mod h1:zhcGixNJz9dgwFiUwc7gkkAqdVqXagU1SNNoIVXYKGo=
 github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0 h1:O3qNq62Zl930/1jZQY1TUERSkmU8QVj+FcHQiOVPGbE=
 github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0/go.mod h1:bEGwDYl9QgC3oZ4kdnJTuR2HX/XlUhxZjx/QAakKuBc=
-github.com/talos-systems/talos/pkg/machinery v1.2.0 h1:xIXeAhFe6dNPfnGJfE5ykeFbmpNu9kZQ1Ou+tGN0oHM=
-github.com/talos-systems/talos/pkg/machinery v1.2.0/go.mod h1:COX/MYTdrp/P5x0asCXVz5lySAJGe+Cqq7zUaW6FUXA=
+github.com/talos-systems/talos/pkg/machinery v1.2.2 h1:pg/IqBM+48yEGbStU8IrSpNqeEzbC8bQNDQfnbLJgBs=
+github.com/talos-systems/talos/pkg/machinery v1.2.2/go.mod h1:0slhVFW8vjKBtW7wCatPoVOFTkEC/NMGglOqj5pm6IE=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20201229170055-e5319fda7802/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=

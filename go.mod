@@ -26,7 +26,7 @@ require (
 	github.com/talos-systems/grpc-proxy v0.3.1
 	github.com/talos-systems/net v0.3.2
 	github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0
-	github.com/talos-systems/talos/pkg/machinery v1.2.0
+	github.com/talos-systems/talos/pkg/machinery v1.2.2
 	go.uber.org/zap v1.23.0
 	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
@@ -99,7 +99,7 @@ require (
 	github.com/siderolabs/go-pointer v1.0.0 // indirect
 	github.com/siderolabs/protoenc v0.1.3 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/talos-systems/crypto v0.3.6 // indirect
+	github.com/talos-systems/crypto v0.3.7 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go4.org/intern v0.0.0-20220617035311-6925f38cc365 // indirect
