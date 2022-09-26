@@ -641,8 +641,8 @@ github.com/shopspring/decimal v1.2.0/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFR
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
 github.com/siderolabs/go-pointer v1.0.0 h1:6TshPKep2doDQJAAtHUuHWXbca8ZfyRySjSBT/4GsMU=
 github.com/siderolabs/go-pointer v1.0.0/go.mod h1:HTRFUNYa3R+k0FFKNv11zgkaCLzEkWVzoYZ433P3kHc=
-github.com/siderolabs/protoenc v0.1.3 h1:MtKTRogutD28T2UeVS5h4dyQ9iKfCT5Q+46M8Ms2oGU=
-github.com/siderolabs/protoenc v0.1.3/go.mod h1:mu4gc6pJxhdJYpuloacKE4jsJojj87qDXwn8LUvs2bY=
+github.com/siderolabs/protoenc v0.1.4-0.20220912144557-28f42ee12889 h1:RVK6GOTtUtwaPHLG9FXoPwv2rKfrqy4rEw/ZnNEpCWM=
+github.com/siderolabs/protoenc v0.1.4-0.20220912144557-28f42ee12889/go.mod h1:mu4gc6pJxhdJYpuloacKE4jsJojj87qDXwn8LUvs2bY=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=
 github.com/sirupsen/logrus v1.6.0/go.mod h1:7uNnSEd1DgxDLC74fIahvMZmmYsHGZGEOFrfsX/uA88=
@@ -701,8 +701,8 @@ github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.5 h1:7Iqh+3q/
 github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.5/go.mod h1:ZTXo8epuJD3ccHlW8C4XklsKYYQ92zwNAc0ES63KiJ4=
 github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.9 h1:kg1VxUzBgAbo1yzIyGQ20wAidSGHIcSt4xQNfHKrf6U=
 github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.9/go.mod h1:yZfBvGjvBNNg3FD4JmvXylpJHVZ9o46CGYkxDTohuV0=
-github.com/talos-systems/crypto v0.3.6 h1:aq1uADaF71P2/K35igWx8u/ivHOYp3vHQ/kAzqu83vk=
-github.com/talos-systems/crypto v0.3.6/go.mod h1:jbt9CspHnhdwyKmXQQEIiFSHz1cfsCJjsd0iNat1wEA=
+github.com/talos-systems/crypto v0.3.7 h1:q3YTgo+eA+7jxRmnaJFKSr9358AnOa3eP+cApMb2/vE=
+github.com/talos-systems/crypto v0.3.7/go.mod h1:jbt9CspHnhdwyKmXQQEIiFSHz1cfsCJjsd0iNat1wEA=
 github.com/talos-systems/go-blockdevice v0.3.4 h1:LP2hgIcd5qbympxYFlWbHYTPyD/f/sZjBMma01soniQ=
 github.com/talos-systems/go-blockdevice v0.3.4/go.mod h1:qnn/zDc09I1DA2BUDDCOSA2D0P8pIDjN8pGiRoRaQig=
 github.com/talos-systems/go-cmd v0.0.0-20210216164758-68eb0067e0f0/go.mod h1:kf+rZzTEmlDiYQ6ulslvRONnKLQH8x83TowltGMhO+k=
@@ -719,8 +719,8 @@ github.com/talos-systems/net v0.3.2 h1:IMseRyuha8fNsv/3FbQPRE9hLVRBEFR+9sxcoETQ5
 github.com/talos-systems/net v0.3.2/go.mod h1:zhcGixNJz9dgwFiUwc7gkkAqdVqXagU1SNNoIVXYKGo=
 github.com/talos-systems/talos v1.2.0 h1:9hUhk3d2ZZO4Yb0nVilC8uyKvsshCaDhI6+qb/+P5Bw=
 github.com/talos-systems/talos v1.2.0/go.mod h1:2ENVqXEZCDDla75UaDRQcso/tDQGF9Nd04mpOT7ORyU=
-github.com/talos-systems/talos/pkg/machinery v1.2.0 h1:xIXeAhFe6dNPfnGJfE5ykeFbmpNu9kZQ1Ou+tGN0oHM=
-github.com/talos-systems/talos/pkg/machinery v1.2.0/go.mod h1:COX/MYTdrp/P5x0asCXVz5lySAJGe+Cqq7zUaW6FUXA=
+github.com/talos-systems/talos/pkg/machinery v1.2.3 h1:fMj1Srjm6HEZrL5vONTKkL8Qh9urWcW7W9Oc92c9z2k=
+github.com/talos-systems/talos/pkg/machinery v1.2.3/go.mod h1:bMaqe3cZ95419vkUt+zQQXXvgVcW7saTi80RsWyIC2M=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20201229170055-e5319fda7802/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/u-root/uio v0.0.0-20210528114334-82958018845c/go.mod h1:LpEX5FO/cB+WF4TYGY1V5qktpaZLkKkSegbr0V4eYXA=

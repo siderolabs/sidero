@@ -23,7 +23,7 @@ require (
 	github.com/talos-systems/net v0.3.2
 	github.com/talos-systems/sidero v0.0.0-00010101000000-000000000000
 	github.com/talos-systems/talos v1.2.0
-	github.com/talos-systems/talos/pkg/machinery v1.2.0
+	github.com/talos-systems/talos/pkg/machinery v1.2.3
 	google.golang.org/grpc v1.49.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.25.0
@@ -136,7 +136,7 @@ require (
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
-	github.com/siderolabs/protoenc v0.1.3 // indirect
+	github.com/siderolabs/protoenc v0.1.4-0.20220912144557-28f42ee12889 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
@@ -145,7 +145,7 @@ require (
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/talos-systems/cluster-api-bootstrap-provider-talos v0.5.5 // indirect
-	github.com/talos-systems/crypto v0.3.6 // indirect
+	github.com/talos-systems/crypto v0.3.7 // indirect
 	github.com/talos-systems/go-blockdevice v0.3.4 // indirect
 	github.com/u-root/uio v0.0.0-20220204230159-dac05f7d2cb4 // indirect
 	github.com/ulikunitz/xz v0.5.8 // indirect
