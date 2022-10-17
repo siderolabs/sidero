@@ -26,11 +26,11 @@ require (
 	github.com/talos-systems/grpc-proxy v0.3.1
 	github.com/talos-systems/net v0.3.2
 	github.com/talos-systems/siderolink v0.1.1-0.20211130121818-9902ad2774f0
-	github.com/talos-systems/talos/pkg/machinery v1.2.0
+	github.com/talos-systems/talos/pkg/machinery v1.2.5
 	go.uber.org/zap v1.23.0
-	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced
+	golang.org/x/net v0.0.0-20220812174116-3211cb980234
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
-	golang.org/x/sys v0.0.0-20220808155132-1c4a2a72c664
+	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20220330030906-9490840b0b01
 	google.golang.org/grpc v1.49.0
 	google.golang.org/protobuf v1.28.1
@@ -89,7 +89,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
-	github.com/opencontainers/runtime-spec v1.0.3-0.20200929063507-e6143ca7d51d // indirect
+	github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
@@ -97,9 +97,9 @@ require (
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/siderolabs/go-pointer v1.0.0 // indirect
-	github.com/siderolabs/protoenc v0.1.3 // indirect
+	github.com/siderolabs/protoenc v0.1.4-0.20220912144557-28f42ee12889 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/talos-systems/crypto v0.3.6 // indirect
+	github.com/talos-systems/crypto v0.3.7 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go4.org/intern v0.0.0-20220617035311-6925f38cc365 // indirect
