@@ -47,14 +47,14 @@ $ show service dhcp-server shared-network-name MetalDHCP
      start 192.168.254.2 {
          stop 192.168.254.252
      }
-     subnet-parameters "include &quot;/etc/dhcp/ipxe-metal.conf&quot;;"
+     subnet-parameters "include &quot;/config/ipxe-metal.conf&quot;;"
  }
 ```
 
 Here is the ipxe-metal.conf file.
 
 ```bash
-$ cat /etc/dhcp/ipxe-metal.conf
+$ cat /config/ipxe-metal.conf
 
 allow bootp;
 allow booting;
