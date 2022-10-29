@@ -105,7 +105,7 @@ shared-network sidero {
   subnet 172.16.199.0 netmask 255.255.255.0 {
     option domain-name-servers 8.8.8.8, 1.1.1.1;
     option routers 172.16.199.1;
-    include "/etc/dhcp/ipxe-metal.conf";
+    include "/config/ipxe-metal.conf";
   }
 }
 ```
