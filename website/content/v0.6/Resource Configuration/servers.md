@@ -146,7 +146,8 @@ Sidero can use IPMI information to control `Server` power state, reboot servers 
 IPMI information will be, by default, setup automatically if possible as part of the acceptance process.
 In this design, a "sidero" user will be added to the IPMI user list and a randomly generated password will be issued.
 This information is then squirreled away in a Kubernetes secret in the `sidero-system` namespace, with a name format of `<server-uuid>-bmc`.
-Users wishing to turn off this feature can pass the `--auto-bmc-setup=false` flag to `sidero-controller-manager`
+Users wishing to turn off this feature can pass the `--auto-bmc-setup=false` flag to `sidero-controller-manager`,
+e.g. using `export SIDERO_CONTROLLER_MANAGER_AUTO_BMC_SETUP=false` during [installation](../../overview/installation/).
 
 IPMI connection information can also be set manually in the `Server` spec after initial registration:
 
