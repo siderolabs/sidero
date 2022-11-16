@@ -164,6 +164,13 @@ type ServerSpec struct {
 	//
 	// +optional
 	BootFromDiskMethod siderotypes.BootFromDisk `json:"bootFromDiskMethod,omitempty"`
+	// PXEMode specifies the method to trigger PXE boot via IPMI.
+	//
+	// If not set, controller default is used.
+	// Valid values: uefi, bios.
+	//
+	// +optional
+	PXEMode siderotypes.PXEMode `json:"pxeMode,omitempty"`
 }
 
 const (

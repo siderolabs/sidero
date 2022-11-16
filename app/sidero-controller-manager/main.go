@@ -35,7 +35,6 @@ import (
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/ipxe"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/metadata"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/api"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/server"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/tftp"
@@ -101,7 +100,7 @@ func main() {
 	flag.BoolVar(&insecureWipe, "insecure-wipe", true, "Wipe head of the disk only (if false, wipe whole disk).")
 	flag.BoolVar(&autoBMCSetup, "auto-bmc-setup", true, "Attempt to setup BMC info automatically when agent boots.")
 	flag.DurationVar(&serverRebootTimeout, "server-reboot-timeout", constants.DefaultServerRebootTimeout, "Timeout to wait for the server to restart and start wipe.")
-	flag.StringVar(&ipmiPXEMethod, "ipmi-pxe-method", string(metal.PXEModeUEFI), fmt.Sprintf("Default method to use to set server to boot from PXE via IPMI: %s.", []string{metal.PXEModeUEFI, metal.PXEModeBIOS}))
+	flag.StringVar(&ipmiPXEMethod, "ipmi-pxe-method", string(siderotypes.PXEModeUEFI), fmt.Sprintf("Default method to use to set server to boot from PXE via IPMI: %s.", []string{siderotypes.PXEModeUEFI, siderotypes.PXEModeBIOS}))
 	flag.Float64Var(&testPowerSimulatedExplicitFailureProb, "test-power-simulated-explicit-failure-prob", 0, "Test failure simulation setting.")
 	flag.Float64Var(&testPowerSimulatedSilentFailureProb, "test-power-simulated-silent-failure-prob", 0, "Test failure simulation setting.")
 
@@ -130,7 +129,7 @@ func main() {
 		}
 	}
 
-	if !metal.PXEMode(ipmiPXEMethod).IsValid() {
+	if !siderotypes.PXEMode(ipmiPXEMethod).IsValid() {
 		setupLog.Error(fmt.Errorf("ipmi-pxe-method is invalid"), "")
 		os.Exit(1)
 	}
@@ -202,7 +201,7 @@ func main() {
 		APIReader:     mgr.GetAPIReader(),
 		Recorder:      recorder,
 		RebootTimeout: serverRebootTimeout,
-		PXEMode:       metal.PXEMode(ipmiPXEMethod),
+		PXEMode:       siderotypes.PXEMode(ipmiPXEMethod),
 	}).SetupWithManager(ctx, mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Server")
 		os.Exit(1)
