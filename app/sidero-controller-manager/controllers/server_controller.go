@@ -32,8 +32,8 @@ import (
 	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
 	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
+	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 const (
@@ -49,7 +49,7 @@ type ServerReconciler struct {
 	Recorder  record.EventRecorder
 
 	RebootTimeout time.Duration
-	PXEMode       metal.PXEMode
+	PXEMode       siderotypes.PXEMode
 }
 
 // +kubebuilder:rbac:groups=metal.sidero.dev,resources=servers,verbs=get;list;watch;create;update;patch;delete
@@ -100,6 +100,11 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 	if poweredOn {
 		s.Status.Power = "on"
+	}
+
+	pxeMode := r.PXEMode
+	if s.Spec.PXEMode != "" {
+		pxeMode = s.Spec.PXEMode
 	}
 
 	f := func(ready bool, result ctrl.Result) (ctrl.Result, error) {
@@ -203,7 +208,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 		if !poweredOn {
 			// it's safe to set server to PXE boot even if it's already installed, as PXE server makes sure server is PXE booted only once
-			err = mgmtClient.SetPXE(r.PXEMode)
+			err = mgmtClient.SetPXE(pxeMode)
 			if err != nil {
 				log.Error(err, "failed to set PXE")
 				r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to set to PXE boot once: %s.", err))
@@ -246,7 +251,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 			return f(false, ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter})
 		}
 
-		err = mgmtClient.SetPXE(r.PXEMode)
+		err = mgmtClient.SetPXE(pxeMode)
 		if err != nil {
 			log.Error(err, "failed to set PXE")
 			r.Recorder.Event(serverRef, corev1.EventTypeWarning, "Server Management", fmt.Sprintf("Failed to set to PXE boot once: %s.", err))

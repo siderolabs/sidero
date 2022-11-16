@@ -14,7 +14,7 @@ import (
 	"time"
 
 	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
+	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 // Client provides management over simple API.
@@ -88,7 +88,7 @@ func (c *Client) PowerCycle() error {
 }
 
 // SetPXE makes sure the node will pxe boot next time.
-func (c *Client) SetPXE(mode metal.PXEMode) error {
+func (c *Client) SetPXE(mode types.PXEMode) error {
 	// no way to enforce mode via QEMU API
 	return c.postRequest("/pxeboot")
 }

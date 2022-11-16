@@ -5,32 +5,15 @@
 // Package metal provides interfaces to manage metal machines.
 package metal
 
+import "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
+
 // ManagementClient control power and boot order of metal machine.
 type ManagementClient interface {
 	PowerOn() error
 	PowerOff() error
 	PowerCycle() error
 	IsPoweredOn() (bool, error)
-	SetPXE(mode PXEMode) error
+	SetPXE(mode types.PXEMode) error
 	IsFake() bool
 	Close() error
-}
-
-// PXEMode specifies PXE boot mode.
-type PXEMode string
-
-const (
-	PXEModeBIOS = "bios"
-	PXEModeUEFI = "uefi"
-)
-
-func (mode PXEMode) IsValid() bool {
-	switch mode {
-	case PXEModeBIOS:
-		return true
-	case PXEModeUEFI:
-		return true
-	default:
-		return false
-	}
 }

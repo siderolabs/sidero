@@ -57,6 +57,20 @@ func (r *Server) ValidateDelete() error {
 func (r *Server) validate() error {
 	var allErrs field.ErrorList
 
+	allErrs = append(allErrs, r.validateBootFromDisk()...)
+	allErrs = append(allErrs, r.validatePXEMode()...)
+	allErrs = append(allErrs, r.validateConfigPatches()...)
+
+	if len(allErrs) == 0 {
+		return nil
+	}
+
+	return apierrors.NewInvalid(
+		schema.GroupKind{Group: GroupVersion.Group, Kind: "Server"},
+		r.Name, allErrs)
+}
+
+func (r *Server) validateBootFromDisk() (allErrs field.ErrorList) {
 	validValues := []siderotypes.BootFromDisk{
 		"",
 		siderotypes.BootIPXEExit,
@@ -82,6 +96,38 @@ func (r *Server) validate() error {
 		)
 	}
 
+	return allErrs
+}
+
+func (r *Server) validatePXEMode() (allErrs field.ErrorList) {
+	validValues := []siderotypes.PXEMode{
+		"",
+		siderotypes.PXEModeBIOS,
+		siderotypes.PXEModeUEFI,
+	}
+
+	var valid bool
+
+	for _, v := range validValues {
+		if r.Spec.PXEMode == v {
+			valid = true
+
+			break
+		}
+	}
+
+	if !valid {
+		allErrs = append(allErrs,
+			field.Invalid(field.NewPath("spec").Child("pxeMode"), r.Spec.BootFromDiskMethod,
+				fmt.Sprintf("valid values are: %q", validValues),
+			),
+		)
+	}
+
+	return allErrs
+}
+
+func (r *Server) validateConfigPatches() (allErrs field.ErrorList) {
 	for index, patch := range r.Spec.ConfigPatches {
 		if _, ok := operations[patch.Op]; !ok {
 			allErrs = append(allErrs,
@@ -92,13 +138,7 @@ func (r *Server) validate() error {
 		}
 	}
 
-	if len(allErrs) == 0 {
-		return nil
-	}
-
-	return apierrors.NewInvalid(
-		schema.GroupKind{Group: GroupVersion.Group, Kind: "Server"},
-		r.Name, allErrs)
+	return allErrs
 }
 
 func init() {

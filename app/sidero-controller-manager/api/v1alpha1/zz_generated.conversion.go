@@ -812,6 +812,7 @@ func autoConvert_v1alpha1_ServerSpec_To_v1alpha2_ServerSpec(in *ServerSpec, out 
 	out.Cordoned = in.Cordoned
 	out.PXEBootAlways = in.PXEBootAlways
 	out.BootFromDiskMethod = types.BootFromDisk(in.BootFromDiskMethod)
+	out.PXEMode = types.PXEMode(in.PXEMode)
 	return nil
 }
 
@@ -826,6 +827,7 @@ func autoConvert_v1alpha2_ServerSpec_To_v1alpha1_ServerSpec(in *v1alpha2.ServerS
 	out.Cordoned = in.Cordoned
 	out.PXEBootAlways = in.PXEBootAlways
 	out.BootFromDiskMethod = types.BootFromDisk(in.BootFromDiskMethod)
+	out.PXEMode = types.PXEMode(in.PXEMode)
 	return nil
 }
 

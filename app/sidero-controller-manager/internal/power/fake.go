@@ -4,7 +4,7 @@
 
 package power
 
-import "github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
+import "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
 
 type fakeClient struct{}
 
@@ -20,7 +20,7 @@ func (fakeClient) PowerCycle() error {
 	return nil
 }
 
-func (fakeClient) SetPXE(mode metal.PXEMode) error {
+func (fakeClient) SetPXE(mode types.PXEMode) error {
 	return nil
 }
 

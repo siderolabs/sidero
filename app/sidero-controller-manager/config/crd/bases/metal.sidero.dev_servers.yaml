@@ -241,6 +241,11 @@ spec:
                 type: object
               pxeBootAlways:
                 type: boolean
+              pxeMode:
+                description: "PXEMode specifies the method to trigger PXE boot via
+                  IPMI. \n If not set, controller default is used. Valid values: uefi,
+                  bios."
+                type: string
               system:
                 properties:
                   family:
@@ -702,6 +707,11 @@ spec:
                 type: object
               pxeBootAlways:
                 type: boolean
+              pxeMode:
+                description: "PXEMode specifies the method to trigger PXE boot via
+                  IPMI. \n If not set, controller default is used. Valid values: uefi,
+                  bios."
+                type: string
             required:
             - accepted
             type: object
