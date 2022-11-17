@@ -1,3 +1,30 @@
+## [Sidero 0.5.6](https://github.com/talos-systems/sidero/releases/tag/v0.5.6) (2022-11-17)
+
+Welcome to the v0.5.6 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`5f58a05`](https://github.com/talos-systems/sidero/commit/5f58a0574c5dfc068e35bedb6916337ccb12f55d) feat: provide a way to override IPMI PXE boot method on `Server`
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.5.5](https://github.com/talos-systems/sidero/releases/tag/v0.5.5)
+
 ## [Sidero 0.5.5](https://github.com/talos-systems/sidero/releases/tag/v0.5.5) (2022-09-02)
 
 Welcome to the v0.5.5 release of Sidero!
