@@ -15,7 +15,7 @@ require (
 	github.com/siderolabs/go-pointer v1.0.0
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
-	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.9
+	github.com/talos-systems/cluster-api-control-plane-provider-talos v0.4.10
 	github.com/talos-systems/go-debug v0.2.1
 	github.com/talos-systems/go-loadbalancer v0.1.3
 	github.com/talos-systems/go-procfs v0.1.0
