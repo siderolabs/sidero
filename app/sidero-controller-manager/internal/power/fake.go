@@ -4,7 +4,7 @@
 
 package power
 
-import "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
+import "github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 
 type fakeClient struct{}
 

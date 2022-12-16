@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
-	metalv1alpha2 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
+	metalv1alpha1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1alpha2 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
 func TestServerConvertV1alpha1V1Alpha2(t *testing.T) {

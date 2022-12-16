@@ -10,16 +10,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/siderolabs/go-retry/retry"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/talos-systems/go-retry/retry"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
 )
 
 // TestMachineDeploymentReconcile verifies that machine deployment can reconcile delete machines.

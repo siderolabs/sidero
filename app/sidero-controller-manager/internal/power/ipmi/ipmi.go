@@ -9,8 +9,8 @@ import (
 
 	goipmi "github.com/pensando/goipmi"
 
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
+	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 // Link to the IPMI spec: https://www.intel.com/content/dam/www/public/us/en/documents/product-briefs/ipmi-second-gen-interface-spec-v2-rev1-1.pdf

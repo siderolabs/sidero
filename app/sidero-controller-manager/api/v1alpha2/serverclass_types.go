@@ -8,7 +8,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
+	siderotypes "github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 // ServerClassAny is an automatically created ServerClass that includes all Servers.

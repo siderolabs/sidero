@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metalv1alpha1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 func TestFilterAcceptedServers(t *testing.T) {

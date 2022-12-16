@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
+	metal "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
 //nolint:maintidx

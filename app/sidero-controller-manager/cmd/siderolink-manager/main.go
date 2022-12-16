@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/netip"
 	"os"
 	"os/signal"
 	"syscall"
@@ -24,13 +25,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"inet.af/netaddr"
 
-	pb "github.com/talos-systems/siderolink/api/siderolink"
-	"github.com/talos-systems/siderolink/pkg/wireguard"
+	pb "github.com/siderolabs/siderolink/api/siderolink"
+	"github.com/siderolabs/siderolink/pkg/wireguard"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/siderolink"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/constants"
 )
 
 var (
@@ -111,12 +111,12 @@ func run() error {
 		return err
 	}
 
-	wireguardEndpoint, err := netaddr.ParseIPPort(siderolink.Cfg.WireguardEndpoint)
+	wireguardEndpoint, err := netip.ParseAddrPort(siderolink.Cfg.WireguardEndpoint)
 	if err != nil {
 		return fmt.Errorf("invalid Wireguard endpoint: %w", err)
 	}
 
-	wgDevice, err := wireguard.NewDevice(siderolink.Cfg.ServerAddress, siderolink.Cfg.PrivateKey, wireguardEndpoint.Port())
+	wgDevice, err := wireguard.NewDevice(siderolink.Cfg.ServerAddress, siderolink.Cfg.PrivateKey, wireguardEndpoint.Port(), false, logger)
 	if err != nil {
 		return fmt.Errorf("error initializing wgDevice: %w", err)
 	}
@@ -175,7 +175,7 @@ func run() error {
 }
 
 func getIPForHost(host string) (string, error) {
-	parsedIP, err := netaddr.ParseIP(host)
+	parsedIP, err := netip.ParseAddr(host)
 	if err == nil {
 		return parsedIP.String(), nil
 	}

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/talos-systems/talos/pkg/machinery/kernel"
+	"github.com/siderolabs/talos/pkg/machinery/kernel"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

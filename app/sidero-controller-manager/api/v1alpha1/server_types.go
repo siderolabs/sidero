@@ -15,7 +15,7 @@ import (
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
+	siderotypes "github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 // BMC defines data about how to talk to the node via ipmitool.

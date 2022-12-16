@@ -17,8 +17,8 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1beta1 "sigs.k8s.io/cluster-api/api/v1beta1"
 
-	v1alpha2 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
-	types "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
+	v1alpha2 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
+	types "github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 func init() {

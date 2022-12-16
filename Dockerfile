@@ -42,8 +42,8 @@ ARG CGO_ENABLED
 ENV CGO_ENABLED ${CGO_ENABLED}
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
-RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2
-RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.24.2
+RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.10.0
+RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.25.0
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
 RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.2 \
 	&& mv /go/bin/golangci-lint /toolchain/bin/golangci-lint
@@ -305,7 +305,7 @@ FROM sfyra-base AS sfyra-build
 WORKDIR /src/sfyra/cmd/sfyra
 ARG TALOS_RELEASE
 ARG DEFAULT_K8S_VERSION
-ARG SFYRA_CMD_PKG=github.com/talos-systems/sidero/sfyra/cmd/sfyra/cmd
+ARG SFYRA_CMD_PKG=github.com/siderolabs/sidero/sfyra/cmd/sfyra/cmd
 ARG GO_BUILDFLAGS
 ARG GO_LDFLAGS
 RUN --mount=type=cache,target=/.cache GOOS=linux go build ${GO_BUILDFLAGS} -ldflags "${GO_LDFLAGS} -X ${SFYRA_CMD_PKG}.TalosRelease=${TALOS_RELEASE} -X ${SFYRA_CMD_PKG}.KubernetesVersion=${DEFAULT_K8S_VERSION}" -o /sfyra

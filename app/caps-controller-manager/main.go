@@ -9,7 +9,7 @@ import (
 	"flag"
 	"os"
 
-	debug "github.com/talos-systems/go-debug"
+	debug "github.com/siderolabs/go-debug"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	cgrecord "k8s.io/client-go/tools/record"
@@ -20,10 +20,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	infrav1alpha2 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha2"
-	infrav1alpha3 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	"github.com/talos-systems/sidero/app/caps-controller-manager/controllers"
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
+	infrav1alpha2 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha2"
+	infrav1alpha3 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	"github.com/siderolabs/sidero/app/caps-controller-manager/controllers"
+	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -111,7 +111,6 @@ func main() {
 
 	if err := (&remote.ClusterCacheReconciler{
 		Client:  mgr.GetClient(),
-		Log:     ctrl.Log.WithName("remote").WithName("ClusterCacheReconciler"),
 		Tracker: tracker,
 	}).SetupWithManager(ctx, mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ClusterCacheReconciler")

@@ -10,8 +10,8 @@ import (
 	"log"
 	"os"
 
+	debug "github.com/siderolabs/go-debug"
 	"github.com/spf13/cobra"
-	debug "github.com/talos-systems/go-debug"
 )
 
 const (

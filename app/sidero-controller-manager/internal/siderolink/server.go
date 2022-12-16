@@ -9,19 +9,19 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+	"net/netip"
 
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"inet.af/netaddr"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/cluster-api/util/patch"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	pb "github.com/talos-systems/siderolink/api/siderolink"
+	pb "github.com/siderolabs/siderolink/api/siderolink"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	sidero "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
 )
 
 // Server implements gRPC API.
@@ -57,17 +57,17 @@ func (srv *Server) Provision(ctx context.Context, req *pb.ProvisionRequest) (*pb
 		return nil, err
 	}
 
-	var nodeAddress netaddr.IPPrefix
+	var nodeAddress netip.Prefix
 
 	if serverbinding.Spec.SideroLink.NodeAddress != "" {
 		// find already provisioned address
-		nodeAddress, err = netaddr.ParseIPPrefix(serverbinding.Spec.SideroLink.NodeAddress)
+		nodeAddress, err = netip.ParsePrefix(serverbinding.Spec.SideroLink.NodeAddress)
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		// generate random address for the node
-		raw := srv.cfg.Subnet.IP().As16()
+		raw := srv.cfg.Subnet.Addr().As16()
 		salt := make([]byte, 8)
 
 		_, err := io.ReadFull(rand.Reader, salt)
@@ -77,7 +77,7 @@ func (srv *Server) Provision(ctx context.Context, req *pb.ProvisionRequest) (*pb
 
 		copy(raw[8:], salt)
 
-		nodeAddress = netaddr.IPPrefixFrom(netaddr.IPFrom16(raw), srv.cfg.Subnet.Bits())
+		nodeAddress = netip.PrefixFrom(netip.AddrFrom16(raw), srv.cfg.Subnet.Bits())
 
 		serverbinding.Spec.SideroLink.NodeAddress = nodeAddress.String()
 	}
@@ -96,7 +96,7 @@ func (srv *Server) Provision(ctx context.Context, req *pb.ProvisionRequest) (*pb
 	return &pb.ProvisionResponse{
 		ServerEndpoint:    srv.cfg.WireguardEndpoint,
 		ServerPublicKey:   srv.cfg.PublicKey.String(),
-		ServerAddress:     srv.cfg.ServerAddress.IP().String(),
+		ServerAddress:     srv.cfg.ServerAddress.Addr().String(),
 		NodeAddressPrefix: nodeAddress.String(),
 	}, nil
 }

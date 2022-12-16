@@ -16,8 +16,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 
-	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
+	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
 // ServerBindingReconciler reconciles a ServerBinding object.

@@ -20,8 +20,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	"github.com/talos-systems/sidero/app/caps-controller-manager/pkg/constants"
+	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	"github.com/siderolabs/sidero/app/caps-controller-manager/pkg/constants"
 )
 
 // MetalClusterReconciler reconciles a MetalCluster object.

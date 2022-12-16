@@ -11,7 +11,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	sidero "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
 )
 
 func getMetalClient() (runtimeclient.Client, *rest.Config, error) {

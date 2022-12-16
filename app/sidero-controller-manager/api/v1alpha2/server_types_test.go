@@ -8,7 +8,7 @@ package v1alpha2_test
 import (
 	"testing"
 
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
+	metal "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
 func Test_PartialEqual(t *testing.T) {

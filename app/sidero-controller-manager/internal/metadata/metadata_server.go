@@ -13,16 +13,16 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch"
 	"github.com/ghodss/yaml"
-	"github.com/talos-systems/talos/pkg/machinery/config/configloader"
-	talosv1alpha1 "github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1" //nolint:typecheck
+	"github.com/siderolabs/talos/pkg/machinery/config/configloader"
+	talosv1alpha1 "github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1" //nolint:typecheck
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/cluster-api/util"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
+	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
 type errorWithCode struct {

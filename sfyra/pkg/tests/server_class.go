@@ -14,11 +14,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/siderolabs/go-retry/retry"
+	"github.com/siderolabs/talos/pkg/machinery/config/configloader"
+	talosconfig "github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/talos-systems/go-retry/retry"
-	"github.com/talos-systems/talos/pkg/machinery/config/configloader"
-	talosconfig "github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -32,11 +32,11 @@ import (
 	capiclient "sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
-	"github.com/talos-systems/sidero/sfyra/pkg/capi"
-	"github.com/talos-systems/sidero/sfyra/pkg/constants"
-	"github.com/talos-systems/sidero/sfyra/pkg/talos"
-	"github.com/talos-systems/sidero/sfyra/pkg/vm"
+	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
+	"github.com/siderolabs/sidero/sfyra/pkg/capi"
+	"github.com/siderolabs/sidero/sfyra/pkg/constants"
+	"github.com/siderolabs/sidero/sfyra/pkg/talos"
+	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 const (

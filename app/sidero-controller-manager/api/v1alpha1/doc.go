@@ -4,4 +4,4 @@
 
 package v1alpha1
 
-// +k8s:conversion-gen=github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2
+// +k8s:conversion-gen=github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2

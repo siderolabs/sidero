@@ -15,7 +15,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
+	siderotypes "github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 var operations = map[string]struct{}{

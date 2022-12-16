@@ -7,16 +7,16 @@ package cmd
 import (
 	"context"
 	"log"
-	"net"
+	"net/netip"
 
+	talosnet "github.com/siderolabs/net"
+	"github.com/siderolabs/talos/pkg/cli"
 	"github.com/spf13/cobra"
-	talosnet "github.com/talos-systems/net"
-	"github.com/talos-systems/talos/pkg/cli"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
-	"github.com/talos-systems/sidero/sfyra/pkg/capi"
-	"github.com/talos-systems/sidero/sfyra/pkg/loadbalancer"
+	"github.com/siderolabs/sidero/sfyra/pkg/capi"
+	"github.com/siderolabs/sidero/sfyra/pkg/loadbalancer"
 )
 
 var (
@@ -44,7 +44,7 @@ var loadbalancerCreateCmd = &cobra.Command{
 				return err
 			}
 
-			lb, err := loadbalancer.NewControlPlane(metalClient, net.ParseIP(lbAddress), lbPort, "default", clusterName, true)
+			lb, err := loadbalancer.NewControlPlane(metalClient, netip.MustParseAddr(lbAddress), lbPort, "default", clusterName, true)
 			if err != nil {
 				return err
 			}
@@ -61,10 +61,7 @@ var loadbalancerCreateCmd = &cobra.Command{
 func init() {
 	loadbalancerCmd.AddCommand(loadbalancerCreateCmd)
 
-	_, cidr, err := net.ParseCIDR(options.ManagementCIDR)
-	if err != nil {
-		log.Fatal(err)
-	}
+	cidr := netip.MustParsePrefix(options.ManagementCIDR)
 
 	bridgeIP, err := talosnet.NthIPInNetwork(cidr, 1)
 	if err != nil {

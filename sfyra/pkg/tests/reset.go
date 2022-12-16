@@ -10,13 +10,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/siderolabs/go-retry/retry"
 	"github.com/stretchr/testify/require"
-	"github.com/talos-systems/go-retry/retry"
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
+	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
 // TestServerReset verifies that all the servers got reset.

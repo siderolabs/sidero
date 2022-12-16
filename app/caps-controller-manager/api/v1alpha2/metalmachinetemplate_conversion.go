@@ -9,7 +9,7 @@ import (
 	utilconversion "sigs.k8s.io/cluster-api/util/conversion"
 	"sigs.k8s.io/controller-runtime/pkg/conversion"
 
-	infrav1alpha3 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	infrav1alpha3 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
 )
 
 // ConvertTo converts this MetalMachineTemplate to the Hub version (v1alpha3).

@@ -16,10 +16,10 @@ import (
 	"time"
 
 	"github.com/siderolabs/go-pointer"
+	"github.com/siderolabs/go-retry/retry"
+	talosconfig "github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/talos-systems/go-retry/retry"
-	talosconfig "github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1"
 	"gopkg.in/yaml.v3"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
@@ -30,13 +30,13 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
-	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
-	"github.com/talos-systems/sidero/sfyra/pkg/capi"
-	"github.com/talos-systems/sidero/sfyra/pkg/constants"
-	"github.com/talos-systems/sidero/sfyra/pkg/talos"
-	"github.com/talos-systems/sidero/sfyra/pkg/vm"
+	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
+	siderotypes "github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
+	"github.com/siderolabs/sidero/sfyra/pkg/capi"
+	"github.com/siderolabs/sidero/sfyra/pkg/constants"
+	"github.com/siderolabs/sidero/sfyra/pkg/talos"
+	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 // TestServerRegistration verifies that all the servers got registered.

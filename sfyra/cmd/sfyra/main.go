@@ -4,7 +4,7 @@
 
 package main
 
-import "github.com/talos-systems/sidero/sfyra/cmd/sfyra/cmd"
+import "github.com/siderolabs/sidero/sfyra/cmd/sfyra/cmd"
 
 func main() {
 	cmd.Execute()

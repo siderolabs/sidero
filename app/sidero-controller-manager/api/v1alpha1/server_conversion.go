@@ -10,7 +10,7 @@ import (
 	utilconversion "sigs.k8s.io/cluster-api/util/conversion"
 	"sigs.k8s.io/controller-runtime/pkg/conversion"
 
-	metalv1alpha2 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
+	metalv1alpha2 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
 // ConvertTo converts this Server to the Hub version (v1alpha2).

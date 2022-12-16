@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/talos-systems/grpc-proxy/proxy"
+	"github.com/siderolabs/grpc-proxy/proxy"
 	"google.golang.org/grpc"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -26,9 +26,9 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 	controllerclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	metalv1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha2"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/api"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
+	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/api"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/constants"
 )
 
 type server struct {
