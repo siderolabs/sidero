@@ -1,3 +1,56 @@
+## [Sidero 0.5.7](https://github.com/talos-systems/sidero/releases/tag/v0.5.7) (2022-12-16)
+
+Welcome to the v0.5.7 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Talos 1.3.x Support
+
+This release of Sidero brings compatibility with Talos v1.3.x release series.
+
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`d7939a3`](https://github.com/talos-systems/sidero/commit/d7939a3af151fdd9a9cdf88f439627af96350d83) feat: update for Talos 1.3.0
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/onsi/gomega**                     v1.19.0 -> v1.24.1
+* **github.com/siderolabs/go-blockdevice**       v0.4.2 **_new_**
+* **github.com/siderolabs/go-debug**             v0.2.2 **_new_**
+* **github.com/siderolabs/go-kmsg**              v0.1.2 **_new_**
+* **github.com/siderolabs/go-procfs**            v0.1.1 **_new_**
+* **github.com/siderolabs/go-retry**             v0.3.2 **_new_**
+* **github.com/siderolabs/grpc-proxy**           v0.4.0 **_new_**
+* **github.com/siderolabs/siderolink**           v0.3.1 **_new_**
+* **github.com/siderolabs/talos/pkg/machinery**  v1.3.0 **_new_**
+* **github.com/stretchr/testify**                v1.8.0 -> v1.8.1
+* **golang.org/x/net**                           07c6da5e1ced -> v0.4.0
+* **golang.org/x/sync**                          886fb9371eb4 -> v0.1.0
+* **golang.org/x/sys**                           1c4a2a72c664 -> v0.3.0
+* **golang.zx2c4.com/wireguard/wgctrl**          9490840b0b01 -> 473347a5e6e3
+* **google.golang.org/grpc**                     v1.49.0 -> v1.51.0
+* **k8s.io/api**                                 v0.24.2 -> v0.25.0
+* **k8s.io/apiextensions-apiserver**             v0.24.2 -> v0.25.0
+* **k8s.io/apimachinery**                        v0.24.2 -> v0.25.0
+* **k8s.io/client-go**                           v0.24.2 -> v0.25.0
+* **k8s.io/utils**                               3a6ce19ff2f9 -> e9cbc92d1a73
+* **sigs.k8s.io/cluster-api**                    v1.2.1 -> v1.3.1
+* **sigs.k8s.io/controller-runtime**             v0.12.3 -> v0.13.1
+
+Previous release can be found at [v0.5.6](https://github.com/talos-systems/sidero/releases/tag/v0.5.6)
+
 ## [Sidero 0.5.6](https://github.com/talos-systems/sidero/releases/tag/v0.5.6) (2022-11-17)
 
 Welcome to the v0.5.6 release of Sidero!
