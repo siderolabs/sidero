@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/ipxe"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/ipxe"
 )
 
 func TestEmbeddedLength(t *testing.T) {

@@ -5,16 +5,19 @@
 // Package constants provides default values for some parameters.
 package constants
 
-import "net"
+import "net/netip"
 
 // Nameservers are defaults to use in bootstrap cluster.
-var Nameservers = []net.IP{net.ParseIP("8.8.8.8"), net.ParseIP("1.1.1.1")}
+var Nameservers = []netip.Addr{netip.MustParseAddr("8.8.8.8"), netip.MustParseAddr("1.1.1.1")}
 
 // MTU default setting.
 const MTU = 1440
 
-// BootstrapMaster is a bootstrap cluster master node name.
-const BootstrapMaster = "bootstrap-master"
+// BootstrapControlPlane is a bootstrap cluster control-plane node name.
+const BootstrapControlPlane = "bootstrap-control-plane"
+
+// BootstrapWorker is a bootstrap cluster worker node name.
+const BootstrapWorker = "bootstrap-worker"
 
 // SideroAPIVersion is a string we need for creating Sidero resources.
 const SideroAPIVersion = "metal.sidero.dev/v1alpha1"

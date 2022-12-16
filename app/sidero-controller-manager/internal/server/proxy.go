@@ -9,14 +9,14 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/talos-systems/grpc-proxy/proxy"
+	"github.com/siderolabs/grpc-proxy/proxy"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/constants"
 )
 
 // director proxy passes gRPC APIs to sub-components based on API method name.
@@ -42,7 +42,7 @@ func (b *backend) String() string {
 }
 
 // GetConnection returns a grpc connection to the backend.
-func (b *backend) GetConnection(ctx context.Context) (context.Context, *grpc.ClientConn, error) {
+func (b *backend) GetConnection(ctx context.Context, _ string) (context.Context, *grpc.ClientConn, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 
 	outCtx := metadata.NewOutgoingContext(ctx, md)

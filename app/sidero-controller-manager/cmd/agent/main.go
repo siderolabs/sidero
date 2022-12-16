@@ -17,23 +17,22 @@ import (
 	"sync"
 	"time"
 
-	"github.com/talos-systems/go-blockdevice/blockdevice"
-	"github.com/talos-systems/go-blockdevice/blockdevice/util/disk"
-	debug "github.com/talos-systems/go-debug"
-	kmsg "github.com/talos-systems/go-kmsg"
-	"github.com/talos-systems/go-procfs/procfs"
-	"github.com/talos-systems/go-retry/retry"
+	"github.com/siderolabs/go-blockdevice/blockdevice"
+	"github.com/siderolabs/go-blockdevice/blockdevice/util/disk"
+	"github.com/siderolabs/go-debug"
+	"github.com/siderolabs/go-kmsg"
+	"github.com/siderolabs/go-procfs/procfs"
+	"github.com/siderolabs/go-retry/retry"
 	"github.com/talos-systems/go-smbios/smbios"
-	talosnet "github.com/talos-systems/net"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sys/unix"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/api"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/ipmi"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/api"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/power/ipmi"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/constants"
 )
 
 const (
@@ -264,7 +263,7 @@ func mainFunc() error {
 
 	log.Println("Registration complete")
 
-	ips, err := talosnet.IPAddrs()
+	ips, err := IPAddrs()
 	if err != nil {
 		log.Println("failed to discover IPs")
 	} else {
@@ -616,4 +615,25 @@ func genPass16() (string, error) {
 	}
 
 	return string(b), nil
+}
+
+// IPAddrs finds and returns a list of non-loopback IP addresses of the
+// current machine.
+func IPAddrs() (ips []net.IP, err error) {
+	ips = []net.IP{}
+
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return
+	}
+
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok {
+			if ipnet.IP.IsGlobalUnicast() && !ipnet.IP.IsLinkLocalUnicast() {
+				ips = append(ips, ipnet.IP)
+			}
+		}
+	}
+
+	return ips, nil
 }

@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	debug "github.com/talos-systems/go-debug"
+	debug "github.com/siderolabs/go-debug"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	corev1 "k8s.io/api/core/v1"
@@ -25,22 +25,22 @@ import (
 	"k8s.io/client-go/tools/record"
 	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
-	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/controllers"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/ipxe"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/metadata"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/api"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/server"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/tftp"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
-	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
-	"github.com/talos-systems/sidero/internal/client"
+	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1alpha1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/controllers"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/ipxe"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/metadata"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/power/api"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/server"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/siderolink"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/tftp"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/constants"
+	siderotypes "github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -256,19 +256,15 @@ func main() {
 
 	grpcServer := server.CreateServer(mgr.GetClient(), apiRecorder, mgr.GetScheme(), autoAcceptServers, insecureWipe, autoBMCSetup, serverRebootTimeout)
 
-	k8sClient, err := client.NewClient(nil)
-	if err != nil {
-		setupLog.Error(err, `failed to create k8s client`)
+	if err = mgr.Add(RunnableClientFunc(controllers.ReconcileServerClassAny)); err != nil {
+		setupLog.Error(err, `failed to add initial reconcile`)
 		os.Exit(1)
 	}
 
-	if err = controllers.ReconcileServerClassAny(ctx, k8sClient); err != nil {
-		setupLog.Error(err, `failed to reconcile ServerClass "any"`)
-		os.Exit(1)
-	}
-
-	if err = controllers.ReconcileEnvironmentDefault(ctx, k8sClient, TalosRelease, apiEndpoint, uint16(apiPort)); err != nil {
-		setupLog.Error(err, `failed to reconcile Environment "default"`)
+	if err = mgr.Add(RunnableClientFunc(func(ctx context.Context, k8sClient client.Client) error {
+		return controllers.ReconcileEnvironmentDefault(ctx, k8sClient, TalosRelease, apiEndpoint, uint16(apiPort))
+	})); err != nil {
+		setupLog.Error(err, `failed to add initial reconcile`)
 		os.Exit(1)
 	}
 
@@ -338,4 +334,30 @@ func setupChecks(mgr ctrl.Manager, httpPort int) {
 		setupLog.Error(err, "unable to create health check")
 		os.Exit(1)
 	}
+}
+
+// RunnableClientFunc implements Runnable and inject.Client using a function.
+func RunnableClientFunc(f func(context.Context, client.Client) error) *runnableClientFunc {
+	return &runnableClientFunc{
+		Func: f,
+	}
+}
+
+type runnableClientFunc struct {
+	Client client.Client
+	Func   func(context.Context, client.Client) error
+}
+
+// InjectClient implements inject.Client.
+//
+//nolint:unparam
+func (r *runnableClientFunc) InjectClient(c client.Client) error {
+	r.Client = c
+
+	return nil
+}
+
+// Start implements Runnable.
+func (r *runnableClientFunc) Start(ctx context.Context) error {
+	return r.Func(ctx, r.Client)
 }

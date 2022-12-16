@@ -6,12 +6,12 @@ package cmd
 
 import (
 	"context"
-	"net"
+	"net/netip"
 
+	"github.com/siderolabs/talos/pkg/cli"
 	"github.com/spf13/cobra"
-	"github.com/talos-systems/talos/pkg/cli"
 
-	"github.com/talos-systems/sidero/sfyra/pkg/vm"
+	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 var bootSource string
@@ -22,7 +22,7 @@ var bootstrapServersCmd = &cobra.Command{
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return cli.WithContext(context.Background(), func(ctx context.Context) error {
-			bootSourceIP := net.ParseIP(bootSource)
+			bootSourceIP := netip.MustParseAddr(bootSource)
 
 			vmSet, err := vm.NewSet(ctx, vm.Options{
 				Name:       options.ManagementSetName,

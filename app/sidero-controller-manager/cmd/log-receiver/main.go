@@ -16,8 +16,8 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
-	"github.com/talos-systems/siderolink/pkg/logreceiver"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/siderolink"
+	"github.com/siderolabs/siderolink/pkg/logreceiver"
 )
 
 func main() {

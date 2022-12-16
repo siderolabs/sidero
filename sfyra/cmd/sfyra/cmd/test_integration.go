@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/siderolabs/talos/pkg/cli"
 	"github.com/spf13/cobra"
-	"github.com/talos-systems/talos/pkg/cli"
 
-	"github.com/talos-systems/sidero/sfyra/pkg/bootstrap"
-	"github.com/talos-systems/sidero/sfyra/pkg/capi"
-	"github.com/talos-systems/sidero/sfyra/pkg/tests"
-	"github.com/talos-systems/sidero/sfyra/pkg/vm"
+	"github.com/siderolabs/sidero/sfyra/pkg/bootstrap"
+	"github.com/siderolabs/sidero/sfyra/pkg/capi"
+	"github.com/siderolabs/sidero/sfyra/pkg/tests"
+	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 var runTestPattern string

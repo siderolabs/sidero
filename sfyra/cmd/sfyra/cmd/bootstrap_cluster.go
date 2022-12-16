@@ -7,10 +7,10 @@ package cmd
 import (
 	"context"
 
+	"github.com/siderolabs/talos/pkg/cli"
 	"github.com/spf13/cobra"
-	"github.com/talos-systems/talos/pkg/cli"
 
-	"github.com/talos-systems/sidero/sfyra/pkg/bootstrap"
+	"github.com/siderolabs/sidero/sfyra/pkg/bootstrap"
 )
 
 var bootstrapClusterCmd = &cobra.Command{

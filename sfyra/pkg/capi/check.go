@@ -8,8 +8,8 @@ import (
 	"context"
 	"fmt"
 
-	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
-	"github.com/talos-systems/go-retry/retry"
+	cacpt "github.com/siderolabs/cluster-api-control-plane-provider-talos/api/v1alpha3"
+	"github.com/siderolabs/go-retry/retry"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"

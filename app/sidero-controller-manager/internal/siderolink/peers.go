@@ -6,11 +6,11 @@ package siderolink
 
 import (
 	"context"
+	"net/netip"
 	"time"
 
 	"go.uber.org/zap"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
-	"inet.af/netaddr"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/dynamic"
@@ -18,8 +18,8 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	"github.com/talos-systems/siderolink/pkg/wireguard"
+	sidero "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	"github.com/siderolabs/siderolink/pkg/wireguard"
 )
 
 // PeerState syncs data from Kubernetes ServerBinding as peer state.
@@ -114,7 +114,7 @@ func (peers *PeerState) buildEvent(serverBinding *sidero.ServerBinding, deleted 
 		return
 	}
 
-	address, err := netaddr.ParseIPPrefix(serverBinding.Spec.SideroLink.NodeAddress)
+	address, err := netip.ParsePrefix(serverBinding.Spec.SideroLink.NodeAddress)
 	if err != nil {
 		peers.logger.Error("error parsing node address", zap.Error(err), zap.String("uuid", serverBinding.Name))
 
@@ -131,7 +131,7 @@ func (peers *PeerState) buildEvent(serverBinding *sidero.ServerBinding, deleted 
 	peers.eventCh <- wireguard.PeerEvent{
 		PubKey:  pubKey,
 		Remove:  deleted,
-		Address: address.IP(),
+		Address: address.Addr(),
 	}
 }
 

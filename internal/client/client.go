@@ -13,8 +13,8 @@ import (
 	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	caps "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	scm "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	caps "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	scm "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // NewClient is responsible for creating a controller-runtime k8s client with all schemas.

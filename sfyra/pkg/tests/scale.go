@@ -10,16 +10,16 @@ import (
 	"testing"
 	"time"
 
+	capbt "github.com/siderolabs/cluster-api-control-plane-provider-talos/api/v1alpha3"
+	"github.com/siderolabs/go-retry/retry"
 	"github.com/stretchr/testify/require"
-	capbt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
-	"github.com/talos-systems/go-retry/retry"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/talos-systems/sidero/sfyra/pkg/capi"
-	"github.com/talos-systems/sidero/sfyra/pkg/vm"
+	"github.com/siderolabs/sidero/sfyra/pkg/capi"
+	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 type ScaleCallBack func(runtime.Object) error

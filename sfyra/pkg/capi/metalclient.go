@@ -5,15 +5,15 @@
 package capi
 
 import (
-	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
+	cacpt "github.com/siderolabs/cluster-api-control-plane-provider-talos/api/v1alpha3"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	sidero "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	metal "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // GetMetalClient builds k8s client with schemes required to access all the CAPI/Sidero/Talos components.

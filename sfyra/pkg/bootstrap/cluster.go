@@ -6,30 +6,26 @@ package bootstrap
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net"
+	"net/netip"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	talosnet "github.com/talos-systems/net"
-	taloscluster "github.com/talos-systems/talos/pkg/cluster"
-	"github.com/talos-systems/talos/pkg/cluster/check"
-	clientconfig "github.com/talos-systems/talos/pkg/machinery/client/config"
-	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1/bundle"
-	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1/generate"
-	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1/machine"
-	"github.com/talos-systems/talos/pkg/provision"
-	"github.com/talos-systems/talos/pkg/provision/access"
-	"github.com/talos-systems/talos/pkg/provision/providers/qemu"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/strategicpatch"
+	talosnet "github.com/siderolabs/net"
+	taloscluster "github.com/siderolabs/talos/pkg/cluster"
+	"github.com/siderolabs/talos/pkg/cluster/check"
+	clientconfig "github.com/siderolabs/talos/pkg/machinery/client/config"
+	"github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1/bundle"
+	"github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1/generate"
+	"github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1/machine"
+	"github.com/siderolabs/talos/pkg/provision"
+	"github.com/siderolabs/talos/pkg/provision/access"
+	"github.com/siderolabs/talos/pkg/provision/providers/qemu"
 
-	"github.com/talos-systems/sidero/sfyra/pkg/constants"
+	"github.com/siderolabs/sidero/sfyra/pkg/constants"
 )
 
 // Cluster sets up initial Talos cluster.
@@ -40,8 +36,9 @@ type Cluster struct {
 	cluster     provision.Cluster
 	access      *access.Adapter
 
-	bridgeIP net.IP
-	masterIP net.IP
+	bridgeIP       netip.Addr
+	controlplaneIP netip.Addr
+	workerIP       netip.Addr
 
 	stateDir   string
 	cniDir     string
@@ -109,11 +106,7 @@ func (cluster *Cluster) Setup(ctx context.Context) error {
 	checkCtx, checkCtxCancel := context.WithTimeout(ctx, 10*time.Minute)
 	defer checkCtxCancel()
 
-	if err = check.Wait(checkCtx, cluster.access, check.DefaultClusterChecks(), check.StderrReporter()); err != nil {
-		return err
-	}
-
-	return cluster.untaint(ctx)
+	return check.Wait(checkCtx, cluster.access, check.DefaultClusterChecks(), check.StderrReporter())
 }
 
 func (cluster *Cluster) findExisting(ctx context.Context) error {
@@ -129,7 +122,7 @@ func (cluster *Cluster) findExisting(ctx context.Context) error {
 		return err
 	}
 
-	_, cidr, err := net.ParseCIDR(cluster.options.CIDR)
+	cidr, err := netip.ParsePrefix(cluster.options.CIDR)
 	if err != nil {
 		return err
 	}
@@ -139,7 +132,7 @@ func (cluster *Cluster) findExisting(ctx context.Context) error {
 		return err
 	}
 
-	cluster.masterIP, err = talosnet.NthIPInNetwork(cidr, 2)
+	cluster.controlplaneIP, err = talosnet.NthIPInNetwork(cidr, 2)
 	if err != nil {
 		return err
 	}
@@ -150,7 +143,7 @@ func (cluster *Cluster) findExisting(ctx context.Context) error {
 }
 
 func (cluster *Cluster) create(ctx context.Context) error {
-	_, cidr, err := net.ParseCIDR(cluster.options.CIDR)
+	cidr, err := netip.ParsePrefix(cluster.options.CIDR)
 	if err != nil {
 		return err
 	}
@@ -160,7 +153,12 @@ func (cluster *Cluster) create(ctx context.Context) error {
 		return err
 	}
 
-	cluster.masterIP, err = talosnet.NthIPInNetwork(cidr, 2)
+	cluster.controlplaneIP, err = talosnet.NthIPInNetwork(cidr, 2)
+	if err != nil {
+		return err
+	}
+
+	cluster.workerIP, err = talosnet.NthIPInNetwork(cidr, 3)
 	if err != nil {
 		return err
 	}
@@ -170,8 +168,8 @@ func (cluster *Cluster) create(ctx context.Context) error {
 
 		Network: provision.NetworkRequest{
 			Name:         cluster.options.Name,
-			CIDRs:        []net.IPNet{*cidr},
-			GatewayAddrs: []net.IP{cluster.bridgeIP},
+			CIDRs:        []netip.Prefix{cidr},
+			GatewayAddrs: []netip.Addr{cluster.bridgeIP},
 			MTU:          constants.MTU,
 			Nameservers:  constants.Nameservers,
 			CNI: provision.CNIConfig{
@@ -203,7 +201,7 @@ func (cluster *Cluster) create(ctx context.Context) error {
 		genOptions = append(genOptions, generate.WithRegistryMirror(parts[0], parts[1]))
 	}
 
-	masterEndpoint := cluster.masterIP.String()
+	controlplaneEndpoint := cluster.controlplaneIP.String()
 
 	configBundle, err := bundle.NewConfigBundle(bundle.WithInputOptions(
 		&bundle.InputOptions{
@@ -211,7 +209,7 @@ func (cluster *Cluster) create(ctx context.Context) error {
 			Endpoint:    fmt.Sprintf("https://%s", net.JoinHostPort(defaultInternalLB, "6443")),
 			GenOptions: append(
 				genOptions,
-				generate.WithEndpointList([]string{masterEndpoint}),
+				generate.WithEndpointList([]string{controlplaneEndpoint}),
 				generate.WithInstallImage(cluster.options.InstallerImage),
 				generate.WithDNSDomain("cluster.local"),
 			),
@@ -222,9 +220,9 @@ func (cluster *Cluster) create(ctx context.Context) error {
 
 	request.Nodes = append(request.Nodes,
 		provision.NodeRequest{
-			Name:     constants.BootstrapMaster,
+			Name:     constants.BootstrapControlPlane,
 			Type:     machine.TypeControlPlane,
-			IPs:      []net.IP{cluster.masterIP},
+			IPs:      []netip.Addr{cluster.controlplaneIP},
 			Memory:   cluster.options.MemMB * 1024 * 1024,
 			NanoCPUs: cluster.options.CPUs * 1000 * 1000 * 1000,
 			Disks: []*provision.Disk{
@@ -233,7 +231,21 @@ func (cluster *Cluster) create(ctx context.Context) error {
 				},
 			},
 			Config: configBundle.ControlPlane(),
-		})
+		},
+		provision.NodeRequest{
+			Name:     constants.BootstrapWorker,
+			Type:     machine.TypeWorker,
+			IPs:      []netip.Addr{cluster.workerIP},
+			Memory:   cluster.options.MemMB * 1024 * 1024,
+			NanoCPUs: cluster.options.CPUs * 1000 * 1000 * 1000,
+			Disks: []*provision.Disk{
+				{
+					Size: uint64(cluster.options.DiskGB) * 1024 * 1024 * 1024,
+				},
+			},
+			Config: configBundle.Worker(),
+		},
+	)
 
 	cluster.cluster, err = cluster.provisioner.Create(ctx, request,
 		provision.WithBootlader(true),
@@ -265,41 +277,6 @@ func (cluster *Cluster) create(ctx context.Context) error {
 	return nil
 }
 
-func (cluster *Cluster) untaint(ctx context.Context) error {
-	clientset, err := cluster.access.K8sClient(ctx)
-	if err != nil {
-		return err
-	}
-
-	n, err := clientset.CoreV1().Nodes().Get(ctx, constants.BootstrapMaster, metav1.GetOptions{})
-	if err != nil {
-		return err
-	}
-
-	oldData, err := json.Marshal(n)
-	if err != nil {
-		return fmt.Errorf("failed to marshal unmodified node %q into JSON: %w", n.Name, err)
-	}
-
-	n.Spec.Taints = []corev1.Taint{}
-
-	newData, err := json.Marshal(n)
-	if err != nil {
-		return fmt.Errorf("failed to marshal modified node %q into JSON: %w", n.Name, err)
-	}
-
-	patchBytes, err := strategicpatch.CreateTwoWayMergePatch(oldData, newData, corev1.Node{})
-	if err != nil {
-		return fmt.Errorf("failed to create two way merge patch: %w", err)
-	}
-
-	if _, err := clientset.CoreV1().Nodes().Patch(ctx, n.Name, types.StrategicMergePatchType, patchBytes, metav1.PatchOptions{}); err != nil {
-		return fmt.Errorf("error patching node %q: %w", n.Name, err)
-	}
-
-	return nil
-}
-
 // TearDown the bootstrap cluster.
 func (cluster *Cluster) TearDown(ctx context.Context) error {
 	if cluster.cluster != nil {
@@ -319,12 +296,12 @@ func (cluster *Cluster) KubernetesClient() taloscluster.K8sProvider {
 }
 
 // SideroComponentsIP returns the IP of the master node.
-func (cluster *Cluster) SideroComponentsIP() net.IP {
-	return cluster.masterIP
+func (cluster *Cluster) SideroComponentsIP() netip.Addr {
+	return cluster.workerIP
 }
 
 // BridgeIP returns the IP of the gateway (bridge).
-func (cluster *Cluster) BridgeIP() net.IP {
+func (cluster *Cluster) BridgeIP() netip.Addr {
 	return cluster.bridgeIP
 }
 

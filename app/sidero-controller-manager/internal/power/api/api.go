@@ -13,8 +13,8 @@ import (
 	"net/http"
 	"time"
 
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
+	metalv1alpha1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 // Client provides management over simple API.

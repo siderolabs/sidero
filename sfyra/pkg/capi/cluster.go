@@ -9,15 +9,16 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/netip"
 	"os"
 	"time"
 
-	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
-	"github.com/talos-systems/go-retry/retry"
-	taloscluster "github.com/talos-systems/talos/pkg/cluster"
-	talosclusterapi "github.com/talos-systems/talos/pkg/machinery/api/cluster"
-	talosclient "github.com/talos-systems/talos/pkg/machinery/client"
-	clientconfig "github.com/talos-systems/talos/pkg/machinery/client/config"
+	cacpt "github.com/siderolabs/cluster-api-control-plane-provider-talos/api/v1alpha3"
+	"github.com/siderolabs/go-retry/retry"
+	taloscluster "github.com/siderolabs/talos/pkg/cluster"
+	talosclusterapi "github.com/siderolabs/talos/pkg/machinery/api/cluster"
+	talosclient "github.com/siderolabs/talos/pkg/machinery/client"
+	clientconfig "github.com/siderolabs/talos/pkg/machinery/client/config"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	corev1 "k8s.io/api/core/v1"
@@ -27,8 +28,8 @@ import (
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	sidero "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	metal "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // Cluster attaches to the provisioned CAPI cluster and provides talos.Cluster.
@@ -36,13 +37,13 @@ type Cluster struct {
 	name              string
 	controlPlaneNodes []string
 	workerNodes       []string
-	bridgeIP          net.IP
+	bridgeIP          netip.Addr
 	client            *talosclient.Client
 	k8sProvider       *taloscluster.KubernetesClient
 }
 
 // NewCluster fetches cluster info from the CAPI state.
-func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterName string, bridgeIP net.IP) (*Cluster, error) {
+func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterName string, bridgeIP netip.Addr) (*Cluster, error) {
 	var (
 		cluster            capiv1.Cluster
 		controlPlane       cacpt.TalosControlPlane
@@ -232,7 +233,7 @@ func (cluster *Cluster) Name() string {
 }
 
 // BridgeIP returns IP of the bridge which controls the cluster.
-func (cluster *Cluster) BridgeIP() net.IP {
+func (cluster *Cluster) BridgeIP() netip.Addr {
 	return cluster.bridgeIP
 }
 

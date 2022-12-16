@@ -10,9 +10,9 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/talos-systems/sidero/sfyra/pkg/capi"
-	"github.com/talos-systems/sidero/sfyra/pkg/talos"
-	"github.com/talos-systems/sidero/sfyra/pkg/vm"
+	"github.com/siderolabs/sidero/sfyra/pkg/capi"
+	"github.com/siderolabs/sidero/sfyra/pkg/talos"
+	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 const (

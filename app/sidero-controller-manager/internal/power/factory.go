@@ -10,11 +10,11 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/api"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/ipmi"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/power/metal"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/power/api"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/power/ipmi"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/power/metal"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/constants"
 )
 
 // NewManagementClient builds ManagementClient from the server spec.

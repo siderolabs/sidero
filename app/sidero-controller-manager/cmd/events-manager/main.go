@@ -14,13 +14,16 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/siderolabs/talos/pkg/machinery/api/machine"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
-	"github.com/talos-systems/siderolink/api/events"
-	sink "github.com/talos-systems/siderolink/pkg/events"
+	"github.com/siderolabs/siderolink/api/events"
+	sink "github.com/siderolabs/siderolink/pkg/events"
+
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/siderolink"
 )
 
 func main() {
@@ -67,7 +70,17 @@ func run() error {
 		logger.With(zap.String("component", "sink")),
 	)
 
-	srv := sink.NewSink(adapter)
+	srv := sink.NewSink(adapter,
+		[]protoreflect.ProtoMessage{
+			&machine.AddressEvent{},
+			&machine.ConfigValidationErrorEvent{},
+			&machine.ConfigLoadErrorEvent{},
+			&machine.PhaseEvent{},
+			&machine.TaskEvent{},
+			&machine.ServiceStateEvent{},
+			&machine.SequenceEvent{},
+		},
+	)
 
 	events.RegisterEventSinkServiceServer(s, srv)
 

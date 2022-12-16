@@ -18,16 +18,16 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/siderolabs/go-procfs/procfs"
+	"github.com/siderolabs/go-retry/retry"
+	"github.com/siderolabs/talos/pkg/machinery/kernel"
 	"github.com/stretchr/testify/require"
-	"github.com/talos-systems/go-procfs/procfs"
-	"github.com/talos-systems/go-retry/retry"
-	"github.com/talos-systems/talos/pkg/machinery/kernel"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/sfyra/pkg/capi"
-	"github.com/talos-systems/sidero/sfyra/pkg/constants"
-	"github.com/talos-systems/sidero/sfyra/pkg/talos"
-	"github.com/talos-systems/sidero/sfyra/pkg/vm"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
+	"github.com/siderolabs/sidero/sfyra/pkg/capi"
+	"github.com/siderolabs/sidero/sfyra/pkg/constants"
+	"github.com/siderolabs/sidero/sfyra/pkg/talos"
+	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 const (

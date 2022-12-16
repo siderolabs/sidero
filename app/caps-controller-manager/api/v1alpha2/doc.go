@@ -4,4 +4,4 @@
 
 package v1alpha2
 
-// +k8s:conversion-gen=github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3
+// +k8s:conversion-gen=github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3

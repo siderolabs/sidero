@@ -27,15 +27,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 
-	"github.com/talos-systems/go-procfs/procfs"
-	talosconstants "github.com/talos-systems/talos/pkg/machinery/constants"
-	"github.com/talos-systems/talos/pkg/machinery/kernel"
+	"github.com/siderolabs/go-procfs/procfs"
+	talosconstants "github.com/siderolabs/talos/pkg/machinery/constants"
+	"github.com/siderolabs/talos/pkg/machinery/kernel"
 
-	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/constants"
-	siderotypes "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
+	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	metalv1alpha1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/siderolink"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/constants"
+	siderotypes "github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 )
 
 var ErrBootFromDisk = errors.New("boot from disk")
@@ -524,12 +524,12 @@ outer:
 		case logDeliveryPrefix:
 			// patch environment with the log receiver endpoint
 			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
-				fmt.Sprintf("%s=tcp://[%s]:%d", talosconstants.KernelParamLoggingKernel, siderolink.Cfg.ServerAddress.IP(), siderolink.LogReceiverPort),
+				fmt.Sprintf("%s=tcp://[%s]:%d", talosconstants.KernelParamLoggingKernel, siderolink.Cfg.ServerAddress.Addr(), siderolink.LogReceiverPort),
 			)
 		case eventsSinkPrefix:
 			// patch environment with the events sink endpoint
 			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
-				fmt.Sprintf("%s=[%s]:%d", talosconstants.KernelParamEventsSink, siderolink.Cfg.ServerAddress.IP(), siderolink.EventsSinkPort),
+				fmt.Sprintf("%s=[%s]:%d", talosconstants.KernelParamEventsSink, siderolink.Cfg.ServerAddress.Addr(), siderolink.EventsSinkPort),
 			)
 		}
 	}

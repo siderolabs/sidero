@@ -6,17 +6,17 @@ package main
 
 import (
 	"encoding/json"
+	"net/netip"
 	"os"
 
 	"go.uber.org/zap"
-	"inet.af/netaddr"
 
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
-	"github.com/talos-systems/siderolink/pkg/logreceiver"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/siderolink"
+	"github.com/siderolabs/siderolink/pkg/logreceiver"
 )
 
 func logHandler(logger *zap.Logger, annotator *siderolink.Annotator) logreceiver.Handler {
-	return func(srcAddr netaddr.IP, msg map[string]interface{}) {
+	return func(srcAddr netip.Addr, msg map[string]interface{}) {
 		annotation, _ := annotator.Get(srcAddr.String())
 
 		if annotation.ServerUUID != "" {

@@ -11,9 +11,9 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/talos-systems/sidero/sfyra/pkg/capi"
-	"github.com/talos-systems/sidero/sfyra/pkg/talos"
-	"github.com/talos-systems/sidero/sfyra/pkg/vm"
+	"github.com/siderolabs/sidero/sfyra/pkg/capi"
+	"github.com/siderolabs/sidero/sfyra/pkg/talos"
+	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 // TestFunc is a testing function prototype.

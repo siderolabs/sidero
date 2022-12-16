@@ -16,7 +16,7 @@ import (
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 
-	v1alpha3 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	v1alpha3 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
 )
 
 func init() {

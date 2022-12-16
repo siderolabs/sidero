@@ -7,11 +7,11 @@ package siderolink
 import (
 	"context"
 	"fmt"
+	"net/netip"
 	"sync"
 	"time"
 
 	"go.uber.org/zap"
-	"inet.af/netaddr"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -23,7 +23,7 @@ import (
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
+	sidero "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
 )
 
 // Annotation describes the source server by SideroLink IP address.
@@ -133,13 +133,13 @@ func (a *Annotator) notify(old, new interface{}) {
 			return
 		}
 
-		ipPrefix, err := netaddr.ParseIPPrefix(address)
+		ipPrefix, err := netip.ParsePrefix(address)
 		if err != nil {
 			a.logger.Error("failure parsing siderolink address", zap.Error(err))
 			return
 		}
 
-		address = ipPrefix.IP().String()
+		address = ipPrefix.Addr().String()
 
 		if oldServerBinding != nil {
 			delete(a.nodes, oldServerBinding.Spec.SideroLink.NodeAddress)

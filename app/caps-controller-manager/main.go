@@ -9,7 +9,7 @@ import (
 	"flag"
 	"os"
 
-	debug "github.com/talos-systems/go-debug"
+	debug "github.com/siderolabs/go-debug"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
@@ -21,10 +21,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	infrav1alpha2 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha2"
-	infrav1alpha3 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	"github.com/talos-systems/sidero/app/caps-controller-manager/controllers"
-	metalv1alpha1 "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	infrav1alpha2 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha2"
+	infrav1alpha3 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	"github.com/siderolabs/sidero/app/caps-controller-manager/controllers"
+	metalv1alpha1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
 	// +kubebuilder:scaffold:imports
 )
 

@@ -7,22 +7,22 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/netip"
 	"strings"
 
 	"go.uber.org/zap"
-	"inet.af/netaddr"
 	"k8s.io/apimachinery/pkg/types"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	sidero "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	"github.com/talos-systems/sidero/app/sidero-controller-manager/internal/siderolink"
+	sidero "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/siderolink"
 
-	"github.com/talos-systems/siderolink/pkg/events"
+	"github.com/siderolabs/siderolink/pkg/events"
 
-	"github.com/talos-systems/talos/pkg/machinery/api/machine"
+	"github.com/siderolabs/talos/pkg/machinery/api/machine"
 )
 
 // Adapter implents gRPC API.
@@ -56,12 +56,12 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 
 	var err error
 
-	ipPort, err := netaddr.ParseIPPort(event.Node)
+	ipPort, err := netip.ParseAddrPort(event.Node)
 	if err != nil {
 		return err
 	}
 
-	ip := ipPort.IP().String()
+	ip := ipPort.Addr().String()
 
 	annotation, _ := a.annotator.Get(ip)
 

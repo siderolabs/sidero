@@ -19,7 +19,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	infrastructurev1alpha2 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha2"
+	infrastructurev1alpha2 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha2"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -33,7 +33,7 @@ var (
 )
 
 func TestAPIs(t *testing.T) {
-	t.Skip("Fix or remove: https://github.com/talos-systems/sidero/issues/47")
+	t.Skip("Fix or remove: https://github.com/siderolabs/sidero/issues/47")
 
 	RegisterFailHandler(Fail)
 

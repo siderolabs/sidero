@@ -7,16 +7,16 @@ package vm
 import (
 	"context"
 	"fmt"
-	"net"
+	"net/netip"
 	"path/filepath"
 
-	talosnet "github.com/talos-systems/net"
-	clientconfig "github.com/talos-systems/talos/pkg/machinery/client/config"
-	"github.com/talos-systems/talos/pkg/machinery/config/types/v1alpha1/machine"
-	"github.com/talos-systems/talos/pkg/provision"
-	"github.com/talos-systems/talos/pkg/provision/providers/qemu"
+	talosnet "github.com/siderolabs/net"
+	clientconfig "github.com/siderolabs/talos/pkg/machinery/client/config"
+	"github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1/machine"
+	"github.com/siderolabs/talos/pkg/provision"
+	"github.com/siderolabs/talos/pkg/provision/providers/qemu"
 
-	"github.com/talos-systems/sidero/sfyra/pkg/constants"
+	"github.com/siderolabs/sidero/sfyra/pkg/constants"
 )
 
 // Set is a number of PXE-booted VMs.
@@ -26,14 +26,14 @@ type Set struct {
 	options     Options
 	stateDir    string
 	cniDir      string
-	bridgeIP    net.IP
+	bridgeIP    netip.Addr
 }
 
 // Options configure new VM set.
 type Options struct {
 	Name       string
 	Nodes      int
-	BootSource net.IP
+	BootSource netip.Addr
 	CIDR       string
 
 	TalosctlPath string
@@ -93,7 +93,7 @@ func (set *Set) findExisting(ctx context.Context) error {
 		return err
 	}
 
-	_, cidr, err := net.ParseCIDR(set.options.CIDR)
+	cidr, err := netip.ParsePrefix(set.options.CIDR)
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (set *Set) findExisting(ctx context.Context) error {
 }
 
 func (set *Set) create(ctx context.Context) error {
-	_, cidr, err := net.ParseCIDR(set.options.CIDR)
+	cidr, err := netip.ParsePrefix(set.options.CIDR)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (set *Set) create(ctx context.Context) error {
 		return err
 	}
 
-	ips := make([]net.IP, 1+set.options.Nodes)
+	ips := make([]netip.Addr, 1+set.options.Nodes)
 
 	for i := range ips {
 		ips[i], err = talosnet.NthIPInNetwork(cidr, i+2)
@@ -131,8 +131,8 @@ func (set *Set) create(ctx context.Context) error {
 
 		Network: provision.NetworkRequest{
 			Name:         set.options.Name,
-			CIDRs:        []net.IPNet{*cidr},
-			GatewayAddrs: []net.IP{set.bridgeIP},
+			CIDRs:        []netip.Prefix{cidr},
+			GatewayAddrs: []netip.Addr{set.bridgeIP},
 			MTU:          constants.MTU,
 			Nameservers:  constants.Nameservers,
 			CNI: provision.CNIConfig{
@@ -153,7 +153,7 @@ func (set *Set) create(ctx context.Context) error {
 			provision.NodeRequest{
 				Name:     fmt.Sprintf("pxe-%d", i),
 				Type:     machine.TypeUnknown,
-				IPs:      []net.IP{ips[i+1]},
+				IPs:      []netip.Addr{ips[i+1]},
 				Memory:   set.options.MemMB * 1024 * 1024,
 				NanoCPUs: set.options.CPUs * 1000 * 1000 * 1000,
 				Disks: []*provision.Disk{
@@ -191,7 +191,7 @@ func (set *Set) TearDown(ctx context.Context) error {
 }
 
 // BridgeIP returns the IP of the gateway (bridge).
-func (set *Set) BridgeIP() net.IP {
+func (set *Set) BridgeIP() netip.Addr {
 	return set.bridgeIP
 }
 

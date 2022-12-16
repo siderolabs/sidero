@@ -13,7 +13,7 @@ import (
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	metal "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // TestMatchServersMetalMachines verifies that number of metal machines and servers match.

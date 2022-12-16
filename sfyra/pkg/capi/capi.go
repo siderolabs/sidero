@@ -16,7 +16,7 @@ import (
 	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/talos-systems/sidero/sfyra/pkg/talos"
+	"github.com/siderolabs/sidero/sfyra/pkg/talos"
 )
 
 // Manager installs and controls cluster API installation.

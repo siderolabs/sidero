@@ -7,9 +7,9 @@ package siderolink
 import (
 	"context"
 	"fmt"
+	"net/netip"
 
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
-	"inet.af/netaddr"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,7 +17,7 @@ import (
 	clusterctl "sigs.k8s.io/cluster-api/cmd/clusterctl/api/v1alpha3"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/talos-systems/siderolink/pkg/wireguard"
+	"github.com/siderolabs/siderolink/pkg/wireguard"
 )
 
 // Config is the internal SideroLink configuration.
@@ -26,8 +26,8 @@ type Config struct {
 	PrivateKey        wgtypes.Key
 	PublicKey         wgtypes.Key
 	WireguardEndpoint string
-	Subnet            netaddr.IPPrefix
-	ServerAddress     netaddr.IPPrefix
+	Subnet            netip.Prefix
+	ServerAddress     netip.Prefix
 }
 
 const (
@@ -130,5 +130,5 @@ func (cfg *Config) fill() {
 	cfg.PublicKey = cfg.PrivateKey.PublicKey()
 
 	cfg.Subnet = wireguard.NetworkPrefix(cfg.InstallationID)
-	cfg.ServerAddress = netaddr.IPPrefixFrom(cfg.Subnet.IP().Next(), cfg.Subnet.Bits())
+	cfg.ServerAddress = netip.PrefixFrom(cfg.Subnet.Addr().Next(), cfg.Subnet.Bits())
 }

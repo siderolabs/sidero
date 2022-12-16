@@ -6,9 +6,9 @@
 package talos
 
 import (
-	"net"
+	"net/netip"
 
-	"github.com/talos-systems/talos/pkg/cluster"
+	"github.com/siderolabs/talos/pkg/cluster"
 )
 
 // Cluster is an abstract interface for the Talos cluster.
@@ -18,9 +18,9 @@ type Cluster interface {
 	// Name of the cluster.
 	Name() string
 	// IP of the bridge which controls the cluster.
-	BridgeIP() net.IP
+	BridgeIP() netip.Addr
 	// IP for the Sidero components (TFTP, iPXE, etc.).
-	SideroComponentsIP() net.IP
+	SideroComponentsIP() netip.Addr
 	// K8s client source.
 	KubernetesClient() cluster.K8sProvider
 }

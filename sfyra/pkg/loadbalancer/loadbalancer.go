@@ -10,22 +10,22 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net"
+	"net/netip"
 	"reflect"
 	"sort"
 	"sync"
 	"time"
 
-	cacpt "github.com/talos-systems/cluster-api-control-plane-provider-talos/api/v1alpha3"
-	"github.com/talos-systems/go-loadbalancer/controlplane"
+	cacpt "github.com/siderolabs/cluster-api-control-plane-provider-talos/api/v1alpha3"
+	"github.com/siderolabs/go-loadbalancer/controlplane"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	infrav1 "github.com/talos-systems/sidero/app/caps-controller-manager/api/v1alpha3"
-	metal "github.com/talos-systems/sidero/app/sidero-controller-manager/api/v1alpha1"
+	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
+	metal "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
 )
 
 // ControlPlane implements dynamic loadbalancer for the control plane.
@@ -44,7 +44,7 @@ type ControlPlane struct {
 }
 
 // NewControlPlane initializes new control plane load balancer.
-func NewControlPlane(client client.Client, address net.IP, port int, clusterNamespace, clusterName string, verboseLog bool) (*ControlPlane, error) {
+func NewControlPlane(client client.Client, address netip.Addr, port int, clusterNamespace, clusterName string, verboseLog bool) (*ControlPlane, error) {
 	cp := ControlPlane{
 		client:           client,
 		clusterNamespace: clusterNamespace,

@@ -5,7 +5,7 @@
 // Package metal provides interfaces to manage metal machines.
 package metal
 
-import "github.com/talos-systems/sidero/app/sidero-controller-manager/pkg/types"
+import "github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 
 // ManagementClient control power and boot order of metal machine.
 type ManagementClient interface {
