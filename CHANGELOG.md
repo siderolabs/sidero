@@ -1,3 +1,35 @@
+## [Sidero 0.5.8](https://github.com/talos-systems/sidero/releases/tag/v0.5.8) (2022-12-19)
+
+Welcome to the v0.5.8 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Talos 1.3.x Support
+
+This release of Sidero brings compatibility with Talos v1.3.x release series.
+
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`fd1df3c`](https://github.com/talos-systems/sidero/commit/fd1df3c0e782884a1b3f0febee14bc5c136f24fb) fix: use updated pkgs with fixed ipmitool
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.5.7](https://github.com/talos-systems/sidero/releases/tag/v0.5.7)
+
 ## [Sidero 0.5.7](https://github.com/talos-systems/sidero/releases/tag/v0.5.7) (2022-12-16)
 
 Welcome to the v0.5.7 release of Sidero!
