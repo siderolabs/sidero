@@ -30,7 +30,7 @@ require (
 	github.com/siderolabs/talos/pkg/machinery v1.3.0
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
-	google.golang.org/grpc v1.51.0
+	google.golang.org/grpc v1.52.3
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.26.0
 	k8s.io/apiextensions-apiserver v0.25.0
