@@ -138,7 +138,7 @@ You should then set your `KUBECONFIG` environment variable to the path of this f
 Because this is a single node cluster, we need to remove the "NoSchedule" taint on the node to make sure non-controlplane components can be scheduled.
 
 ```bash
-kubectl taint node talos-default-master-1 node-role.kubernetes.io/master:NoSchedule-
+kubectl taint node talos-default-controlplane-1 node-role.kubernetes.io/control-plane:NoSchedule-
 ```
 
 ## Install Sidero

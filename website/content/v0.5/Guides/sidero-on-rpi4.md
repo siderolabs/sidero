@@ -30,7 +30,7 @@ export SIDERO_ENDPOINT=192.168.x.x
 Generate Talos machine configuration for a single-node cluster:
 
 ```bash
-talosctl gen config --config-patch='[{"op": "add", "path": "/cluster/allowSchedulingOnMasters", "value": true},{"op": "replace", "path": "/machine/install/disk", "value": "/dev/mmcblk0"}]' rpi4-sidero https://${SIDERO_ENDPOINT}:6443/
+talosctl gen config --config-patch='[{"op": "add", "path": "/cluster/allowSchedulingOnControlPlanes", "value": true},{"op": "replace", "path": "/machine/install/disk", "value": "/dev/mmcblk0"}]' rpi4-sidero https://${SIDERO_ENDPOINT}:6443/
 ```
 
 Submit the generated configuration to Talos:
