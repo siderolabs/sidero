@@ -21,7 +21,7 @@ require (
 	github.com/siderolabs/go-kmsg v0.1.2
 	github.com/siderolabs/go-procfs v0.1.1
 	github.com/siderolabs/go-retry v0.3.2
-	github.com/siderolabs/go-smbios v0.3.1
+	github.com/siderolabs/go-smbios v0.3.2
 	github.com/siderolabs/grpc-proxy v0.4.0
 	github.com/siderolabs/siderolink v0.3.1
 	github.com/siderolabs/talos/pkg/machinery v1.3.0
@@ -51,7 +51,6 @@ require (
 	github.com/containerd/go-cni v1.1.7 // indirect
 	github.com/containernetworking/cni v1.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/digitalocean/go-smbios v0.0.0-20180907143718-390a4f403a8e // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect

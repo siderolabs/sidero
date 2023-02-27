@@ -81,8 +81,6 @@ github.com/coredns/corefile-migration v1.0.18 h1:zs5PJm/VGZVje1ESRj6ZqyUuVsVfagE
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/digitalocean/go-smbios v0.0.0-20180907143718-390a4f403a8e h1:vUmf0yezR0y7jJ5pceLHthLaYf4bA5T14B6q39S4q2Q=
-github.com/digitalocean/go-smbios v0.0.0-20180907143718-390a4f403a8e/go.mod h1:YTIHhz/QFSYnu/EhlF2SpU2Uk+32abacUYA5ZPljz1A=
 github.com/docker/distribution v2.8.1+incompatible h1:Q50tZOPR6T/hjNsyc9g8/syEs6bk8XXApsHjKukMl68=
 github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815/go.mod h1:WwZ+bS3ebgob9U8Nd0kOddGdZWjyMGR8Wziv+TBNwSE=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
@@ -358,8 +356,8 @@ github.com/siderolabs/go-procfs v0.1.1 h1:GkKjnDfFkupcuLN0w6A/Oy58/8FPAHcmlgiHIa
 github.com/siderolabs/go-procfs v0.1.1/go.mod h1:byGwc3MfF65wg1mz8t3qQ1zlrYhMngEYh1eDzaFAYq0=
 github.com/siderolabs/go-retry v0.3.2 h1:FzWslFm4y8RY1wU0gIskm0oZHOpsSibZqlR8N8/k4Eo=
 github.com/siderolabs/go-retry v0.3.2/go.mod h1:Ac8HIh0nAYDQm04FGZHNofVAXteyd4xR9oujTRrtvK0=
-github.com/siderolabs/go-smbios v0.3.1 h1:lS7axBwd485Gevb20a8QSimBh2OoP88P2SgA2mSHumA=
-github.com/siderolabs/go-smbios v0.3.1/go.mod h1:Yyyj/yY9qrYTXZnQViyhGuCV4b3IRSZNj3sOXrLvl/c=
+github.com/siderolabs/go-smbios v0.3.2 h1:/9MCz1h3HYFcNdFG9rIL9EKwtQJsHRPuGuM2ESdao3A=
+github.com/siderolabs/go-smbios v0.3.2/go.mod h1:AKzwL3QdFOgA81h65Hay2bs3BUnH+FBnXqNfgeChpEc=
 github.com/siderolabs/grpc-proxy v0.4.0 h1:zYrhqLYs8JlYoLHYeel7/XwXDZ4OJ5XyP9wX7JlbPew=
 github.com/siderolabs/grpc-proxy v0.4.0/go.mod h1:QDurYOwQD4H8BKyvCuUxMiuG/etYnb/++xaQB644NdU=
 github.com/siderolabs/net v0.4.0 h1:1bOgVay/ijPkJz4qct98nHsiB/ysLQU0KLoBC4qLm7I=
