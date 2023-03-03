@@ -61,7 +61,7 @@ var loadbalancerCreateCmd = &cobra.Command{
 func init() {
 	loadbalancerCmd.AddCommand(loadbalancerCreateCmd)
 
-	cidr := netip.MustParsePrefix(options.ManagementCIDR)
+	cidr := netip.MustParsePrefix(options.BootstrapCIDR)
 
 	bridgeIP, err := talosnet.NthIPInNetwork(cidr, 1)
 	if err != nil {

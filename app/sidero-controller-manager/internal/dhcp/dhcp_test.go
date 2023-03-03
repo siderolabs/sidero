@@ -2,5 +2,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// Package vm provides tools to build a set of PXE-booted VMs for Sidero testing.
-package vm
+package dhcp_test
+
+import "testing"
+
+func TestEmpty(t *testing.T) {
+	// added for accurate coverage estimation
+	//
+	// please remove it once any unit-test is added
+	// for this package
+}

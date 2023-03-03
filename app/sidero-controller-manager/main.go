@@ -33,6 +33,7 @@ import (
 	metalv1alpha1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha1"
 	metalv1alpha2 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 	"github.com/siderolabs/sidero/app/sidero-controller-manager/controllers"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/dhcp"
 	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/ipxe"
 	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/metadata"
 	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/power/api"
@@ -224,14 +225,22 @@ func main() {
 
 	errCh := make(chan error)
 
+	setupLog.Info("starting proxy DHCP server")
+
+	go func() {
+		if err := dhcp.ServeDHCP(ctrl.Log.WithName("dhcp-proxy"), apiEndpoint, apiPort); err != nil {
+			setupLog.Error(err, "unable to start proxy DHCP server", "controller", "Environment")
+			errCh <- err
+		}
+	}()
+
 	setupLog.Info("starting TFTP server")
 
 	go func() {
 		if err := tftp.ServeTFTP(); err != nil {
 			setupLog.Error(err, "unable to start TFTP server", "controller", "Environment")
+			errCh <- err
 		}
-
-		errCh <- err
 	}()
 
 	httpMux := http.NewServeMux()
@@ -282,12 +291,10 @@ func main() {
 	setupLog.Info("starting manager and HTTP server")
 
 	go func() {
-		err := mgr.Start(ctx)
-		if err != nil {
+		if err := mgr.Start(ctx); err != nil {
 			setupLog.Error(err, "problem running manager")
+			errCh <- err
 		}
-
-		errCh <- err
 	}()
 
 	go func() {
@@ -311,12 +318,10 @@ func main() {
 			httpMux.ServeHTTP(w, req)
 		})
 
-		err := http.ListenAndServe(fmt.Sprintf(":%d", httpPort), h2c.NewHandler(grpcHandler, h2s))
-		if err != nil {
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", httpPort), h2c.NewHandler(grpcHandler, h2s)); err != nil {
 			setupLog.Error(err, "problem running HTTP server")
+			errCh <- err
 		}
-
-		errCh <- err
 	}()
 
 	for err = range errCh {

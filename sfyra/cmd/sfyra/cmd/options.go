@@ -28,9 +28,7 @@ type Options struct {
 
 	RegistryMirrors []string
 
-	ManagementCIDR    string
-	ManagementSetName string
-	ManagementNodes   int
+	ManagementNodes int
 
 	BootstrapMemMB  int64
 	BootstrapCPUs   int64
@@ -72,9 +70,7 @@ func DefaultOptions() Options {
 		InfrastructureProviders: []string{"sidero"},
 		ControlPlaneProviders:   []string{"talos"},
 
-		ManagementCIDR:    "172.25.0.0/24",
-		ManagementSetName: "sfyra-management",
-		ManagementNodes:   4,
+		ManagementNodes: 4,
 
 		BootstrapMemMB:  3072,
 		BootstrapCPUs:   3,

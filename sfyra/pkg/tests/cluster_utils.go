@@ -28,11 +28,10 @@ import (
 	"github.com/siderolabs/sidero/sfyra/pkg/capi"
 	"github.com/siderolabs/sidero/sfyra/pkg/loadbalancer"
 	"github.com/siderolabs/sidero/sfyra/pkg/talos"
-	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 // createCluster without waiting for it to become ready.
-func createCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, vmSet *vm.Set,
+func createCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster,
 	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string,
 ) *loadbalancer.ControlPlane {
 	t.Logf("deploying cluster %q from server class %q with loadbalancer port %d", clusterName, serverClassName, loadbalancerPort)
@@ -46,10 +45,10 @@ func createCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 	capiClient := capiManager.GetManagerClient()
 
 	//nolint:contextcheck
-	loadbalancer, err := loadbalancer.NewControlPlane(metalClient, vmSet.BridgeIP(), loadbalancerPort, "default", clusterName, false)
+	loadbalancer, err := loadbalancer.NewControlPlane(metalClient, capiCluster.BridgeIP(), loadbalancerPort, "default", clusterName, false)
 	require.NoError(t, err)
 
-	t.Setenv("CONTROL_PLANE_ENDPOINT", vmSet.BridgeIP().String())
+	t.Setenv("CONTROL_PLANE_ENDPOINT", capiCluster.BridgeIP().String())
 	t.Setenv("CONTROL_PLANE_PORT", strconv.Itoa(loadbalancerPort))
 	t.Setenv("CONTROL_PLANE_SERVERCLASS", serverClassName)
 	t.Setenv("WORKER_SERVERCLASS", serverClassName)
@@ -116,7 +115,7 @@ func createCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 }
 
 // waitForClusterReady waits for cluster to become ready.
-func waitForClusterReady(ctx context.Context, t *testing.T, metalClient client.Client, vmSet *vm.Set, clusterName string) *capi.Cluster {
+func waitForClusterReady(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, clusterName string) *capi.Cluster {
 	t.Log("waiting for the cluster to be provisioned")
 
 	require.NoError(t, retry.Constant(10*time.Minute, retry.WithUnits(10*time.Second), retry.WithErrorLogging(true)).Retry(func() error {
@@ -125,7 +124,7 @@ func waitForClusterReady(ctx context.Context, t *testing.T, metalClient client.C
 
 	t.Log("verifying cluster health")
 
-	deployedCluster, err := capi.NewCluster(ctx, metalClient, clusterName, vmSet.BridgeIP())
+	deployedCluster, err := capi.NewCluster(ctx, metalClient, clusterName, capiCluster.BridgeIP())
 	require.NoError(t, err)
 
 	require.NoError(t, deployedCluster.Health(ctx))
@@ -133,12 +132,12 @@ func waitForClusterReady(ctx context.Context, t *testing.T, metalClient client.C
 	return deployedCluster
 }
 
-func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, vmSet *vm.Set,
+func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster,
 	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string,
 ) *loadbalancer.ControlPlane {
-	loadbalancer := createCluster(ctx, t, metalClient, capiCluster, vmSet, capiManager, clusterName, serverClassName, loadbalancerPort, controlPlaneNodes, workerNodes, talosVersion, kubernetesVersion)
+	loadbalancer := createCluster(ctx, t, metalClient, capiCluster, capiManager, clusterName, serverClassName, loadbalancerPort, controlPlaneNodes, workerNodes, talosVersion, kubernetesVersion)
 
-	waitForClusterReady(ctx, t, metalClient, vmSet, clusterName)
+	waitForClusterReady(ctx, t, metalClient, capiCluster, clusterName)
 
 	return loadbalancer
 }

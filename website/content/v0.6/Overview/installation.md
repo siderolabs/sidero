@@ -30,6 +30,7 @@ variables or as variables in the `clusterctl` configuration:
 
 Sidero provides three endpoints which should be made available to the infrastructure:
 
+- UDP port 67 for the proxy DHCP service (providing PXE boot information to the nodes, but no IPAM)
 - TCP port 8081 which provides combined iPXE, metadata and gRPC service (external endpoint should be specified as `SIDERO_CONTROLLER_MANAGER_API_ENDPOINT` and  `SIDERO_CONTROLLER_MANAGER_API_PORT`)
 - UDP port 69 for the TFTP service (DHCP server should point the nodes to PXE boot from that IP)
 - UDP port 51821 for the SideroLink Wireguard service (external endpoint should be specified as `SIDERO_CONTROLLER_MANAGER_SIDEROLINK_ENDPOINT` and `SIDERO_CONTROLLER_MANAGER_SIDEROLINK_PORT`)

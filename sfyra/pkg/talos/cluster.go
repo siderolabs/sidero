@@ -9,6 +9,7 @@ import (
 	"net/netip"
 
 	"github.com/siderolabs/talos/pkg/cluster"
+	"github.com/siderolabs/talos/pkg/provision"
 )
 
 // Cluster is an abstract interface for the Talos cluster.
@@ -23,4 +24,6 @@ type Cluster interface {
 	SideroComponentsIP() netip.Addr
 	// K8s client source.
 	KubernetesClient() cluster.K8sProvider
+	// Nodes returns a list of PXE VMs.
+	Nodes() []provision.NodeInfo
 }

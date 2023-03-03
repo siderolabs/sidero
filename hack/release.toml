@@ -46,3 +46,11 @@ Sidero should be able to process machine config for future versions of Talos.
 Sidero Agent now runs DHCP client in the userland, on the link which was used to PXE boot the machine.
 This allows to run Sidero Agent on the machine with several autoconfigured network interfaces, when one of them is used for the management network.
 """
+
+    [notes.dhcpproxy]
+        title = "DHCP Proxy"
+        description = """\
+Sidero Controller Manager now includes DHCP proxy which augments DHCP response with additional PXE boot options.
+When enabled, DHCP server in the environment only handles IP allocation and network configuration, while DHCP proxy
+provides PXE boot information automatically based on the architecture and boot method.
+"""

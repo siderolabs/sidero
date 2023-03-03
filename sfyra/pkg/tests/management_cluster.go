@@ -12,7 +12,6 @@ import (
 
 	"github.com/siderolabs/sidero/sfyra/pkg/capi"
 	"github.com/siderolabs/sidero/sfyra/pkg/talos"
-	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 const (
@@ -21,8 +20,8 @@ const (
 )
 
 // TestManagementCluster deploys the management cluster via CAPI.
-func TestManagementCluster(ctx context.Context, metalClient client.Client, cluster talos.Cluster, vmSet *vm.Set, capiManager *capi.Manager, talosRelease, kubernetesVersion string) TestFunc {
+func TestManagementCluster(ctx context.Context, metalClient client.Client, cluster talos.Cluster, capiManager *capi.Manager, talosRelease, kubernetesVersion string) TestFunc {
 	return func(t *testing.T) {
-		deployCluster(ctx, t, metalClient, cluster, vmSet, capiManager, managementClusterName, serverClassName, managementClusterLBPort, 1, 1, talosRelease, kubernetesVersion)
+		deployCluster(ctx, t, metalClient, cluster, capiManager, managementClusterName, serverClassName, managementClusterLBPort, 1, 1, talosRelease, kubernetesVersion)
 	}
 }

@@ -32,9 +32,9 @@ var bootstrapClusterCmd = &cobra.Command{
 
 				RegistryMirrors: options.RegistryMirrors,
 
-				CPUs:   options.BootstrapCPUs,
-				MemMB:  options.BootstrapMemMB,
-				DiskGB: options.BootstrapDiskGB,
+				BootstrapCPUs:   options.BootstrapCPUs,
+				BootstrapMemMB:  options.BootstrapMemMB,
+				BootstrapDiskGB: options.BootstrapDiskGB,
 			})
 			if err != nil {
 				return err

@@ -36,7 +36,6 @@ import (
 	"github.com/siderolabs/sidero/sfyra/pkg/capi"
 	"github.com/siderolabs/sidero/sfyra/pkg/constants"
 	"github.com/siderolabs/sidero/sfyra/pkg/talos"
-	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 const (
@@ -45,9 +44,9 @@ const (
 )
 
 // TestServerClassAny verifies server class "any".
-func TestServerClassAny(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+func TestServerClassAny(ctx context.Context, metalClient client.Client, capiCluster talos.Cluster) TestFunc {
 	return func(t *testing.T) {
-		numNodes := len(vmSet.Nodes())
+		numNodes := len(capiCluster.Nodes())
 
 		var serverClass metalv1.ServerClass
 		err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.ServerClassAny}, &serverClass)
@@ -81,7 +80,7 @@ func TestServerClassAny(ctx context.Context, metalClient client.Client, vmSet *v
 }
 
 // TestServerClassCreate verifies server class creation.
-func TestServerClassCreate(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+func TestServerClassCreate(ctx context.Context, metalClient client.Client, capiCluster talos.Cluster) TestFunc {
 	return func(t *testing.T) {
 		classSpec := metalv1.ServerClassSpec{
 			Qualifiers: metalv1.Qualifiers{
@@ -105,7 +104,7 @@ func TestServerClassCreate(ctx context.Context, metalClient client.Client, vmSet
 		serverClass, err := createServerClass(ctx, metalClient, defaultServerClassName, classSpec)
 		require.NoError(t, err)
 
-		numNodes := len(vmSet.Nodes())
+		numNodes := len(capiCluster.Nodes())
 
 		// wait for the server class to gather all nodes (all nodes should match)
 		require.NoError(t, retry.Constant(2*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
@@ -122,7 +121,7 @@ func TestServerClassCreate(ctx context.Context, metalClient client.Client, vmSet
 
 		assert.Len(t, append(serverClass.Status.ServersAvailable, serverClass.Status.ServersInUse...), numNodes)
 
-		nodes := vmSet.Nodes()
+		nodes := capiCluster.Nodes()
 		expectedUUIDs := make([]string, len(nodes))
 
 		for i := range nodes {

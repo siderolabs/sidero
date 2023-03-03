@@ -58,9 +58,17 @@ type Options struct {
 
 	RegistryMirrors []string
 
-	MemMB  int64
-	CPUs   int64
-	DiskGB int64
+	BootstrapMemMB  int64
+	BootstrapCPUs   int64
+	BootstrapDiskGB int64
+
+	VMNodes int
+
+	VMMemMB  int64
+	VMCPUs   int64
+	VMDiskGB int64
+
+	VMDefaultBootOrder string
 }
 
 // NewCluster creates new bootstrap Talos cluster.
@@ -228,11 +236,11 @@ func (cluster *Cluster) create(ctx context.Context) error {
 			Name:     constants.BootstrapControlPlane,
 			Type:     machine.TypeControlPlane,
 			IPs:      []netip.Addr{cluster.controlplaneIP},
-			Memory:   cluster.options.MemMB * 1024 * 1024,
-			NanoCPUs: cluster.options.CPUs * 1000 * 1000 * 1000,
+			Memory:   cluster.options.BootstrapMemMB * 1024 * 1024,
+			NanoCPUs: cluster.options.BootstrapCPUs * 1000 * 1000 * 1000,
 			Disks: []*provision.Disk{
 				{
-					Size: uint64(cluster.options.DiskGB) * 1024 * 1024 * 1024,
+					Size: uint64(cluster.options.BootstrapDiskGB) * 1024 * 1024 * 1024,
 				},
 			},
 			Config: configBundle.ControlPlane(),
@@ -241,16 +249,46 @@ func (cluster *Cluster) create(ctx context.Context) error {
 			Name:     constants.BootstrapWorker,
 			Type:     machine.TypeWorker,
 			IPs:      []netip.Addr{cluster.workerIP},
-			Memory:   cluster.options.MemMB * 1024 * 1024,
-			NanoCPUs: cluster.options.CPUs * 1000 * 1000 * 1000,
+			Memory:   cluster.options.BootstrapMemMB * 1024 * 1024,
+			NanoCPUs: cluster.options.BootstrapCPUs * 1000 * 1000 * 1000,
 			Disks: []*provision.Disk{
 				{
-					Size: uint64(cluster.options.DiskGB) * 1024 * 1024 * 1024,
+					Size: uint64(cluster.options.BootstrapDiskGB) * 1024 * 1024 * 1024,
 				},
 			},
 			Config: configBundle.Worker(),
 		},
 	)
+
+	vmIPs := make([]netip.Addr, cluster.options.VMNodes)
+
+	for i := range vmIPs {
+		vmIPs[i], err = talosnet.NthIPInNetwork(cidr, i+4)
+		if err != nil {
+			return err
+		}
+	}
+
+	for i := 0; i < cluster.options.VMNodes; i++ {
+		request.Nodes = append(request.Nodes,
+			provision.NodeRequest{
+				Name:     fmt.Sprintf("pxe-%d", i),
+				Type:     machine.TypeUnknown,
+				IPs:      []netip.Addr{vmIPs[i]},
+				Memory:   cluster.options.VMMemMB * 1024 * 1024,
+				NanoCPUs: cluster.options.VMCPUs * 1000 * 1000 * 1000,
+				Disks: []*provision.Disk{
+					{
+						Size: uint64(cluster.options.VMDiskGB) * 1024 * 1024 * 1024,
+					},
+				},
+				PXEBooted: true,
+				// TFTPServer:          set.options.BootSource.String(),
+				// IPXEBootFilename:    "undionly.kpxe",
+				SkipInjectingConfig: true,
+				DefaultBootOrder:    cluster.options.VMDefaultBootOrder,
+			})
+	}
 
 	cluster.cluster, err = cluster.provisioner.Create(ctx, request,
 		provision.WithBootlader(true),
@@ -313,4 +351,9 @@ func (cluster *Cluster) BridgeIP() netip.Addr {
 // Name returns cluster name.
 func (cluster *Cluster) Name() string {
 	return cluster.cluster.Info().ClusterName
+}
+
+// Nodes return information about PXE VMs.
+func (cluster *Cluster) Nodes() []provision.NodeInfo {
+	return cluster.cluster.Info().ExtraNodes
 }

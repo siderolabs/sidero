@@ -15,7 +15,6 @@ import (
 	"github.com/siderolabs/sidero/sfyra/pkg/bootstrap"
 	"github.com/siderolabs/sidero/sfyra/pkg/capi"
 	"github.com/siderolabs/sidero/sfyra/pkg/tests"
-	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 var runTestPattern string
@@ -39,9 +38,17 @@ var testIntegrationCmd = &cobra.Command{
 
 				RegistryMirrors: options.RegistryMirrors,
 
-				CPUs:   options.BootstrapCPUs,
-				MemMB:  options.BootstrapMemMB,
-				DiskGB: options.BootstrapDiskGB,
+				BootstrapCPUs:   options.BootstrapCPUs,
+				BootstrapMemMB:  options.BootstrapMemMB,
+				BootstrapDiskGB: options.BootstrapDiskGB,
+
+				VMNodes: options.ManagementNodes,
+
+				VMCPUs:   options.ManagementCPUs,
+				VMMemMB:  options.ManagementMemMB,
+				VMDiskGB: options.ManagementDiskGB,
+
+				VMDefaultBootOrder: options.DefaultBootOrder,
 			})
 			if err != nil {
 				return err
@@ -52,33 +59,6 @@ var testIntegrationCmd = &cobra.Command{
 			}
 
 			if err = bootstrapCluster.Setup(ctx); err != nil {
-				return err
-			}
-
-			managementSet, err := vm.NewSet(ctx, vm.Options{
-				Name:       options.ManagementSetName,
-				Nodes:      options.ManagementNodes,
-				BootSource: bootstrapCluster.SideroComponentsIP(),
-				CIDR:       options.ManagementCIDR,
-
-				CNIBundleURL: options.BootstrapCNIBundleURL,
-				TalosctlPath: options.TalosctlPath,
-
-				CPUs:   options.ManagementCPUs,
-				MemMB:  options.ManagementMemMB,
-				DiskGB: options.ManagementDiskGB,
-
-				DefaultBootOrder: options.DefaultBootOrder,
-			})
-			if err != nil {
-				return err
-			}
-
-			if !options.SkipTeardown {
-				defer managementSet.TearDown(ctx) //nolint:errcheck
-			}
-
-			if err = managementSet.Setup(ctx); err != nil {
 				return err
 			}
 
@@ -103,7 +83,7 @@ var testIntegrationCmd = &cobra.Command{
 			// hacky hack
 			os.Args = append(os.Args[0:1], "-test.v")
 
-			if ok := tests.Run(ctx, bootstrapCluster, managementSet, clusterAPI, tests.Options{
+			if ok := tests.Run(ctx, bootstrapCluster, clusterAPI, tests.Options{
 				KernelURL: options.TalosKernelURL,
 				InitrdURL: options.TalosInitrdURL,
 
@@ -131,7 +111,6 @@ func init() {
 	testIntegrationCmd.Flags().StringVar(&options.BootstrapTalosInitramfs, "bootstrap-initramfs", options.BootstrapTalosInitramfs, "Talos initramfs image for bootstrap cluster")
 	testIntegrationCmd.Flags().StringVar(&options.BootstrapTalosInstaller, "bootstrap-installer", options.BootstrapTalosInstaller, "Talos install image for bootstrap cluster")
 	testIntegrationCmd.Flags().StringVar(&options.BootstrapCIDR, "bootstrap-cidr", options.BootstrapCIDR, "bootstrap cluster network CIDR")
-	testIntegrationCmd.Flags().StringVar(&options.ManagementCIDR, "management-cidr", options.ManagementCIDR, "management cluster network CIDR")
 	testIntegrationCmd.Flags().IntVar(&options.ManagementNodes, "management-nodes", options.ManagementNodes, "number of PXE nodes to create for the management rack")
 	testIntegrationCmd.Flags().StringVar(&options.TalosctlPath, "talosctl-path", options.TalosctlPath, "path to the talosctl (for the QEMU provisioner)")
 	testIntegrationCmd.Flags().StringSliceVar(&options.RegistryMirrors, "registry-mirror", options.RegistryMirrors, "registry mirrors to use")

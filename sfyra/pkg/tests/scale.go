@@ -19,51 +19,51 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/siderolabs/sidero/sfyra/pkg/capi"
-	"github.com/siderolabs/sidero/sfyra/pkg/vm"
+	"github.com/siderolabs/sidero/sfyra/pkg/talos"
 )
 
 type ScaleCallBack func(runtime.Object) error
 
 // TestScaleControlPlaneUp verifies that the control plane can scale up.
-func TestScaleControlPlaneUp(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+func TestScaleControlPlaneUp(ctx context.Context, metalClient client.Client, capiCluster talos.Cluster) TestFunc {
 	return func(t *testing.T) {
 		err := scaleControlPlane(ctx, metalClient, 3)
 		require.NoError(t, err)
 
-		err = verifyClusterHealth(ctx, metalClient, vmSet, t)
+		err = verifyClusterHealth(ctx, metalClient, capiCluster, t)
 		require.NoError(t, err)
 	}
 }
 
 // TestScaleControlPlaneDown verifies that the control plane can scale down.
-func TestScaleControlPlaneDown(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+func TestScaleControlPlaneDown(ctx context.Context, metalClient client.Client, capiCluster talos.Cluster) TestFunc {
 	return func(t *testing.T) {
 		err := scaleControlPlane(ctx, metalClient, 1)
 		require.NoError(t, err)
 
-		err = verifyClusterHealth(ctx, metalClient, vmSet, t)
+		err = verifyClusterHealth(ctx, metalClient, capiCluster, t)
 		require.NoError(t, err)
 	}
 }
 
 // TestScaleWorkersUp verifies that the workers can scale up.
-func TestScaleWorkersUp(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+func TestScaleWorkersUp(ctx context.Context, metalClient client.Client, capiCluster talos.Cluster) TestFunc {
 	return func(t *testing.T) {
 		err := scaleWorkers(ctx, metalClient, 3)
 		require.NoError(t, err)
 
-		err = verifyClusterHealth(ctx, metalClient, vmSet, t)
+		err = verifyClusterHealth(ctx, metalClient, capiCluster, t)
 		require.NoError(t, err)
 	}
 }
 
 // TestScaleWorkersDown verifies that the workers can scale down.
-func TestScaleWorkersDown(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+func TestScaleWorkersDown(ctx context.Context, metalClient client.Client, capiCluster talos.Cluster) TestFunc {
 	return func(t *testing.T) {
 		err := scaleWorkers(ctx, metalClient, 1)
 		require.NoError(t, err)
 
-		err = verifyClusterHealth(ctx, metalClient, vmSet, t)
+		err = verifyClusterHealth(ctx, metalClient, capiCluster, t)
 		require.NoError(t, err)
 	}
 }
@@ -177,10 +177,10 @@ func scale(ctx context.Context, metalClient client.Client, name string, obj clie
 	return nil
 }
 
-func verifyClusterHealth(ctx context.Context, metalClient client.Reader, vmSet *vm.Set, t *testing.T) error {
+func verifyClusterHealth(ctx context.Context, metalClient client.Reader, capiCluster talos.Cluster, t *testing.T) error {
 	t.Log("verifying cluster health")
 
-	cluster, err := capi.NewCluster(ctx, metalClient, managementClusterName, vmSet.BridgeIP())
+	cluster, err := capi.NewCluster(ctx, metalClient, managementClusterName, capiCluster.BridgeIP())
 	if err != nil {
 		return err
 	}

@@ -12,7 +12,6 @@ import (
 
 	"github.com/siderolabs/sidero/sfyra/pkg/capi"
 	"github.com/siderolabs/sidero/sfyra/pkg/talos"
-	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 const (
@@ -21,9 +20,9 @@ const (
 )
 
 // TestWorkloadCluster deploys and destroys the workload cluster via CAPI.
-func TestWorkloadCluster(ctx context.Context, metalClient client.Client, cluster talos.Cluster, vmSet *vm.Set, capiManager *capi.Manager, talosRelease, kubernetesVersion string) TestFunc {
+func TestWorkloadCluster(ctx context.Context, metalClient client.Client, cluster talos.Cluster, capiManager *capi.Manager, talosRelease, kubernetesVersion string) TestFunc {
 	return func(t *testing.T) {
-		loadbalancer := deployCluster(ctx, t, metalClient, cluster, vmSet, capiManager, workloadClusterName, serverClassName, workloadClusterLBPort, 1, 0, talosRelease, kubernetesVersion)
+		loadbalancer := deployCluster(ctx, t, metalClient, cluster, capiManager, workloadClusterName, serverClassName, workloadClusterLBPort, 1, 0, talosRelease, kubernetesVersion)
 		defer loadbalancer.Close()
 
 		deleteCluster(ctx, t, metalClient, workloadClusterName)

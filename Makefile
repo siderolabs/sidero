@@ -9,7 +9,7 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 TEST_PKGS ?= ./...
-TALOS_RELEASE ?= v1.5.0
+TALOS_RELEASE ?= v1.6.0-alpha.0
 DEFAULT_K8S_VERSION ?= v1.27.2
 
 TOOLS ?= ghcr.io/siderolabs/tools:v1.5.0
@@ -227,3 +227,11 @@ conformance: ## Performs policy checks against the commit and source code.
 .PHONY: clean
 clean:
 	@rm -rf $(ARTIFACTS)
+
+.PHONY: docs-preview
+docs-preview: ## Starts a local preview of the documentation using Hugo in docker
+	@docker run --rm --interactive --tty \
+        --volume $(PWD):/src --workdir /src/website \
+        --publish 1313:1313 \
+        klakegg/hugo:0.95.0-ext-alpine \
+        server

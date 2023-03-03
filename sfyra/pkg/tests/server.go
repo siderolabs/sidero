@@ -37,13 +37,12 @@ import (
 	"github.com/siderolabs/sidero/sfyra/pkg/capi"
 	"github.com/siderolabs/sidero/sfyra/pkg/constants"
 	"github.com/siderolabs/sidero/sfyra/pkg/talos"
-	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 // TestServerRegistration verifies that all the servers got registered.
-func TestServerRegistration(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+func TestServerRegistration(ctx context.Context, metalClient client.Client, capiCluster talos.Cluster) TestFunc {
 	return func(t *testing.T) {
-		numNodes := len(vmSet.Nodes())
+		numNodes := len(capiCluster.Nodes())
 
 		var servers *metalv1.ServerList
 
@@ -64,7 +63,7 @@ func TestServerRegistration(ctx context.Context, metalClient client.Client, vmSe
 
 		assert.Len(t, servers.Items, numNodes)
 
-		nodes := vmSet.Nodes()
+		nodes := capiCluster.Nodes()
 		expectedUUIDs := make([]string, len(nodes))
 
 		for i := range nodes {
@@ -99,11 +98,11 @@ func configPatchToJSON(t *testing.T, o interface{}) []byte {
 }
 
 // TestServerMgmtAPI patches all the servers for the management API.
-func TestServerMgmtAPI(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+func TestServerMgmtAPI(ctx context.Context, metalClient client.Client, capiCluster talos.Cluster) TestFunc {
 	return func(t *testing.T) {
-		bridgeIP := vmSet.BridgeIP()
+		bridgeIP := capiCluster.BridgeIP()
 
-		for _, vm := range vmSet.Nodes() {
+		for _, vm := range capiCluster.Nodes() {
 			server := metalv1.Server{}
 
 			require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: vm.UUID.String()}, &server))
@@ -218,7 +217,7 @@ func TestServerPatch(ctx context.Context, metalClient client.Client, registryMir
 }
 
 // TestServerAcceptance makes sure the accepted bool works.
-func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+func TestServerAcceptance(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
 		const numDummies = 3
 
@@ -304,7 +303,7 @@ func TestServerAcceptance(ctx context.Context, metalClient client.Client, vmSet 
 }
 
 // TestServerCordoned makes sure the cordoned bool works.
-func TestServerCordoned(ctx context.Context, metalClient client.Client, vmSet *vm.Set) TestFunc {
+func TestServerCordoned(ctx context.Context, metalClient client.Client) TestFunc {
 	return func(t *testing.T) {
 		const numDummies = 3
 
@@ -533,7 +532,7 @@ const (
 )
 
 // TestServerPXEBoot verifies that PXE boot is retried when the server gets incorrect configuration.
-func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster talos.Cluster, vmSet *vm.Set, capiManager *capi.Manager, talosRelease, kubernetesVersion string) TestFunc {
+func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster talos.Cluster, capiManager *capi.Manager, talosRelease, kubernetesVersion string) TestFunc {
 	return func(t *testing.T) {
 		pxeTestServerClass := "pxe-test-server"
 
@@ -568,7 +567,7 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 
 		t.Cleanup(func() { assert.NoError(t, metalClient.Delete(ctx, &serverClass)) })
 
-		loadbalancer := createCluster(ctx, t, metalClient, cluster, vmSet, capiManager, pxeTestClusterName, pxeTestServerClass, pxeTestClusterLBPort, 1, 0, talosRelease, kubernetesVersion)
+		loadbalancer := createCluster(ctx, t, metalClient, cluster, capiManager, pxeTestClusterName, pxeTestServerClass, pxeTestClusterLBPort, 1, 0, talosRelease, kubernetesVersion)
 
 		t.Log("waiting for the machine to report config validation error")
 
@@ -612,7 +611,7 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 		err = patchHelper.Patch(ctx, &serverClass)
 		require.NoError(t, err)
 
-		waitForClusterReady(ctx, t, metalClient, vmSet, pxeTestClusterName)
+		waitForClusterReady(ctx, t, metalClient, cluster, pxeTestClusterName)
 
 		deleteCluster(ctx, t, metalClient, pxeTestClusterName)
 		loadbalancer.Close() //nolint:errcheck

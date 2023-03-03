@@ -13,7 +13,6 @@ import (
 
 	"github.com/siderolabs/sidero/sfyra/pkg/capi"
 	"github.com/siderolabs/sidero/sfyra/pkg/talos"
-	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
 // TestFunc is a testing function prototype.
@@ -32,7 +31,7 @@ type Options struct {
 }
 
 // Run all the tests.
-func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager *capi.Manager, options Options) (ok bool) {
+func Run(ctx context.Context, cluster talos.Cluster, capiManager *capi.Manager, options Options) (ok bool) {
 	metalClient, err := capiManager.GetMetalClient(ctx)
 	if err != nil {
 		log.Printf("error creating metalClient: %s", err)
@@ -43,11 +42,11 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 	testList := []testing.InternalTest{
 		{
 			"TestServerRegistration",
-			TestServerRegistration(ctx, metalClient, vmSet),
+			TestServerRegistration(ctx, metalClient, cluster),
 		},
 		{
 			"TestServerMgmtAPI",
-			TestServerMgmtAPI(ctx, metalClient, vmSet),
+			TestServerMgmtAPI(ctx, metalClient, cluster),
 		},
 		{
 			"TestServerPatch",
@@ -59,11 +58,11 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		},
 		{
 			"TestServerAcceptance",
-			TestServerAcceptance(ctx, metalClient, vmSet),
+			TestServerAcceptance(ctx, metalClient),
 		},
 		{
 			"TestServerCordoned",
-			TestServerCordoned(ctx, metalClient, vmSet),
+			TestServerCordoned(ctx, metalClient),
 		},
 		{
 			"TestServerResetOnAcceptance",
@@ -87,11 +86,11 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		},
 		{
 			"TestServerClassAny",
-			TestServerClassAny(ctx, metalClient, vmSet),
+			TestServerClassAny(ctx, metalClient, cluster),
 		},
 		{
 			"TestServerClassCreate",
-			TestServerClassCreate(ctx, metalClient, vmSet),
+			TestServerClassCreate(ctx, metalClient, cluster),
 		},
 		{
 			"TestServerClassPatch",
@@ -99,11 +98,11 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		},
 		{
 			"TestServerPXEBoot",
-			TestServerPXEBoot(ctx, metalClient, cluster, vmSet, capiManager, options.TalosRelease, options.KubernetesVersion),
+			TestServerPXEBoot(ctx, metalClient, cluster, capiManager, options.TalosRelease, options.KubernetesVersion),
 		},
 		{
 			"TestManagementCluster",
-			TestManagementCluster(ctx, metalClient, cluster, vmSet, capiManager, options.TalosRelease, options.KubernetesVersion),
+			TestManagementCluster(ctx, metalClient, cluster, capiManager, options.TalosRelease, options.KubernetesVersion),
 		},
 		{
 			"TestMatchServersMetalMachines",
@@ -111,19 +110,19 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		},
 		{
 			"TestScaleWorkersUp",
-			TestScaleWorkersUp(ctx, metalClient, vmSet),
+			TestScaleWorkersUp(ctx, metalClient, cluster),
 		},
 		{
 			"TestScaleWorkersDown",
-			TestScaleWorkersDown(ctx, metalClient, vmSet),
+			TestScaleWorkersDown(ctx, metalClient, cluster),
 		},
 		{
 			"TestScaleControlPlaneUp",
-			TestScaleControlPlaneUp(ctx, metalClient, vmSet),
+			TestScaleControlPlaneUp(ctx, metalClient, cluster),
 		},
 		{
 			"TestScaleControlPlaneDown",
-			TestScaleControlPlaneDown(ctx, metalClient, vmSet),
+			TestScaleControlPlaneDown(ctx, metalClient, cluster),
 		},
 		{
 			"TestMachineDeploymentReconcile",
@@ -139,7 +138,7 @@ func Run(ctx context.Context, cluster talos.Cluster, vmSet *vm.Set, capiManager 
 		},
 		{
 			"TestWorkloadCluster",
-			TestWorkloadCluster(ctx, metalClient, cluster, vmSet, capiManager, options.TalosRelease, options.KubernetesVersion),
+			TestWorkloadCluster(ctx, metalClient, cluster, capiManager, options.TalosRelease, options.KubernetesVersion),
 		},
 	}
 
