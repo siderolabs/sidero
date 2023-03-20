@@ -16,7 +16,7 @@ require (
 	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
-	github.com/siderolabs/go-blockdevice v0.4.2
+	github.com/siderolabs/go-blockdevice v0.4.3
 	github.com/siderolabs/go-debug v0.2.2
 	github.com/siderolabs/go-kmsg v0.1.2
 	github.com/siderolabs/go-procfs v0.1.1
@@ -24,12 +24,12 @@ require (
 	github.com/siderolabs/go-smbios v0.3.1
 	github.com/siderolabs/grpc-proxy v0.4.0
 	github.com/siderolabs/siderolink v0.3.1
-	github.com/siderolabs/talos/pkg/machinery v1.3.0
+	github.com/siderolabs/talos/pkg/machinery v1.3.6
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.23.0
 	golang.org/x/net v0.2.0
 	golang.org/x/sync v0.1.0
-	golang.org/x/sys v0.2.0
+	golang.org/x/sys v0.5.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20220916014741-473347a5e6e3
 	google.golang.org/grpc v1.51.0
 	google.golang.org/protobuf v1.28.1
@@ -102,7 +102,7 @@ require (
 	golang.org/x/crypto v0.3.0 // indirect
 	golang.org/x/oauth2 v0.1.0 // indirect
 	golang.org/x/term v0.2.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20211104114900-415007cec224 // indirect
 	golang.zx2c4.com/wireguard v0.0.0-20220920152132-bb719d3a6e2c // indirect
