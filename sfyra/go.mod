@@ -27,7 +27,7 @@ require (
 	github.com/siderolabs/net v0.4.0
 	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
 	github.com/siderolabs/talos v1.3.0
-	github.com/siderolabs/talos/pkg/machinery v1.3.0
+	github.com/siderolabs/talos/pkg/machinery v1.3.6
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	google.golang.org/grpc v1.51.0
@@ -68,7 +68,7 @@ require (
 	github.com/containernetworking/cni v1.1.2 // indirect
 	github.com/containernetworking/plugins v1.1.1 // indirect
 	github.com/coreos/go-iptables v0.6.0 // indirect
-	github.com/cosi-project/runtime v0.2.0 // indirect
+	github.com/cosi-project/runtime v0.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/drone/envsubst/v2 v2.0.0-20210730161058-179042472c46 // indirect
@@ -151,7 +151,7 @@ require (
 	github.com/siderolabs/crypto v0.4.0 // indirect
 	github.com/siderolabs/gen v0.4.1 // indirect
 	github.com/siderolabs/go-api-signature v0.2.2 // indirect
-	github.com/siderolabs/go-blockdevice v0.4.2 // indirect
+	github.com/siderolabs/go-blockdevice v0.4.3 // indirect
 	github.com/siderolabs/go-tail v0.1.0 // indirect
 	github.com/siderolabs/protoenc v0.2.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
@@ -173,9 +173,9 @@ require (
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/oauth2 v0.2.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.3.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/term v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.2.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
