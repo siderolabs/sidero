@@ -311,7 +311,7 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 					*metav1.NewControllerRef(obj, metalv1.GroupVersion.WithKind("Server")),
 				},
 				Labels: map[string]string{
-					clusterctl.ClusterctlMoveLabelName: "",
+					clusterctl.ClusterctlMoveLabel: "",
 				},
 			}
 

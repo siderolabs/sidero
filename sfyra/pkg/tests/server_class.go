@@ -270,7 +270,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 		var metadataBytes []byte
 
 		require.NoError(t, retry.Constant(5*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
-			req, _ := http.NewRequestWithContext(ctx, "GET", metadataEndpoint, nil)
+			req, _ := http.NewRequestWithContext(ctx, http.MethodGet, metadataEndpoint, nil)
 			client := &http.Client{}
 			response, err := client.Do(req)
 			if err != nil {

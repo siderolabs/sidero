@@ -124,7 +124,7 @@ func (c *Client) IsPoweredOn() (bool, error) {
 		}()
 	}
 
-	var status struct {
+	var status struct { //nolint:musttag
 		PoweredOn bool
 	}
 

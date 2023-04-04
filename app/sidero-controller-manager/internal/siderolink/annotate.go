@@ -163,7 +163,7 @@ func (a *Annotator) buildAnnotation(serverBinding *sidero.ServerBinding) (annota
 	annotation.ServerUUID = serverBinding.Name
 	annotation.Namespace = serverBinding.Spec.MetalMachineRef.Namespace
 	annotation.MetalMachineName = serverBinding.Spec.MetalMachineRef.Name
-	annotation.ClusterName = serverBinding.Labels[clusterv1.ClusterLabelName]
+	annotation.ClusterName = serverBinding.Labels[clusterv1.ClusterNameLabel]
 
 	var metalMachine sidero.MetalMachine
 

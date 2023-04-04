@@ -62,6 +62,7 @@ func createCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 
 	capiClient := capiManager.GetManagerClient()
 
+	//nolint:contextcheck
 	loadbalancer, err := loadbalancer.NewControlPlane(metalClient, vmSet.BridgeIP(), loadbalancerPort, "default", clusterName, false)
 	require.NoError(t, err)
 

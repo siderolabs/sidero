@@ -41,6 +41,8 @@ import (
 var ErrBootFromDisk = errors.New("boot from disk")
 
 // BootTemplate is embedded into iPXE binary when that binary is sent to the node.
+//
+//nolint:dupword
 var BootTemplate = template.Must(template.New("iPXE embedded").Parse(`#!ipxe
 prompt --key 0x02 --timeout 2000 Press Ctrl-B for the iPXE command line... && shell ||
 
@@ -153,7 +155,9 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		arch = "amd64"
 	}
 
-	server, serverBinding, err := lookupServer(uuid)
+	ctx := r.Context()
+
+	server, serverBinding, err := lookupServer(ctx, uuid)
 	if err != nil {
 		log.Printf("Error looking up server: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -161,12 +165,12 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	env, err := newEnvironment(server, serverBinding, arch)
+	env, err := newEnvironment(ctx, server, serverBinding, arch)
 	if err != nil {
 		if errors.Is(err, ErrBootFromDisk) {
 			log.Printf("Server %q booting from disk", uuid)
 
-			method, err := getBootFromDiskMethod(server, serverBinding)
+			method, err := getBootFromDiskMethod(ctx, server, serverBinding)
 			if err != nil {
 				log.Printf("%v", err)
 				w.WriteHeader(http.StatusInternalServerError)
@@ -243,13 +247,13 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err = markAsPXEBooted(server); err != nil {
+		if err = markAsPXEBooted(ctx, server); err != nil {
 			log.Printf("error marking server as PXE booted: %s", err)
 		}
 	}
 }
 
-func getBootFromDiskMethod(server *metalv1.Server, serverBinding *infrav1.ServerBinding) (siderotypes.BootFromDisk, error) {
+func getBootFromDiskMethod(ctx context.Context, server *metalv1.Server, serverBinding *infrav1.ServerBinding) (siderotypes.BootFromDisk, error) {
 	method := defaultBootFromDiskMethod
 
 	if server.Spec.BootFromDiskMethod != "" {
@@ -258,7 +262,7 @@ func getBootFromDiskMethod(server *metalv1.Server, serverBinding *infrav1.Server
 		var serverClass metalv1.ServerClass
 
 		if err := c.Get(
-			context.TODO(),
+			ctx,
 			types.NamespacedName{
 				Namespace: serverBinding.Spec.ServerClassRef.Namespace,
 				Name:      serverBinding.Spec.ServerClassRef.Name,
@@ -343,14 +347,14 @@ func parseMAC(s string) (net.HardwareAddr, error) {
 	return macAddr, err
 }
 
-func lookupServer(uuid string) (*metalv1.Server, *infrav1.ServerBinding, error) {
+func lookupServer(ctx context.Context, uuid string) (*metalv1.Server, *infrav1.ServerBinding, error) {
 	key := client.ObjectKey{
 		Name: uuid,
 	}
 
 	s := &metalv1.Server{}
 
-	if err := c.Get(context.Background(), key, s); err != nil {
+	if err := c.Get(ctx, key, s); err != nil {
 		if apierrors.IsNotFound(err) {
 			return nil, nil, nil
 		}
@@ -360,7 +364,7 @@ func lookupServer(uuid string) (*metalv1.Server, *infrav1.ServerBinding, error) 
 
 	b := &infrav1.ServerBinding{}
 
-	if err := c.Get(context.Background(), key, b); err != nil {
+	if err := c.Get(ctx, key, b); err != nil {
 		if apierrors.IsNotFound(err) {
 			return s, nil, nil
 		}
@@ -373,7 +377,7 @@ func lookupServer(uuid string) (*metalv1.Server, *infrav1.ServerBinding, error) 
 
 // newEnvironment handles which env CRD we'll respect for a given server.
 // specied in the server spec overrides everything, specified in the server class overrides default, default is default :).
-func newEnvironment(server *metalv1.Server, serverBinding *infrav1.ServerBinding, arch string) (env *metalv1.Environment, err error) {
+func newEnvironment(ctx context.Context, server *metalv1.Server, serverBinding *infrav1.ServerBinding, arch string) (env *metalv1.Environment, err error) {
 	// NB: The order of this switch statement is important. It defines the
 	// precedence of which environment to boot.
 	switch {
@@ -384,19 +388,19 @@ func newEnvironment(server *metalv1.Server, serverBinding *infrav1.ServerBinding
 	case conditions.Has(server, metalv1.ConditionPXEBooted) && !server.Spec.PXEBootAlways:
 		return nil, ErrBootFromDisk
 	case server.Spec.EnvironmentRef != nil:
-		env, err = newEnvironmentFromServer(server)
+		env, err = newEnvironmentFromServer(ctx, server)
 		if err != nil {
 			return nil, err
 		}
 	case serverBinding.Spec.ServerClassRef != nil:
-		env, err = newEnvironmentFromServerClass(serverBinding)
+		env, err = newEnvironmentFromServerClass(ctx, serverBinding)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if env == nil {
-		env, err = newDefaultEnvironment()
+		env, err = newDefaultEnvironment(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -442,10 +446,10 @@ func newAgentEnvironment(arch string) *metalv1.Environment {
 	return env
 }
 
-func newDefaultEnvironment() (env *metalv1.Environment, err error) {
+func newDefaultEnvironment(ctx context.Context) (env *metalv1.Environment, err error) {
 	env = &metalv1.Environment{}
 
-	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: metalv1.EnvironmentDefault}, env); err != nil {
+	if err := c.Get(ctx, types.NamespacedName{Namespace: "", Name: metalv1.EnvironmentDefault}, env); err != nil {
 		return nil, err
 	}
 
@@ -454,10 +458,10 @@ func newDefaultEnvironment() (env *metalv1.Environment, err error) {
 	return env, nil
 }
 
-func newEnvironmentFromServer(server *metalv1.Server) (env *metalv1.Environment, err error) {
+func newEnvironmentFromServer(ctx context.Context, server *metalv1.Server) (env *metalv1.Environment, err error) {
 	env = &metalv1.Environment{}
 
-	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: server.Spec.EnvironmentRef.Name}, env); err != nil {
+	if err := c.Get(ctx, types.NamespacedName{Namespace: "", Name: server.Spec.EnvironmentRef.Name}, env); err != nil {
 		return nil, err
 	}
 
@@ -466,10 +470,10 @@ func newEnvironmentFromServer(server *metalv1.Server) (env *metalv1.Environment,
 	return env, nil
 }
 
-func newEnvironmentFromServerClass(serverBinding *infrav1.ServerBinding) (env *metalv1.Environment, err error) {
+func newEnvironmentFromServerClass(ctx context.Context, serverBinding *infrav1.ServerBinding) (env *metalv1.Environment, err error) {
 	serverClassResource := &metalv1.ServerClass{}
 
-	if err := c.Get(context.Background(), types.NamespacedName{Namespace: serverBinding.Spec.ServerClassRef.Namespace, Name: serverBinding.Spec.ServerClassRef.Name}, serverClassResource); err != nil {
+	if err := c.Get(ctx, types.NamespacedName{Namespace: serverBinding.Spec.ServerClassRef.Namespace, Name: serverBinding.Spec.ServerClassRef.Name}, serverClassResource); err != nil {
 		return nil, err
 	}
 
@@ -479,7 +483,7 @@ func newEnvironmentFromServerClass(serverBinding *infrav1.ServerBinding) (env *m
 
 	env = &metalv1.Environment{}
 
-	if err := c.Get(context.Background(), types.NamespacedName{Namespace: "", Name: serverClassResource.Spec.EnvironmentRef.Name}, env); err != nil {
+	if err := c.Get(ctx, types.NamespacedName{Namespace: "", Name: serverClassResource.Spec.EnvironmentRef.Name}, env); err != nil {
 		return nil, err
 	}
 
@@ -535,7 +539,7 @@ outer:
 	}
 }
 
-func markAsPXEBooted(server *metalv1.Server) error {
+func markAsPXEBooted(ctx context.Context, server *metalv1.Server) error {
 	patchHelper, err := patch.NewHelper(server, c)
 	if err != nil {
 		return err
@@ -543,7 +547,7 @@ func markAsPXEBooted(server *metalv1.Server) error {
 
 	conditions.MarkTrue(server, metalv1.ConditionPXEBooted)
 
-	return patchHelper.Patch(context.Background(), server, patch.WithOwnedConditions{
+	return patchHelper.Patch(ctx, server, patch.WithOwnedConditions{
 		Conditions: []clusterv1.ConditionType{metalv1.ConditionPXEBooted},
 	})
 }

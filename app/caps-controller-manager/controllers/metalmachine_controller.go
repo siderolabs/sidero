@@ -195,7 +195,7 @@ func (r *MetalMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	// Set the providerID, as its required in upstream capi for machine lifecycle
-	metalMachine.Spec.ProviderID = pointer.StringPtr(fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name))
+	metalMachine.Spec.ProviderID = pointer.String(fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name))
 
 	// Copy over statuses from ServerBinding to MetalMachine
 	if metalMachine.Spec.ServerRef != nil {

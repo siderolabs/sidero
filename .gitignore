@@ -14,3 +14,5 @@ node_modules
 website/resources
 website/public
 website/.hugo_build.lock
+
+go.work.sum

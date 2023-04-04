@@ -98,7 +98,7 @@ func (cfg *Config) save(ctx context.Context, metalClient runtimeclient.Client) e
 			Namespace: corev1.NamespaceDefault,
 			Name:      SecretName,
 			Labels: map[string]string{
-				clusterctl.ClusterctlMoveLabelName: "",
+				clusterctl.ClusterctlMoveLabel: "",
 			},
 		},
 		Data: map[string][]byte{
