@@ -10,7 +10,6 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 ARTIFACTS := _out
 TEST_PKGS ?= ./...
 TALOS_RELEASE ?= v1.4.0-beta.0
-PREVIOUS_TALOS_RELEASE ?= v0.13.4
 DEFAULT_K8S_VERSION ?= v1.26.0
 
 TOOLS ?= ghcr.io/siderolabs/tools:v1.4.0
@@ -172,7 +171,6 @@ run-sfyra: talos-artifacts clusterctl-release ## Run Sfyra integration test.
 	@ARTIFACTS=$(ARTIFACTS) \
 		CLUSTERCTL_CONFIG=$(SFYRA_CLUSTERCTL_CONFIG) \
 		TALOS_RELEASE=$(TALOS_RELEASE) \
-		PREVIOUS_TALOS_RELEASE=$(PREVIOUS_TALOS_RELEASE) \
 		./hack/scripts/integration-test.sh
 
 # Development

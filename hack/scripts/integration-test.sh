@@ -36,15 +36,9 @@ else
     PREFIX=
 fi
 
-COMPATIBILITY_TESTS_ARGS=
-
-if [[ ! -z "${PREVIOUS_TALOS_RELEASE}" ]]; then
-    COMPATIBILITY_TESTS_ARGS="--prev-talos-release=${PREVIOUS_TALOS_RELEASE}"
-fi
-
 ${PREFIX} "${INTEGRATION_TEST}" test integration \
     --talosctl-path "${TALOSCTL}" \
     --clusterctl-config "${CLUSTERCTL_CONFIG}" \
     --power-simulated-explicit-failure-prob=0.1 \
     --power-simulated-silent-failure-prob=0.0 \
-    ${COMPATIBILITY_TESTS_ARGS} ${REGISTRY_MIRROR_FLAGS} ${SFYRA_EXTRA_FLAGS}
+    ${REGISTRY_MIRROR_FLAGS} ${SFYRA_EXTRA_FLAGS}

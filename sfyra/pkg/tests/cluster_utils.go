@@ -31,28 +31,11 @@ import (
 	"github.com/siderolabs/sidero/sfyra/pkg/vm"
 )
 
-type clusterOptions struct {
-	configURL string
-}
-
-type clusterOption func(o *clusterOptions)
-
-func withConfigURL(value string) clusterOption {
-	return func(o *clusterOptions) {
-		o.configURL = value
-	}
-}
-
 // createCluster without waiting for it to become ready.
 func createCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, vmSet *vm.Set,
-	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string, options ...clusterOption,
+	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string,
 ) *loadbalancer.ControlPlane {
 	t.Logf("deploying cluster %q from server class %q with loadbalancer port %d", clusterName, serverClassName, loadbalancerPort)
-
-	var opts clusterOptions
-	for _, o := range options {
-		o(&opts)
-	}
 
 	kubeconfig, err := capiManager.GetKubeconfig(ctx)
 	require.NoError(t, err)
@@ -78,12 +61,6 @@ func createCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 		ClusterName:              clusterName,
 		ControlPlaneMachineCount: &controlPlaneNodes,
 		WorkerMachineCount:       &workerNodes,
-	}
-
-	if opts.configURL != "" {
-		templateOptions.URLSource = &capiclient.URLSourceOptions{
-			URL: opts.configURL,
-		}
 	}
 
 	template, err := capiClient.GetClusterTemplate(templateOptions)
@@ -157,9 +134,9 @@ func waitForClusterReady(ctx context.Context, t *testing.T, metalClient client.C
 }
 
 func deployCluster(ctx context.Context, t *testing.T, metalClient client.Client, capiCluster talos.Cluster, vmSet *vm.Set,
-	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string, options ...clusterOption,
+	capiManager *capi.Manager, clusterName, serverClassName string, loadbalancerPort int, controlPlaneNodes, workerNodes int64, talosVersion, kubernetesVersion string,
 ) *loadbalancer.ControlPlane {
-	loadbalancer := createCluster(ctx, t, metalClient, capiCluster, vmSet, capiManager, clusterName, serverClassName, loadbalancerPort, controlPlaneNodes, workerNodes, talosVersion, kubernetesVersion, options...)
+	loadbalancer := createCluster(ctx, t, metalClient, capiCluster, vmSet, capiManager, clusterName, serverClassName, loadbalancerPort, controlPlaneNodes, workerNodes, talosVersion, kubernetesVersion)
 
 	waitForClusterReady(ctx, t, metalClient, vmSet, clusterName)
 
