@@ -33,7 +33,7 @@ It is a good idea to verify that the services are exposed as you think they
 should be.
 
 ```bash
-$ curl -I http://192.168.1.150:8081/tftp/ipxe.efi
+$ curl -I http://192.168.1.150:8081/tftp/snp.efi
 HTTP/1.1 200 OK
 Accept-Ranges: bytes
 Content-Length: 1020416

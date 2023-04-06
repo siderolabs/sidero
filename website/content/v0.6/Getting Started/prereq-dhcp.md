@@ -23,11 +23,21 @@ but they all use the same DHCP metadata key.
 In fact, we have as many as six different client types:
 
 - Legacy BIOS-based PXE boot (undionly.kpxe via TFTP)
-- UEFI-based PXE boot (ipxe.efi via TFTP)
-- UEFI HTTP boot (ipxe.efi via HTTP URL)
+- UEFI-based PXE boot (snp.efi/ipxe.efi via TFTP)
+- UEFI HTTP boot (snp.efi/ipxe.efi via HTTP URL)
 - iPXE (boot.ipxe via HTTP URL)
 - UEFI-based PXE arm64 boot (ipxe-arm64.efi via TFTP)
 - UEFI HTTP boot on arm64 (ipxe-arm64.efi via HTTP URL)
+
+## UEFI iPXE modules
+
+There are two iPXE modules available with Sidero Metal:
+
+- `snp.efi` uses iPXE network drivers to configure networking.
+- `ipxe.efi` uses the UEFI network drivers to configure networking.
+
+It is recommended to use `snp.efi` for UEFI-based PXE boot, since it is more reliable.
+However, some UEFI implementations do not support `snp.efi` and require `ipxe.efi` instead.
 
 ## Common client types
 
@@ -38,17 +48,17 @@ options:
 - `Server-Name` (option 66) with the IP of the Sidero TFTP service
 - `Bootfile-Name` (option 67) with the appropriate value for the boot client type:
   - Legacy BIOS PXE boot: `undionly.kpxe`
-  - UEFI-based PXE boot: `ipxe.efi`
-  - UEFI HTTP boot: `http://sidero-server-url/tftp/ipxe.efi`
+  - UEFI-based PXE boot: `snp.efi` (fallback to `ipxe.efi` if `snp.efi` doesn't work)
+  - UEFI HTTP boot: `http://sidero-server-url/tftp/ipxe.efi` (fallback to `ipxe.efi` if `snp.efi` doesn't work)
   - iPXE boot: `http://sidero-server-url/boot.ipxe`
-  - arm64 UEFI PXE boot: `ipxe-arm64.efi`
-  - arm64 UEFI HTTP boot: `http://sidero-server-url/tftp/ipxe-arm64.efi`
+  - arm64 UEFI PXE boot: `snp-arm64.efi` (fallback to `ipxe-arm64.efi` if `snp-arm64.efi` doesn't work)
+  - arm64 UEFI HTTP boot: `http://sidero-server-url/tftp/ipxe-arm64.efi` (fallback to `ipxe-arm64.efi` if `snp-arm64.efi` doesn't work)
 
 In the ISC DHCP server, these options look like:
 
 ```text
 next-server 172.16.199.50;
-filename "ipxe.efi";
+filename "snp.efi";
 ```
 
 ## Multiple client types
@@ -83,14 +93,14 @@ class "biosclients" {
 # Configuration for UEFI-based PXE boot
 class "pxeclients" {
   match if not exists user-class and substring (option vendor-class-identifier, 0, 9) = "PXEClient";
-  filename "ipxe.efi";
+  filename "snp.efi";
 }
 
 # Configuration for UEFI-based HTTP boot
 class "httpclients" {
   match if not exists user-class and substring (option vendor-class-identifier, 0, 10) = "HTTPClient";
   option vendor-class-identifier "HTTPClient";
-  filename "http://172.16.199.50/tftp/ipxe.efi";
+  filename "http://172.16.199.50/tftp/snp.efi";
 }
 ```
 

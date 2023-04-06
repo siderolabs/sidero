@@ -62,7 +62,7 @@ allow bootp;
 allow booting;
 
 next-server 192.168.1.150;
-filename "ipxe.efi"; # use "undionly.kpxe" for BIOS netboot or "ipxe.efi" for UEFI netboot
+filename "snp.efi"; # use "undionly.kpxe" for BIOS netboot or "snp.efi" for UEFI netboot
 
 host talos-mgmt-0 {
     fixed-address 192.168.254.2;
@@ -89,9 +89,9 @@ allow booting;
 next-server 192.168.1.150;
 
 if option system-arch = 00:0b {
-    filename "ipxe-arm64.efi";
+    filename "snp-arm64.efi";
 } else {
-    filename "ipxe.efi";
+    filename "snp.efi";
 }
 
 host talos-mgmt-0 {

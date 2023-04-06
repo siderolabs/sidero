@@ -19,12 +19,22 @@ import (
 // BIOS amd64 undionly.pxe is compressed, so we instead patch uncompressed version and compress it back using zbin.
 // (zbin is built with iPXE).
 func PatchBinaries(script []byte) error {
-	if err := patchScript("/var/lib/sidero/ipxe/amd64/ipxe.efi", "/var/lib/sidero/tftp/ipxe.efi", script); err != nil {
-		return err
-	}
+	for _, name := range []string{"ipxe", "snp"} {
+		if err := patchScript(
+			fmt.Sprintf("/var/lib/sidero/ipxe/amd64/%s.efi", name),
+			fmt.Sprintf("/var/lib/sidero/tftp/%s.efi", name),
+			script,
+		); err != nil {
+			return err
+		}
 
-	if err := patchScript("/var/lib/sidero/ipxe/arm64/ipxe.efi", "/var/lib/sidero/tftp/ipxe-arm64.efi", script); err != nil {
-		return err
+		if err := patchScript(
+			fmt.Sprintf("/var/lib/sidero/ipxe/arm64/%s.efi", name),
+			fmt.Sprintf("/var/lib/sidero/tftp/%s-arm64.efi", name),
+			script,
+		); err != nil {
+			return err
+		}
 	}
 
 	if err := patchScript("/var/lib/sidero/ipxe/amd64/kpxe/undionly.kpxe.bin", "/var/lib/sidero/ipxe/amd64/kpxe/undionly.kpxe.bin.patched", script); err != nil {

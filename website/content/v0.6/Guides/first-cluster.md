@@ -63,9 +63,9 @@ if exists user-class and option user-class = "iPXE" {
     # UEFI
     if substring (option vendor-class-identifier, 0, 10) = "HTTPClient" {
       option vendor-class-identifier "HTTPClient";
-      filename "http://192.168.254.2:8081/tftp/ipxe.efi";
+      filename "http://192.168.254.2:8081/tftp/snp.efi";
     } else {
-      filename "ipxe.efi";
+      filename "snp.efi";
     }
   }
 }
@@ -79,7 +79,7 @@ host talos-mgmt-0 {
 There are multiple ways to boot the via iPXE:
 
 - if the node has built-in iPXE, direct URL to the iPXE script can be used: `http://192.168.254.2:8081/boot.ipxe`.
-- depending on the boot mode (BIOS or UEFI), either `ipxe.efi` or `undionly.kpxe` can be used (these images contain embedded iPXE scripts).
+- depending on the boot mode (BIOS or UEFI), either `snp.efi` or `undionly.kpxe` can be used (these images contain embedded iPXE scripts).
 - iPXE binaries can be delivered either over TFTP or HTTP (HTTP support depends on node firmware).
 
 ## Register the Servers

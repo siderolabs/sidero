@@ -57,7 +57,7 @@ TFTP service is available at the IP you are advertising via DHCP.
 
 ```bash
   $ atftp 172.16.199.50
-  tftp> get ipxe.efi
+  tftp> get snp.efi
 ```
 
 TFTP is an old, slow protocol with very little feedback or checking.
