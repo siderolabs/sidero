@@ -26,6 +26,12 @@ FROM ghcr.io/siderolabs/liblzma:${PKGS} AS pkg-liblzma
 FROM ghcr.io/siderolabs/ipxe:${PKGS} AS pkg-ipxe
 FROM --platform=amd64 ghcr.io/siderolabs/ipxe:${PKGS} AS pkg-ipxe-amd64
 FROM --platform=arm64 ghcr.io/siderolabs/ipxe:${PKGS} AS pkg-ipxe-arm64
+FROM --platform=amd64 ghcr.io/siderolabs/eudev:${PKGS} AS pkg-eudev-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/eudev:${PKGS} AS pkg-eudev-arm64
+FROM --platform=amd64 ghcr.io/siderolabs/util-linux:${PKGS} AS pkg-util-linux-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/util-linux:${PKGS} AS pkg-util-linux-arm64
+FROM --platform=amd64 ghcr.io/siderolabs/kmod:${PKGS} AS pkg-kmod-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/kmod:${PKGS} AS pkg-kmod-arm64
 
 # The base target provides the base for running various tasks against the source
 # code
@@ -178,10 +184,14 @@ WORKDIR /initramfs
 COPY --from=pkg-ca-certificates / .
 COPY --from=pkg-musl-amd64 / .
 COPY --from=pkg-openssl-amd64 / .
+COPY --from=pkg-util-linux-amd64 / .
+COPY --from=pkg-kmod-amd64 / .
+COPY --from=pkg-eudev-amd64 / .
 COPY --from=pkg-ipmitool-amd64 / .
 COPY --from=agent-build-amd64 /agent ./init
 COPY --from=pkg-linux-firmware-amd64 /lib/firmware/bnx2 ./lib/firmware/bnx2
 COPY --from=pkg-linux-firmware-amd64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
+COPY --from=pkg-kernel-amd64 /lib/modules ./lib/modules
 RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 
 FROM base AS initramfs-archive-arm64
@@ -189,10 +199,14 @@ WORKDIR /initramfs
 COPY --from=pkg-ca-certificates / .
 COPY --from=pkg-musl-arm64 / .
 COPY --from=pkg-openssl-arm64 / .
+COPY --from=pkg-util-linux-arm64 / .
+COPY --from=pkg-kmod-arm64 / .
+COPY --from=pkg-eudev-arm64 / .
 COPY --from=pkg-ipmitool-arm64 / .
 COPY --from=agent-build-arm64 /agent ./init
 COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2 ./lib/firmware/bnx2
 COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
+COPY --from=pkg-kernel-arm64 /lib/modules ./lib/modules
 RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 
 FROM scratch AS sidero-controller-manager-image

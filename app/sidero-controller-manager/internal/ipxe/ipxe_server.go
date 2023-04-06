@@ -145,6 +145,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 	labels := labelsFromRequest(r)
 
 	uuid := labels["uuid"]
+	mac := labels["mac"]
 
 	var arch string
 
@@ -165,7 +166,7 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	env, err := newEnvironment(ctx, server, serverBinding, arch)
+	env, err := newEnvironment(ctx, server, serverBinding, arch, mac)
 	if err != nil {
 		if errors.Is(err, ErrBootFromDisk) {
 			log.Printf("Server %q booting from disk", uuid)
@@ -377,14 +378,14 @@ func lookupServer(ctx context.Context, uuid string) (*metalv1.Server, *infrav1.S
 
 // newEnvironment handles which env CRD we'll respect for a given server.
 // specied in the server spec overrides everything, specified in the server class overrides default, default is default :).
-func newEnvironment(ctx context.Context, server *metalv1.Server, serverBinding *infrav1.ServerBinding, arch string) (env *metalv1.Environment, err error) {
+func newEnvironment(ctx context.Context, server *metalv1.Server, serverBinding *infrav1.ServerBinding, arch, mac string) (env *metalv1.Environment, err error) {
 	// NB: The order of this switch statement is important. It defines the
 	// precedence of which environment to boot.
 	switch {
 	case server == nil:
-		return newAgentEnvironment(arch), nil
+		return newAgentEnvironment(arch, mac), nil
 	case serverBinding == nil:
-		return newAgentEnvironment(arch), nil
+		return newAgentEnvironment(arch, mac), nil
 	case conditions.Has(server, metalv1.ConditionPXEBooted) && !server.Spec.PXEBootAlways:
 		return nil, ErrBootFromDisk
 	case server.Spec.EnvironmentRef != nil:
@@ -413,14 +414,14 @@ func newEnvironment(ctx context.Context, server *metalv1.Server, serverBinding *
 	return env, nil
 }
 
-func newAgentEnvironment(arch string) *metalv1.Environment {
+func newAgentEnvironment(arch, mac string) *metalv1.Environment {
 	args := append([]string(nil), kernel.DefaultArgs...)
 	args = append(args,
 		"console=tty0",
 		"console=ttyS0",
 		"initrd=initramfs.xz",
-		"ip=dhcp",
 		"panic=30",
+		fmt.Sprintf("%s=%s", constants.AgentMACArg, mac),
 		fmt.Sprintf("%s=%s:%d", constants.AgentEndpointArg, apiEndpoint, apiPort),
 	)
 
