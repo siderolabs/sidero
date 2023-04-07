@@ -12,6 +12,7 @@ import (
 	"log"
 	"math/big"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/siderolabs/go-retry/retry"
@@ -128,7 +129,7 @@ func attemptBMCUserSetup(ctx context.Context, client api.AgentClient, s *smbios.
 			log.Printf("Sidero user already present in slot %d. We'll claim it as our very own.\n", i)
 
 			break
-		} else if userRes.Username == "" && sideroUserID == 0 {
+		} else if (userRes.Username == "" || strings.TrimSpace(userRes.Username) == "(Empty User)") && sideroUserID == 0 {
 			// If this is the first empty user that's not the UID 1 (which we skip),
 			// we'll take this spot for sidero user
 			log.Printf("Found empty user slot %d. Noting as a possible place for sidero user.\n", i)

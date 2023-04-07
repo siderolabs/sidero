@@ -84,7 +84,7 @@ func mainFunc() error {
 		log.Println("failed to discover IPs")
 	} else {
 		if err = reconcileIPs(ctx, client, s, ips); err != nil {
-			shutdown(err)
+			return err
 		}
 
 		log.Printf("Reconciled IPs")
@@ -93,7 +93,7 @@ func mainFunc() error {
 	if createResp.GetWipe() {
 		disks, err := disk.List()
 		if err != nil {
-			shutdown(err)
+			return err
 		}
 
 		var (
@@ -176,11 +176,11 @@ func mainFunc() error {
 		}
 
 		if err := eg.Wait(); err != nil {
-			shutdown(err)
+			return err
 		}
 
 		if err := wipe(ctx, client, s); err != nil {
-			shutdown(err)
+			return err
 		}
 
 		log.Println("Wipe complete")
