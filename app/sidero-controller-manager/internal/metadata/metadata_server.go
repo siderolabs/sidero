@@ -11,10 +11,8 @@ import (
 	"log"
 	"net/http"
 
-	jsonpatch "github.com/evanphx/json-patch"
-	"github.com/ghodss/yaml"
-	"github.com/siderolabs/talos/pkg/machinery/config/configloader"
-	talosv1alpha1 "github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1" //nolint:typecheck
+	"github.com/siderolabs/talos/pkg/machinery/config/configpatcher" //nolint:typecheck
+	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -87,7 +85,7 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 
 	// Given the MetalMachine, find the Machine resource that owns it
 	ownerMachine, err := util.GetOwnerMachine(ctx, m.client, metalMachine.ObjectMeta)
-	if err != nil {
+	if err != nil || ownerMachine == nil {
 		throwError(
 			w,
 			errorWithCode{
@@ -251,62 +249,102 @@ func patchConfigs(decodedData []byte, patches []metalv1.ConfigPatches) ([]byte, 
 		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure marshaling config patches from server: %s", err)}
 	}
 
-	jsonDecodedData, err := yaml.YAMLToJSON(decodedData)
+	patch, err := configpatcher.LoadPatch(marshalledPatches)
 	if err != nil {
-		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure converting bootstrap data to json: %s", err)}
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure loading rfc6902 patches from server: %s", err)}
 	}
 
-	patch, err := jsonpatch.DecodePatch(marshalledPatches)
-	if err != nil {
-		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure decoding config patches from server to rfc6902 patch: %s", err)}
-	}
-
-	jsonDecodedData, err = patch.Apply(jsonDecodedData)
+	patched, err := configpatcher.Apply(configpatcher.WithBytes(decodedData), []configpatcher.Patch{patch})
 	if err != nil {
 		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure applying rfc6902 patches to machine config: %s", err)}
 	}
 
-	decodedData, err = yaml.JSONToYAML(jsonDecodedData)
+	result, err := patched.Bytes()
 	if err != nil {
-		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure converting bootstrap data from json to yaml: %s", err)}
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure converting patched config to bytes: %s", err)}
 	}
 
-	return decodedData, errorWithCode{}
+	return result, errorWithCode{}
 }
 
 // labelNodes is responsible for editing the kubelet extra args such that a given
 // server gets registered with a label containing the UUID of the server resource it's actually running on.
 func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
-	configProvider, err := configloader.NewFromBytes(decodedData)
-	if err != nil {
+	// avoid using the `configloader` from Talos machinery here, as it will fail on "unknown" fields
+	// causing a dependency on Talos version that Sidero was built with
+	var cfg struct {
+		Version string `yaml:"version"`
+		Machine *struct {
+			Kubelet *struct {
+				ExtraArgs map[string]string `yaml:"extraArgs"`
+			} `yaml:"kubelet"`
+		} `yaml:"machine"`
+	}
+
+	if err := yaml.Unmarshal(decodedData, &cfg); err != nil {
 		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure creating config struct: %s", err)}
 	}
 
-	switch configProvider.Version() {
+	switch cfg.Version {
 	case "v1alpha1":
-		config, ok := configProvider.Raw().(*talosv1alpha1.Config)
-		if !ok {
-			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unable to case config")}
+		var (
+			patch      metalv1.ConfigPatches
+			patchValue any
+		)
+
+		label := fmt.Sprintf("metal.sidero.dev/uuid=%s", serverName)
+
+		switch {
+		case cfg.Machine == nil:
+			patch = metalv1.ConfigPatches{
+				Path: "/machine",
+				Op:   "add",
+			}
+
+			patchValue = map[string]any{
+				"kubelet": map[string]any{
+					"extraArgs": map[string]string{
+						"node-labels": label,
+					},
+				},
+			}
+		case cfg.Machine.Kubelet == nil:
+			patch = metalv1.ConfigPatches{
+				Path: "/machine/kubelet",
+				Op:   "add",
+			}
+
+			patchValue = map[string]any{
+				"extraArgs": map[string]string{
+					"node-labels": label,
+				},
+			}
+		case cfg.Machine.Kubelet.ExtraArgs == nil:
+			patch = metalv1.ConfigPatches{
+				Path: "/machine/kubelet/extraArgs",
+				Op:   "add",
+			}
+
+			patchValue = map[string]any{
+				"node-labels": label,
+			}
+		default:
+			kubeletExtraArgs := cfg.Machine.Kubelet.ExtraArgs
+			if _, ok := kubeletExtraArgs["node-labels"]; ok {
+				kubeletExtraArgs["node-labels"] += "," + label
+			} else {
+				kubeletExtraArgs["node-labels"] = label
+			}
+
+			patch = metalv1.ConfigPatches{
+				Path: "/machine/kubelet/extraArgs",
+				Op:   "replace",
+			}
+
+			patchValue = kubeletExtraArgs
 		}
 
-		patch := metalv1.ConfigPatches{
-			Path: "/machine/kubelet/extraArgs",
-			Op:   "replace",
-		}
-
-		kubeletExtraArgs := config.MachineConfig.MachineKubelet.KubeletExtraArgs
-		if kubeletExtraArgs == nil {
-			patch.Op = "add"
-			kubeletExtraArgs = make(map[string]string)
-		}
-
-		if _, ok = kubeletExtraArgs["node-labels"]; ok {
-			kubeletExtraArgs["node-labels"] += fmt.Sprintf(",metal.sidero.dev/uuid=%s", serverName)
-		} else {
-			kubeletExtraArgs["node-labels"] = fmt.Sprintf("metal.sidero.dev/uuid=%s", serverName)
-		}
-
-		value, err := json.Marshal(kubeletExtraArgs)
+		value, err := json.Marshal(patchValue)
 		if err != nil {
 			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure marshaling kubelet.extraArgs: %s", err)}
 		}

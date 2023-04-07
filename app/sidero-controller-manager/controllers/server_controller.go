@@ -143,7 +143,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 
 			// Talos installation was successful, so mark the server as PXE booted.
 			if conditions.IsTrue(serverBinding, infrav1.TalosInstalledCondition) {
-				conditions.MarkTrue(serverBinding, metalv1.ConditionPXEBooted)
+				conditions.MarkTrue(&s, metalv1.ConditionPXEBooted)
 			}
 		}
 	}

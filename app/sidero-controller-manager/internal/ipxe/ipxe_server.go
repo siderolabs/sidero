@@ -21,9 +21,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/util/conditions"
-	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 
@@ -237,20 +235,6 @@ func ipxeHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return
-	}
-
-	// This code is left here only for backward compatibility with Talos <= v0.13.
-	if !strings.HasPrefix(env.ObjectMeta.Name, "agent") {
-		// Do not mark as PXE booted here if SideroLink events are available and Talos installation is in progress.
-		// SideroLink events handler will mark the machine with TalosInstalledCondition condition,
-		// then server controller will reconcile this status and mark server as PXEBooted.
-		if conditions.Has(serverBinding, infrav1.TalosInstalledCondition) {
-			return
-		}
-
-		if err = markAsPXEBooted(ctx, server); err != nil {
-			log.Printf("error marking server as PXE booted: %s", err)
-		}
 	}
 }
 
@@ -538,19 +522,6 @@ outer:
 			)
 		}
 	}
-}
-
-func markAsPXEBooted(ctx context.Context, server *metalv1.Server) error {
-	patchHelper, err := patch.NewHelper(server, c)
-	if err != nil {
-		return err
-	}
-
-	conditions.MarkTrue(server, metalv1.ConditionPXEBooted)
-
-	return patchHelper.Patch(ctx, server, patch.WithOwnedConditions{
-		Conditions: []clusterv1.ConditionType{metalv1.ConditionPXEBooted},
-	})
 }
 
 func Check(addr string) healthz.Checker {

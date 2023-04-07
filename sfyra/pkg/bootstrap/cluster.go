@@ -137,6 +137,11 @@ func (cluster *Cluster) findExisting(ctx context.Context) error {
 		return err
 	}
 
+	cluster.workerIP, err = talosnet.NthIPInNetwork(cidr, 3)
+	if err != nil {
+		return err
+	}
+
 	cluster.access = access.NewAdapter(cluster.cluster, provision.WithTalosConfig(config))
 
 	return nil

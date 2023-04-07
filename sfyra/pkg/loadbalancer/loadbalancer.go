@@ -18,14 +18,10 @@ import (
 
 	cacpt "github.com/siderolabs/cluster-api-control-plane-provider-talos/api/v1alpha3"
 	"github.com/siderolabs/go-loadbalancer/controlplane"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
 // ControlPlane implements dynamic loadbalancer for the control plane.
@@ -143,26 +139,8 @@ func (cp *ControlPlane) reconcile(ctx context.Context) error {
 	var upstreams []string
 
 	for _, machine := range machines.Items {
-		// we could have looked up addresses via Machine.status, but as we still have tests with Talos 0.13 (before SideroLink was introduced),
-		// we need to keep this way of looking up addresses.
-		var metalMachine infrav1.MetalMachine
-
-		if err := cp.client.Get(ctx, types.NamespacedName{Namespace: machine.Spec.InfrastructureRef.Namespace, Name: machine.Spec.InfrastructureRef.Name}, &metalMachine); err != nil {
-			continue
-		}
-
-		var server metalv1.Server
-
-		if metalMachine.Spec.ServerRef == nil {
-			continue
-		}
-
-		if err := cp.client.Get(ctx, types.NamespacedName{Namespace: metalMachine.Spec.ServerRef.Namespace, Name: metalMachine.Spec.ServerRef.Name}, &server); err != nil {
-			return err
-		}
-
-		for _, address := range server.Status.Addresses {
-			if address.Type == corev1.NodeInternalIP {
+		for _, address := range machine.Status.Addresses {
+			if address.Type == capiv1.MachineInternalIP {
 				upstreams = append(upstreams, fmt.Sprintf("%s:6443", address.Address))
 			}
 		}

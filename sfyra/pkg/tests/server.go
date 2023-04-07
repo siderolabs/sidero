@@ -26,6 +26,7 @@ import (
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
+	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -565,9 +566,13 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 		serverClass, err := createServerClass(ctx, metalClient, pxeTestServerClass, classSpec)
 		require.NoError(t, err)
 
+		t.Cleanup(func() { assert.NoError(t, metalClient.Delete(ctx, &serverClass)) })
+
 		loadbalancer := createCluster(ctx, t, metalClient, cluster, vmSet, capiManager, pxeTestClusterName, pxeTestServerClass, pxeTestClusterLBPort, 1, 0, talosRelease, kubernetesVersion)
 
-		retry.Constant(time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
+		t.Log("waiting for the machine to report config validation error")
+
+		require.NoError(t, retry.Constant(3*time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {
 			var machines infrav1.MetalMachineList
 
 			labelSelector, err := labels.Parse(fmt.Sprintf("cluster.x-k8s.io/cluster-name=%s", pxeTestClusterName))
@@ -582,12 +587,22 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 				return retry.ExpectedErrorf("no metal machines detected yet")
 			}
 
-			if !conditions.IsFalse(&machines.Items[0], infrav1.TalosConfigLoadedCondition) || !conditions.IsFalse(&machines.Items[0], infrav1.TalosConfigValidatedCondition) {
-				return retry.ExpectedErrorf("the machine doesn't have any config failure conditions yet")
+			machine := machines.Items[0]
+
+			// wait for config validation event
+			if conditions.IsFalse(&machine, infrav1.TalosConfigLoadedCondition) {
+				severity := conditions.GetSeverity(&machines.Items[0], infrav1.TalosConfigLoadedCondition)
+				if severity != nil && *severity == capiv1.ConditionSeverityError {
+					t.Logf("machine condition reached: %#+v", machines.Items[0].Status.Conditions)
+
+					return nil
+				}
 			}
 
-			return nil
-		})
+			return retry.ExpectedErrorf("the machine doesn't have any config failure conditions yet")
+		}))
+
+		t.Log("removing broken config patches and proceeding with the normal cluster boot")
 
 		patchHelper, err := patch.NewHelper(&serverClass, metalClient)
 		require.NoError(t, err)
