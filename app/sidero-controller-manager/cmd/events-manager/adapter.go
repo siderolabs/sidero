@@ -22,6 +22,7 @@ import (
 
 	"github.com/siderolabs/siderolink/pkg/events"
 
+	"github.com/siderolabs/talos/pkg/machinery/api/common"
 	"github.com/siderolabs/talos/pkg/machinery/api/machine"
 )
 
@@ -144,16 +145,6 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 		if event.GetError() != nil {
 			err = fmt.Errorf(event.GetError().GetMessage())
 		}
-
-		if event.GetSequence() == "install" &&
-			event.GetAction() == machine.SequenceEvent_STOP {
-			if event.GetError() != nil {
-				message = "failed to install Talos"
-				break
-			}
-
-			message = "successfully installed Talos"
-		}
 	}
 
 	if err != nil {
@@ -170,37 +161,30 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 }
 
 func (a *Adapter) handleSequenceEvent(ctx context.Context, ip string, event *machine.SequenceEvent) error {
-	if event.GetSequence() != "install" {
-		return nil
-	}
+	var err error
 
-	var callback func(*sidero.ServerBinding)
-
-	if event.GetAction() == machine.SequenceEvent_STOP {
-		if event.GetError() != nil {
-			callback = func(serverbinding *sidero.ServerBinding) {
-				conditions.MarkFalse(serverbinding, sidero.TalosInstalledCondition, sidero.TalosInstallationFailedReason, clusterv1.ConditionSeverityError, event.GetError().GetMessage())
-			}
-		} else {
-			callback = func(serverbinding *sidero.ServerBinding) {
+	switch {
+	case event.GetSequence() == "install" && event.GetAction() == machine.SequenceEvent_NOOP && event.GetError().GetCode() == common.Code_FATAL:
+		// this is ugly, but we need to handle this case
+		if strings.Contains(event.GetError().GetMessage(), "unix.Reboot") {
+			err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
 				conditions.MarkTrue(serverbinding, sidero.TalosInstalledCondition)
-				conditions.MarkTrue(serverbinding, sidero.TalosConfigValidatedCondition)
-				conditions.MarkTrue(serverbinding, sidero.TalosConfigLoadedCondition)
-			}
+			})
+		} else {
+			err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
+				conditions.MarkFalse(serverbinding, sidero.TalosInstalledCondition, sidero.TalosInstallationFailedReason, clusterv1.ConditionSeverityError, event.GetError().GetMessage())
+			})
 		}
-	} else if event.GetAction() == machine.SequenceEvent_START {
-		callback = func(serverbinding *sidero.ServerBinding) {
-			conditions.MarkFalse(serverbinding, sidero.TalosInstalledCondition, sidero.TalosInstallationInProgressReason, clusterv1.ConditionSeverityInfo, "")
-			conditions.MarkFalse(serverbinding, sidero.TalosConfigValidatedCondition, sidero.TalosInstallationInProgressReason, clusterv1.ConditionSeverityInfo, "")
-			conditions.MarkFalse(serverbinding, sidero.TalosConfigLoadedCondition, sidero.TalosInstallationInProgressReason, clusterv1.ConditionSeverityInfo, "")
-		}
+	case event.GetSequence() == "boot" && event.GetAction() == machine.SequenceEvent_START:
+		err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
+			// if Talos reached 'boot' sequence, everything is good
+			conditions.MarkTrue(serverbinding, sidero.TalosInstalledCondition)
+			conditions.MarkTrue(serverbinding, sidero.TalosConfigValidatedCondition)
+			conditions.MarkTrue(serverbinding, sidero.TalosConfigLoadedCondition)
+		})
 	}
 
-	if callback == nil {
-		return nil
-	}
-
-	return a.patchServerBinding(ctx, ip, callback)
+	return err
 }
 
 func (a *Adapter) handleConfigLoadFailedEvent(ctx context.Context, ip string, event *machine.ConfigLoadErrorEvent) error {
@@ -215,31 +199,25 @@ func (a *Adapter) handleConfigValidationFailedEvent(ctx context.Context, ip stri
 	})
 }
 
-func (a *Adapter) handlePhaseEvent(ctx context.Context, ip string, event *machine.PhaseEvent) (err error) {
-	if event.GetAction() != machine.PhaseEvent_STOP {
-		return nil
+func (a *Adapter) handlePhaseEvent(ctx context.Context, ip string, event *machine.PhaseEvent) error {
+	var err error
+
+	// handle only START events, STOP events come for both success and failures
+	switch {
+	case event.GetPhase() == "install" && event.GetAction() == machine.PhaseEvent_START:
+		// starting phase install, mark as in progress
+		err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
+			conditions.MarkFalse(serverbinding, sidero.TalosInstalledCondition, sidero.TalosInstallationInProgressReason, clusterv1.ConditionSeverityInfo, "")
+		})
+	case event.GetPhase() == "saveConfig" && event.GetAction() == machine.PhaseEvent_START:
+		// if we reached this phase, config was validated and loaded
+		err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
+			conditions.MarkTrue(serverbinding, sidero.TalosConfigValidatedCondition)
+			conditions.MarkTrue(serverbinding, sidero.TalosConfigLoadedCondition)
+		})
 	}
 
-	switch event.GetPhase() {
-	case "validateConfig":
-		if err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
-			if !conditions.Has(serverbinding, sidero.TalosConfigValidatedCondition) {
-				conditions.MarkTrue(serverbinding, sidero.TalosConfigValidatedCondition)
-			}
-		}); err != nil {
-			return err
-		}
-	case "loadConfig":
-		if err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
-			if !conditions.Has(serverbinding, sidero.TalosConfigLoadedCondition) {
-				conditions.MarkTrue(serverbinding, sidero.TalosConfigLoadedCondition)
-			}
-		}); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return err
 }
 
 func (a *Adapter) patchServerBinding(ctx context.Context, ip string, callback func(serverbinding *sidero.ServerBinding)) error {
