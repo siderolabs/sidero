@@ -27,7 +27,7 @@ require (
 	github.com/siderolabs/net v0.4.0
 	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
 	github.com/siderolabs/talos v1.4.0-beta.0
-	github.com/siderolabs/talos/pkg/machinery v1.4.0-beta.0
+	github.com/siderolabs/talos/pkg/machinery v1.4.0-beta.1
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.2
 	google.golang.org/grpc v1.54.0
