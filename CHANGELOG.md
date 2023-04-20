@@ -1,3 +1,163 @@
+## [Sidero 0.6.0-alpha.0](https://github.com/talos-systems/sidero/releases/tag/v0.6.0-alpha.0) (2023-04-20)
+
+Welcome to the v0.6.0-alpha.0 release of Sidero!  
+*This is a pre-release of Sidero*
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Sidero Agent
+
+Sidero Agent now runs DHCP client in the userland, on the link which was used to PXE boot the machine.
+This allows to run Sidero Agent on the machine with several autoconfigured network interfaces, when one of them is used for the management network.
+
+
+### Metadata Server
+
+Sidero Metadata Server no longer depends on the version of Talos machinery library it is built with.
+Sidero should be able to process machine config for future versions of Talos.
+
+
+### New API Version for `metal.sidero.dev` Resources
+
+Resources under `metal.sidero.dev` (`Server`, `ServerClass`, `Environment`) now have a new version `v1alpha2`.
+Old version `v1alpha1` is still supported, but it is recommended to update templates to use the new resource version.
+
+#### `Server` Changes
+
+Hardware information was restructured and extended when compared with `v1alpha1`:
+
+* `.spec.systemInformation` -> `.spec.hardware.system`
+* `.spec.cpu` -> `.spec.hardware.compute.processors[]`
+
+#### `ServerClass` Changes
+
+* `.spec.qualifiers.systemInformation` -> `.spec.qualifiers.system`
+* `.spec.qualifiers.cpu` -> `.spec.qualifiers.hardware.compute.processors[]`
+
+
+### Contributors
+
+* Andrey Smirnov
+* Spencer Smith
+* Gerard de Leeuw
+* Tim Jones
+* Artem Chernyshev
+* Noel Georgi
+* JJGadgets
+* Martin Sweeny
+* Michael Vorburger ⛑️
+* Russell Troxel
+* Steve Francis
+* Utku Ozdemir
+* Zach Bernstein
+* bzub
+
+### Changes
+<details><summary>59 commits</summary>
+<p>
+
+* [`b2c53bf`](https://github.com/talos-systems/sidero/commit/b2c53bf9d7d016d418365ee3caff352ddae86f68) fix: allow 'empty user' slots to be used in IPMI setup
+* [`2b3dedc`](https://github.com/talos-systems/sidero/commit/2b3dedc23b1bf1c109fe7426471e1209acf91455) feat: update to final Talos 1.4.0 release
+* [`6c15a40`](https://github.com/talos-systems/sidero/commit/6c15a401ebe59b43cb3be46a1e5aed97c3462cf6) fix: parse Talos events into Machine conditions
+* [`24e1893`](https://github.com/talos-systems/sidero/commit/24e189331df34f55c4583a0a45bd6dc3b096b116) fix: break the link of metadata server to Talos machine config
+* [`ef65ff0`](https://github.com/talos-systems/sidero/commit/ef65ff05a91bc49d0bc8474cefe3f5b0c880c4cb) chore: add v0.6.x to metadata, fix metrics service
+* [`e433504`](https://github.com/talos-systems/sidero/commit/e433504087ae39299d1c2e492db6ed5714dd73a0) feat: provide 'snp.efi' and recommend it over 'ipxe.efi'
+* [`71390a3`](https://github.com/talos-systems/sidero/commit/71390a33dba10a5e2f02ade07805cd4435d69d5a) docs: remove docs v0.1-v0.3
+* [`b305f2c`](https://github.com/talos-systems/sidero/commit/b305f2c5f0970b0f779bd465537546476e99d67c) feat: rework the way Sidero Agent boots and configures networking
+* [`b6235eb`](https://github.com/talos-systems/sidero/commit/b6235eb4bdc562eb33c32fbf217bb81e2c68b579) test: drop tests with old Talos compatibility
+* [`9121a3b`](https://github.com/talos-systems/sidero/commit/9121a3b7d53b3897fe60c734b6bfa3599954710f) chore: bump dependencies
+* [`18116bc`](https://github.com/talos-systems/sidero/commit/18116bcabe77f1e7aa8d33b4d10cf2ff4a7cd18b) fix: use updated pkgs with fixed ipmitool
+* [`fbcd02a`](https://github.com/talos-systems/sidero/commit/fbcd02a45d49a774ee9a6327347d342edd4ed2fa) feat: update for Talos 1.3.0
+* [`c95184a`](https://github.com/talos-systems/sidero/commit/c95184a318544a45203825c94e187fc50c0b1919) docs: detail how to disable IPMI magic (re. #988)
+* [`51ac816`](https://github.com/talos-systems/sidero/commit/51ac816e6f1bd2625030be3f0044cabe7849e55d) fix: docs: /etc/dhcp -> config to preserve across firmware update
+* [`d8ef68b`](https://github.com/talos-systems/sidero/commit/d8ef68b6b951df093d288c1dae6c0d32a9e00aec) feat: provide a way to override IPMI PXE boot method on `Server`
+* [`831761a`](https://github.com/talos-systems/sidero/commit/831761aeffaa9534e3072d1b894df97a0b495809) fix: docs sitemap www prefix
+* [`2b2ed86`](https://github.com/talos-systems/sidero/commit/2b2ed86e1ceb9b6f1a74be85a6546a6a61f73c8c) docs: fix dead link in serverclasses guide
+* [`5527432`](https://github.com/talos-systems/sidero/commit/5527432ddfc0fca78ad8bd9a1034a431117fcc06) fix: canonical links in docs site
+* [`757706c`](https://github.com/talos-systems/sidero/commit/757706cae125abfdcb8ff49167539abd832b7c6a) feat: finalize update to Talos 1.2.0
+* [`f9d12f3`](https://github.com/talos-systems/sidero/commit/f9d12f3c4635281015c6e3795aadfbc61dad805c) feat: update Talos to 1.2.0-beta.2
+* [`44f1962`](https://github.com/talos-systems/sidero/commit/44f1962ceaac518f1e59205a43db3a1bf1e79cd6) fix: properly inspect readonly flag of the disk
+* [`7cb28fc`](https://github.com/talos-systems/sidero/commit/7cb28fccfea5be7f5a22ddd9f895cd04cda68dc1) docs: handle latest version banner and canonical urls
+* [`824d059`](https://github.com/talos-systems/sidero/commit/824d05920a8add702a9e705321585f247ea4ca48) fix: filter out SideroLink address from Machine addresses
+* [`08cac99`](https://github.com/talos-systems/sidero/commit/08cac998b1e5228cf4daa0d1911ef7d0a8b4ae16) feat: update base Talos to 1.1.1
+* [`3c65480`](https://github.com/talos-systems/sidero/commit/3c654806a52bbeb8604b78f27f2fafc0a75f2eb9) fix: skip read-only block devices on wiping
+* [`4e714a1`](https://github.com/talos-systems/sidero/commit/4e714a1e4d657e01fcfe0f7a3e64ca58d6af89f5) fix: resolve wireguard endpoint to IP
+* [`3eddbbd`](https://github.com/talos-systems/sidero/commit/3eddbbd69ecab561bc6583d75262442ed4b73228) fix: use http response writer directly
+* [`a06135a`](https://github.com/talos-systems/sidero/commit/a06135a96e0d19c07d5e34908ebffee1ea15571d) docs: use ipxe-sanboot for raspberry pi 4's
+* [`c0dfd23`](https://github.com/talos-systems/sidero/commit/c0dfd23fa5f8b775bf1ea84ce14c93927b821a88) test: integrate new controlplane loadbalancer
+* [`fd0086d`](https://github.com/talos-systems/sidero/commit/fd0086d6f0579f3888cb0dfd8476b6c91cdd5c28) fix: append Talos default kernel args even if there is something defined
+* [`6c6b354`](https://github.com/talos-systems/sidero/commit/6c6b3546e40665b605fa44cc5508647c90d20223) docs: edit for clarity and conciseness
+* [`56d27ce`](https://github.com/talos-systems/sidero/commit/56d27ce71876df1626edcc56cb19c5c7b53d5aca) chore: bump dependencies
+* [`b8843e2`](https://github.com/talos-systems/sidero/commit/b8843e2f875c0dc73a3acdba5ed65a3d9a869e04) chore: bump dependencies
+* [`03a5c90`](https://github.com/talos-systems/sidero/commit/03a5c90b2c961d92709e3ff318e340ec6a5d0105) chore: bump dependencies
+* [`6092854`](https://github.com/talos-systems/sidero/commit/609285488e13423626dc9131fef5c77e91ab9f5a) docs: fix spelling mistake
+* [`c29d464`](https://github.com/talos-systems/sidero/commit/c29d4645d9dbb3715e6829948ba42fc0f518817b) feat: make MetalMachineTemplate immutable
+* [`835d5cf`](https://github.com/talos-systems/sidero/commit/835d5cf227961d9a423985277d80767407dc7eac) docs: fix links and getting started overview
+* [`7c7a377`](https://github.com/talos-systems/sidero/commit/7c7a37785711a5a90afd701921995ba88755ccce) feat: add extended hardware information to Server and ServerClass CRDs
+* [`e4bb416`](https://github.com/talos-systems/sidero/commit/e4bb4165e9d25cceabd2e4cd73e5a53b4d5756ef) feat: restructure HW information in `Server` resources (v1alpha2)
+* [`6c81518`](https://github.com/talos-systems/sidero/commit/6c81518b172ba09efbc46f15e33706d7340cdecf) docs: fork docs for Sidero 0.6
+* [`061ee8e`](https://github.com/talos-systems/sidero/commit/061ee8e57debf11457e732f74be6e654e31e0203) refactor: remove pre-ServerBinding leftovers, use remote cached clients
+* [`24449aa`](https://github.com/talos-systems/sidero/commit/24449aa3993f75299a8cf2113aa82a8aba65e551) chore: bump dependencies
+* [`fd34779`](https://github.com/talos-systems/sidero/commit/fd34779bf7ada1914e320997c73fecc624813e8a) docs: add info about GitHub Org rename to v0.5 docs
+* [`c86953e`](https://github.com/talos-systems/sidero/commit/c86953e11c0f9a82e7279b1f3977d869a33870bb) docs: update algolia info
+* [`511ddfc`](https://github.com/talos-systems/sidero/commit/511ddfc0828a3e9b5ac26814d34ae9c5b117071a) feat: enable webhooks in `sidero-controller-manager`
+* [`37a1d52`](https://github.com/talos-systems/sidero/commit/37a1d526962c0d3f6cbef28a43c6ca86d555df81) docs: add sitemap override
+* [`54f896d`](https://github.com/talos-systems/sidero/commit/54f896dd6750874a2d065dc00ec96a56494a3f9d) feat: allow configuring Sidero deployment strategy
+* [`3be5e6e`](https://github.com/talos-systems/sidero/commit/3be5e6e817fc8db6a8e4e2566cbad311d54ee7ad) chore: bump dependencies
+* [`b7cc8b2`](https://github.com/talos-systems/sidero/commit/b7cc8b2e40d687b51558bb73efc014fc53e60183) docs: switch code block to text for DHCP prereq
+* [`15f6730`](https://github.com/talos-systems/sidero/commit/15f67308f0bdbd52a4565deff8923d67a4c4c755) chore: use consistent naming for imports
+* [`8985a04`](https://github.com/talos-systems/sidero/commit/8985a04231ed91f79477d5556a3256919287efb4) fix: ipxe prompt on ARM64
+* [`9f9c922`](https://github.com/talos-systems/sidero/commit/9f9c92205c40e289975e9470625f4da0bf6cad64) docs: move docs to hugo
+* [`2a475db`](https://github.com/talos-systems/sidero/commit/2a475db79ee6df559cecd082581fb7ba67d4f35b) feat: update to Talos 1.0
+* [`7a1a930`](https://github.com/talos-systems/sidero/commit/7a1a930989d1b93667645c8b1d075a99dd31d799) chore: update more registries
+* [`9438ca8`](https://github.com/talos-systems/sidero/commit/9438ca8e8aaafff3270bac85c5982918f3333278) chore: fix gpg check and sfyra build
+* [`5fb30a9`](https://github.com/talos-systems/sidero/commit/5fb30a996c3ed4a4239ddfd48c67dd8f73f4d0b5) docs: update README for 0.5 version compatibility
+* [`4d11603`](https://github.com/talos-systems/sidero/commit/4d116038e09d2c3aa62486ae4eac4f8ea863f1df) chore: bump cert-manager to v1
+* [`13e11d3`](https://github.com/talos-systems/sidero/commit/13e11d3320c529c0934f0b2e5e5b80c0e36a14cc) chore: bump dependencies
+* [`d3e75dc`](https://github.com/talos-systems/sidero/commit/d3e75dc9beff977b3c0e754805ccf94fb2e77001) docs: make 0.5 docs the default, add what's new
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/go-logr/logr**                       v0.4.0 -> v1.2.3
+* **github.com/google/go-cmp**                      v0.5.9 **_new_**
+* **github.com/grpc-ecosystem/go-grpc-middleware**  v1.3.0 -> v1.4.0
+* **github.com/insomniacslk/dhcp**                  74ae03f2425e **_new_**
+* **github.com/jsimonetti/rtnetlink**               v1.3.2 **_new_**
+* **github.com/siderolabs/gen**                     v0.4.3 **_new_**
+* **github.com/siderolabs/go-blockdevice**          v0.4.4 **_new_**
+* **github.com/siderolabs/go-cmd**                  v0.1.1 **_new_**
+* **github.com/siderolabs/go-debug**                v0.2.2 **_new_**
+* **github.com/siderolabs/go-kmsg**                 v0.1.3 **_new_**
+* **github.com/siderolabs/go-procfs**               v0.1.1 **_new_**
+* **github.com/siderolabs/go-retry**                v0.3.2 **_new_**
+* **github.com/siderolabs/go-smbios**               v0.3.2 **_new_**
+* **github.com/siderolabs/grpc-proxy**              v0.4.0 **_new_**
+* **github.com/siderolabs/siderolink**              v0.3.1 **_new_**
+* **github.com/siderolabs/talos/pkg/machinery**     v1.4.0 **_new_**
+* **github.com/stretchr/testify**                   v1.7.0 -> v1.8.2
+* **go.uber.org/zap**                               v1.20.0 -> v1.24.0
+* **golang.org/x/net**                              cd36cc0744dd -> v0.9.0
+* **golang.org/x/sync**                             036812b2e83c -> v0.1.0
+* **golang.org/x/sys**                              99c3d69c2c27 -> v0.7.0
+* **golang.zx2c4.com/wireguard/wgctrl**             daad0b7ba671 -> 9c5414ab4bde
+* **google.golang.org/grpc**                        v1.44.0 -> v1.54.0
+* **google.golang.org/protobuf**                    v1.27.1 -> v1.30.0
+* **gopkg.in/yaml.v3**                              v3.0.1 **_new_**
+* **k8s.io/api**                                    v0.22.2 -> v0.26.1
+* **k8s.io/apiextensions-apiserver**                v0.22.2 -> v0.26.1
+* **k8s.io/apimachinery**                           v0.22.2 -> v0.26.1
+* **k8s.io/client-go**                              v0.22.2 -> v0.26.1
+* **k8s.io/utils**                                  cb0fa318a74b -> 99ec85e7a448
+* **sigs.k8s.io/cluster-api**                       v1.0.4 -> v1.4.1
+* **sigs.k8s.io/controller-runtime**                v0.10.3 -> v0.14.5
+
+Previous release can be found at [v0.5.0](https://github.com/talos-systems/sidero/releases/tag/v0.5.0)
+
 ## [Sidero 0.5.0-alpha.2](https://github.com/talos-systems/sidero/releases/tag/v0.5.0-alpha.2) (2022-02-04)
 
 Welcome to the v0.5.0-alpha.2 release of Sidero!  

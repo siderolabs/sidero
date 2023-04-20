@@ -32,3 +32,17 @@ Hardware information was restructured and extended when compared with `v1alpha1`
 * `.spec.qualifiers.systemInformation` -> `.spec.qualifiers.system`
 * `.spec.qualifiers.cpu` -> `.spec.qualifiers.hardware.compute.processors[]`
 """
+
+    [notes.machineconfig]
+        title = "Metadata Server"
+        description = """\
+Sidero Metadata Server no longer depends on the version of Talos machinery library it is built with.
+Sidero should be able to process machine config for future versions of Talos.
+"""
+
+    [notes.agent]
+        title = "Sidero Agent"
+        description = """\
+Sidero Agent now runs DHCP client in the userland, on the link which was used to PXE boot the machine.
+This allows to run Sidero Agent on the machine with several autoconfigured network interfaces, when one of them is used for the management network.
+"""
