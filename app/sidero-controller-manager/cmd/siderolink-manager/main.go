@@ -176,7 +176,11 @@ func run() error {
 func getIPForHost(host string) (string, error) {
 	parsedIP, err := netip.ParseAddr(host)
 	if err == nil {
-		return parsedIP.String(), nil
+		if parsedIP.Is6() {
+			return "[" + parsedIP.String() + "]", nil
+		} else {
+			return parsedIP.String(), nil
+		}
 	}
 
 	resolvedIPs, err := net.LookupIP(host)
@@ -188,5 +192,10 @@ func getIPForHost(host string) (string, error) {
 		return "", fmt.Errorf("no IPs found for %s", host)
 	}
 
-	return resolvedIPs[0].String(), nil
+	ip := resolvedIPs[0]
+	if ip.To4() == nil {
+		return "[" + ip.String() + "]", nil
+	} else {
+		return ip.String(), nil
+	}
 }
