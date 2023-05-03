@@ -14,6 +14,7 @@ import (
 	"net/netip"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
@@ -104,7 +105,7 @@ func run() error {
 		logger.Sugar().Infof("resolved wireguard endpoint %s to %s", wireguardEndpoint, wireguardEndpointIP)
 	}
 
-	siderolink.Cfg.WireguardEndpoint = fmt.Sprintf("%s:%d", wireguardEndpointIP, wireguardPort)
+	siderolink.Cfg.WireguardEndpoint = net.JoinHostPort(wireguardEndpointIP, strconv.Itoa(wireguardPort))
 
 	if err = siderolink.Cfg.LoadOrCreate(ctx, metalclient); err != nil {
 		return err
