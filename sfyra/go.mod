@@ -26,8 +26,8 @@ require (
 	github.com/siderolabs/go-retry v0.3.2
 	github.com/siderolabs/net v0.4.0
 	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
-	github.com/siderolabs/talos v1.4.0
-	github.com/siderolabs/talos/pkg/machinery v1.4.0
+	github.com/siderolabs/talos v1.4.1
+	github.com/siderolabs/talos/pkg/machinery v1.4.1
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.2
 	google.golang.org/grpc v1.54.0
@@ -153,7 +153,7 @@ require (
 	github.com/siderolabs/crypto v0.4.0 // indirect
 	github.com/siderolabs/gen v0.4.3 // indirect
 	github.com/siderolabs/go-api-signature v0.2.2 // indirect
-	github.com/siderolabs/go-blockdevice v0.4.4 // indirect
+	github.com/siderolabs/go-blockdevice v0.4.5 // indirect
 	github.com/siderolabs/go-kubernetes v0.2.0 // indirect
 	github.com/siderolabs/go-tail v0.1.0 // indirect
 	github.com/siderolabs/protoenc v0.2.0 // indirect
