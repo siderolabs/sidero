@@ -20,7 +20,7 @@ replace (
 require (
 	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.4.11
 	github.com/siderolabs/go-debug v0.2.2
-	github.com/siderolabs/go-loadbalancer v0.2.1
+	github.com/siderolabs/go-loadbalancer v0.2.2
 	github.com/siderolabs/go-pointer v1.0.0
 	github.com/siderolabs/go-procfs v0.1.1
 	github.com/siderolabs/go-retry v0.3.2
@@ -175,7 +175,7 @@ require (
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.6.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/term v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.3.0 // indirect

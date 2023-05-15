@@ -727,8 +727,8 @@ github.com/siderolabs/go-debug v0.2.2 h1:c8styCvp+MO0oPO8q4N1CKSF3fVuAT0qnuUIeZ/
 github.com/siderolabs/go-debug v0.2.2/go.mod h1:c/wMqY6+djxwrwEg1eg3kaTeZIfq6OUlEHAMreo1VV0=
 github.com/siderolabs/go-kubernetes v0.2.0 h1:UqE+4dIfEhUdqq1eYYxLFPSa1WxZXUnKPR1CsBuL+OY=
 github.com/siderolabs/go-kubernetes v0.2.0/go.mod h1:oNMxB93Yu606+h+k1zfVGt0jUfO+WK3kDmR/pajgBdY=
-github.com/siderolabs/go-loadbalancer v0.2.1 h1:zjkBvKM6j/KIPQeitDWtP02G7Ew5ZnnrDdp+k6zcEBc=
-github.com/siderolabs/go-loadbalancer v0.2.1/go.mod h1:yVZxpjjbDgvbp71z9inTTjT0rZtY11wPDbB2kbH/m8Q=
+github.com/siderolabs/go-loadbalancer v0.2.2 h1:Fp8BB2Ms/hL2fY1JFA1u+ieKYIaG3w3ic3igDSAPv5E=
+github.com/siderolabs/go-loadbalancer v0.2.2/go.mod h1:5I/2567zQE2pH52KowwC7WpJKtqCXRzzot6r92MxLxU=
 github.com/siderolabs/go-pointer v1.0.0 h1:6TshPKep2doDQJAAtHUuHWXbca8ZfyRySjSBT/4GsMU=
 github.com/siderolabs/go-pointer v1.0.0/go.mod h1:HTRFUNYa3R+k0FFKNv11zgkaCLzEkWVzoYZ433P3kHc=
 github.com/siderolabs/go-procfs v0.1.1 h1:GkKjnDfFkupcuLN0w6A/Oy58/8FPAHcmlgiHIaw6M+g=
@@ -1078,8 +1078,8 @@ golang.org/x/sys v0.0.0-20220908164124-27713097b956/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.1.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.2.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.7.0 h1:3jlCCIQZPdOYu1h8BkNvLz8Kgwtae2cagcG/VamtZRU=
-golang.org/x/sys v0.7.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.8.0 h1:EBmGv8NaZBZTWvrbjNoL6HVt+IVy3QDQpJs7VRIw3tU=
+golang.org/x/sys v0.8.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
 golang.org/x/term v0.1.0/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
