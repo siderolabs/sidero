@@ -56,5 +56,5 @@ The latest version can be found on our
 ```bash
 sudo curl -Lo /usr/local/bin/talosctl \
  "https://github.com/talos-systems/talos/releases/latest/download/talosctl-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64"
-chmod +x /usr/local/bin/talosctl
+sudo chmod +x /usr/local/bin/talosctl
 ```
