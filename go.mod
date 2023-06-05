@@ -15,7 +15,7 @@ require (
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/siderolabs/gen v0.4.3
-	github.com/siderolabs/go-blockdevice v0.4.4
+	github.com/siderolabs/go-blockdevice v0.4.5
 	github.com/siderolabs/go-cmd v0.1.1
 	github.com/siderolabs/go-debug v0.2.2
 	github.com/siderolabs/go-kmsg v0.1.3
@@ -24,7 +24,7 @@ require (
 	github.com/siderolabs/go-smbios v0.3.2
 	github.com/siderolabs/grpc-proxy v0.4.0
 	github.com/siderolabs/siderolink v0.3.1
-	github.com/siderolabs/talos/pkg/machinery v1.4.0
+	github.com/siderolabs/talos/pkg/machinery v1.4.5
 	github.com/stretchr/testify v1.8.2
 	go.uber.org/zap v1.24.0
 	golang.org/x/net v0.9.0
