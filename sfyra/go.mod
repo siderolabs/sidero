@@ -29,7 +29,7 @@ require (
 	github.com/siderolabs/talos v1.4.0
 	github.com/siderolabs/talos/pkg/machinery v1.4.0
 	github.com/spf13/cobra v1.7.0
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.54.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.27.1
