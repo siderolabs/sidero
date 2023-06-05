@@ -25,7 +25,7 @@ require (
 	github.com/siderolabs/grpc-proxy v0.4.0
 	github.com/siderolabs/siderolink v0.3.1
 	github.com/siderolabs/talos/pkg/machinery v1.4.0
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.24.0
 	golang.org/x/net v0.9.0
 	golang.org/x/sync v0.1.0
