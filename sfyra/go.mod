@@ -18,7 +18,7 @@ replace (
 )
 
 require (
-	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.4.11
+	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.1
 	github.com/siderolabs/go-debug v0.2.2
 	github.com/siderolabs/go-loadbalancer v0.2.1
 	github.com/siderolabs/go-pointer v1.0.0
@@ -37,7 +37,7 @@ require (
 	k8s.io/apimachinery v0.27.1
 	k8s.io/client-go v0.27.1
 	sigs.k8s.io/cluster-api v1.4.1
-	sigs.k8s.io/controller-runtime v0.14.5
+	sigs.k8s.io/controller-runtime v0.14.6
 )
 
 require (
