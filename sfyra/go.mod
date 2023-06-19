@@ -20,7 +20,7 @@ replace (
 require (
 	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.4.11
 	github.com/siderolabs/go-debug v0.2.2
-	github.com/siderolabs/go-loadbalancer v0.2.1
+	github.com/siderolabs/go-loadbalancer v0.3.2
 	github.com/siderolabs/go-pointer v1.0.0
 	github.com/siderolabs/go-procfs v0.1.1
 	github.com/siderolabs/go-retry v0.3.2
@@ -29,7 +29,7 @@ require (
 	github.com/siderolabs/talos v1.4.0
 	github.com/siderolabs/talos/pkg/machinery v1.4.0
 	github.com/spf13/cobra v1.7.0
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.54.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.27.1
@@ -151,12 +151,13 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.5.6 // indirect
 	github.com/siderolabs/crypto v0.4.0 // indirect
-	github.com/siderolabs/gen v0.4.3 // indirect
+	github.com/siderolabs/gen v0.4.5 // indirect
 	github.com/siderolabs/go-api-signature v0.2.2 // indirect
 	github.com/siderolabs/go-blockdevice v0.4.4 // indirect
 	github.com/siderolabs/go-kubernetes v0.2.0 // indirect
 	github.com/siderolabs/go-tail v0.1.0 // indirect
 	github.com/siderolabs/protoenc v0.2.0 // indirect
+	github.com/siderolabs/tcpproxy v0.1.0 // indirect
 	github.com/spf13/afero v1.9.3 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
@@ -175,7 +176,7 @@ require (
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.6.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/term v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
@@ -188,7 +189,6 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	inet.af/tcpproxy v0.0.0-20221017015627-91f861402626 // indirect
 	k8s.io/apiserver v0.27.1 // indirect
 	k8s.io/cluster-bootstrap v0.25.0 // indirect
 	k8s.io/component-base v0.27.1 // indirect
