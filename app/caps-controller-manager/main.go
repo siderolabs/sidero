@@ -101,7 +101,7 @@ func main() {
 	// Set up a ClusterCacheTracker to provide to controllers
 	// requiring a connection to a remote cluster
 	tracker, err := remote.NewClusterCacheTracker(mgr, remote.ClusterCacheTrackerOptions{
-		Indexes:               remote.DefaultIndexes,
+		Indexes:               []remote.Index{remote.NodeProviderIDIndex},
 		ClientUncachedObjects: []client.Object{},
 	})
 	if err != nil {

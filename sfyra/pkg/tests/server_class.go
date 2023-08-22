@@ -307,21 +307,16 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 		require.NoError(t, metalClient.Get(ctx, types.NamespacedName{Name: dummyServer.Name}, response))
 		require.Greater(t, len(response.Finalizers), 0)
 
-		switch configProvider.Version() {
-		case "v1alpha1":
-			config, ok := configProvider.Raw().(*talosconfig.Config)
-			if !ok {
-				t.Error("unable to cast config")
-			}
+		configV1Alpha1 := configProvider.RawV1Alpha1()
 
-			require.Len(t, config.MachineConfig.MachineInstall.InstallExtraKernelArgs, 1)
+		if config == nil {
+			t.Error("unable to cast config")
+		}
 
-			if config.MachineConfig.MachineInstall.InstallExtraKernelArgs[0] != "woot" {
-				t.Error("unable to validate server class patch was applied to kernel args")
-			}
+		require.Len(t, configV1Alpha1.MachineConfig.MachineInstall.InstallExtraKernelArgs, 1)
 
-		default:
-			t.Error("unknown config type")
+		if configV1Alpha1.MachineConfig.MachineInstall.InstallExtraKernelArgs[0] != "woot" {
+			t.Error("unable to validate server class patch was applied to kernel args")
 		}
 	}
 }

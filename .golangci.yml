@@ -157,10 +157,14 @@ linters:
     - exhaustruct
     - nosnakecase
     - nonamedreturns
+    - depguard
     # abandoned linters for which golangci shows the warning that the repo is archived by the owner
     - interfacer
     - maligned
     - scopelint
+    - varcheck
+    - structcheck
+    - deadcode
   disable-all: false
   fast: false
 

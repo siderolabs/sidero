@@ -15,8 +15,6 @@ FROM --platform=arm64 ghcr.io/siderolabs/ipmitool:${PKGS} AS pkg-ipmitool-arm64
 FROM ghcr.io/siderolabs/openssl:${PKGS} AS pkg-openssl
 FROM --platform=amd64 ghcr.io/siderolabs/openssl:${PKGS} AS pkg-openssl-amd64
 FROM --platform=arm64 ghcr.io/siderolabs/openssl:${PKGS} AS pkg-openssl-arm64
-FROM --platform=amd64 ghcr.io/siderolabs/linux-firmware:${PKGS} AS pkg-linux-firmware-amd64
-FROM --platform=arm64 ghcr.io/siderolabs/linux-firmware:${PKGS} AS pkg-linux-firmware-arm64
 FROM ghcr.io/siderolabs/musl:${PKGS} AS pkg-musl
 FROM --platform=amd64 ghcr.io/siderolabs/musl:${PKGS} AS pkg-musl-amd64
 FROM --platform=arm64 ghcr.io/siderolabs/musl:${PKGS} AS pkg-musl-arm64
@@ -33,6 +31,9 @@ FROM --platform=arm64 ghcr.io/siderolabs/util-linux:${PKGS} AS pkg-util-linux-ar
 FROM --platform=amd64 ghcr.io/siderolabs/kmod:${PKGS} AS pkg-kmod-amd64
 FROM --platform=arm64 ghcr.io/siderolabs/kmod:${PKGS} AS pkg-kmod-arm64
 
+# linux-firmware is not arch-specific
+FROM --platform=amd64 ghcr.io/siderolabs/linux-firmware:${PKGS} AS pkg-linux-firmware
+
 # The base target provides the base for running various tasks against the source
 # code
 
@@ -48,10 +49,10 @@ ARG CGO_ENABLED
 ENV CGO_ENABLED ${CGO_ENABLED}
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
-RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.11.3
-RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.26.1
+RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.12.0
+RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.27.2
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
-RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2 \
+RUN --mount=type=cache,target=/.cache go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3 \
 	&& mv /go/bin/golangci-lint /toolchain/bin/golangci-lint
 WORKDIR /src
 COPY ./go.mod ./
@@ -189,8 +190,10 @@ COPY --from=pkg-kmod-amd64 / .
 COPY --from=pkg-eudev-amd64 / .
 COPY --from=pkg-ipmitool-amd64 / .
 COPY --from=agent-build-amd64 /agent ./init
-COPY --from=pkg-linux-firmware-amd64 /lib/firmware/bnx2 ./lib/firmware/bnx2
-COPY --from=pkg-linux-firmware-amd64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
+COPY --from=pkg-linux-firmware /lib/firmware/bnx2 ./lib/firmware/bnx2
+COPY --from=pkg-linux-firmware /lib/firmware/bnx2x ./lib/firmware/bnx2x
+COPY --from=pkg-linux-firmware /lib/firmware/intel/ice/ddp/ice-*.pkg ./lib/firmware/intel/ice/ddp/ice.pkg
+COPY --from=pkg-linux-firmware /lib/firmware/rtl_nic ./lib/firmware/rtl_nic
 COPY --from=pkg-kernel-amd64 /lib/modules ./lib/modules
 RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 
@@ -204,8 +207,10 @@ COPY --from=pkg-kmod-arm64 / .
 COPY --from=pkg-eudev-arm64 / .
 COPY --from=pkg-ipmitool-arm64 / .
 COPY --from=agent-build-arm64 /agent ./init
-COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2 ./lib/firmware/bnx2
-COPY --from=pkg-linux-firmware-arm64 /lib/firmware/bnx2x ./lib/firmware/bnx2x
+COPY --from=pkg-linux-firmware /lib/firmware/bnx2 ./lib/firmware/bnx2
+COPY --from=pkg-linux-firmware /lib/firmware/bnx2x ./lib/firmware/bnx2x
+COPY --from=pkg-linux-firmware /lib/firmware/intel/ice/ddp/ice-*.pkg ./lib/firmware/intel/ice/ddp/ice.pkg
+COPY --from=pkg-linux-firmware /lib/firmware/rtl_nic ./lib/firmware/rtl_nic
 COPY --from=pkg-kernel-arm64 /lib/modules ./lib/modules
 RUN set -o pipefail && find . 2>/dev/null | cpio -H newc -o | xz -v -C crc32 -0 -e -T 0 -z >/initramfs.xz
 

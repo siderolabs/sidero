@@ -27,7 +27,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
@@ -326,7 +325,7 @@ func (r *ServerReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manage
 		return err
 	}
 
-	mapRequests := func(a client.Object) []reconcile.Request {
+	mapRequests := func(_ context.Context, a client.Object) []reconcile.Request {
 		// servers and serverbindings always have matching names
 		return []reconcile.Request{
 			{
@@ -342,7 +341,7 @@ func (r *ServerReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manage
 		WithOptions(options).
 		For(&metalv1.Server{}).
 		Watches(
-			&source.Kind{Type: &infrav1.ServerBinding{}},
+			&infrav1.ServerBinding{},
 			handler.EnqueueRequestsFromMapFunc(mapRequests),
 		).
 		Complete(r)

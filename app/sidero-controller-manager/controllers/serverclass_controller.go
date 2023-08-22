@@ -18,7 +18,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
@@ -134,7 +133,7 @@ func (r *ServerClassReconciler) SetupWithManager(ctx context.Context, mgr ctrl.M
 	// This mapRequests handler allows us to add a watch on server resources. Upon a server resource update,
 	// we will dump all server classes and issue a reconcile against them so that they will get updated statuses
 	// for available/in-use servers that match.
-	mapRequests := func(a client.Object) []reconcile.Request {
+	mapRequests := func(_ context.Context, a client.Object) []reconcile.Request {
 		reqList := []reconcile.Request{}
 
 		scList := &metalv1.ServerClassList{}
@@ -162,7 +161,7 @@ func (r *ServerClassReconciler) SetupWithManager(ctx context.Context, mgr ctrl.M
 		WithOptions(options).
 		For(&metalv1.ServerClass{}).
 		Watches(
-			&source.Kind{Type: &metalv1.Server{}},
+			&metalv1.Server{},
 			handler.EnqueueRequestsFromMapFunc(mapRequests),
 		).
 		Complete(r)

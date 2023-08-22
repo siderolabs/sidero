@@ -29,7 +29,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
 	"github.com/siderolabs/sidero/app/caps-controller-manager/pkg/constants"
@@ -278,10 +277,10 @@ func (r *MetalMachineReconciler) SetupWithManager(ctx context.Context, mgr ctrl.
 		return err
 	}
 
-	mapRequests := func(a client.Object) []reconcile.Request {
+	mapRequests := func(ctx context.Context, a client.Object) []reconcile.Request {
 		serverBinding := &infrav1.ServerBinding{}
 
-		if err := r.Get(context.Background(), types.NamespacedName{Namespace: a.GetNamespace(), Name: a.GetName()}, serverBinding); err != nil {
+		if err := r.Get(ctx, types.NamespacedName{Namespace: a.GetNamespace(), Name: a.GetName()}, serverBinding); err != nil {
 			return nil
 		}
 
@@ -299,7 +298,7 @@ func (r *MetalMachineReconciler) SetupWithManager(ctx context.Context, mgr ctrl.
 		WithOptions(options).
 		For(&infrav1.MetalMachine{}).
 		Watches(
-			&source.Kind{Type: &infrav1.ServerBinding{}},
+			&infrav1.ServerBinding{},
 			handler.EnqueueRequestsFromMapFunc(mapRequests),
 		).
 		Complete(r)

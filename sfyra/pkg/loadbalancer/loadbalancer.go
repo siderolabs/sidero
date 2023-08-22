@@ -8,7 +8,6 @@ package loadbalancer
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/netip"
 	"reflect"
@@ -18,6 +17,7 @@ import (
 
 	cacpt "github.com/siderolabs/cluster-api-control-plane-provider-talos/api/v1alpha3"
 	"github.com/siderolabs/go-loadbalancer/controlplane"
+	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
@@ -47,14 +47,18 @@ func NewControlPlane(client client.Client, address netip.Addr, port int, cluster
 		clusterName:      clusterName,
 	}
 
-	logWriter := log.Writer()
+	var zapOpts []zap.Option
+
 	if !verboseLog {
-		logWriter = io.Discard
+		zapOpts = append(zapOpts, zap.IncreaseLevel(zap.ErrorLevel))
 	}
 
-	var err error
+	logger, err := zap.NewProduction(zapOpts...)
+	if err != nil {
+		return nil, err
+	}
 
-	cp.lb, err = controlplane.NewLoadBalancer(address.String(), port, logWriter)
+	cp.lb, err = controlplane.NewLoadBalancer(address.String(), port, logger)
 	if err != nil {
 		return nil, err
 	}

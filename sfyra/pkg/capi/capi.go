@@ -11,10 +11,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/siderolabs/go-pointer"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/cluster-api/cmd/clusterctl/client"
+	logf "sigs.k8s.io/cluster-api/cmd/clusterctl/log"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
+	runtimelog "sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/siderolabs/sidero/sfyra/pkg/talos"
 )
@@ -45,6 +48,10 @@ type Options struct {
 
 // NewManager creates new Manager object.
 func NewManager(ctx context.Context, cluster talos.Cluster, options Options) (*Manager, error) {
+	logger := logf.NewLogger(logf.WithThreshold(pointer.To(6)))
+	logf.SetLogger(logger)
+	runtimelog.SetLogger(logger)
+
 	clusterAPI := &Manager{
 		options: options,
 		cluster: cluster,

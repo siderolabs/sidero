@@ -25,7 +25,6 @@ import (
 	"k8s.io/client-go/tools/record"
 	capi "sigs.k8s.io/cluster-api/api/v1beta1"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -266,13 +265,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = mgr.Add(RunnableClientFunc(controllers.ReconcileServerClassAny)); err != nil {
+	if err = mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
+		return controllers.ReconcileServerClassAny(ctx, mgr.GetClient())
+	})); err != nil {
 		setupLog.Error(err, `failed to add initial reconcile`)
 		os.Exit(1)
 	}
 
-	if err = mgr.Add(RunnableClientFunc(func(ctx context.Context, k8sClient client.Client) error {
-		return controllers.ReconcileEnvironmentDefault(ctx, k8sClient, TalosRelease, apiEndpoint, uint16(apiPort))
+	if err = mgr.Add(manager.RunnableFunc(func(ctx context.Context) error {
+		return controllers.ReconcileEnvironmentDefault(ctx, mgr.GetClient(), TalosRelease, apiEndpoint, uint16(apiPort))
 	})); err != nil {
 		setupLog.Error(err, `failed to add initial reconcile`)
 		os.Exit(1)
@@ -369,30 +370,4 @@ func setupChecks(mgr ctrl.Manager, httpPort int) {
 		setupLog.Error(err, "unable to create health check")
 		os.Exit(1)
 	}
-}
-
-// RunnableClientFunc implements Runnable and inject.Client using a function.
-func RunnableClientFunc(f func(context.Context, client.Client) error) *runnableClientFunc {
-	return &runnableClientFunc{
-		Func: f,
-	}
-}
-
-type runnableClientFunc struct {
-	Client client.Client
-	Func   func(context.Context, client.Client) error
-}
-
-// InjectClient implements inject.Client.
-//
-//nolint:unparam
-func (r *runnableClientFunc) InjectClient(c client.Client) error {
-	r.Client = c
-
-	return nil
-}
-
-// Start implements Runnable.
-func (r *runnableClientFunc) Start(ctx context.Context) error {
-	return r.Func(ctx, r.Client)
 }

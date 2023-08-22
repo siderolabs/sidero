@@ -14,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	siderotypes "github.com/siderolabs/sidero/app/sidero-controller-manager/pkg/types"
 )
@@ -46,18 +47,18 @@ func (r *Server) SetupWebhookWithManager(mgr ctrl.Manager) error {
 var _ webhook.Validator = &Server{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type.
-func (r *Server) ValidateCreate() error {
-	return r.validate()
+func (r *Server) ValidateCreate() (admission.Warnings, error) {
+	return nil, r.validate()
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type.
-func (r *Server) ValidateUpdate(old runtime.Object) error {
-	return r.validate()
+func (r *Server) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	return nil, r.validate()
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type.
-func (r *Server) ValidateDelete() error {
-	return nil
+func (r *Server) ValidateDelete() (admission.Warnings, error) {
+	return nil, nil
 }
 
 func (r *Server) validate() error {

@@ -18,9 +18,9 @@ import (
 	taloscluster "github.com/siderolabs/talos/pkg/cluster"
 	"github.com/siderolabs/talos/pkg/cluster/check"
 	clientconfig "github.com/siderolabs/talos/pkg/machinery/client/config"
-	"github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1/bundle"
-	"github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1/generate"
-	"github.com/siderolabs/talos/pkg/machinery/config/types/v1alpha1/machine"
+	"github.com/siderolabs/talos/pkg/machinery/config/bundle"
+	"github.com/siderolabs/talos/pkg/machinery/config/generate"
+	"github.com/siderolabs/talos/pkg/machinery/config/machine"
 	"github.com/siderolabs/talos/pkg/provision"
 	"github.com/siderolabs/talos/pkg/provision/access"
 	"github.com/siderolabs/talos/pkg/provision/providers/qemu"
@@ -208,7 +208,7 @@ func (cluster *Cluster) create(ctx context.Context) error {
 
 	controlplaneEndpoint := cluster.controlplaneIP.String()
 
-	configBundle, err := bundle.NewConfigBundle(bundle.WithInputOptions(
+	configBundle, err := bundle.NewBundle(bundle.WithInputOptions(
 		&bundle.InputOptions{
 			ClusterName: cluster.options.Name,
 			Endpoint:    fmt.Sprintf("https://%s", net.JoinHostPort(defaultInternalLB, "6443")),
