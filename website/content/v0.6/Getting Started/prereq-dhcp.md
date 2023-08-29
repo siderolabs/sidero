@@ -4,6 +4,19 @@ weight: 4
 title: "Prerequisite: DHCP service"
 ---
 
+## Automatic DHCP Proxy
+
+Sidero v0.6 comes with DHCP proxy which augments the DHCP service provided by the network environment with
+PXE boot instructions automatically.
+There is no configuration required besides configuring the network environment DHCP server to assign IPs to the
+machines.
+
+If the Sidero Metal DHCP proxy server is not enabled, follow the next section to set up the DHCP server.
+
+## Manual DHCP Server Configuration
+
+> Note: This section is only required if you are not using the automatic DHCP proxy.
+
 In order to network boot Talos, we need to set up our DHCP server to supply the
 network boot parameters to our servers.
 For maximum flexibility, Sidero makes use of iPXE to be able to reference

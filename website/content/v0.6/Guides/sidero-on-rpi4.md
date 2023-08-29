@@ -13,7 +13,7 @@ In this guide, we are going to install Talos on Raspberry Pi4, deploy Sidero and
 Please see Talos documentation for additional information on [installing Talos on Raspberry Pi4](https://www.talos.dev/latest/talos-guides/install/single-board-computers/rpi_4/).
 
 Download the `clusterctl` CLI  from [CAPI releases](https://github.com/kubernetes-sigs/cluster-api/releases).
-The minimum required version is 0.4.3.
+The minimum required version is 1.5.0.
 
 ## Installing Talos
 
@@ -30,7 +30,7 @@ export SIDERO_ENDPOINT=192.168.x.x
 Generate Talos machine configuration for a single-node cluster:
 
 ```bash
-talosctl gen config --config-patch='[{"op": "add", "path": "/cluster/allowSchedulingOnMasters", "value": true},{"op": "replace", "path": "/machine/install/disk", "value": "/dev/mmcblk0"}]' rpi4-sidero https://${SIDERO_ENDPOINT}:6443/
+talosctl gen config --config-patch='[{"op": "add", "path": "/cluster/allowSchedulingOnControlPlanes", "value": true},{"op": "replace", "path": "/machine/install/disk", "value": "/dev/mmcblk0"}]' rpi4-sidero https://${SIDERO_ENDPOINT}:6443/
 ```
 
 Submit the generated configuration to Talos:

@@ -4,10 +4,10 @@ no_list: true
 linkTitle: "Documentation"
 cascade:
   type: docs
-preRelease: true
+menu: main
 ---
 
-Welcome to the Sidero documentation.
+Welcome to the Sidero Metal documentation.
 
 ## Community
 

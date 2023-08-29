@@ -6,8 +6,13 @@ title: "Expose Sidero Services"
 
 > If you built your cluster as specified in the [Prerequisite: Kubernetes] section in this tutorial, your services are already exposed and you can skip this section.
 
-There are three external Services which Sidero serves and which much be made
+There are four external Services which Sidero serves and which much be made
 reachable by the servers which it will be driving.
+
+DHCP Proxy (port 67/udp) is needed for all servers to provide PXE boot instructions.
+Most probably it can be only exposed via host network mode, as it requires receiving and sending packets
+targeted to the broadcast address.
+If DHCP Proxy is not exposed, follow [Prerequisite: DHCP service]({{< relref "prereq-dhcp" >}}) section to set up the DHCP server in your environment.
 
 For most servers, TFTP (port 69/udp) will be needed.
 This is used for PXE booting, both BIOS and UEFI.

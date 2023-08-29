@@ -21,19 +21,6 @@ To complete this tutorial, you will need a few things:
   These have the same minimum specifications as the Sidero machine.
 - Workstation on which `talosctl`, `kubectl`, and `clusterctl` can be run.
 
-## Steps
-
-1. Prerequisite: CLI tools
-1. Prerequisite: DHCP server
-1. Prerequisite: Kubernetes
-1. Install Sidero
-1. Expose services
-1. Import workload machines
-1. Create a workload cluster
-1. Scale the workload cluster
-1. Destroy the workload cluster
-1. Optional: Pivot management cluster
-
 ## Useful Terms
 
 **ClusterAPI** or **CAPI** is the common system for managing Kubernetes clusters
