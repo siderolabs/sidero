@@ -28,7 +28,7 @@ variables or as variables in the `clusterctl` configuration:
 - `SIDERO_CONTROLLER_MANAGER_IPMI_PXE_METHOD` (`uefi`): IPMI boot from PXE method: `uefi` for UEFI boot or `bios` for BIOS boot
 - `SIDERO_CONTROLLER_MANAGER_BOOT_FROM_DISK_METHOD` (`ipxe-exit`): configures the way Sidero forces server to boot from disk when server hits iPXE server after initial install: `ipxe-exit` returns iPXE script with `exit` command, `http-404` returns HTTP 404 Not Found error, `ipxe-sanboot` uses iPXE `sanboot` command to boot from the first hard disk (can be also configured on `ServerClass`/`Server` method)
 
-Sidero provides three endpoints which should be made available to the infrastructure:
+Sidero provides four endpoints which should be made available to the infrastructure:
 
 - UDP port 67 for the proxy DHCP service (providing PXE boot information to the nodes, but no IPAM)
 - TCP port 8081 which provides combined iPXE, metadata and gRPC service (external endpoint should be specified as `SIDERO_CONTROLLER_MANAGER_API_ENDPOINT` and  `SIDERO_CONTROLLER_MANAGER_API_PORT`)

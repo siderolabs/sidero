@@ -46,7 +46,7 @@ host.
 This is _not_ the Docker bridge IP but the standard IP address of the
 workstation.
 
-Note that there are three ports mentioned in the command above.
+Note that there are four ports mentioned in the command above.
 The first (67) is for DHCP proxy.
 The second (69) is
 for TFTP.
