@@ -39,7 +39,7 @@ The main article for installing `clusterctl` can be found
 
 ```bash
 sudo curl -Lo /usr/local/bin/clusterctl \
-  "https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.4.7/clusterctl-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64" \
+  "https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.4.7/clusterctl-$(uname -s | tr '[:upper:]' '[:lower:]')-amd64"
 sudo chmod +x /usr/local/bin/clusterctl
 ```
 
