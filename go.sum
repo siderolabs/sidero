@@ -230,8 +230,8 @@ github.com/ryanuber/go-glob v1.0.0/go.mod h1:807d1WSdnB0XRJzKNil9Om6lcp/3a0v4qIH
 github.com/shopspring/decimal v1.3.1 h1:2Usl1nmF/WZucqkFZhnfFYxxxu8LG21F6nPQBE5gKV8=
 github.com/siderolabs/crypto v0.4.1 h1:PP84WSDDyCCbjYKePcc0IaMSPXDndz8V3cQ9hMRSvpA=
 github.com/siderolabs/crypto v0.4.1/go.mod h1:nJmvkqWy1Hngbzw3eg2TdtJ/ZYHHofQK1NbmmYywW8k=
-github.com/siderolabs/gen v0.4.5 h1:rwXUVJlL7hYza1LrSVXfT905ZC9Rgei37jMKKs/+eP0=
-github.com/siderolabs/gen v0.4.5/go.mod h1:wS8tFq7sn5vqKAuyS30vJUig3tX5v6q79VG4KfUnILM=
+github.com/siderolabs/gen v0.4.6 h1:/H9Hd64humYoBa1iU4TqM8SsEt/3z96ie9ro1MmtJ+U=
+github.com/siderolabs/gen v0.4.6/go.mod h1:4PBYMdXxTg292IDRq4CGn5AymyDxJVEDvobVKDqFBEA=
 github.com/siderolabs/go-blockdevice v0.4.6 h1:yfxFYzXezzszB0mSF2ZG8jPPampoNXa9r8W8nM0IoZI=
 github.com/siderolabs/go-blockdevice v0.4.6/go.mod h1:4PeOuk71pReJj1JQEXDE7kIIQJPVe8a+HZQa+qjxSEA=
 github.com/siderolabs/go-cmd v0.1.1 h1:nTouZUSxLeiiEe7hFexSVvaTsY/3O8k1s08BxPRrsps=
