@@ -34,7 +34,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.25.0
-	google.golang.org/grpc v1.57.0
+	google.golang.org/grpc v1.58.2
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.28.0
 	k8s.io/apiextensions-apiserver v0.27.2
