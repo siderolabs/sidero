@@ -148,7 +148,6 @@ func offerDHCP(req *dhcpv4.DHCPv4, apiEndpoint string, apiPort int, fwtype Firmw
 	modifiers := []dhcpv4.Modifier{
 		dhcpv4.WithServerIP(serverIP),
 		dhcpv4.WithOptionCopied(req, dhcpv4.OptionClientMachineIdentifier),
-		dhcpv4.WithOptionCopied(req, dhcpv4.OptionClassIdentifier),
 	}
 
 	resp, err := dhcpv4.NewReplyFromRequest(req,
@@ -156,10 +155,6 @@ func offerDHCP(req *dhcpv4.DHCPv4, apiEndpoint string, apiPort int, fwtype Firmw
 	)
 	if err != nil {
 		return nil, err
-	}
-
-	if resp.GetOneOption(dhcpv4.OptionClassIdentifier) == nil {
-		resp.UpdateOption(dhcpv4.OptClassIdentifier("PXEClient"))
 	}
 
 	switch fwtype {
