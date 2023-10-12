@@ -9,7 +9,7 @@ require (
 	github.com/google/go-cmp v0.5.9
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/insomniacslk/dhcp v0.0.0-20230816195147-b3ca2534940d
+	github.com/insomniacslk/dhcp v0.0.0-20230908212754-65c27093e38a
 	github.com/jsimonetti/rtnetlink v1.3.5
 	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
@@ -24,14 +24,14 @@ require (
 	github.com/siderolabs/go-smbios v0.3.2
 	github.com/siderolabs/grpc-proxy v0.4.0
 	github.com/siderolabs/siderolink v0.3.1
-	github.com/siderolabs/talos/pkg/machinery v1.5.0
+	github.com/siderolabs/talos/pkg/machinery v1.5.3
 	github.com/stretchr/testify v1.8.4
-	go.uber.org/zap v1.25.0
-	golang.org/x/net v0.14.0
-	golang.org/x/sync v0.3.0
-	golang.org/x/sys v0.11.0
+	go.uber.org/zap v1.26.0
+	golang.org/x/net v0.17.0
+	golang.org/x/sync v0.4.0
+	golang.org/x/sys v0.13.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
-	google.golang.org/grpc v1.57.0
+	google.golang.org/grpc v1.58.3
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.27.2
@@ -39,7 +39,7 @@ require (
 	k8s.io/apimachinery v0.27.2
 	k8s.io/client-go v0.27.2
 	k8s.io/utils v0.0.0-20230209194617-a36077c30491
-	sigs.k8s.io/cluster-api v1.5.0
+	sigs.k8s.io/cluster-api v1.5.2
 	sigs.k8s.io/controller-runtime v0.15.1
 )
 
@@ -101,10 +101,10 @@ require (
 	github.com/u-root/uio v0.0.0-20230220225925-ffce2a382923 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	go4.org/netipx v0.0.0-20220925034521-797b0c90d8ab // indirect
-	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/oauth2 v0.10.0 // indirect
-	golang.org/x/term v0.11.0 // indirect
-	golang.org/x/text v0.12.0 // indirect
+	golang.org/x/term v0.13.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard v0.0.0-20230325221338-052af4a8072b // indirect

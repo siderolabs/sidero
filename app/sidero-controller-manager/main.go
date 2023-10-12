@@ -85,6 +85,7 @@ func main() {
 		autoBMCSetup         bool
 		serverRebootTimeout  time.Duration
 		ipmiPXEMethod        string
+		disableDHCPProxy     bool
 
 		testPowerSimulatedExplicitFailureProb float64
 		testPowerSimulatedSilentFailureProb   float64
@@ -103,6 +104,7 @@ func main() {
 	flag.BoolVar(&autoBMCSetup, "auto-bmc-setup", true, "Attempt to setup BMC info automatically when agent boots.")
 	flag.DurationVar(&serverRebootTimeout, "server-reboot-timeout", constants.DefaultServerRebootTimeout, "Timeout to wait for the server to restart and start wipe.")
 	flag.StringVar(&ipmiPXEMethod, "ipmi-pxe-method", string(siderotypes.PXEModeUEFI), fmt.Sprintf("Default method to use to set server to boot from PXE via IPMI: %s.", []string{siderotypes.PXEModeUEFI, siderotypes.PXEModeBIOS}))
+	flag.BoolVar(&disableDHCPProxy, "disable-dhcp-proxy", false, "Disable DHCP Proxy service.")
 	flag.Float64Var(&testPowerSimulatedExplicitFailureProb, "test-power-simulated-explicit-failure-prob", 0, "Test failure simulation setting.")
 	flag.Float64Var(&testPowerSimulatedSilentFailureProb, "test-power-simulated-silent-failure-prob", 0, "Test failure simulation setting.")
 
@@ -225,14 +227,16 @@ func main() {
 
 	errCh := make(chan error)
 
-	setupLog.Info("starting proxy DHCP server")
+	if !disableDHCPProxy {
+		setupLog.Info("starting proxy DHCP server")
 
-	go func() {
-		if err := dhcp.ServeDHCP(ctrl.Log.WithName("dhcp-proxy"), apiEndpoint, apiPort); err != nil {
-			setupLog.Error(err, "unable to start proxy DHCP server", "controller", "Environment")
-			errCh <- err
-		}
-	}()
+		go func() {
+			if err := dhcp.ServeDHCP(ctrl.Log.WithName("dhcp-proxy"), apiEndpoint, apiPort); err != nil {
+				setupLog.Error(err, "unable to start proxy DHCP server", "controller", "Environment")
+				errCh <- err
+			}
+		}()
+	}
 
 	setupLog.Info("starting TFTP server")
 

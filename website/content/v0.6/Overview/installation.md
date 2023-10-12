@@ -27,6 +27,7 @@ variables or as variables in the `clusterctl` configuration:
 - `SIDERO_CONTROLLER_MANAGER_SERVER_REBOOT_TIMEOUT` (`20m`): timeout for the server reboot (how long it might take for the server to be rebooted before Sidero retries an IPMI reboot operation)
 - `SIDERO_CONTROLLER_MANAGER_IPMI_PXE_METHOD` (`uefi`): IPMI boot from PXE method: `uefi` for UEFI boot or `bios` for BIOS boot
 - `SIDERO_CONTROLLER_MANAGER_BOOT_FROM_DISK_METHOD` (`ipxe-exit`): configures the way Sidero forces server to boot from disk when server hits iPXE server after initial install: `ipxe-exit` returns iPXE script with `exit` command, `http-404` returns HTTP 404 Not Found error, `ipxe-sanboot` uses iPXE `sanboot` command to boot from the first hard disk (can be also configured on `ServerClass`/`Server` method)
+- `SIDERO_CONTROLLER_MANAGER_DISABLE_DHCP_PROXY` (`false`): disable DHCP Proxy service (enabled by default)
 
 Sidero provides four endpoints which should be made available to the infrastructure:
 

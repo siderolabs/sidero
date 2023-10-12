@@ -12,7 +12,7 @@ TEST_PKGS ?= ./...
 TALOS_RELEASE ?= v1.6.0-alpha.0
 DEFAULT_K8S_VERSION ?= v1.27.2
 
-TOOLS ?= ghcr.io/siderolabs/tools:v1.5.0
+TOOLS ?= ghcr.io/siderolabs/tools:v1.5.0-2-g8adf637
 PKGS ?= v1.5.0
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
