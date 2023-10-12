@@ -99,7 +99,7 @@ metadata:
 spec:
   configPatches:
   - op: replace
-    path: /machine/install/disk
+    path: /machine/install
     value: /dev/nvme0n1
   - op: add
     path: /machine/install/extraKernelArgs
@@ -135,7 +135,7 @@ metadata:
 spec:
   configPatches:
   - op: replace
-    path: /machine/install/disk
+    path: /machine/install
     value: /dev/nvme1n1
   - op: add
     path: /machine/install/extraKernelArgs

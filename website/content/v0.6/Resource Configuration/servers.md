@@ -102,7 +102,7 @@ spec:
   accepted: false
   configPatches:
     - op: replace
-      path: /machine/install/disk
+      path: /machine/install
       value: /dev/sda
 ```
 
@@ -115,7 +115,7 @@ kind: ServerClass
 spec:
   configPatches:
     - op: replace
-      path: /machine/install/disk
+      path: /machine/install
       value: /dev/sda
 ```
 
