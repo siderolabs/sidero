@@ -1,3 +1,48 @@
+## [Sidero 0.6.1](https://github.com/talos-systems/sidero/releases/tag/v0.6.1) (2023-10-12)
+
+Welcome to the v0.6.1 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### DHCP Proxy
+
+Sidero Controller Manager now provides a way to disable DHCP Proxy with `SIDERO_CONTROLLER_MANAGER_DISABLE_DHCP_PROXY` variable on
+installation.
+
+
+### Contributors
+
+* Andrey Smirnov
+* Daniel Höxtermann
+* Victor Seva
+
+### Changes
+<details><summary>5 commits</summary>
+<p>
+
+* [`56744cf`](https://github.com/talos-systems/sidero/commit/56744cfb03f2dd562c4ee88bc56168f3a5b135b1) feat: provide a way to disable DHCP proxy
+* [`7880ee2`](https://github.com/talos-systems/sidero/commit/7880ee21b7fa2690a663f260598de9dd247d0060) feat: update kube-rbac-proxy to support arm64
+* [`42685a8`](https://github.com/talos-systems/sidero/commit/42685a8c1c4500bee736edd97958cb8b656533e9) docs: fix port count for DHCP proxy
+* [`891edce`](https://github.com/talos-systems/sidero/commit/891edce4f16975349e3a20d4fdc68f5118dcb77a) docs: remove excess bash continuation backslashes
+* [`8820a2b`](https://github.com/talos-systems/sidero/commit/8820a2bd5a5d9807920a11242d1a9a9a005d9d33) docs: update documentation for Sidero v0.6
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/insomniacslk/dhcp**  b3ca2534940d -> 65c27093e38a
+* **go.uber.org/zap**               v1.25.0 -> v1.26.0
+* **golang.org/x/net**              v0.14.0 -> v0.17.0
+* **golang.org/x/sync**             v0.3.0 -> v0.4.0
+* **golang.org/x/sys**              v0.11.0 -> v0.13.0
+* **google.golang.org/grpc**        v1.57.0 -> v1.58.3
+* **sigs.k8s.io/cluster-api**       v1.5.0 -> v1.5.2
+
+Previous release can be found at [v0.6.0](https://github.com/talos-systems/sidero/releases/tag/v0.6.0)
+
 ## [Sidero 0.6.0](https://github.com/talos-systems/sidero/releases/tag/v0.6.0) (2023-08-29)
 
 Welcome to the v0.6.0 release of Sidero!
