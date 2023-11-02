@@ -44,10 +44,10 @@ var ErrBootFromDisk = errors.New("boot from disk")
 var BootTemplate = template.Must(template.New("iPXE embedded").Parse(`#!ipxe
 prompt --key 0x02 --timeout 2000 Press Ctrl-B for the iPXE command line... && shell ||
 
-# print interfaces
+{{/* print interfaces */}}
 ifstat
 
-# retry 10 times overall
+{{/* retry 10 times overall */}}
 set attempts:int32 10
 set x:int32 0
 
@@ -56,18 +56,19 @@ set x:int32 0
 	set idx:int32 0
 
 	:loop
-		# try DHCP on each interface
+		{{/* try DHCP on each interface */}}
 		isset ${net${idx}/mac} || goto exhausted
 
 		ifclose
 		iflinkwait --timeout 5000 net${idx} || goto next_iface
-		dhcp net${idx} && goto boot
+		dhcp net${idx} || goto next_iface
+		goto boot
 
 	:next_iface
 		inc idx && goto loop
 
 	:boot
-		# attempt boot, if fails try next iface
+		{{/* attempt boot, if fails try next iface */}}
 		route
 
 		chain --replace http://{{ .Endpoint }}:{{ .Port }}/ipxe?uuid=${uuid}&mac=${net${idx}/mac:hexhyp}&domain=${domain}&hostname=${hostname}&serial=${serial}&arch=${buildarch} || goto next_iface
