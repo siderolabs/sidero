@@ -25,7 +25,7 @@ require (
 	github.com/siderolabs/go-debug v0.2.3
 	github.com/siderolabs/go-loadbalancer v0.3.2
 	github.com/siderolabs/go-pointer v1.0.0
-	github.com/siderolabs/go-procfs v0.1.1
+	github.com/siderolabs/go-procfs v0.1.2
 	github.com/siderolabs/go-retry v0.3.2
 	github.com/siderolabs/net v0.4.0
 	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
