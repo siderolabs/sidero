@@ -10,15 +10,20 @@ import (
 	"os"
 
 	debug "github.com/siderolabs/go-debug"
+	"github.com/spf13/pflag"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	cgrecord "k8s.io/client-go/tools/record"
+	"k8s.io/component-base/logs"
+	logsv1 "k8s.io/component-base/logs/api/v1"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/controllers/remote"
+	"sigs.k8s.io/cluster-api/util/flags"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	infrav1alpha2 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha2"
 	infrav1alpha3 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
@@ -47,24 +52,50 @@ func init() {
 	// +kubebuilder:scaffold:scheme
 }
 
+var (
+	healthAddr           string
+	enableLeaderElection bool
+	webhookPort          int
+	webhookCertDir       string
+	tlsOptions           = flags.TLSOptions{}
+	diagnosticsOptions   = flags.DiagnosticsOptions{}
+	logOptions           = logs.NewOptions()
+)
+
+// InitFlags initializes the flags.
+func InitFlags(fs *pflag.FlagSet) {
+	logsv1.AddFlags(logOptions, fs)
+
+	fs.BoolVar(&enableLeaderElection, "enable-leader-election", false,
+		"Enable leader election for controller manager. "+
+			"Enabling this will ensure there is only one active controller manager.")
+	fs.IntVar(&webhookPort, "webhook-port", 9443, "Webhook Server port, disabled by default. When enabled, the manager will only work as webhook server, no reconcilers are installed.")
+	fs.StringVar(&webhookCertDir, "webhook-cert-dir", "/tmp/k8s-webhook-server/serving-certs/",
+		"Webhook cert dir, only used when webhook-port is specified.")
+	fs.StringVar(&healthAddr, "health-addr", ":9440",
+		"The address the health endpoint binds to.")
+
+	flags.AddDiagnosticsOptions(fs, &diagnosticsOptions)
+	flags.AddTLSOptions(fs, &tlsOptions)
+}
+
 func main() {
-	var (
-		metricsAddr          string
-		healthAddr           string
-		enableLeaderElection bool
-		webhookPort          int
-	)
+	InitFlags(pflag.CommandLine)
+	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+	pflag.Parse()
 
-	flag.StringVar(&metricsAddr, "metrics-bind-addr", ":8080", "The address the metric endpoint binds to.")
-	flag.StringVar(&healthAddr, "health-addr", ":9440", "The address the health endpoint binds to.")
-	flag.BoolVar(&enableLeaderElection, "enable-leader-election", true,
-		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
-	flag.IntVar(&webhookPort, "webhook-port", 9443, "Webhook Server port, disabled by default. When enabled, the manager will only work as webhook server, no reconcilers are installed.")
-	flag.Parse()
+	if err := logsv1.ValidateAndApply(logOptions, nil); err != nil {
+		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
 
-	ctrl.SetLogger(zap.New(func(o *zap.Options) {
-		o.Development = true
-	}))
+	diagnosticsOpts := flags.GetDiagnosticsOptions(diagnosticsOptions)
+
+	tlsOptionOverrides, err := flags.GetTLSOptionOverrideFuncs(tlsOptions)
+	if err != nil {
+		setupLog.Error(err, "unable to add TLS settings to the webhook server")
+		os.Exit(1)
+	}
 
 	go func() {
 		debugLogFunc := func(msg string) {
@@ -84,12 +115,26 @@ func main() {
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
-		MetricsBindAddress:     metricsAddr,
+		Metrics:                diagnosticsOpts,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "controller-leader-election-capm",
-		Port:                   webhookPort,
 		EventBroadcaster:       broadcaster,
 		HealthProbeBindAddress: healthAddr,
+		Client: client.Options{
+			Cache: &client.CacheOptions{
+				DisableFor: []client.Object{
+					&corev1.ConfigMap{},
+					&corev1.Secret{},
+				},
+			},
+		},
+		WebhookServer: webhook.NewServer(
+			webhook.Options{
+				Port:    webhookPort,
+				CertDir: webhookCertDir,
+				TLSOpts: tlsOptionOverrides,
+			},
+		),
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

@@ -9,11 +9,11 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 TEST_PKGS ?= ./...
-TALOS_RELEASE ?= v1.6.0-alpha.0
-DEFAULT_K8S_VERSION ?= v1.27.2
+TALOS_RELEASE ?= v1.6.0
+DEFAULT_K8S_VERSION ?= v1.28.4
 
-TOOLS ?= ghcr.io/siderolabs/tools:v1.5.0-2-g8adf637
-PKGS ?= v1.5.0
+TOOLS ?= ghcr.io/siderolabs/tools:v1.6.0-1-g336d248
+PKGS ?= v1.6.0-3-g617d342
 
 SFYRA_CLUSTERCTL_CONFIG ?= $(HOME)/.cluster-api/clusterctl.sfyra.yaml
 

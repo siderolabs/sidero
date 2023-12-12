@@ -226,7 +226,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 			WorkerMachineCount:       &nodeCountWorker,
 		}
 
-		template, err := capiClient.GetClusterTemplate(templateOptions)
+		template, err := capiClient.GetClusterTemplate(ctx, templateOptions)
 		require.NoError(t, err)
 
 		dc, err := discovery.NewDiscoveryClientForConfig(config)

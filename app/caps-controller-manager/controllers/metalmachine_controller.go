@@ -10,6 +10,7 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	"github.com/siderolabs/go-pointer"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/fields"
@@ -17,7 +18,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
-	"k8s.io/utils/pointer"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/cluster-api/controllers/remote"
 	"sigs.k8s.io/cluster-api/util"
@@ -194,7 +194,7 @@ func (r *MetalMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	// Set the providerID, as its required in upstream capi for machine lifecycle
-	metalMachine.Spec.ProviderID = pointer.String(fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name))
+	metalMachine.Spec.ProviderID = pointer.To(fmt.Sprintf("%s://%s", constants.ProviderID, metalMachine.Spec.ServerRef.Name))
 
 	// Copy over statuses from ServerBinding to MetalMachine
 	if metalMachine.Spec.ServerRef != nil {

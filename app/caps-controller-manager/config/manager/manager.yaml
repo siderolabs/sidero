@@ -20,7 +20,9 @@ spec:
             - /manager
           image: controller:latest
           args:
-            - --metrics-bind-addr=127.0.0.1:8080
+            - --enable-leader-election
+            - "--diagnostics-address=${CAPI_DIAGNOSTICS_ADDRESS:=:8443}"
+            - "--insecure-diagnostics=${CAPI_INSECURE_DIAGNOSTICS:=false}"
           imagePullPolicy: Always
           name: manager
           resources:
@@ -31,6 +33,9 @@ spec:
               cpu: 100m
               memory: 128Mi
           ports:
+            - containerPort: 8443
+              name: metrics
+              protocol: TCP
             - containerPort: 9440
               name: healthz
               protocol: TCP

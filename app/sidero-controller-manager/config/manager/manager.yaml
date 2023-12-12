@@ -74,7 +74,9 @@ spec:
         - command:
             - /manager
           args:
-            - --metrics-bind-addr=127.0.0.1:8080
+            - --enable-leader-election
+            - "--diagnostics-address=${CAPI_DIAGNOSTICS_ADDRESS:=:8443}"
+            - "--insecure-diagnostics=${CAPI_INSECURE_DIAGNOSTICS:=false}"
             - --api-endpoint=${SIDERO_CONTROLLER_MANAGER_API_ENDPOINT:=-}
             - --api-port=${SIDERO_CONTROLLER_MANAGER_API_PORT:=8081}
             - --http-port=${SIDERO_CONTROLLER_MANAGER_CONTAINER_API_PORT:=8081}
@@ -103,6 +105,9 @@ spec:
               protocol: TCP
             - containerPort: 9440
               name: healthz
+              protocol: TCP
+            - containerPort: 8443
+              name: metrics
               protocol: TCP
           env:
             - name: API_ENDPOINT

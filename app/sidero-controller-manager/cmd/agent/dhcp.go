@@ -16,7 +16,7 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/dhcpv4/nclient4"
 	"github.com/jsimonetti/rtnetlink"
-	"github.com/siderolabs/gen/slices"
+	"github.com/siderolabs/gen/xslices"
 	"github.com/siderolabs/go-procfs/procfs"
 	"github.com/siderolabs/go-retry/retry"
 	"golang.org/x/sys/unix"
@@ -253,7 +253,7 @@ func configureNetworking(linkIndex int, lease *nclient4.Lease) error {
 	if len(lease.ACK.DNS()) > 0 {
 		log.Printf("setting DNS servers to %s", lease.ACK.DNS())
 
-		contents := strings.Join(slices.Map(lease.ACK.DNS(),
+		contents := strings.Join(xslices.Map(lease.ACK.DNS(),
 			func(ns net.IP) string {
 				return fmt.Sprintf("nameserver %s\n", ns)
 			}), "")

@@ -14,7 +14,7 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
 	"github.com/insomniacslk/dhcp/iana"
-	"github.com/siderolabs/gen/slices"
+	"github.com/siderolabs/gen/xslices"
 )
 
 // ServeDHCP starts the DHCP proxy server.
@@ -95,7 +95,7 @@ func validateDHCP(m *dhcpv4.DHCPv4) (fwtype Firmware, err error) {
 	}
 
 	if fwtype == FirmwareUnsupported {
-		return 0, fmt.Errorf("unsupported client arch: %v", slices.Map(arches, func(a iana.Arch) string { return a.String() }))
+		return 0, fmt.Errorf("unsupported client arch: %v", xslices.Map(arches, func(a iana.Arch) string { return a.String() }))
 	}
 
 	// Now, identify special sub-breeds of client firmware based on

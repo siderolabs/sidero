@@ -62,7 +62,7 @@ func createCluster(ctx context.Context, t *testing.T, metalClient client.Client,
 		WorkerMachineCount:       &workerNodes,
 	}
 
-	template, err := capiClient.GetClusterTemplate(templateOptions)
+	template, err := capiClient.GetClusterTemplate(ctx, templateOptions)
 	require.NoError(t, err)
 
 	dc, err := discovery.NewDiscoveryClientForConfig(config)

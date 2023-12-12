@@ -94,7 +94,7 @@ func (srv *Server) Provision(ctx context.Context, req *pb.ProvisionRequest) (*pb
 	}
 
 	return &pb.ProvisionResponse{
-		ServerEndpoint:    srv.cfg.WireguardEndpoint,
+		ServerEndpoint:    []string{srv.cfg.WireguardEndpoint},
 		ServerPublicKey:   srv.cfg.PublicKey.String(),
 		ServerAddress:     srv.cfg.ServerAddress.Addr().String(),
 		NodeAddressPrefix: nodeAddress.String(),

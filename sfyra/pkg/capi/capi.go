@@ -59,7 +59,7 @@ func NewManager(ctx context.Context, cluster talos.Cluster, options Options) (*M
 
 	var err error
 
-	clusterAPI.client, err = client.New(options.ClusterctlConfigPath)
+	clusterAPI.client, err = client.New(ctx, options.ClusterctlConfigPath)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (clusterAPI *Manager) Install(ctx context.Context) error {
 
 	_, err = clusterAPI.clientset.CoreV1().Namespaces().Get(ctx, "sidero-system", metav1.GetOptions{})
 	if err != nil {
-		_, err = clusterAPI.client.Init(options)
+		_, err = clusterAPI.client.Init(ctx, options)
 		return err
 	}
 
