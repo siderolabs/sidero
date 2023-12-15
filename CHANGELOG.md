@@ -1,3 +1,58 @@
+## [Sidero 0.6.2](https://github.com/talos-systems/sidero/releases/tag/v0.6.2) (2023-12-15)
+
+Welcome to the v0.6.2 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Contributors
+
+* Nathan Lee
+* Andrey Smirnov
+* Oscar Utbult
+
+### Changes
+<details><summary>4 commits</summary>
+<p>
+
+* [`01981eb`](https://github.com/talos-systems/sidero/commit/01981eb1c63db76e5aa8ab45d366ad028c683e9b) feat: update Talos to 1.6.0
+* [`130e608`](https://github.com/talos-systems/sidero/commit/130e608a0d3e66bf9501e26ce1bda7a7f844b3ee) feat: add firmware to agent initramfs for QLogic NICs
+* [`0f7973c`](https://github.com/talos-systems/sidero/commit/0f7973c86c174a8d859def174f41d9c708406eba) docs: fix website redirect to latest version
+* [`7f6f787`](https://github.com/talos-systems/sidero/commit/7f6f7875054a5c04edb43407e58ffd0647f47ed3) fix: handle network interfaces without dhcp during pxeboot
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/go-logr/logr**                    v1.2.4 -> v1.3.0
+* **github.com/google/go-cmp**                   v0.5.9 -> v0.6.0
+* **github.com/insomniacslk/dhcp**               65c27093e38a -> 8c70d406f6d2
+* **github.com/jsimonetti/rtnetlink**            v1.3.5 -> v1.4.0
+* **github.com/siderolabs/gen**                  v0.4.5 -> v0.4.7
+* **github.com/siderolabs/go-blockdevice**       v0.4.6 -> v0.4.7
+* **github.com/siderolabs/go-pointer**           v1.0.0 **_new_**
+* **github.com/siderolabs/go-retry**             v0.3.2 -> v0.3.3
+* **github.com/siderolabs/siderolink**           v0.3.1 -> v0.3.4
+* **github.com/siderolabs/talos/pkg/machinery**  v1.5.3 -> v1.6.0
+* **github.com/spf13/pflag**                     v1.0.5 **_new_**
+* **golang.org/x/net**                           v0.17.0 -> v0.18.0
+* **golang.org/x/sync**                          v0.4.0 -> v0.5.0
+* **golang.org/x/sys**                           v0.13.0 -> e4099bfacb8c
+* **google.golang.org/grpc**                     v1.58.3 -> v1.59.0
+* **k8s.io/api**                                 v0.27.2 -> v0.28.4
+* **k8s.io/apiextensions-apiserver**             v0.27.2 -> v0.28.4
+* **k8s.io/apimachinery**                        v0.27.2 -> v0.28.4
+* **k8s.io/client-go**                           v0.27.2 -> v0.28.4
+* **k8s.io/component-base**                      v0.28.4 **_new_**
+* **k8s.io/utils**                               a36077c30491 -> d93618cff8a2
+* **sigs.k8s.io/cluster-api**                    v1.5.2 -> v1.6.0
+* **sigs.k8s.io/controller-runtime**             v0.15.1 -> v0.16.3
+
+Previous release can be found at [v0.6.1](https://github.com/talos-systems/sidero/releases/tag/v0.6.1)
+
+
 ## [Sidero 0.6.1](https://github.com/talos-systems/sidero/releases/tag/v0.6.1) (2023-10-12)
 
 Welcome to the v0.6.1 release of Sidero!
