@@ -121,7 +121,7 @@ Issue the following to create a single-node cluster:
 
 ```bash
 talosctl cluster create \
- --kubernetes-version 1.22.2 \
+ --kubernetes-version 1.29.0 \
   -p 69:69/udp,8081:8081/tcp,51821:51821/udp \
   --workers 0 \
   --endpoint $PUBLIC_IP
@@ -138,7 +138,7 @@ You should then set your `KUBECONFIG` environment variable to the path of this f
 Because this is a single node cluster, we need to remove the "NoSchedule" taint on the node to make sure non-controlplane components can be scheduled.
 
 ```bash
-kubectl taint node talos-default-master-1 node-role.kubernetes.io/master:NoSchedule-
+kubectl taint node talos-default-controlplane-1 node-role.kubernetes.io/control-plane:NoSchedule-
 ```
 
 ## Install Sidero
@@ -220,9 +220,9 @@ Note that there are several variables that should be set in order for the templa
   This has the disadvantage of being a single point of failure, but it can be a simple way to get running.
 - `CONTROL_PLANE_SERVERCLASS`: The server class to use for control plane nodes.
 - `WORKER_SERVERCLASS`: The server class to use for worker nodes.
-- `KUBERNETES_VERSION`: The version of Kubernetes to deploy (e.g. `v1.22.2`).
+- `KUBERNETES_VERSION`: The version of Kubernetes to deploy (e.g. `v1.29.0`).
 - `CONTROL_PLANE_PORT`: The port used for the Kubernetes API server (port 6443)
-- `TALOS_VERSION`: This should correspond to the minor version of Talos that you will be deploying (e.g. `v0.13`).
+- `TALOS_VERSION`: This should correspond to the minor version of Talos that you will be deploying (e.g. `v1.6.1`).
   This value is used in determining the fields present in the machine configuration that gets generated for Talos nodes.
 
 For instance:
@@ -230,8 +230,8 @@ For instance:
 ```bash
 export CONTROL_PLANE_SERVERCLASS=any
 export WORKER_SERVERCLASS=any
-export TALOS_VERSION=v0.13
-export KUBERNETES_VERSION=v1.22.2
+export TALOS_VERSION=v1.6.1
+export KUBERNETES_VERSION=v1.29.0
 export CONTROL_PLANE_PORT=6443
 export CONTROL_PLANE_ENDPOINT=1.2.3.4
 clusterctl generate cluster management-plane -i sidero > management-plane.yaml
@@ -281,4 +281,4 @@ Followed by:
 clusterctl move --to-kubeconfig=/path/to/management-plane/kubeconfig
 ```
 
-Upon completion of this command, we can now tear down our bootstrap cluster with `talosctl cluster destroy` and begin using our management plane as our point of creation for all future clusters!
+Upon completion of this command, we can now tear down our bootstrap cluster with `talosctl cluster destroy` and begin using our management plane as our point of creation for all future clusters!.
