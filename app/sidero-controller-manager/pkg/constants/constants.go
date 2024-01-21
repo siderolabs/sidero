@@ -8,8 +8,8 @@ import "time"
 
 const (
 	DataDirectory    = "/var/lib/sidero"
-	AgentEndpointArg = "sidero.mac"
-	AgentMACArg      = "sidero.endpoint"
+	AgentEndpointArg = "sidero.endpoint"
+	AgentMACArg      = "sidero.mac"
 
 	KernelAsset = "vmlinuz"
 	InitrdAsset = "initramfs.xz"
