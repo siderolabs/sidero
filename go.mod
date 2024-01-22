@@ -25,7 +25,7 @@ require (
 	github.com/siderolabs/go-smbios v0.3.2
 	github.com/siderolabs/grpc-proxy v0.4.0
 	github.com/siderolabs/siderolink v0.3.4
-	github.com/siderolabs/talos/pkg/machinery v1.6.0
+	github.com/siderolabs/talos/pkg/machinery v1.6.2
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
