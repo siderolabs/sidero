@@ -1,3 +1,36 @@
+## [Sidero 0.6.3](https://github.com/talos-systems/sidero/releases/tag/v0.6.3) (2024-01-23)
+
+Welcome to the v0.6.3 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Contributors
+
+* Alexandra
+* Andrey Smirnov
+* Anthony ARNAUD
+* rmvangun
+
+### Changes
+<details><summary>4 commits</summary>
+<p>
+
+* [`30d077f`](https://github.com/talos-systems/sidero/commit/30d077fb50a2b4200d19ab7a07beddc172ce0ce5) fix: set a default controller runtime log
+* [`aabe7bc`](https://github.com/talos-systems/sidero/commit/aabe7bc6945328b1b23b0aded7dbbe39b0c01e02) fix: sidero.endpoint and sidero.mac was inverted
+* [`90d7a7d`](https://github.com/talos-systems/sidero/commit/90d7a7d5b3bb42c1515bd421f3791da191183ec8) docs: update to reflect master => controlplane
+* [`dc8b95e`](https://github.com/talos-systems/sidero/commit/dc8b95edf73b59efea6a0d7b29e640e2bbd06c2e) docs: fix wrong raspberry installation url
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.6.2](https://github.com/talos-systems/sidero/releases/tag/v0.6.2)
+
 ## [Sidero 0.6.2](https://github.com/talos-systems/sidero/releases/tag/v0.6.2) (2023-12-15)
 
 Welcome to the v0.6.2 release of Sidero!
