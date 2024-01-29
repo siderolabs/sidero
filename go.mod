@@ -25,7 +25,7 @@ require (
 	github.com/siderolabs/go-smbios v0.3.2
 	github.com/siderolabs/grpc-proxy v0.4.0
 	github.com/siderolabs/siderolink v0.3.4
-	github.com/siderolabs/talos/pkg/machinery v1.6.0
+	github.com/siderolabs/talos/pkg/machinery v1.6.3
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
@@ -41,6 +41,7 @@ require (
 	k8s.io/apimachinery v0.28.4
 	k8s.io/client-go v0.28.4
 	k8s.io/component-base v0.28.4
+	k8s.io/klog/v2 v2.100.1
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2
 	sigs.k8s.io/cluster-api v1.6.0
 	sigs.k8s.io/controller-runtime v0.16.3
@@ -144,7 +145,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/apiserver v0.28.4 // indirect
 	k8s.io/cluster-bootstrap v0.28.4 // indirect
-	k8s.io/klog/v2 v2.100.1 // indirect
 	k8s.io/kms v0.28.4 // indirect
 	k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.1.2 // indirect
