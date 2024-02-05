@@ -1,7 +1,6 @@
 module github.com/siderolabs/sidero/sfyra
 
 go 1.21.5
-
 replace (
 	// local replace
 	github.com/siderolabs/sidero => ../
@@ -29,7 +28,7 @@ require (
 	github.com/siderolabs/net v0.4.0
 	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
 	github.com/siderolabs/talos v1.6.0
-	github.com/siderolabs/talos/pkg/machinery v1.6.0
+	github.com/siderolabs/talos/pkg/machinery v1.6.4
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
@@ -129,7 +128,7 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/onsi/gomega v1.30.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/runtime-spec v1.1.0-rc.1 // indirect
+	github.com/opencontainers/runtime-spec v1.1.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
