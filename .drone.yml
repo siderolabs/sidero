@@ -188,7 +188,7 @@ steps:
 
 services:
   - name: docker
-    image: docker:20.10-dind
+    image: docker:25.0.2-dind
     entrypoint:
     - dockerd
     commands:
@@ -240,6 +240,6 @@ depends_on:
   - default
 ---
 kind: signature
-hmac: 6425fcd833ae7569c74776f815d8c5be3e3df1fca97908cb2bccf38dcb3f04af
+hmac: abf1b9ed854ecc755bd808eb7f2ffeb3289ee2fd79cfdde084c5e32db0ad6ae5
 
 ...

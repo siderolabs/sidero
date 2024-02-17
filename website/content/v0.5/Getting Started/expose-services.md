@@ -6,7 +6,7 @@ title: "Expose Sidero Services"
 
 > If you built your cluster as specified in the [Prerequisite: Kubernetes] section in this tutorial, your services are already exposed and you can skip this section.
 
-There are three external Services which Sidero serves and which much be made
+There are three external Services which Sidero serves and which must be made
 reachable by the servers which it will be driving.
 
 For most servers, TFTP (port 69/udp) will be needed.
