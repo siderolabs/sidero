@@ -479,6 +479,8 @@ spec:
                   to force boot from disk. \n If not set, controller default is used.
                   Valid values: ipxe-exit, http-404, ipxe-sanboot."
                 type: string
+              configPatch:
+                type: string
               configPatches:
                 items:
                   properties:

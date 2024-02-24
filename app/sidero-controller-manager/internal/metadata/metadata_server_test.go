@@ -101,6 +101,13 @@ func TestMetadataService(t *testing.T) {
 			expectedCode: http.StatusOK,
 			expectedBody: "cluster: {}\nmachine:\n  kubelet:\n    extraArgs:\n      node-labels: metal.sidero.dev/uuid=5555-6666-7777\nversion: v1alpha1\n",
 		},
+		{
+			name: "server and server class as strategic merge patch",
+			path: "/configdata?uuid=6666-7777-8888",
+
+			expectedCode: http.StatusOK,
+			expectedBody: "cluster: null\nmachine:\n  certSANs: []\n  kubelet:\n    extraArgs:\n      node-labels: foo=bar,metal.sidero.dev/uuid=6666-7777-8888\n  network:\n    hostname: example6\n  token: \"\"\n  type: \"\"\nversion: v1alpha1\n",
+		},
 	} {
 		test := test
 

@@ -242,6 +242,7 @@ type ServerSpec struct {
 	BMC            *BMC                    `json:"bmc,omitempty"`
 	ManagementAPI  *ManagementAPI          `json:"managementApi,omitempty"`
 	ConfigPatches  []ConfigPatches         `json:"configPatches,omitempty"`
+	ConfigPatch    string                  `json:"configPatch,omitempty"`
 	Accepted       bool                    `json:"accepted"`
 	Cordoned       bool                    `json:"cordoned,omitempty"`
 	PXEBootAlways  bool                    `json:"pxeBootAlways,omitempty"`
