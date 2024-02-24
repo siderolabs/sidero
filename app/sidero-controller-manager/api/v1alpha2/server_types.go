@@ -242,9 +242,13 @@ type ServerSpec struct {
 	BMC            *BMC                    `json:"bmc,omitempty"`
 	ManagementAPI  *ManagementAPI          `json:"managementApi,omitempty"`
 	ConfigPatches  []ConfigPatches         `json:"configPatches,omitempty"`
-	Accepted       bool                    `json:"accepted"`
-	Cordoned       bool                    `json:"cordoned,omitempty"`
-	PXEBootAlways  bool                    `json:"pxeBootAlways,omitempty"`
+	// StrategicPatches are Talos machine configuration strategic merge patches.
+	//
+	// +optional
+	StrategicPatches []string `json:"strategicPatches,omitempty"`
+	Accepted         bool     `json:"accepted"`
+	Cordoned         bool     `json:"cordoned,omitempty"`
+	PXEBootAlways    bool     `json:"pxeBootAlways,omitempty"`
 	// BootFromDiskMethod specifies the method to exit iPXE to force boot from disk.
 	//
 	// If not set, controller default is used.

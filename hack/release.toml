@@ -6,7 +6,7 @@ github_repo = "talos-systems/sidero"
 match_deps = "^github.com/(talos-systems/[a-zA-Z0-9-]+)$"
 
 # previous release
-previous = "v0.6.2"
+previous = "v0.6.3"
 
 pre_release = false
 
@@ -14,3 +14,9 @@ preface = """\
 """
 
 [notes]
+
+[notes.patches]
+    title = "Patches"
+        description = """\
+Sidero Metal now supports Talos Linux machine configuration strategic merge patches via 'strategicPatches' field on the `Server` and `ServerClass` CRDs.
+"""

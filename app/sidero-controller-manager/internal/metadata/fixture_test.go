@@ -27,6 +27,7 @@ func fixture() []client.Object {
 		fixture3,
 		fixture4,
 		fixture5,
+		fixture6,
 	} {
 		objects = append(objects, fixture()...)
 	}
@@ -215,6 +216,81 @@ func fixture5() []client.Object {
 version: v1alpha1
 cluster: {}
 `)
+}
+
+// fixture6 creates a server with Server- & ServerClass-level with strategic merge config patches.
+func fixture6() []client.Object {
+	oldConfigPatch := "machine:\n  network:\n    hostname: invalid6"
+	newConfigPatch := "machine:\n  network:\n    hostname: example6"
+
+	return []client.Object{
+		&infrav1.ServerBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "6666-7777-8888",
+			},
+			Spec: infrav1.ServerBindingSpec{
+				MetalMachineRef: corev1.ObjectReference{
+					Name: "metal-machine-6",
+				},
+				ServerClassRef: &corev1.ObjectReference{
+					Name: "server-class-6",
+				},
+			},
+		},
+		&infrav1.MetalMachine{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "metal-machine-6",
+				OwnerReferences: []metav1.OwnerReference{
+					{
+						APIVersion: "cluster.x-k8s.io/v1beta1",
+						Kind:       "Machine",
+						Name:       "machine-6",
+					},
+				},
+			},
+			Spec: infrav1.MetalMachineSpec{},
+		},
+		&capiv1.Machine{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "machine-6",
+			},
+			Spec: capiv1.MachineSpec{
+				Bootstrap: capiv1.Bootstrap{
+					DataSecretName: pointer.To("bootstrap6"),
+				},
+			},
+		},
+		&metalv1.ServerClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "server-class-6",
+			},
+			Spec: metalv1.ServerClassSpec{
+				StrategicPatches: []string{oldConfigPatch},
+			},
+		},
+		&metalv1.Server{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "6666-7777-8888",
+			},
+			Spec: metalv1.ServerSpec{
+				StrategicPatches: []string{newConfigPatch},
+			},
+		},
+		&corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "bootstrap6",
+			},
+			Data: map[string][]byte{
+				"value": []byte(`
+version: v1alpha1
+machine:
+  kubelet:
+    extraArgs:
+      node-labels: foo=bar
+`),
+			},
+		},
+	}
 }
 
 func fixtureSimple(uuid string, index int, config string) []client.Object {

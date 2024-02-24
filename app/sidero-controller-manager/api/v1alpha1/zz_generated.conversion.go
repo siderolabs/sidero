@@ -727,6 +727,7 @@ func autoConvert_v1alpha2_ServerClassSpec_To_v1alpha1_ServerClassSpec(in *v1alph
 	}
 	out.Selector = in.Selector
 	out.ConfigPatches = *(*[]ConfigPatches)(unsafe.Pointer(&in.ConfigPatches))
+	// INFO: in.StrategicPatches opted out of conversion generation
 	out.BootFromDiskMethod = types.BootFromDisk(in.BootFromDiskMethod)
 	return nil
 }
@@ -823,6 +824,7 @@ func autoConvert_v1alpha2_ServerSpec_To_v1alpha1_ServerSpec(in *v1alpha2.ServerS
 	out.BMC = (*BMC)(unsafe.Pointer(in.BMC))
 	out.ManagementAPI = (*ManagementAPI)(unsafe.Pointer(in.ManagementAPI))
 	out.ConfigPatches = *(*[]ConfigPatches)(unsafe.Pointer(&in.ConfigPatches))
+	// WARNING: in.StrategicPatches requires manual conversion: does not exist in peer-type
 	out.Accepted = in.Accepted
 	out.Cordoned = in.Cordoned
 	out.PXEBootAlways = in.PXEBootAlways

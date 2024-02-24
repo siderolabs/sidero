@@ -542,6 +542,12 @@ spec:
                     type: object
                 type: object
                 x-kubernetes-map-type: atomic
+              strategicPatches:
+                description: Strategic merge patches to apply to the machine configuration
+                  to the servers provisioned via this server class.
+                items:
+                  type: string
+                type: array
             type: object
           status:
             description: ServerClassStatus defines the observed state of ServerClass.

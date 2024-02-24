@@ -38,6 +38,10 @@ type ServerClassSpec struct {
 	// Set of config patches to apply to the machine configuration to the servers provisioned via this server class.
 	// +optional
 	ConfigPatches []ConfigPatches `json:"configPatches,omitempty"`
+	// Strategic merge patches to apply to the machine configuration to the servers provisioned via this server class.
+	// +optional
+	// +k8s:conversion-gen=false
+	StrategicPatches []string `json:"strategicPatches,omitempty"`
 	// BootFromDiskMethod specifies the method to exit iPXE to force boot from disk.
 	//
 	// If not set, controller default is used.

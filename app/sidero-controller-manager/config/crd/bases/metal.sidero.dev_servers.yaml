@@ -737,6 +737,12 @@ spec:
                   If not set, controller default is used.
                   Valid values: uefi, bios.
                 type: string
+              strategicPatches:
+                description: StrategicPatches are Talos machine configuration strategic
+                  merge patches.
+                items:
+                  type: string
+                type: array
             required:
             - accepted
             type: object

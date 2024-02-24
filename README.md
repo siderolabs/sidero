@@ -38,8 +38,6 @@ This provider's versions are compatible with the following versions of Talos:
 | Sidero Provider (v0.5) | ✓ (+)  | ✓ (+) | ✓     | ✓     | ✓     | ✓     | ✓     |       |       |       |       |
 | Sidero Provider (v0.6) |        |       |       | ✓     | ✓     | ✓     | ✓     | ✓     | ✓     | ✓     | ✓     |
 
-> Note: Sidero Metal is not compatible with multi-document Talos Linux machine configuration, as it relies on JSON patch to apply configuration patches.
-
 ## Support
 
 Join our [Slack](https://slack.dev.talos-systems.io)!
