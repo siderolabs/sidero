@@ -20,7 +20,7 @@ replace (
 )
 
 require (
-	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.4
+	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.5
 	github.com/siderolabs/go-debug v0.2.3
 	github.com/siderolabs/go-loadbalancer v0.3.2
 	github.com/siderolabs/go-pointer v1.0.0

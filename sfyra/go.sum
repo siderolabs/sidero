@@ -391,8 +391,8 @@ github.com/shopspring/decimal v1.3.1 h1:2Usl1nmF/WZucqkFZhnfFYxxxu8LG21F6nPQBE5g
 github.com/shopspring/decimal v1.3.1/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=
 github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.6.3 h1:UomBIen2Wn/KemFZiRDcI9349iflMM12kQjZRRn+LhU=
 github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.6.3/go.mod h1:U+1pkbI6st1SVodPgIzJWpvxKfUkAp8oT9wo8EBDrEs=
-github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.4 h1:cbRnro2hIvdehMkOCCu3ppA3ja5b/Cfmnjkt7khlvDo=
-github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.4/go.mod h1:EHn1NM4XSaItuWcLEqB6H/DHvcLZO4wNHLWNjctAO2M=
+github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.5 h1:dq1PpHVEh0sc6JZzC3tUt0Pvburn5hYpvInrNyTkxR4=
+github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.5/go.mod h1:EHn1NM4XSaItuWcLEqB6H/DHvcLZO4wNHLWNjctAO2M=
 github.com/siderolabs/crypto v0.4.1 h1:PP84WSDDyCCbjYKePcc0IaMSPXDndz8V3cQ9hMRSvpA=
 github.com/siderolabs/crypto v0.4.1/go.mod h1:nJmvkqWy1Hngbzw3eg2TdtJ/ZYHHofQK1NbmmYywW8k=
 github.com/siderolabs/gen v0.4.7 h1:lM69UYggT7yzpubf7hEFaNujPdY55Y9zvQf/NC18GvA=
