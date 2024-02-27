@@ -195,9 +195,8 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Handle patches added to serverclass object
-	if serverClassObj != nil && len(serverClassObj.Spec.ConfigPatches) > 0 {
-		decodedData, ewc = patchConfigs(decodedData, serverClassObj.Spec.ConfigPatches)
+	if serverClassObj != nil {
+		decodedData, ewc = handlePatches(decodedData, serverClassObj.Spec.ConfigPatches, serverClassObj.Spec.ConfigPatch)
 		if ewc.errorObj != nil {
 			throwError(
 				w,
@@ -208,17 +207,14 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Handle patches added to server object
-	if len(serverObj.Spec.ConfigPatches) > 0 {
-		decodedData, ewc = patchConfigs(decodedData, serverObj.Spec.ConfigPatches)
-		if ewc.errorObj != nil {
-			throwError(
-				w,
-				ewc,
-			)
+	decodedData, ewc = handlePatches(decodedData, serverObj.Spec.ConfigPatches, serverObj.Spec.ConfigPatch)
+	if ewc.errorObj != nil {
+		throwError(
+			w,
+			ewc,
+		)
 
-			return
-		}
+		return
 	}
 
 	// Append or add a node label to kubelet extra args.
@@ -242,21 +238,45 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 	log.Printf("successfully returned metadata for %q", uuid)
 }
 
-// patchConfigs is responsible for applying a set of configPatches to the bootstrap data.
+// this function is responsible for applying rfc6902 and a strategic merge patch to bootstrap data.
+func handlePatches(decodedData []byte, patches []metalv1.ConfigPatches, patch string) ([]byte, errorWithCode) {
+	var ewc errorWithCode
+	// Handle rfc6902 patches
+	if len(patches) > 0 {
+		decodedData, ewc = patchConfigs(decodedData, patches)
+		if ewc.errorObj != nil {
+			return decodedData, ewc
+		}
+	}
+	// Handle strategic merge patch
+	if len(patch) > 0 {
+		decodedData, ewc = patchConfig(decodedData, []byte(patch))
+		if ewc.errorObj != nil {
+			return decodedData, ewc
+		}
+	}
+	return decodedData, errorWithCode{}
+}
+
+// patchConfigs is responsible for applying rfc6902 configPatches to the bootstrap data.
 func patchConfigs(decodedData []byte, patches []metalv1.ConfigPatches) ([]byte, errorWithCode) {
 	marshalledPatches, err := json.Marshal(patches)
 	if err != nil {
 		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure marshaling config patches from server: %s", err)}
 	}
+	return patchConfig(decodedData, marshalledPatches)
+}
 
-	patch, err := configpatcher.LoadPatch(marshalledPatches)
+// patch config is responsible for applying marshalled rfc6902 configPatches or a strategic merge patch to the bootstrap data.
+func patchConfig(decodedData []byte, patches []byte) ([]byte, errorWithCode) {
+	patch, err := configpatcher.LoadPatch(patches)
 	if err != nil {
-		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure loading rfc6902 patches from server: %s", err)}
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure loading patches from server: %s", err)}
 	}
 
 	patched, err := configpatcher.Apply(configpatcher.WithBytes(decodedData), []configpatcher.Patch{patch})
 	if err != nil {
-		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure applying rfc6902 patches to machine config: %s", err)}
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure applying patches to machine config: %s", err)}
 	}
 
 	result, err := patched.Bytes()
