@@ -1,5 +1,12 @@
 # Sidero
 
+<!-- textlint-disable -->
+> [!CAUTION]
+> Sidero Labs is no longer actively developing Sidero Metal.
+> For an alternative, please see [Omni](https://github.com/siderolabs/omni.git).
+> Unless you have an existing support contract covering Sidero Metal, all support will be provided by the community (including questions in our Slack workspace).
+<!-- textlint-enable -->
+
 Kubernetes Bare Metal Lifecycle Management.
 Sidero Metal provides lightweight, composable tools that can be used to create bare-metal Talos + Kubernetes clusters.
 Sidero Metal is an open-source project from [Sidero Labs](https://www.SideroLabs.com).
