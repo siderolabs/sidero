@@ -1,6 +1,7 @@
 module github.com/siderolabs/sidero/sfyra
 
 go 1.21.6
+toolchain go1.22.1
 
 replace (
 	// local replace
@@ -29,7 +30,7 @@ require (
 	github.com/siderolabs/net v0.4.0
 	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
 	github.com/siderolabs/talos v1.6.4
-	github.com/siderolabs/talos/pkg/machinery v1.6.4
+	github.com/siderolabs/talos/pkg/machinery v1.6.6
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
