@@ -7,7 +7,6 @@ package bootstrap
 import (
 	"context"
 	"fmt"
-	"net"
 	"net/netip"
 	"os"
 	"path/filepath"
@@ -78,8 +77,8 @@ func NewCluster(ctx context.Context, options Options) (*Cluster, error) {
 	}
 
 	var err error
-	cluster.provisioner, err = qemu.NewProvisioner(ctx)
 
+	cluster.provisioner, err = qemu.NewProvisioner(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +200,7 @@ func (cluster *Cluster) create(ctx context.Context) error {
 		StateDirectory: cluster.stateDir,
 	}
 
-	defaultInternalLB, _ := cluster.provisioner.GetLoadBalancers(request.Network)
+	defaultInternalLB := cluster.provisioner.GetInClusterKubernetesControlPlaneEndpoint(request.Network, 6443)
 
 	genOptions := cluster.provisioner.GenOptions(request.Network)
 
@@ -219,7 +218,7 @@ func (cluster *Cluster) create(ctx context.Context) error {
 	configBundle, err := bundle.NewBundle(bundle.WithInputOptions(
 		&bundle.InputOptions{
 			ClusterName: cluster.options.Name,
-			Endpoint:    fmt.Sprintf("https://%s", net.JoinHostPort(defaultInternalLB, "6443")),
+			Endpoint:    defaultInternalLB,
 			GenOptions: append(
 				genOptions,
 				generate.WithEndpointList([]string{controlplaneEndpoint}),

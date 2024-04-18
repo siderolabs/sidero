@@ -43,6 +43,7 @@ func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, clus
 				if apierrors.IsNotFound(err) {
 					return retry.ExpectedError(err)
 				}
+
 				return err
 			}
 

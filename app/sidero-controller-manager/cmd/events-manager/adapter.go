@@ -108,7 +108,6 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 			serverbinding.Spec.Addresses = addresses
 			serverbinding.Spec.Hostname = event.Hostname
 		})
-
 		if err != nil {
 			return err
 		}

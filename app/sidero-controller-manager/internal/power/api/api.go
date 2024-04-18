@@ -124,11 +124,11 @@ func (c *Client) IsPoweredOn() (bool, error) {
 		}()
 	}
 
-	var status struct { //nolint:musttag
+	var status struct {
 		PoweredOn bool
 	}
 
-	if err = json.NewDecoder(resp.Body).Decode(&status); err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&status); err != nil { //nolint:musttag
 		return false, err
 	}
 

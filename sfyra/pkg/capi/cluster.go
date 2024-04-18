@@ -83,8 +83,8 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 	}
 
 	var clientConfig *clientconfig.Config
-	clientConfig, err = clientconfig.FromBytes(config)
 
+	clientConfig, err = clientconfig.FromBytes(config)
 	if err != nil {
 		return nil, err
 	}

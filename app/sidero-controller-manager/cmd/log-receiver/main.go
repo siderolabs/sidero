@@ -53,10 +53,7 @@ func run() error {
 
 	annotator := siderolink.NewAnnotator(metalclient, kubeconfig, logger)
 
-	srv, err := logreceiver.NewServer(logger, listener, logHandler(logger, annotator))
-	if err != nil {
-		return fmt.Errorf("error initializing log receiver: %w", err)
-	}
+	srv := logreceiver.NewServer(logger, listener, logHandler(logger, annotator))
 
 	eg.Go(func() error {
 		return annotator.Run(ctx)

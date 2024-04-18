@@ -64,6 +64,7 @@ func TestServerClassAny(ctx context.Context, metalClient client.Client, capiClus
 				if apierrors.IsNotFound(err) {
 					return retry.ExpectedError(err)
 				}
+
 				return err
 			}
 
@@ -275,6 +276,7 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 			}
 
 			client := &http.Client{}
+
 			response, err := client.Do(req)
 			if err != nil {
 				return err
@@ -285,10 +287,12 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 			}
 
 			defer response.Body.Close()
+
 			metadataBytes, err = io.ReadAll(response.Body)
 			if err != nil {
 				return err
 			}
+
 			return nil
 		}))
 

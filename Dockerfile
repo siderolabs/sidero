@@ -50,10 +50,10 @@ ENV CGO_ENABLED ${CGO_ENABLED}
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
 ENV GOTOOLCHAIN local
-RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.13.0
-RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.28.4
+RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.14.0
+RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.29.3
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
-RUN --mount=type=cache,target=/.cache go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3 \
+RUN --mount=type=cache,target=/.cache go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.1 \
 	&& mv /go/bin/golangci-lint /toolchain/bin/golangci-lint
 WORKDIR /src
 COPY ./go.mod ./
@@ -260,6 +260,7 @@ FROM base AS lint-go
 COPY .golangci.yml .
 ENV GOGC=50
 ENV GOLANGCI_LINT_CACHE /.cache/lint
+RUN golangci-lint config verify --config .golangci.yml
 RUN --mount=type=cache,target=/.cache golangci-lint run --config .golangci.yml
 ARG MODULE
 RUN --mount=type=cache,target=/.cache FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)
@@ -319,6 +320,7 @@ FROM sfyra-base AS lint-sfyra
 COPY .golangci.yml .
 ENV GOGC=50
 ENV GOLANGCI_LINT_CACHE /.cache/lint
+RUN golangci-lint config verify --config .golangci.yml
 RUN --mount=type=cache,target=/.cache golangci-lint run --config .golangci.yml
 ARG MODULE
 RUN --mount=type=cache,target=/.cache FILES="$(gofumports -l -local ${MODULE} .)" && test -z "${FILES}" || (echo -e "Source code is not formatted with 'gofumports -w -local ${MODULE} .':\n${FILES}"; exit 1)

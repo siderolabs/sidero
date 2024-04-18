@@ -7,10 +7,10 @@ package metadata_test
 import (
 	"fmt"
 
+	"github.com/siderolabs/go-pointer"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/pointer"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -75,7 +75,7 @@ func fixture2() []client.Object {
 			},
 			Spec: capiv1.MachineSpec{
 				Bootstrap: capiv1.Bootstrap{
-					DataSecretName: pointer.String("bootstrap2"),
+					DataSecretName: pointer.To("bootstrap2"),
 				},
 			},
 		},
@@ -147,7 +147,7 @@ func fixture3() []client.Object {
 			},
 			Spec: capiv1.MachineSpec{
 				Bootstrap: capiv1.Bootstrap{
-					DataSecretName: pointer.String("bootstrap3"),
+					DataSecretName: pointer.To("bootstrap3"),
 				},
 			},
 		},
@@ -248,7 +248,7 @@ func fixtureSimple(uuid string, index int, config string) []client.Object {
 			},
 			Spec: capiv1.MachineSpec{
 				Bootstrap: capiv1.Bootstrap{
-					DataSecretName: pointer.String(fmt.Sprintf("bootstrap%d", index)),
+					DataSecretName: pointer.To(fmt.Sprintf("bootstrap%d", index)),
 				},
 			},
 		},

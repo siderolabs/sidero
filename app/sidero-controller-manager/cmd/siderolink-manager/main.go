@@ -116,7 +116,12 @@ func run() error {
 		return fmt.Errorf("invalid Wireguard endpoint: %w", err)
 	}
 
-	wgDevice, err := wireguard.NewDevice(siderolink.Cfg.ServerAddress, siderolink.Cfg.PrivateKey, wireguardEndpoint.Port(), false, logger)
+	wgDevice, err := wireguard.NewDevice(wireguard.DeviceConfig{
+		Logger:       logger,
+		ServerPrefix: siderolink.Cfg.ServerAddress,
+		PrivateKey:   siderolink.Cfg.PrivateKey,
+		ListenPort:   wireguardEndpoint.Port(),
+	})
 	if err != nil {
 		return fmt.Errorf("error initializing wgDevice: %w", err)
 	}

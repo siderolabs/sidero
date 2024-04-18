@@ -91,8 +91,6 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			Asset:    env.Spec.Initrd.Asset,
 		},
 	} {
-		assetTask := assetTask
-
 		file := filepath.Join(envs, assetTask.BaseName)
 
 		setReady := func(ready bool) {

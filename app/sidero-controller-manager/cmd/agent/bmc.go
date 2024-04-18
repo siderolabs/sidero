@@ -69,7 +69,6 @@ func attemptBMCIP(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS)
 				BmcInfo: bmcInfo,
 			},
 		)
-
 		if err != nil {
 			return retry.ExpectedError(err)
 		}
@@ -197,7 +196,6 @@ func attemptBMCUserSetup(ctx context.Context, client api.AgentClient, s *smbios.
 				BmcInfo: bmcInfo,
 			},
 		)
-
 		if err != nil {
 			return retry.ExpectedError(err)
 		}

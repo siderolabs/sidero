@@ -355,6 +355,7 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client) TestFunc
 		// verify that all servers shows up as available in `any` serverclass
 		require.NoError(t, retry.Constant(30*time.Second, retry.WithUnits(5*time.Second)).Retry(func() error {
 			var serverClass metalv1.ServerClass
+
 			err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.ServerClassAny}, &serverClass)
 			if err != nil {
 				return err
@@ -383,6 +384,7 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client) TestFunc
 
 		require.NoError(t, retry.Constant(30*time.Second, retry.WithUnits(5*time.Second)).Retry(func() error {
 			var serverClass metalv1.ServerClass
+
 			err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.ServerClassAny}, &serverClass)
 			if err != nil {
 				return err
@@ -409,6 +411,7 @@ func TestServerCordoned(ctx context.Context, metalClient client.Client) TestFunc
 
 		require.NoError(t, retry.Constant(30*time.Second, retry.WithUnits(5*time.Second)).Retry(func() error {
 			var serverClass metalv1.ServerClass
+
 			err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.ServerClassAny}, &serverClass)
 			if err != nil {
 				return err

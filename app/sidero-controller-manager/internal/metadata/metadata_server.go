@@ -11,7 +11,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/siderolabs/talos/pkg/machinery/config/configpatcher" //nolint:typecheck
+	"github.com/siderolabs/talos/pkg/machinery/config/configpatcher"
 	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
