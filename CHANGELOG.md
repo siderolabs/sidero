@@ -1,3 +1,65 @@
+## [Sidero 0.6.4](https://github.com/talos-systems/sidero/releases/tag/v0.6.4) (2024-04-19)
+
+Welcome to the v0.6.4 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Patches
+
+Sidero Metal now supports Talos Linux machine configuration strategic merge patches via 'strategicPatches' field on the `Server` and `ServerClass` CRDs.
+
+
+### Contributors
+
+* Andrey Smirnov
+* Andrew Rynhard
+* Ksawery Kuczyński
+* Luke Carrier
+
+### Changes
+<details><summary>5 commits</summary>
+<p>
+
+* [`62d34bd`](https://github.com/talos-systems/sidero/commit/62d34bd29b26380a6b2e94f9b534ed2fbb5b70c7) feat: update to final Talos 1.7.0
+* [`b3f0131`](https://github.com/talos-systems/sidero/commit/b3f01313937cb5ae4c52a6815f32939c61218f8e) feat: add support for strategic merge patches
+* [`5f9acdf`](https://github.com/talos-systems/sidero/commit/5f9acdf5648dccdb23d64186ba444e2251a7ea8c) feat: update to Talos 1.7.0-beta.1
+* [`b19e58a`](https://github.com/talos-systems/sidero/commit/b19e58a85aa2d422d7bec354f72893fabb7519f4) chore: add notice to README
+* [`376fd6e`](https://github.com/talos-systems/sidero/commit/376fd6e6bf441e08491ef164efb6a2f129cf0982) docs: correct "which { much => must }" typo
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/go-logr/logr**                    v1.3.0 -> v1.4.1
+* **github.com/insomniacslk/dhcp**               8c70d406f6d2 -> c728f5dd21c8
+* **github.com/jsimonetti/rtnetlink**            v1.4.0 -> v1.4.1
+* **github.com/siderolabs/gen**                  v0.4.7 -> v0.4.8
+* **github.com/siderolabs/go-debug**             v0.2.3 -> v0.3.0
+* **github.com/siderolabs/go-kmsg**              v0.1.3 -> v0.1.4
+* **github.com/siderolabs/go-procfs**            v0.1.1 -> v0.1.2
+* **github.com/siderolabs/siderolink**           v0.3.4 -> v0.3.5
+* **github.com/siderolabs/talos/pkg/machinery**  v1.6.0 -> v1.7.0
+* **github.com/stretchr/testify**                v1.8.4 -> v1.9.0
+* **go.uber.org/zap**                            v1.26.0 -> v1.27.0
+* **golang.org/x/net**                           v0.18.0 -> v0.24.0
+* **golang.org/x/sync**                          v0.5.0 -> v0.7.0
+* **golang.org/x/sys**                           e4099bfacb8c -> v0.19.0
+* **google.golang.org/grpc**                     v1.59.0 -> v1.62.1
+* **google.golang.org/protobuf**                 v1.31.0 -> v1.33.0
+* **k8s.io/api**                                 v0.28.4 -> v0.29.3
+* **k8s.io/apiextensions-apiserver**             v0.28.4 -> v0.29.3
+* **k8s.io/apimachinery**                        v0.28.4 -> v0.29.3
+* **k8s.io/client-go**                           v0.28.4 -> v0.29.3
+* **k8s.io/component-base**                      v0.28.4 -> v0.29.3
+* **k8s.io/klog/v2**                             v2.110.1 **_new_**
+* **sigs.k8s.io/cluster-api**                    v1.6.0 -> v1.7.0
+* **sigs.k8s.io/controller-runtime**             v0.16.3 -> v0.17.3
+
+Previous release can be found at [v0.6.3](https://github.com/talos-systems/sidero/releases/tag/v0.6.3)
+
 ## [Sidero 0.6.3](https://github.com/talos-systems/sidero/releases/tag/v0.6.3) (2024-01-23)
 
 Welcome to the v0.6.3 release of Sidero!
