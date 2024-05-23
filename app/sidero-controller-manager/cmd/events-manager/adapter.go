@@ -17,9 +17,10 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/siderolabs/gen/xslices"
+
 	sidero "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
 	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/siderolink"
-
 	"github.com/siderolabs/siderolink/pkg/events"
 
 	"github.com/siderolabs/talos/pkg/machinery/api/common"
@@ -30,17 +31,19 @@ import (
 type Adapter struct {
 	Sink *events.Sink
 
-	logger      *zap.Logger
-	annotator   *siderolink.Annotator
-	metalClient runtimeclient.Client
+	logger                *zap.Logger
+	annotator             *siderolink.Annotator
+	metalClient           runtimeclient.Client
+	negativeAddressFilter []netip.Prefix
 }
 
 // NewAdapter initializes new server.
-func NewAdapter(metalClient runtimeclient.Client, annotator *siderolink.Annotator, logger *zap.Logger) *Adapter {
+func NewAdapter(metalClient runtimeclient.Client, annotator *siderolink.Annotator, logger *zap.Logger, negativeAddressFilter []netip.Prefix) *Adapter {
 	return &Adapter{
-		logger:      logger,
-		annotator:   annotator,
-		metalClient: metalClient,
+		logger:                logger,
+		annotator:             annotator,
+		metalClient:           metalClient,
+		negativeAddressFilter: negativeAddressFilter,
 	}
 }
 
@@ -62,9 +65,9 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 		return err
 	}
 
-	ip := ipPort.Addr().String()
+	ip := ipPort.Addr()
 
-	annotation, _ := a.annotator.Get(ip)
+	annotation, _ := a.annotator.Get(ip.String())
 
 	if annotation.ServerUUID != "" {
 		fields = append(fields, zap.String("server_uuid", annotation.ServerUUID))
@@ -88,23 +91,32 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 
 	switch event := event.Payload.(type) {
 	case *machine.AddressEvent:
-		fields = append(fields, zap.String("hostname", event.GetHostname()), zap.String("addresses", strings.Join(event.GetAddresses(), ",")))
+		fields = append(fields, zap.String("hostname", event.GetHostname()), zap.Strings("addresses", event.GetAddresses()))
 
-		// filter out SideroLink address from the list
-		addresses := event.Addresses
+		// filter out SideroLink address and other negative matches from the list
+		addresses := xslices.Filter(event.Addresses,
+			func(addrStr string) bool {
+				addr, err := netip.ParseAddr(addrStr)
+				if err != nil {
+					// invalid address
+					return false
+				}
 
-		n := 0
+				if addr == ip {
+					// SideroLink address
+					return false
+				}
 
-		for _, addr := range addresses {
-			if addr != ip {
-				addresses[n] = addr
-				n++
-			}
-		}
+				for _, prefix := range a.negativeAddressFilter {
+					if prefix.Contains(addr) {
+						return false
+					}
+				}
 
-		addresses = addresses[:n]
+				return true
+			})
 
-		err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
+		err = a.patchServerBinding(ctx, ip.String(), func(serverbinding *sidero.ServerBinding) {
 			serverbinding.Spec.Addresses = addresses
 			serverbinding.Spec.Hostname = event.Hostname
 		})
@@ -114,19 +126,19 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 	case *machine.ConfigValidationErrorEvent:
 		fields = append(fields, zap.Error(fmt.Errorf(event.GetError())))
 
-		if err = a.handleConfigValidationFailedEvent(ctx, ip, event); err != nil {
+		if err = a.handleConfigValidationFailedEvent(ctx, ip.String(), event); err != nil {
 			return err
 		}
 	case *machine.ConfigLoadErrorEvent:
 		fields = append(fields, zap.Error(fmt.Errorf(event.GetError())))
 
-		if err = a.handleConfigLoadFailedEvent(ctx, ip, event); err != nil {
+		if err = a.handleConfigLoadFailedEvent(ctx, ip.String(), event); err != nil {
 			return err
 		}
 	case *machine.PhaseEvent:
 		fields = append(fields, zap.String("phase", event.GetPhase()), zap.String("action", event.GetAction().String()))
 
-		if err = a.handlePhaseEvent(ctx, ip, event); err != nil {
+		if err = a.handlePhaseEvent(ctx, ip.String(), event); err != nil {
 			return err
 		}
 	case *machine.TaskEvent:
@@ -137,7 +149,7 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 	case *machine.SequenceEvent:
 		fields = append(fields, zap.String("sequence", event.GetSequence()), zap.String("action", event.GetAction().String()))
 
-		if err = a.handleSequenceEvent(ctx, ip, event); err != nil {
+		if err = a.handleSequenceEvent(ctx, ip.String(), event); err != nil {
 			return err
 		}
 

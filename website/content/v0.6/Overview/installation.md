@@ -28,6 +28,7 @@ variables or as variables in the `clusterctl` configuration:
 - `SIDERO_CONTROLLER_MANAGER_IPMI_PXE_METHOD` (`uefi`): IPMI boot from PXE method: `uefi` for UEFI boot or `bios` for BIOS boot
 - `SIDERO_CONTROLLER_MANAGER_BOOT_FROM_DISK_METHOD` (`ipxe-exit`): configures the way Sidero forces server to boot from disk when server hits iPXE server after initial install: `ipxe-exit` returns iPXE script with `exit` command, `http-404` returns HTTP 404 Not Found error, `ipxe-sanboot` uses iPXE `sanboot` command to boot from the first hard disk (can be also configured on `ServerClass`/`Server` method)
 - `SIDERO_CONTROLLER_MANAGER_DISABLE_DHCP_PROXY` (`false`): disable DHCP Proxy service (enabled by default)
+- `SIDERO_CONTROLLER_MANAGER_EVENTS_NEGATIVE_ADDRESS_FILTER` (empty): negative filter for reported machine addresses (e.g. `10.0.0.0/8` won't publish any `10.x` addresses to the `MetalMachine` status)
 
 Sidero provides four endpoints which should be made available to the infrastructure:
 

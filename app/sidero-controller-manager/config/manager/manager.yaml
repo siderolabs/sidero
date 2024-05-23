@@ -175,6 +175,7 @@ spec:
               memory: 128Mi
         - command:
             - /events-manager
+            - --negative-address-filter=${SIDERO_CONTROLLER_MANAGER_EVENTS_NEGATIVE_ADDRESS_FILTER:=-}
           image: controller:latest
           imagePullPolicy: Always
           name: serverevents

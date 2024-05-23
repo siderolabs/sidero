@@ -1,6 +1,6 @@
 module github.com/siderolabs/sidero
 
-go 1.22.2
+go 1.22.3
 
 replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67
 
@@ -9,8 +9,8 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/insomniacslk/dhcp v0.0.0-20240227161007-c728f5dd21c8
-	github.com/jsimonetti/rtnetlink v1.4.1
+	github.com/insomniacslk/dhcp v0.0.0-20240419123447-f1cffa2c0c49
+	github.com/jsimonetti/rtnetlink v1.4.2
 	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
@@ -25,13 +25,13 @@ require (
 	github.com/siderolabs/go-smbios v0.3.2
 	github.com/siderolabs/grpc-proxy v0.4.0
 	github.com/siderolabs/siderolink v0.3.5
-	github.com/siderolabs/talos/pkg/machinery v1.7.0
+	github.com/siderolabs/talos/pkg/machinery v1.7.2
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/net v0.24.0
 	golang.org/x/sync v0.7.0
-	golang.org/x/sys v0.19.0
+	golang.org/x/sys v0.20.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
@@ -42,7 +42,7 @@ require (
 	k8s.io/client-go v0.29.3
 	k8s.io/component-base v0.29.3
 	k8s.io/klog/v2 v2.110.1
-	sigs.k8s.io/cluster-api v1.7.0
+	sigs.k8s.io/cluster-api v1.7.2
 	sigs.k8s.io/controller-runtime v0.17.3
 )
 
