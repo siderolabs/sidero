@@ -1,3 +1,37 @@
+## [Sidero 0.6.5](https://github.com/talos-systems/sidero/releases/tag/v0.6.5) (2024-05-23)
+
+Welcome to the v0.6.5 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Contributors
+
+* Andrey Smirnov
+* Spencer Smith
+
+### Changes
+<details><summary>3 commits</summary>
+<p>
+
+* [`a30f4d9`](https://github.com/talos-systems/sidero/commit/a30f4d9bbacc7f7755d779c29fc6dc93bd6f3aca) feat: provide negative address filter support
+* [`cb907cf`](https://github.com/talos-systems/sidero/commit/cb907cf6e05c3ae0dbd939da5a02e0242af0ff80) chore: update office hours
+* [`d91ab75`](https://github.com/talos-systems/sidero/commit/d91ab75b0771109d5c280a95098c244a2d28d6c4) fix: update HTTP boot filename
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/insomniacslk/dhcp**               c728f5dd21c8 -> f1cffa2c0c49
+* **github.com/jsimonetti/rtnetlink**            v1.4.1 -> v1.4.2
+* **github.com/siderolabs/talos/pkg/machinery**  v1.7.0 -> v1.7.2
+* **golang.org/x/sys**                           v0.19.0 -> v0.20.0
+* **sigs.k8s.io/cluster-api**                    v1.7.0 -> v1.7.2
+
+Previous release can be found at [v0.6.4](https://github.com/talos-systems/sidero/releases/tag/v0.6.4)
+
 ## [Sidero 0.6.4](https://github.com/talos-systems/sidero/releases/tag/v0.6.4) (2024-04-19)
 
 Welcome to the v0.6.4 release of Sidero!
