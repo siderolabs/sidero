@@ -45,7 +45,7 @@ clusterctl generate cluster cluster-0 -i sidero > cluster-0.yaml
 
 Take a look at this new `cluster-0.yaml` manifest and make any changes as you
 see fit.
-Feel free to adjust the `replicas` field of the `TalosControlPlane` and `MachineDeployment` objects to match the number of machines you want in your controlplane and worker sets, respecively.
+Feel free to adjust the `replicas` field of the `TalosControlPlane` and `MachineDeployment` objects to match the number of machines you want in your controlplane and worker sets, respectively.
 `MachineDeployment` (worker) count is allowed to be 0.
 
 Of course, these may also be scaled up or down _after_ they have been created,
