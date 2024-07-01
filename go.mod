@@ -14,7 +14,7 @@ require (
 	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/pkg/errors v0.9.1
-	github.com/siderolabs/gen v0.4.8
+	github.com/siderolabs/gen v0.5.0
 	github.com/siderolabs/go-blockdevice v0.4.7
 	github.com/siderolabs/go-cmd v0.1.1
 	github.com/siderolabs/go-debug v0.3.0
