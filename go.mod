@@ -34,7 +34,7 @@ require (
 	golang.org/x/sys v0.20.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20230429144221-925a1e7659e6
 	google.golang.org/grpc v1.62.1
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/protobuf v1.34.2
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.29.3
 	k8s.io/apiextensions-apiserver v0.29.3
@@ -123,7 +123,6 @@ require (
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/oauth2 v0.18.0 // indirect
 	golang.org/x/term v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard v0.0.0-20231211153847-12269c276173 // indirect
