@@ -22,7 +22,7 @@ replace (
 require (
 	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.6
 	github.com/siderolabs/go-debug v0.3.0
-	github.com/siderolabs/go-loadbalancer v0.3.3
+	github.com/siderolabs/go-loadbalancer v0.3.4
 	github.com/siderolabs/go-pointer v1.0.0
 	github.com/siderolabs/go-procfs v0.1.2
 	github.com/siderolabs/go-retry v0.3.3
@@ -144,7 +144,7 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.6.5 // indirect
 	github.com/siderolabs/crypto v0.4.4 // indirect
-	github.com/siderolabs/gen v0.4.8 // indirect
+	github.com/siderolabs/gen v0.5.0 // indirect
 	github.com/siderolabs/go-api-signature v0.3.2 // indirect
 	github.com/siderolabs/go-blockdevice v0.4.7 // indirect
 	github.com/siderolabs/go-kubernetes v0.2.9 // indirect
@@ -169,7 +169,7 @@ require (
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/oauth2 v0.18.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/term v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
