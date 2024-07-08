@@ -1,7 +1,6 @@
 module github.com/siderolabs/sidero
 
 go 1.22.3
-
 replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67
 
 require (
@@ -25,7 +24,7 @@ require (
 	github.com/siderolabs/go-smbios v0.3.2
 	github.com/siderolabs/grpc-proxy v0.4.0
 	github.com/siderolabs/siderolink v0.3.5
-	github.com/siderolabs/talos/pkg/machinery v1.7.2
+	github.com/siderolabs/talos/pkg/machinery v1.7.5
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/zap v1.27.0
