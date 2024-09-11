@@ -28,13 +28,6 @@ rules:
   resources:
   - clusters
   - clusters/status
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - cluster.x-k8s.io
-  resources:
   - machines
   - machines/status
   verbs:
@@ -45,47 +38,7 @@ rules:
   - infrastructure.cluster.x-k8s.io
   resources:
   - metalclusters
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - infrastructure.cluster.x-k8s.io
-  resources:
-  - metalclusters/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - infrastructure.cluster.x-k8s.io
-  resources:
   - metalmachines
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - infrastructure.cluster.x-k8s.io
-  resources:
-  - metalmachines/status
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - infrastructure.cluster.x-k8s.io
-  resources:
   - serverbindings
   verbs:
   - create
@@ -98,30 +51,27 @@ rules:
 - apiGroups:
   - infrastructure.cluster.x-k8s.io
   resources:
+  - metalclusters/status
   - serverbindings/status
   verbs:
   - get
   - patch
   - update
 - apiGroups:
+  - infrastructure.cluster.x-k8s.io
+  resources:
+  - metalmachines/status
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - metal.sidero.dev
   resources:
   - serverclasses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - metal.sidero.dev
-  resources:
   - serverclasses/status
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - metal.sidero.dev
-  resources:
   - servers
   verbs:
   - get

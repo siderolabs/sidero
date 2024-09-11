@@ -129,6 +129,7 @@ spec:
             httpGet:
               path: /healthz
               port: healthz
+          terminationMessagePolicy: FallbackToLogsOnError
         - command:
             - /siderolink-manager
           args:
@@ -155,12 +156,14 @@ spec:
               memory: 128Mi
           securityContext:
             capabilities:
+              drop:
+                - ALL
               add:
                 - NET_ADMIN
-            privileged: false
           volumeMounts:
             - mountPath: /dev/net/tun
               name: dev-tun
+          terminationMessagePolicy: FallbackToLogsOnError
         - command:
             - /log-receiver
           image: controller:latest
@@ -173,6 +176,15 @@ spec:
             requests:
               cpu: 50m
               memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsUser: 65532
+            runAsGroup: 65532
+          terminationMessagePolicy: FallbackToLogsOnError
         - command:
             - /events-manager
             - --negative-address-filter=${SIDERO_CONTROLLER_MANAGER_EVENTS_NEGATIVE_ADDRESS_FILTER:=-}
@@ -186,6 +198,15 @@ spec:
             requests:
               cpu: 50m
               memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsUser: 65532
+            runAsGroup: 65532
+          terminationMessagePolicy: FallbackToLogsOnError
       volumes:
         - hostPath:
             path: /dev/net/tun

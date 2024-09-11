@@ -56,7 +56,7 @@ func mainFunc() error {
 
 	log.Printf("Using %q as API endpoint", endpoint)
 
-	conn, err := connect(ctx, endpoint)
+	conn, err := connect(endpoint)
 	if err != nil {
 		return err
 	}

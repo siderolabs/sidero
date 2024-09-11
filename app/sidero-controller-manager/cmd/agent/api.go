@@ -74,11 +74,8 @@ func wipe(ctx context.Context, client api.AgentClient, s *smbios.SMBIOS) error {
 	})
 }
 
-func connect(ctx context.Context, endpoint string) (*grpc.ClientConn, error) {
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-	defer cancel()
-
-	return grpc.DialContext(ctx,
+func connect(endpoint string) (*grpc.ClientConn, error) {
+	return grpc.NewClient(
 		endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)

@@ -372,7 +372,7 @@ func (s *server) UpdateBMCInfo(ctx context.Context, in *api.UpdateBMCInfoRequest
 func CreateServer(c controllerclient.Client, recorder record.EventRecorder, scheme *runtime.Scheme, autoAccept, insecureWipe, autoBMC bool, rebootTimeout time.Duration) *grpc.Server {
 	s := grpc.NewServer(
 		// proxy pass unknown requests to sub-components
-		grpc.CustomCodec(proxy.Codec()), //nolint:staticcheck
+		grpc.ForceServerCodec(proxy.Codec()),
 		grpc.UnknownServiceHandler(
 			proxy.TransparentHandler(
 				director,

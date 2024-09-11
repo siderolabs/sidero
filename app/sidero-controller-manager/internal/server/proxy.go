@@ -55,11 +55,12 @@ func (b *backend) GetConnection(ctx context.Context, _ string) (context.Context,
 	}
 
 	var err error
-	b.conn, err = grpc.DialContext(
-		ctx,
+	b.conn, err = grpc.NewClient(
 		b.target,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithCodec(proxy.Codec()), //nolint:staticcheck
+		grpc.WithDefaultCallOptions(
+			grpc.ForceCodec(proxy.Codec()),
+		),
 	)
 
 	return outCtx, b.conn, err

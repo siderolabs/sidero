@@ -47,4 +47,13 @@ spec:
             httpGet:
               path: /healthz
               port: healthz
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsUser: 65532
+            runAsGroup: 65532
+          terminationMessagePolicy: FallbackToLogsOnError
       terminationGracePeriodSeconds: 10

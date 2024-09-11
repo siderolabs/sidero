@@ -50,8 +50,8 @@ ENV CGO_ENABLED ${CGO_ENABLED}
 ENV GOCACHE /.cache/go-build
 ENV GOMODCACHE /.cache/mod
 ENV GOTOOLCHAIN local
-RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.14.0
-RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.29.3
+RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.16.2
+RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.31.0
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
 RUN --mount=type=cache,target=/.cache go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.1 \
 	&& mv /go/bin/golangci-lint /toolchain/bin/golangci-lint
@@ -86,8 +86,8 @@ RUN protoc -I/src/app/sidero-controller-manager/internal/api \
   --go_out=paths=source_relative:/src/app/sidero-controller-manager/internal/api --go-grpc_out=paths=source_relative:/src/app/sidero-controller-manager/internal/api \
   api.proto
 RUN --mount=type=cache,target=/.cache controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
-RUN --mount=type=cache,target=/.cache conversion-gen --input-dirs="./app/caps-controller-manager/api/v1alpha2" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
-RUN --mount=type=cache,target=/.cache conversion-gen --input-dirs="./app/sidero-controller-manager/api/v1alpha1" --output-base ./ --output-file-base="zz_generated.conversion" --go-header-file="./hack/boilerplate.go.txt"
+RUN --mount=type=cache,target=/.cache conversion-gen --output-file=zz_generated.conversion.go --go-header-file="./hack/boilerplate.go.txt" ./app/caps-controller-manager/api/v1alpha2
+RUN --mount=type=cache,target=/.cache conversion-gen --output-file=zz_generated.conversion.go --go-header-file="./hack/boilerplate.go.txt" ./app/sidero-controller-manager/api/v1alpha1
 ARG MODULE
 RUN --mount=type=cache,target=/.cache gofumports -w -local ${MODULE} .
 

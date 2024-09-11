@@ -95,9 +95,8 @@ var (
 	testPowerSimulatedExplicitFailureProb float64
 	testPowerSimulatedSilentFailureProb   float64
 
-	tlsOptions         = flags.TLSOptions{}
-	diagnosticsOptions = flags.DiagnosticsOptions{}
-	logOptions         = logs.NewOptions()
+	managerOptions = flags.ManagerOptions{}
+	logOptions     = logs.NewOptions()
 )
 
 // InitFlags initializes the flags.
@@ -123,8 +122,7 @@ func InitFlags(fs *pflag.FlagSet) {
 	fs.Float64Var(&testPowerSimulatedExplicitFailureProb, "test-power-simulated-explicit-failure-prob", 0, "Test failure simulation setting.")
 	fs.Float64Var(&testPowerSimulatedSilentFailureProb, "test-power-simulated-silent-failure-prob", 0, "Test failure simulation setting.")
 
-	flags.AddDiagnosticsOptions(fs, &diagnosticsOptions)
-	flags.AddTLSOptions(fs, &tlsOptions)
+	flags.AddManagerOptions(fs, &managerOptions)
 }
 
 //nolint:maintidx
@@ -141,9 +139,7 @@ func main() {
 	// klog.Background will automatically use the right logger.
 	ctrl.SetLogger(klog.Background())
 
-	diagnosticsOpts := flags.GetDiagnosticsOptions(diagnosticsOptions)
-
-	tlsOptionOverrides, err := flags.GetTLSOptionOverrideFuncs(tlsOptions)
+	tlsOptionOverrides, diagnosticsOpts, err := flags.GetManagerOptions(managerOptions)
 	if err != nil {
 		setupLog.Error(err, "unable to add TLS settings to the webhook server")
 		os.Exit(1)
@@ -192,7 +188,7 @@ func main() {
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
-		Metrics:                diagnosticsOpts,
+		Metrics:                *diagnosticsOpts,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "controller-leader-election-sidero-controller-manager",
 		HealthProbeBindAddress: healthAddr,
