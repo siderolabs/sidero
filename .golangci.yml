@@ -84,7 +84,10 @@ linters-settings:
     range-loops: true # Report preallocation suggestions on range loops, true by default
     for-loops: false # Report preallocation suggestions on for loops, false by default
   gci:
-    local-prefixes: github.com/talos-systems/sidero
+    sections:
+      - standard # Captures all standard packages if they do not match another section.
+      - default # Contains all imports that could not be matched to another section type.
+      - prefix(github.com/siderolabs/sidero) # Groups all imports with the specified Prefix.
   cyclop:
     # the maximal code complexity to report
     max-complexity: 20
@@ -99,7 +102,6 @@ linters:
     - forcetypeassert
     - gci
     - gocyclo
-    - golint
     - govet
     - lll
     - nlreturn
@@ -107,19 +109,16 @@ linters:
     - revive
     - stylecheck
 
-    - gas
+    - gosec
     - typecheck
     - gochecknoglobals
     - gochecknoinits
-    - ifshort
     - forbidigo
     - funlen
     - godox
     - gocognit
-    - gomnd
-    - goerr113
+    - err113
     - nestif
-    - exhaustivestruct
     - errorlint
     - paralleltest
     - thelper
@@ -129,21 +128,15 @@ linters:
     - varnamelen
     - gomoddirectives
     - exhaustruct
-    - nosnakecase
     - nonamedreturns
     - depguard
     # abandoned linters for which golangci shows the warning that the repo is archived by the owner
-    - interfacer
-    - maligned
-    - scopelint
-    - varcheck
-    - structcheck
-    - deadcode
     - intrange
     - perfsprint
     - protogetter
     - testifylint
     - copyloopvar
+    - mnd
   disable-all: false
   fast: false
 

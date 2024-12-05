@@ -114,6 +114,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
+            - name: GRPC_ENFORCE_ALPN_ENABLED # Compatibility with Talos < 1.9
+              value: "false"
           resources:
             limits:
               cpu: 1000m
@@ -143,6 +145,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
+            - name: GRPC_ENFORCE_ALPN_ENABLED # Compatibility with Talos < 1.9
+              value: "false"
           ports:
             - name: siderolink
               containerPort: ${SIDERO_CONTROLLER_MANAGER_SIDEROLINK_PORT:=51821}
@@ -169,6 +173,9 @@ spec:
           image: controller:latest
           imagePullPolicy: Always
           name: serverlogs
+          env:
+            - name: GRPC_ENFORCE_ALPN_ENABLED # Compatibility with Talos < 1.9
+              value: "false"
           resources:
             limits:
               cpu: 256m
@@ -191,6 +198,9 @@ spec:
           image: controller:latest
           imagePullPolicy: Always
           name: serverevents
+          env:
+            - name: GRPC_ENFORCE_ALPN_ENABLED # Compatibility with Talos < 1.9
+              value: "false"
           resources:
             limits:
               cpu: 256m

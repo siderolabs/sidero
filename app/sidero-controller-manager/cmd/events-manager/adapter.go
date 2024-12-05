@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/netip"
 	"strings"
@@ -124,13 +125,13 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 			return err
 		}
 	case *machine.ConfigValidationErrorEvent:
-		fields = append(fields, zap.Error(fmt.Errorf(event.GetError())))
+		fields = append(fields, zap.Error(errors.New(event.GetError())))
 
 		if err = a.handleConfigValidationFailedEvent(ctx, ip.String(), event); err != nil {
 			return err
 		}
 	case *machine.ConfigLoadErrorEvent:
-		fields = append(fields, zap.Error(fmt.Errorf(event.GetError())))
+		fields = append(fields, zap.Error(errors.New(event.GetError())))
 
 		if err = a.handleConfigLoadFailedEvent(ctx, ip.String(), event); err != nil {
 			return err
@@ -154,7 +155,7 @@ func (a *Adapter) HandleEvent(ctx context.Context, event events.Event) error {
 		}
 
 		if event.GetError() != nil {
-			err = fmt.Errorf(event.GetError().GetMessage())
+			err = errors.New(event.GetError().GetMessage())
 		}
 	}
 

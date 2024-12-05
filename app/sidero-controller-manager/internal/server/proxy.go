@@ -59,7 +59,7 @@ func (b *backend) GetConnection(ctx context.Context, _ string) (context.Context,
 		b.target,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultCallOptions(
-			grpc.ForceCodec(proxy.Codec()),
+			grpc.ForceCodecV2(proxy.Codec()),
 		),
 	)
 

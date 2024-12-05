@@ -24,8 +24,16 @@ FROM ghcr.io/siderolabs/liblzma:${PKGS} AS pkg-liblzma
 FROM ghcr.io/siderolabs/ipxe:${PKGS} AS pkg-ipxe
 FROM --platform=amd64 ghcr.io/siderolabs/ipxe:${PKGS} AS pkg-ipxe-amd64
 FROM --platform=arm64 ghcr.io/siderolabs/ipxe:${PKGS} AS pkg-ipxe-arm64
-FROM --platform=amd64 ghcr.io/siderolabs/eudev:${PKGS} AS pkg-eudev-amd64
-FROM --platform=arm64 ghcr.io/siderolabs/eudev:${PKGS} AS pkg-eudev-arm64
+FROM --platform=amd64 ghcr.io/siderolabs/systemd-udevd:${PKGS} AS pkg-systemd-udevd-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/systemd-udevd:${PKGS} AS pkg-systemd-udevd-arm64
+FROM --platform=amd64 ghcr.io/siderolabs/libcap:${PKGS} AS pkg-libcap-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/libcap:${PKGS} AS pkg-libcap-arm64
+FROM --platform=amd64 ghcr.io/siderolabs/libsepol:${PKGS} AS pkg-libsepol-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/libsepol:${PKGS} AS pkg-libsepol-arm64
+FROM --platform=amd64 ghcr.io/siderolabs/libselinux:${PKGS} AS pkg-libselinux-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/libselinux:${PKGS} AS pkg-libselinux-arm64
+FROM --platform=amd64 ghcr.io/siderolabs/pcre2:${PKGS} AS pkg-pcre2-amd64
+FROM --platform=arm64 ghcr.io/siderolabs/pcre2:${PKGS} AS pkg-pcre2-arm64
 FROM --platform=amd64 ghcr.io/siderolabs/util-linux:${PKGS} AS pkg-util-linux-amd64
 FROM --platform=arm64 ghcr.io/siderolabs/util-linux:${PKGS} AS pkg-util-linux-arm64
 FROM --platform=amd64 ghcr.io/siderolabs/kmod:${PKGS} AS pkg-kmod-amd64
@@ -53,7 +61,7 @@ ENV GOTOOLCHAIN local
 RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.16.2
 RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.31.0
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1
-RUN --mount=type=cache,target=/.cache go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.1 \
+RUN --mount=type=cache,target=/.cache go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.62.2 \
 	&& mv /go/bin/golangci-lint /toolchain/bin/golangci-lint
 WORKDIR /src
 COPY ./go.mod ./
@@ -188,7 +196,11 @@ COPY --from=pkg-musl-amd64 / .
 COPY --from=pkg-openssl-amd64 / .
 COPY --from=pkg-util-linux-amd64 / .
 COPY --from=pkg-kmod-amd64 / .
-COPY --from=pkg-eudev-amd64 / .
+COPY --from=pkg-systemd-udevd-amd64 / .
+COPY --from=pkg-libcap-amd64 / .
+COPY --from=pkg-libsepol-amd64 / .
+COPY --from=pkg-libselinux-amd64 / .
+COPY --from=pkg-pcre2-amd64 / .
 COPY --from=pkg-ipmitool-amd64 / .
 COPY --from=agent-build-amd64 /agent ./init
 COPY --from=pkg-linux-firmware /lib/firmware/qed ./lib/firmware/qed
@@ -206,7 +218,11 @@ COPY --from=pkg-musl-arm64 / .
 COPY --from=pkg-openssl-arm64 / .
 COPY --from=pkg-util-linux-arm64 / .
 COPY --from=pkg-kmod-arm64 / .
-COPY --from=pkg-eudev-arm64 / .
+COPY --from=pkg-systemd-udevd-arm64 / .
+COPY --from=pkg-libcap-arm64 / .
+COPY --from=pkg-libsepol-arm64 / .
+COPY --from=pkg-libselinux-arm64 / .
+COPY --from=pkg-pcre2-arm64 / .
 COPY --from=pkg-ipmitool-arm64 / .
 COPY --from=agent-build-arm64 /agent ./init
 COPY --from=pkg-linux-firmware /lib/firmware/qed ./lib/firmware/qed

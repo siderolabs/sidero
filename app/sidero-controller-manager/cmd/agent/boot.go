@@ -84,7 +84,7 @@ func runUdevd() error {
 		return fmt.Errorf("error running udevadm hwdb --update: %w", err)
 	}
 
-	udevdCmd := exec.Command("/sbin/udevd",
+	udevdCmd := exec.Command("/sbin/systemd-udevd",
 		"--resolve-names=never")
 	udevdCmd.Stdout = os.Stdout
 	udevdCmd.Stderr = os.Stderr

@@ -71,9 +71,9 @@ func (a *Annotator) Run(ctx context.Context) error {
 	informer := informerFactory.Informer()
 
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    func(new interface{}) { a.notify(nil, new) },
+		AddFunc:    func(new interface{}) { a.notify(nil, new) }, //nolint:contextcheck
 		UpdateFunc: a.notify,
-		DeleteFunc: func(old interface{}) { a.notify(old, nil) },
+		DeleteFunc: func(old interface{}) { a.notify(old, nil) }, //nolint:contextcheck
 	})
 
 	informer.Run(ctx.Done())

@@ -39,6 +39,9 @@ spec:
             - containerPort: 9440
               name: healthz
               protocol: TCP
+          env:
+            - name: GRPC_ENFORCE_ALPN_ENABLED # Compatibility with Talos < 1.9
+              value: "false"
           readinessProbe:
             httpGet:
               path: /readyz
