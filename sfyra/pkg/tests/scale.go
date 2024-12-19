@@ -46,6 +46,20 @@ func TestScaleControlPlaneDown(ctx context.Context, metalClient client.Client, c
 	}
 }
 
+// TestScaleControlPlaneUpDownNoWait verifies that the control plane can be scaled down after no-wait scale up.
+func TestScaleControlPlaneUpDownNoWait(ctx context.Context, metalClient client.Client, capiCluster talos.Cluster) TestFunc {
+	return func(t *testing.T) {
+		err := scaleControlPlaneNoWait(ctx, metalClient, 3)
+		require.NoError(t, err)
+
+		err = scaleControlPlane(ctx, metalClient, 1)
+		require.NoError(t, err)
+
+		err = verifyClusterHealth(ctx, metalClient, capiCluster, t)
+		require.NoError(t, err)
+	}
+}
+
 // TestScaleWorkersUp verifies that the workers can scale up.
 func TestScaleWorkersUp(ctx context.Context, metalClient client.Client, capiCluster talos.Cluster) TestFunc {
 	return func(t *testing.T) {
@@ -69,11 +83,23 @@ func TestScaleWorkersDown(ctx context.Context, metalClient client.Client, capiCl
 }
 
 func scaleControlPlane(ctx context.Context, metalClient client.Client, replicas int32) error {
+	return scaleControlPlaneInternal(ctx, metalClient, replicas, false)
+}
+
+func scaleControlPlaneNoWait(ctx context.Context, metalClient client.Client, replicas int32) error {
+	return scaleControlPlaneInternal(ctx, metalClient, replicas, true)
+}
+
+func scaleControlPlaneInternal(ctx context.Context, metalClient client.Client, replicas int32, noWait bool) error {
 	verify := func(obj runtime.Object) error {
 		o := obj.(*capbt.TalosControlPlane)
 
 		if o.Status.Replicas != replicas {
 			return fmt.Errorf("expected %d replicas, got %d", replicas, o.Status.ReadyReplicas)
+		}
+
+		if noWait {
+			return nil
 		}
 
 		if o.Status.ReadyReplicas != replicas {
@@ -93,7 +119,7 @@ func scaleControlPlane(ctx context.Context, metalClient client.Client, replicas 
 
 	var obj capbt.TalosControlPlane
 
-	return scale(ctx, metalClient, "management-cluster-cp", &obj, set, verify)
+	return scale(ctx, metalClient, "management-cluster-cp", &obj, set, verify, !noWait)
 }
 
 func scaleWorkers(ctx context.Context, metalClient client.Client, replicas int32) error {
@@ -125,10 +151,10 @@ func scaleWorkers(ctx context.Context, metalClient client.Client, replicas int32
 
 	var obj capiv1.MachineDeployment
 
-	return scale(ctx, metalClient, "management-cluster-workers", &obj, set, verify)
+	return scale(ctx, metalClient, "management-cluster-workers", &obj, set, verify, true)
 }
 
-func scale(ctx context.Context, metalClient client.Client, name string, obj client.Object, set, verify ScaleCallBack) error {
+func scale(ctx context.Context, metalClient client.Client, name string, obj client.Object, set, verify ScaleCallBack, runCAPIHealth bool) error {
 	cleanObj := obj.DeepCopyObject()
 
 	err := metalClient.Get(ctx, types.NamespacedName{Namespace: "default", Name: name}, obj)
@@ -165,6 +191,10 @@ func scale(ctx context.Context, metalClient client.Client, name string, obj clie
 	})
 	if err != nil {
 		return err
+	}
+
+	if !runCAPIHealth {
+		return nil
 	}
 
 	err = retry.Constant(time.Minute, retry.WithUnits(10*time.Second)).Retry(func() error {

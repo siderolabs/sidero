@@ -19,7 +19,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/tools/reference"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
-	"sigs.k8s.io/cluster-api/controllers/remote"
+	"sigs.k8s.io/cluster-api/controllers/clustercache"
 	"sigs.k8s.io/cluster-api/util"
 	"sigs.k8s.io/cluster-api/util/conditions"
 	"sigs.k8s.io/cluster-api/util/patch"
@@ -43,7 +43,7 @@ type MetalMachineReconciler struct {
 	Log      logr.Logger
 	Scheme   *runtime.Scheme
 	Recorder record.EventRecorder
-	Tracker  *remote.ClusterCacheTracker
+	Tracker  clustercache.ClusterCache
 }
 
 // +kubebuilder:rbac:groups=infrastructure.cluster.x-k8s.io,resources=metalmachines,verbs=get;list;watch;create;update;patch;delete

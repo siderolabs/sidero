@@ -19,11 +19,13 @@ import (
 	logsv1 "k8s.io/component-base/logs/api/v1"
 	"k8s.io/klog/v2"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	"sigs.k8s.io/cluster-api/controllers/clustercache"
 	"sigs.k8s.io/cluster-api/controllers/remote"
 	"sigs.k8s.io/cluster-api/util/flags"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	infrav1alpha2 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha2"
@@ -145,20 +147,42 @@ func main() {
 
 	// Set up a ClusterCacheTracker to provide to controllers
 	// requiring a connection to a remote cluster
-	tracker, err := remote.NewClusterCacheTracker(mgr, remote.ClusterCacheTrackerOptions{
-		Indexes:               []remote.Index{remote.NodeProviderIDIndex},
-		ClientUncachedObjects: []client.Object{},
+	secretCachingClient, err := client.New(mgr.GetConfig(), client.Options{
+		HTTPClient: mgr.GetHTTPClient(),
+		Cache: &client.CacheOptions{
+			Reader: mgr.GetCache(),
+		},
 	})
 	if err != nil {
-		setupLog.Error(err, "unable to create cluster cache tracker")
+		setupLog.Error(err, "Unable to create secret caching client")
 		os.Exit(1)
 	}
 
-	if err := (&remote.ClusterCacheReconciler{
-		Client:  mgr.GetClient(),
-		Tracker: tracker,
-	}).SetupWithManager(ctx, mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "ClusterCacheReconciler")
+	ccache, err := clustercache.SetupWithManager(ctx, mgr,
+		clustercache.Options{
+			SecretClient: secretCachingClient,
+			Cache: clustercache.CacheOptions{
+				Indexes: []clustercache.CacheOptionsIndex{
+					clustercache.NodeProviderIDIndex,
+				},
+			},
+			Client: clustercache.ClientOptions{
+				UserAgent: remote.DefaultClusterAPIUserAgent("caps-controller-manager"),
+				Cache: clustercache.ClientCacheOptions{
+					DisableFor: []client.Object{
+						// Don't cache ConfigMaps & Secrets.
+						&corev1.ConfigMap{},
+						&corev1.Secret{},
+					},
+				},
+			},
+		},
+		controller.TypedOptions[reconcile.Request]{
+			MaxConcurrentReconciles: defaultMaxConcurrentReconciles,
+		},
+	)
+	if err != nil {
+		setupLog.Error(err, "unable to create cluster cache tracker")
 		os.Exit(1)
 	}
 
@@ -178,7 +202,7 @@ func main() {
 		Log:      ctrl.Log.WithName("controllers").WithName("MetalMachine"),
 		Scheme:   mgr.GetScheme(),
 		Recorder: recorder,
-		Tracker:  tracker,
+		Tracker:  ccache,
 	}).SetupWithManager(ctx, mgr, controller.Options{MaxConcurrentReconciles: defaultMaxConcurrentReconciles}); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MetalMachine")
 		os.Exit(1)

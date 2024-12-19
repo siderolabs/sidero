@@ -2,6 +2,7 @@ apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
 metadata:
   name: ${CLUSTER_NAME}
+  namespace: default
 spec:
   clusterNetwork:
     pods:
@@ -14,10 +15,12 @@ spec:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     kind: MetalCluster
     name: ${CLUSTER_NAME}
+    namespace: default
   controlPlaneRef:
     apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
     kind: TalosControlPlane
     name: ${CLUSTER_NAME}-cp
+    namespace: default
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: MetalCluster
@@ -39,6 +42,7 @@ spec:
         apiVersion: metal.sidero.dev/v1alpha2
         kind: ServerClass
         name: ${CONTROL_PLANE_SERVERCLASS}
+        namespace: default
 ---
 apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
 kind: TalosControlPlane
@@ -51,6 +55,7 @@ spec:
     kind: MetalMachineTemplate
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
     name: ${CLUSTER_NAME}-cp
+    namespace: default
   controlPlaneConfig:
     controlplane:
       generateType: controlplane
@@ -83,11 +88,13 @@ spec:
           apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
           kind: TalosConfigTemplate
           name: ${CLUSTER_NAME}-workers
+          namespace: default
       clusterName: ${CLUSTER_NAME}
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
         kind: MetalMachineTemplate
         name: ${CLUSTER_NAME}-workers
+        namespace: default
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
 kind: MetalMachineTemplate
@@ -100,3 +107,4 @@ spec:
         apiVersion: metal.sidero.dev/v1alpha2
         kind: ServerClass
         name: ${WORKER_SERVERCLASS}
+        namespace: default
