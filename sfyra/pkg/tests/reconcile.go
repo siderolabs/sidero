@@ -58,7 +58,7 @@ func TestMachineDeploymentReconcile(ctx context.Context, metalClient client.Clie
 				return err
 			}
 
-			if machineDeployment.Status.UnavailableReplicas != replicas {
+			if machineDeployment.Status.UnavailableReplicas != replicas { //nolint:staticcheck
 				return retry.ExpectedError(fmt.Errorf("expected %d unavailable replicas, got %d", replicas, machineDeployment.Status.ReadyReplicas))
 			}
 

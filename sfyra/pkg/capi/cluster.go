@@ -21,15 +21,11 @@ import (
 	clientconfig "github.com/siderolabs/talos/pkg/machinery/client/config"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	capiv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	runtimeclient "sigs.k8s.io/controller-runtime/pkg/client"
-
-	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
-	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
 )
 
 // Cluster attaches to the provisioned CAPI cluster and provides talos.Cluster.
@@ -89,7 +85,7 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 		return nil, err
 	}
 
-	resolveMachinesToIPs := func(machines capiv1.MachineList) ([]string, error) {
+	resolveMachinesToIPs := func(machines capiv1.MachineList) []string {
 		var endpoints []string
 
 		for _, machine := range machines.Items {
@@ -97,46 +93,21 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 				continue
 			}
 
-			if capiv1.MachinePhase(machine.Status.Phase) != capiv1.MachinePhaseRunning {
+			if capiv1.MachinePhase(machine.Status.Phase) != capiv1.MachinePhaseRunning && capiv1.MachinePhase(machine.Status.Phase) != capiv1.MachinePhaseProvisioned {
 				continue
 			}
 
-			var metalMachine infrav1.MetalMachine
-
-			if err = metalClient.Get(ctx,
-				types.NamespacedName{Namespace: machine.Spec.InfrastructureRef.Namespace, Name: machine.Spec.InfrastructureRef.Name},
-				&metalMachine); err != nil {
-				return nil, err
-			}
-
-			if metalMachine.Spec.ServerRef == nil {
-				continue
-			}
-
-			if !metalMachine.DeletionTimestamp.IsZero() {
-				continue
-			}
-
-			var server metalv1.Server
-
-			if err := metalClient.Get(ctx, types.NamespacedName{Namespace: metalMachine.Spec.ServerRef.Namespace, Name: metalMachine.Spec.ServerRef.Name}, &server); err != nil {
-				return nil, err
-			}
-
-			for _, address := range server.Status.Addresses {
-				if address.Type == corev1.NodeInternalIP {
+			for _, address := range machine.Status.Addresses {
+				if address.Type == capiv1.MachineInternalIP {
 					endpoints = append(endpoints, address.Address)
 				}
 			}
 		}
 
-		return endpoints, nil
+		return endpoints
 	}
 
-	controlPlaneNodes, err := resolveMachinesToIPs(machines)
-	if err != nil {
-		return nil, err
-	}
+	controlPlaneNodes := resolveMachinesToIPs(machines)
 
 	if len(controlPlaneNodes) < 1 {
 		return nil, fmt.Errorf("failed to find control plane nodes")
@@ -159,10 +130,7 @@ func NewCluster(ctx context.Context, metalClient runtimeclient.Reader, clusterNa
 		return nil, err
 	}
 
-	workerNodes, err := resolveMachinesToIPs(machines)
-	if err != nil {
-		return nil, err
-	}
+	workerNodes := resolveMachinesToIPs(machines)
 
 	// TODO: endpoints in talosconfig should be filled by Sidero
 	clientConfig.Contexts[clientConfig.Context].Endpoints = controlPlaneNodes

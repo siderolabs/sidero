@@ -125,6 +125,10 @@ func Run(ctx context.Context, cluster talos.Cluster, capiManager *capi.Manager, 
 			TestScaleControlPlaneDown(ctx, metalClient, cluster),
 		},
 		{
+			"TestScaleControlPlaneUpDownNoWait",
+			TestScaleControlPlaneUpDownNoWait(ctx, metalClient, cluster),
+		},
+		{
 			"TestMachineDeploymentReconcile",
 			TestMachineDeploymentReconcile(ctx, metalClient),
 		},

@@ -6,7 +6,7 @@ github_repo = "talos-systems/sidero"
 match_deps = "^github.com/(talos-systems/[a-zA-Z0-9-]+)$"
 
 # previous release
-previous = "v0.6.4"
+previous = "v0.6.5"
 
 pre_release = false
 
@@ -18,5 +18,11 @@ preface = """\
 [notes.talos]
     title = "Talos Linux"
         description = """\
-Sidero Metal now supports Talos Linux v1.8.x.
+Sidero Metal now supports Talos Linux v1.9.x.
+"""
+
+[notes.capi]
+    title = "Cluster API"
+        description = """\
+Sidero Metal is now built and tested with Cluster API 1.9.0.
 """
