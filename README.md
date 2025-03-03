@@ -3,7 +3,10 @@
 <!-- textlint-disable -->
 > [!CAUTION]
 > Sidero Labs is no longer actively developing Sidero Metal.
-> For an alternative, please see [Omni](https://github.com/siderolabs/omni.git).
+>
+> For an alternative, please see [Omni](https://github.com/siderolabs/omni.git)
+> and the [Bare-Metal Infrastructure Provider](https://omni.siderolabs.com/tutorials/setting-up-the-bare-metal-infrastructure-provider).
+>
 > Unless you have an existing support contract covering Sidero Metal, all support will be provided by the community (including questions in our Slack workspace).
 <!-- textlint-enable -->
 
