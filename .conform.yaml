@@ -1,3 +1,7 @@
+# THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
+#
+# Generated on 2025-04-09T14:46:20Z by kres d903dae.
+
 policies:
   - type: commit
     spec:
@@ -36,6 +40,7 @@ policies:
     spec:
       skipPaths:
         - .git/
+        - testdata/
       includeSuffixes:
         - .go
       excludeSuffixes:

@@ -1,0 +1,119 @@
+---
+kind: auto.CI
+spec:
+  compileGHWorkflowsOnly: true
+---
+kind: common.Repository
+spec:
+  conformScopes:
+    - ^v0.1
+    - ^v0.2
+    - ^v0.3
+    - ^v0.4
+    - ^v0.5
+    - ^v0.6
+  licenseChecks:
+    - skipPaths:
+        - .git/
+        - testdata/
+      includeSuffixes:
+        - .go
+      excludeSuffixes:
+        - .pb.go
+        - .deepcopy.go
+        - .conversion.go
+      header: |
+        // This Source Code Form is subject to the terms of the Mozilla Public
+        // License, v. 2.0. If a copy of the MPL was not distributed with this
+        // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+---
+kind: common.SOPS
+spec:
+  enabled: true
+  config: |-
+    creation_rules:
+      - age: age1xrpa9ujxxcj2u2gzfrzv8mxak4rts94a6y60ypurv6rs5cpr4e4sg95f0k
+        # order: Andrey, Noel, Artem, Utku, Dmitriy
+        pgp: >-
+          15D5721F5F5BAF121495363EFE042E3D4085A811,
+          CC51116A94490FA6FB3C18EB2401FCAE863A06CA,
+          4919F560F0D35F80CF382D76E084A2DF1143C14D,
+          11177A43C6E3752E682AC690DBD13117B0A14E93,
+          AA5213AF261C1977AF38B03A94B473337258BFD5
+---
+kind: common.GHWorkflow
+spec:
+  jobs:
+    - name: default
+      sops: true
+      buildxOptions:
+        enabled: true
+      runners:
+        - self-hosted
+        - generic
+      conditions:
+        - on-pull-request
+      steps:
+        - name: generate
+        - name: manifests
+        - name: check-dirty
+        - name: lint
+        - name: all
+          environment:
+            PLATFORM: linux/amd64,linux/arm64
+            REGISTRY: registry.dev.siderolabs.io
+            PUSH: true
+        - name: unit-tests
+        - name: run-sfyra
+          withSudo: true
+          environment:
+            REGISTRY: registry.dev.siderolabs.io
+        - name: integration-test
+          environment:
+            REGISTRY: registry.dev.siderolabs.io
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: push
+      buildxOptions:
+        enabled: true
+      runners:
+        - self-hosted
+        - generic
+      conditions:
+        - except-pull-request
+        - not-on-tag
+      steps:
+        - name: login-to-registry
+          registryLoginStep:
+            registry: ghcr.io
+        - name: push
+          command: all
+          environment:
+            PLATFORM: linux/amd64,linux/arm64
+            PUSH: true
+    - name: tag
+      sops: true
+      buildxOptions:
+        enabled: true
+      runners:
+        - self-hosted
+        - generic
+      conditions:
+        - only-on-tag
+      steps:
+        - name: release
+        - name: release-notes
+        - name: check-dirty
+        - name: login-to-registry
+          registryLoginStep:
+            registry: ghcr.io
+        - name: push
+          command: all
+          environment:
+            PUSH: true
+        - name: release
+          releaseStep:
+            baseDirectory: _out
+            artifacts:
+              - infrastructure-sidero/*/*
+            generateChecksums: true
+            releaseNotes: RELEASE_NOTES.md
