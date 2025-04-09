@@ -1,0 +1,99 @@
+---
+kind: auto.CI
+spec:
+  compileGHWorkflowsOnly: true
+---
+kind: common.Repository
+spec:
+  conformScopes:
+    - ^v0.1
+    - ^v0.2
+    - ^v0.3
+    - ^v0.4
+    - ^v0.5
+    - ^v0.6
+  licenseChecks:
+    - skipPaths:
+        - .git/
+        - testdata/
+      includeSuffixes:
+        - .go
+      excludeSuffixes:
+        - .pb.go
+        - .deepcopy.go
+        - .conversion.go
+      header: |
+        // This Source Code Form is subject to the terms of the Mozilla Public
+        // License, v. 2.0. If a copy of the MPL was not distributed with this
+        // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+---
+kind: common.GHWorkflow
+spec:
+  jobs:
+    - name: default
+      buildxOptions:
+        enabled: true
+      runners:
+        - self-hosted
+        - generic
+      conditions:
+        - on-pull-request
+      steps:
+        - name: generate
+        - name: manifests
+        - name: check-dirty
+        - name: lint
+        - name: all
+          environment:
+            PLATFORM: linux/amd64,linux/arm64
+            REGISTRY: registry.dev.siderolabs.io
+            PUSH: true
+        - name: unit-tests
+        - name: run-sfyra
+          withSudo: true
+          environment:
+            REGISTRY: registry.dev.siderolabs.io
+    - name: push
+      buildxOptions:
+        enabled: true
+      runners:
+        - self-hosted
+        - generic
+      conditions:
+        - except-pull-request
+        - not-on-tag
+      steps:
+        - name: login-to-registry
+          registryLoginStep:
+            registry: ghcr.io
+        - name: push
+          command: all
+          environment:
+            PLATFORM: linux/amd64,linux/arm64
+            PUSH: true
+    - name: tag
+      buildxOptions:
+        enabled: true
+      runners:
+        - self-hosted
+        - generic
+      conditions:
+        - only-on-tag
+      steps:
+        - name: release
+        - name: release-notes
+        - name: check-dirty
+        - name: login-to-registry
+          registryLoginStep:
+            registry: ghcr.io
+        - name: push
+          command: all
+          environment:
+            PUSH: true
+        - name: release
+          releaseStep:
+            baseDirectory: _out
+            artifacts:
+              - infrastructure-sidero/*/*
+            generateChecksums: true
+            releaseNotes: RELEASE_NOTES.md

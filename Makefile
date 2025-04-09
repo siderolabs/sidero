@@ -12,6 +12,8 @@ TEST_PKGS ?= ./...
 TALOS_RELEASE ?= v1.9.0
 DEFAULT_K8S_VERSION ?= v1.31.0
 
+KRES_IMAGE ?= ghcr.io/siderolabs/kres:latest
+
 TOOLS ?= ghcr.io/siderolabs/tools:v1.9.0
 PKGS ?= v1.9.0-12-g9576b97
 
@@ -235,3 +237,8 @@ docs-preview: ## Starts a local preview of the documentation using Hugo in docke
         --publish 1313:1313 \
         klakegg/hugo:0.95.0-ext-alpine \
         server
+
+.PHONY: rekres
+rekres:
+	@docker pull $(KRES_IMAGE)
+	@docker run --rm --net=host --user $(shell id -u):$(shell id -g) -v $(PWD):/src -w /src -e GITHUB_TOKEN $(KRES_IMAGE)
