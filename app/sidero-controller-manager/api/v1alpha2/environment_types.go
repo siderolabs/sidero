@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/siderolabs/talos/pkg/machinery/imager/quirks"
 	"github.com/siderolabs/talos/pkg/machinery/kernel"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -76,8 +77,8 @@ type EnvironmentList struct {
 
 // EnvironmentDefaultSpec returns EnvironmentDefault's spec.
 func EnvironmentDefaultSpec(talosRelease, apiEndpoint string, apiPort uint16) *EnvironmentSpec {
-	args := make([]string, 0, len(kernel.DefaultArgs)+6)
-	args = append(args, kernel.DefaultArgs...)
+	args := make([]string, 0, len(kernel.DefaultArgs(quirks.New(talosRelease)))+6)
+	args = append(args, kernel.DefaultArgs(quirks.New(talosRelease))...)
 	args = append(args, "console=tty0", "console=ttyS0", "earlyprintk=ttyS0")
 	args = append(args, "initrd=initramfs.xz", "talos.platform=metal")
 	sort.Strings(args)

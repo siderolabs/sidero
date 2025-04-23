@@ -27,6 +27,7 @@ import (
 
 	"github.com/siderolabs/go-procfs/procfs"
 	talosconstants "github.com/siderolabs/talos/pkg/machinery/constants"
+	"github.com/siderolabs/talos/pkg/machinery/imager/quirks"
 	"github.com/siderolabs/talos/pkg/machinery/kernel"
 
 	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
@@ -400,7 +401,7 @@ func newEnvironment(ctx context.Context, server *metalv1.Server, serverBinding *
 }
 
 func newAgentEnvironment(arch, mac string) *metalv1.Environment {
-	args := append([]string(nil), kernel.DefaultArgs...)
+	args := append([]string(nil), kernel.DefaultArgs(quirks.New(""))...)
 	args = append(args,
 		"console=tty0",
 		"console=ttyS0",

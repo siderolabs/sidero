@@ -284,7 +284,7 @@ func (r *ServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 			}
 
 			// make sure message is updated in case condition was already set to make sure LastTransitionTime will be updated
-			conditions.MarkFalse(&s, metalv1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, fmt.Sprintf("Server power cycled for wiping at %s.", time.Now().Format(time.RFC3339)))
+			conditions.MarkFalse(&s, metalv1.ConditionPowerCycle, "InProgress", clusterv1.ConditionSeverityInfo, "Server power cycled for wiping at %s.", time.Now().Format(time.RFC3339))
 		}
 
 		// requeue to check for wipe timeout

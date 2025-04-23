@@ -5,6 +5,8 @@
 package v1alpha3
 
 import (
+	"context"
+
 	"github.com/google/go-cmp/cmp"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -16,21 +18,23 @@ import (
 func (r *MetalMachineTemplate) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
 		For(r).
+		WithValidator(r).
 		Complete()
 }
 
 //+kubebuilder:webhook:verbs=create;update;delete,path=/validate-infrastructure-cluster-x-k8s-io-v1alpha3-metalmachinetemplate,mutating=false,failurePolicy=fail,groups=infrastructure.cluster.x-k8s.io,resources=metalmachinetemplates,versions=v1alpha3,name=vmetalmachinetemplates.infrastructure.cluster.x-k8s.io,sideEffects=None,admissionReviewVersions=v1
 
-var _ webhook.Validator = &MetalMachineTemplate{}
+var _ webhook.CustomValidator = &MetalMachineTemplate{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type.
-func (r *MetalMachineTemplate) ValidateCreate() (admission.Warnings, error) {
+func (r *MetalMachineTemplate) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	return nil, nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type.
-func (r *MetalMachineTemplate) ValidateUpdate(oldRaw runtime.Object) (admission.Warnings, error) {
-	old := oldRaw.(*MetalMachineTemplate)
+func (r *MetalMachineTemplate) ValidateUpdate(ctx context.Context, oldObj runtime.Object, newObj runtime.Object) (admission.Warnings, error) {
+	r = newObj.(*MetalMachineTemplate)
+	old := oldObj.(*MetalMachineTemplate)
 
 	if !cmp.Equal(r.Spec, old.Spec) {
 		return nil, apierrors.NewBadRequest("MetalMachineTemplate.Spec is immutable")
@@ -40,6 +44,6 @@ func (r *MetalMachineTemplate) ValidateUpdate(oldRaw runtime.Object) (admission.
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type.
-func (r *MetalMachineTemplate) ValidateDelete() (admission.Warnings, error) {
+func (r *MetalMachineTemplate) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	return nil, nil
 }

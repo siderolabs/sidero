@@ -237,7 +237,7 @@ func (r *MetalMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	if err != nil {
 		logger.Info("Failed to set provider ID", "error", err)
 
-		conditions.MarkFalse(metalMachine, infrav1.ProviderSetCondition, infrav1.ProviderUpdateFailedReason, capiv1.ConditionSeverityWarning, err.Error())
+		conditions.MarkFalse(metalMachine, infrav1.ProviderSetCondition, infrav1.ProviderUpdateFailedReason, capiv1.ConditionSeverityWarning, "%s", err.Error())
 
 		return ctrl.Result{RequeueAfter: constants.DefaultRequeueAfter}, nil
 	}

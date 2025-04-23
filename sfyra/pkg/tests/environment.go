@@ -11,6 +11,7 @@ import (
 
 	"github.com/siderolabs/go-procfs/procfs"
 	"github.com/siderolabs/go-retry/retry"
+	"github.com/siderolabs/talos/pkg/machinery/imager/quirks"
 	"github.com/siderolabs/talos/pkg/machinery/kernel"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -59,7 +60,7 @@ func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, clus
 }
 
 // TestEnvironmentCreate verifies environment creation.
-func TestEnvironmentCreate(ctx context.Context, metalClient client.Client, cluster talos.Cluster, kernelURL, initrdURL string) TestFunc {
+func TestEnvironmentCreate(ctx context.Context, metalClient client.Client, cluster talos.Cluster, talosRelease string, kernelURL, initrdURL string) TestFunc {
 	return func(t *testing.T) {
 		var environment metalv1.Environment
 
@@ -69,7 +70,7 @@ func TestEnvironmentCreate(ctx context.Context, metalClient client.Client, clust
 			}
 
 			cmdline := procfs.NewCmdline("")
-			cmdline.SetAll(kernel.DefaultArgs)
+			cmdline.SetAll(kernel.DefaultArgs(quirks.New(talosRelease)))
 
 			cmdline.Append("console", "ttyS0")
 			cmdline.Append("reboot", "k")

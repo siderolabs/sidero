@@ -184,7 +184,7 @@ func (a *Adapter) handleSequenceEvent(ctx context.Context, ip string, event *mac
 			})
 		} else {
 			err = a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
-				conditions.MarkFalse(serverbinding, sidero.TalosInstalledCondition, sidero.TalosInstallationFailedReason, clusterv1.ConditionSeverityError, event.GetError().GetMessage())
+				conditions.MarkFalse(serverbinding, sidero.TalosInstalledCondition, sidero.TalosInstallationFailedReason, clusterv1.ConditionSeverityError, "%s", event.GetError().GetMessage())
 			})
 		}
 	case event.GetSequence() == "boot" && event.GetAction() == machine.SequenceEvent_START:
@@ -201,13 +201,13 @@ func (a *Adapter) handleSequenceEvent(ctx context.Context, ip string, event *mac
 
 func (a *Adapter) handleConfigLoadFailedEvent(ctx context.Context, ip string, event *machine.ConfigLoadErrorEvent) error {
 	return a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
-		conditions.MarkFalse(serverbinding, sidero.TalosConfigLoadedCondition, sidero.TalosConfigLoadFailedReason, clusterv1.ConditionSeverityError, event.GetError())
+		conditions.MarkFalse(serverbinding, sidero.TalosConfigLoadedCondition, sidero.TalosConfigLoadFailedReason, clusterv1.ConditionSeverityError, "%s", event.GetError())
 	})
 }
 
 func (a *Adapter) handleConfigValidationFailedEvent(ctx context.Context, ip string, event *machine.ConfigValidationErrorEvent) error {
 	return a.patchServerBinding(ctx, ip, func(serverbinding *sidero.ServerBinding) {
-		conditions.MarkFalse(serverbinding, sidero.TalosConfigValidatedCondition, sidero.TalosConfigValidationFailedReason, clusterv1.ConditionSeverityError, event.GetError())
+		conditions.MarkFalse(serverbinding, sidero.TalosConfigValidatedCondition, sidero.TalosConfigValidationFailedReason, clusterv1.ConditionSeverityError, "%s", event.GetError())
 	})
 }
 

@@ -5,6 +5,7 @@
 package v1alpha2
 
 import (
+	"context"
 	"fmt"
 	"sort"
 
@@ -39,25 +40,30 @@ func (r *ServerList) SetupWebhookWithManager(mgr ctrl.Manager) error {
 func (r *Server) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
 		For(r).
+		WithValidator(r).
 		Complete()
 }
 
 //+kubebuilder:webhook:verbs=create;update;delete,path=/validate-metal-sidero-dev-v1alpha2-server,mutating=false,failurePolicy=fail,groups=metal.sidero.dev,resources=servers,versions=v1alpha2,name=vservers.metal.sidero.dev,sideEffects=None,admissionReviewVersions=v1
 
-var _ webhook.Validator = &Server{}
+var _ webhook.CustomValidator = &Server{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type.
-func (r *Server) ValidateCreate() (admission.Warnings, error) {
+func (r *Server) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
+	r = obj.(*Server)
+
 	return nil, r.validate()
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type.
-func (r *Server) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+func (r *Server) ValidateUpdate(ctx context.Context, oldObj runtime.Object, newObj runtime.Object) (admission.Warnings, error) {
+	r = newObj.(*Server)
+
 	return nil, r.validate()
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type.
-func (r *Server) ValidateDelete() (admission.Warnings, error) {
+func (r *Server) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	return nil, nil
 }
 

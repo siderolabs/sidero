@@ -82,7 +82,7 @@ func Run(ctx context.Context, cluster talos.Cluster, capiManager *capi.Manager, 
 		},
 		{
 			"TestEnvironmentCreate",
-			TestEnvironmentCreate(ctx, metalClient, cluster, options.KernelURL, options.InitrdURL),
+			TestEnvironmentCreate(ctx, metalClient, cluster, options.TalosRelease, options.KernelURL, options.InitrdURL),
 		},
 		{
 			"TestServerClassAny",
