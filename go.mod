@@ -28,7 +28,7 @@ require (
 	github.com/siderolabs/go-smbios v0.3.3
 	github.com/siderolabs/grpc-proxy v0.5.1
 	github.com/siderolabs/siderolink v0.3.14
-	github.com/siderolabs/talos/pkg/machinery v1.10.0-beta.1
+	github.com/siderolabs/talos/pkg/machinery v1.10.0
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
@@ -45,7 +45,7 @@ require (
 	k8s.io/client-go v0.32.3
 	k8s.io/component-base v0.32.3
 	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/cluster-api v1.10.0
+	sigs.k8s.io/cluster-api v1.10.1
 	sigs.k8s.io/controller-runtime v0.20.4
 )
 

@@ -9,7 +9,7 @@ MODULE := $(shell head -1 go.mod | cut -d' ' -f2)
 
 ARTIFACTS := _out
 TEST_PKGS ?= ./...
-TALOS_RELEASE ?= v1.10.0-beta.1
+TALOS_RELEASE ?= v1.10.0
 DEFAULT_K8S_VERSION ?= v1.32.4
 
 KRES_IMAGE ?= ghcr.io/siderolabs/kres:latest

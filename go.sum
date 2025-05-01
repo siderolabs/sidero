@@ -275,8 +275,8 @@ github.com/siderolabs/protoenc v0.2.2 h1:vVQDrTjV+QSOiroWTca6h2Sn5XWYk7VSUPav5J0
 github.com/siderolabs/protoenc v0.2.2/go.mod h1:gtkHkjSCFEceXUHUzKDpnuvXu1mab9D3pVxTnQN+z+o=
 github.com/siderolabs/siderolink v0.3.14 h1:VJ0J/w2mLhUrjQy8x3xPz3ZdhVlRFgPW1RYxE+qU1t4=
 github.com/siderolabs/siderolink v0.3.14/go.mod h1:g/QSKmgzJcea/PZ1TKFZZAE0JmQgBHDA1j0itQSmiM8=
-github.com/siderolabs/talos/pkg/machinery v1.10.0-beta.1 h1:8FTI/XDWCNXql8IX4tqVdrZ2GqFsamJ+u3ihYfb6mHk=
-github.com/siderolabs/talos/pkg/machinery v1.10.0-beta.1/go.mod h1:MVJs1hsKm7N2GkQVeByjoDoLJmU/VhQO0cLJRZPxlZk=
+github.com/siderolabs/talos/pkg/machinery v1.10.0 h1:XMwL9OBULHfGWcwMwPS9BhxPD1r/lcySbZspDLcX064=
+github.com/siderolabs/talos/pkg/machinery v1.10.0/go.mod h1:MVJs1hsKm7N2GkQVeByjoDoLJmU/VhQO0cLJRZPxlZk=
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=
 github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
 github.com/sirupsen/logrus v1.9.3/go.mod h1:naHLuLoDiP4jHNo9R0sCBMtWGeIprob74mVsIT4qYEQ=
@@ -507,8 +507,8 @@ k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 h1:M3sRQVHv7vB20Xc2ybTt7ODCeFj6J
 k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738/go.mod h1:OLgZIPagt7ERELqWJFomSt595RzquPNLL48iOWgYOg0=
 sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.0 h1:CPT0ExVicCzcpeN4baWEV2ko2Z/AsiZgEdwgcfwLgMo=
 sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.0/go.mod h1:Ve9uj1L+deCXFrPOk1LpFXqTg7LCFzFso6PA48q/XZw=
-sigs.k8s.io/cluster-api v1.10.0 h1:Jcmr8aEDI4/MCqNmvjj9YQlW7r4qTUpTnL6T9UUrVuQ=
-sigs.k8s.io/cluster-api v1.10.0/go.mod h1:aiPMrNPoaJc/GuJ4TCpWX8bVe11+iCJ4HI0f3c9QiJg=
+sigs.k8s.io/cluster-api v1.10.1 h1:5vsLNgQ4SkPudJ1USK532B0SIdJxRsCNKt2DZtBf+ww=
+sigs.k8s.io/cluster-api v1.10.1/go.mod h1:aiPMrNPoaJc/GuJ4TCpWX8bVe11+iCJ4HI0f3c9QiJg=
 sigs.k8s.io/controller-runtime v0.20.4 h1:X3c+Odnxz+iPTRobG4tp092+CvBU9UK0t/bRf+n0DGU=
 sigs.k8s.io/controller-runtime v0.20.4/go.mod h1:xg2XB0K5ShQzAgsoujxuKN4LNXR2LfwwHsPj7Iaw+XY=
 sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3 h1:/Rv+M11QRah1itp8VhT6HoVx1Ray9eB4DBr+K+/sCJ8=

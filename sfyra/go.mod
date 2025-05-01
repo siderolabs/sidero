@@ -21,7 +21,7 @@ replace (
 )
 
 require (
-	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.9-0.20250416143744-a1c862ed743b
+	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.9
 	github.com/siderolabs/go-debug v0.5.0
 	github.com/siderolabs/go-loadbalancer v0.4.0
 	github.com/siderolabs/go-pointer v1.0.1
@@ -29,18 +29,18 @@ require (
 	github.com/siderolabs/go-retry v0.3.3
 	github.com/siderolabs/net v0.4.0
 	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
-	github.com/siderolabs/talos v1.10.0-beta.1
-	github.com/siderolabs/talos/pkg/machinery v1.10.0-beta.1
+	github.com/siderolabs/talos v1.10.0
+	github.com/siderolabs/talos/pkg/machinery v1.10.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.72.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.33.0-rc.1
+	k8s.io/api v0.33.0
 	k8s.io/apiextensions-apiserver v0.32.3
-	k8s.io/apimachinery v0.33.0-rc.1
-	k8s.io/client-go v0.33.0-rc.1
-	sigs.k8s.io/cluster-api v1.10.0
+	k8s.io/apimachinery v0.33.0
+	k8s.io/client-go v0.33.0
+	sigs.k8s.io/cluster-api v1.10.1
 	sigs.k8s.io/controller-runtime v0.20.4
 )
 
@@ -154,7 +154,7 @@ require (
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.5 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
-	github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.6.8-0.20250416133706-636868bcaf14 // indirect
+	github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.6.8 // indirect
 	github.com/siderolabs/crypto v0.5.1 // indirect
 	github.com/siderolabs/gen v0.8.0 // indirect
 	github.com/siderolabs/go-api-signature v0.3.6 // indirect
@@ -204,9 +204,9 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/apiserver v0.33.0-rc.1 // indirect
+	k8s.io/apiserver v0.33.0 // indirect
 	k8s.io/cluster-bootstrap v0.32.3 // indirect
-	k8s.io/component-base v0.33.0-rc.1 // indirect
+	k8s.io/component-base v0.33.0 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250318190949-c8a335a9a2ff // indirect
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
