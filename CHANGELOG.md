@@ -1,3 +1,65 @@
+## [Sidero 0.6.8](https://github.com/talos-systems/sidero/releases/tag/v0.6.8) (2025-05-01)
+
+Welcome to the v0.6.8 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Cluster API
+
+Sidero Metal is now built and tested with Cluster API 1.10.0.
+
+
+### Talos Linux
+
+Sidero Metal now supports Talos Linux v1.10.x.
+
+
+### Contributors
+
+* Andrey Smirnov
+* Noel Georgi
+* Utku Ozdemir
+
+### Changes
+<details><summary>4 commits</summary>
+<p>
+
+* [`520bb35`](https://github.com/talos-systems/sidero/commit/520bb357a07b07b1aff1f29c2aa5281cd903fcb6) feat: update to Talos 1.10.0 final
+* [`3784341`](https://github.com/talos-systems/sidero/commit/37843417f965ce88c0873e530976e8e2e3bab662) feat: update Talos and CAPI to 1.10
+* [`b27fca4`](https://github.com/talos-systems/sidero/commit/b27fca4f564d25ba831f5036e1c27f5aa4573004) feat: use kres to manage github actions
+* [`a46f257`](https://github.com/talos-systems/sidero/commit/a46f2576f9b73b5304bc586b94c3dcc6ce0d6f74) docs: add Omni bare metal infra provider link to maintenance warning
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/google/go-cmp**                   v0.6.0 -> v0.7.0
+* **github.com/insomniacslk/dhcp**               a481575ed0ef -> 5f8cf70e8c5f
+* **github.com/siderolabs/gen**                  v0.7.0 -> v0.8.0
+* **github.com/siderolabs/go-debug**             v0.4.0 -> v0.5.0
+* **github.com/siderolabs/go-pointer**           v1.0.0 -> v1.0.1
+* **github.com/siderolabs/siderolink**           v0.3.11 -> v0.3.14
+* **github.com/siderolabs/talos/pkg/machinery**  v1.9.0 -> v1.10.0
+* **github.com/spf13/pflag**                     v1.0.5 -> v1.0.6
+* **golang.org/x/net**                           v0.32.0 -> v0.39.0
+* **golang.org/x/sync**                          v0.10.0 -> v0.13.0
+* **golang.org/x/sys**                           v0.28.0 -> v0.32.0
+* **golang.zx2c4.com/wireguard/wgctrl**          925a1e7659e6 -> a9ab2273dd10
+* **google.golang.org/grpc**                     v1.68.1 -> v1.72.0
+* **google.golang.org/protobuf**                 v1.35.2 -> v1.36.6
+* **k8s.io/api**                                 v0.31.3 -> v0.32.3
+* **k8s.io/apiextensions-apiserver**             v0.31.3 -> v0.32.3
+* **k8s.io/apimachinery**                        v0.31.3 -> v0.32.3
+* **k8s.io/client-go**                           v0.31.3 -> v0.32.3
+* **k8s.io/component-base**                      v0.31.3 -> v0.32.3
+* **sigs.k8s.io/cluster-api**                    v1.9.1 -> v1.10.1
+* **sigs.k8s.io/controller-runtime**             v0.19.3 -> v0.20.4
+
+Previous release can be found at [v0.6.7](https://github.com/talos-systems/sidero/releases/tag/v0.6.7)
+
 ## [Sidero 0.6.7](https://github.com/talos-systems/sidero/releases/tag/v0.6.7) (2024-12-20)
 
 Welcome to the v0.6.7 release of Sidero!
