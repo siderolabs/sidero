@@ -1,3 +1,30 @@
+## [Sidero 0.6.9](https://github.com/talos-systems/sidero/releases/tag/v0.6.9) (2025-05-02)
+
+Welcome to the v0.6.9 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Contributors
+
+* Noel Georgi
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`4e082be`](https://github.com/talos-systems/sidero/commit/4e082be6d1277372479d0820ae24ad7ba978c519) fix(ci): arm64 container image asset
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.6.8](https://github.com/talos-systems/sidero/releases/tag/v0.6.8)
+
 ## [Sidero 0.6.8](https://github.com/talos-systems/sidero/releases/tag/v0.6.8) (2025-05-01)
 
 Welcome to the v0.6.8 release of Sidero!
