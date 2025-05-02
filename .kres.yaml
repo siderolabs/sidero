@@ -6,6 +6,7 @@ spec:
 kind: common.Repository
 spec:
   conformScopes:
+    - ci
     - ^v0.1
     - ^v0.2
     - ^v0.3
@@ -89,6 +90,7 @@ spec:
         - name: push
           command: all
           environment:
+            PLATFORM: linux/amd64,linux/arm64
             PUSH: true
         - name: release
           releaseStep:
