@@ -1,4 +1,4 @@
-# syntax = docker/dockerfile-upstream:1.2.0-labs
+# syntax = docker/dockerfile-upstream:1.15.1-labs
 
 # Meta args applied to stage base names.
 
@@ -293,7 +293,7 @@ COPY --from=fmt-build /src /
 #
 # The markdownlint target performs linting on Markdown files.
 #
-FROM node:22.14.0-alpine AS lint-markdown
+FROM node:23.11.0-alpine AS lint-markdown
 RUN apk add --no-cache findutils
 RUN npm i -g markdownlint-cli@0.23.2
 RUN npm i -g textlint@11.7.6
