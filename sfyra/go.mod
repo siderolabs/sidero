@@ -29,8 +29,8 @@ require (
 	github.com/siderolabs/go-retry v0.3.3
 	github.com/siderolabs/net v0.4.0
 	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
-	github.com/siderolabs/talos v1.10.0
-	github.com/siderolabs/talos/pkg/machinery v1.10.0
+	github.com/siderolabs/talos v1.10.1
+	github.com/siderolabs/talos/pkg/machinery v1.10.1
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
@@ -90,7 +90,7 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
-	github.com/go-openapi/jsonreference v0.20.4 // indirect
+	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/gobuffalo/flect v1.0.3 // indirect
@@ -209,11 +209,11 @@ require (
 	k8s.io/component-base v0.33.0 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250318190949-c8a335a9a2ff // indirect
-	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
+	k8s.io/utils v0.0.0-20250321185631-1f6e0b77f77e // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.0 // indirect
-	sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3 // indirect
+	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/knftables v0.0.18 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.6.0 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.7.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
