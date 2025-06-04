@@ -5,6 +5,7 @@
 package metadata
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -278,7 +279,7 @@ func patchConfig(decodedData []byte, patches []byte) ([]byte, errorWithCode) {
 
 	patched, err := configpatcher.Apply(configpatcher.WithBytes(decodedData), []configpatcher.Patch{patch})
 	if err != nil {
-		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure applying patches to machine config: %s", err)}
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure applying patches %s to machine config: %s", string(patches), err)}
 	}
 
 	result, err := patched.Bytes()
@@ -292,6 +293,17 @@ func patchConfig(decodedData []byte, patches []byte) ([]byte, errorWithCode) {
 // labelNodes is responsible for editing the kubelet extra args such that a given
 // server gets registered with a label containing the UUID of the server resource it's actually running on.
 func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
+	isMultiDoc := bytes.Contains(decodedData, []byte("---\n"))
+	if isMultiDoc {
+		return labelNodesStrategic(decodedData, serverName)
+	}
+
+	return labelNodesLegacy(decodedData, serverName)
+}
+
+// labelNodes is responsible for editing the kubelet extra args such that a given
+// server gets registered with a label containing the UUID of the server resource it's actually running on.
+func labelNodesLegacy(decodedData []byte, serverName string) ([]byte, errorWithCode) {
 	// avoid using the `configloader` from Talos machinery here, as it will fail on "unknown" fields
 	// causing a dependency on Talos version that Sidero was built with
 	var cfg struct {
@@ -374,6 +386,58 @@ func labelNodes(decodedData []byte, serverName string) ([]byte, errorWithCode) {
 		patch.Value.Raw = value
 
 		return patchRFC6902Configs(decodedData, []metalv1.ConfigPatches{patch})
+	default:
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unknown config type")}
+	}
+}
+
+func labelNodesStrategic(decodedData []byte, serverName string) ([]byte, errorWithCode) {
+	// avoid using the `configloader` from Talos machinery here, as it will fail on "unknown" fields
+	// causing a dependency on Talos version that Sidero was built with
+	var cfg struct {
+		Version string `yaml:"version"`
+		Machine *struct {
+			Kubelet *struct {
+				ExtraArgs map[string]string `yaml:"extraArgs"`
+			} `yaml:"kubelet"`
+		} `yaml:"machine"`
+	}
+
+	if err := yaml.Unmarshal(decodedData, &cfg); err != nil {
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure creating config struct: %s", err)}
+	}
+
+	label := fmt.Sprintf("metal.sidero.dev/uuid=%s", serverName)
+
+	patch := map[string]any{
+		"machine": map[string]any{
+			"kubelet": map[string]any{
+				"extraArgs": map[string]*string{
+					"node-labels": &label,
+				},
+			},
+		},
+	}
+
+	switch cfg.Version {
+	case "v1alpha1":
+		switch {
+		case cfg.Machine == nil:
+		case cfg.Machine.Kubelet == nil:
+		case cfg.Machine.Kubelet.ExtraArgs == nil:
+		default:
+			kubeletExtraArgs := cfg.Machine.Kubelet.ExtraArgs
+			if _, ok := kubeletExtraArgs["node-labels"]; ok {
+				label = kubeletExtraArgs["node-labels"] + "," + label
+			}
+		}
+
+		patchMarshaled, err := yaml.Marshal(patch)
+		if err != nil {
+			return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure marshaling kubelet.extraArgs: %s", err)}
+		}
+
+		return patchConfig(decodedData, patchMarshaled)
 	default:
 		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unknown config type")}
 	}

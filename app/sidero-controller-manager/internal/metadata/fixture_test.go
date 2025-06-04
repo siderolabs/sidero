@@ -206,7 +206,6 @@ func fixture4() []client.Object {
 	return fixtureSimple("4444-5555-6666", 4, `
 version: v1alpha1
 machine:
-  unsupported: {} # this is not supported by Talos, but should be passed through
 `)
 }
 
@@ -273,7 +272,15 @@ func fixture6() []client.Object {
 				Name: "6666-7777-8888",
 			},
 			Spec: metalv1.ServerSpec{
-				StrategicPatches: []string{newConfigPatch},
+				StrategicPatches: []string{
+					newConfigPatch,
+					`
+apiVersion: v1alpha1
+kind: ExtensionServiceConfig
+name: frr
+environment:
+- TESTKEY=TESTVALUE`,
+				},
 			},
 		},
 		&corev1.Secret{

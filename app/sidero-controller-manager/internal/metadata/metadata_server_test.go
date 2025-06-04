@@ -92,7 +92,7 @@ func TestMetadataService(t *testing.T) {
 			path: "/configdata?uuid=4444-5555-6666",
 
 			expectedCode: http.StatusOK,
-			expectedBody: "machine:\n  kubelet:\n    extraArgs:\n      node-labels: metal.sidero.dev/uuid=4444-5555-6666\n  unsupported: {}\nversion: v1alpha1\n",
+			expectedBody: "machine:\n  kubelet:\n    extraArgs:\n      node-labels: metal.sidero.dev/uuid=4444-5555-6666\nversion: v1alpha1\n",
 		},
 		{
 			name: "machine config without machine",
@@ -106,7 +106,7 @@ func TestMetadataService(t *testing.T) {
 			path: "/configdata?uuid=6666-7777-8888",
 
 			expectedCode: http.StatusOK,
-			expectedBody: "cluster: null\nmachine:\n  certSANs: []\n  kubelet:\n    extraArgs:\n      node-labels: foo=bar,metal.sidero.dev/uuid=6666-7777-8888\n  network:\n    hostname: example6\n  token: \"\"\n  type: \"\"\nversion: v1alpha1\n",
+			expectedBody: "version: v1alpha1\nmachine:\n    type: \"\"\n    token: \"\"\n    certSANs: []\n    kubelet:\n        extraArgs:\n            node-labels: foo=bar,metal.sidero.dev/uuid=6666-7777-8888\n    network:\n        hostname: example6\ncluster: null\n---\napiVersion: v1alpha1\nkind: ExtensionServiceConfig\nname: frr\nenvironment:\n    - TESTKEY=TESTVALUE\n",
 		},
 	} {
 		test := test
