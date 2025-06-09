@@ -329,8 +329,8 @@ github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.6.8 h1:m6tOF+IEF5D
 github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.6.8/go.mod h1:uGpjAcOggqsEE9mU7D9ldV+XPBDXfswUUqIGSOP0SpA=
 github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.9 h1:/usLDpKIu18q0652pcE6Xbkh3uCLSZ23ZkBCrqv69yM=
 github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.9/go.mod h1:cmGdzfuiCtNPP2QcWKHawR/3WzE/A+A1yQ7NtBtqBCs=
-github.com/siderolabs/crypto v0.5.1 h1:aZEUTZBoP8rH+0TqQAlUgazriPh89MrXf4R+th+m6ps=
-github.com/siderolabs/crypto v0.5.1/go.mod h1:7RHC7eUKBx6RLS2lDaNXrQ83zY9iPH/aQSTxk1I4/j4=
+github.com/siderolabs/crypto v0.6.0 h1:s33hNOneGhlxCI3fLKj2hgopeJkeRO7UYo3KL0HNVu4=
+github.com/siderolabs/crypto v0.6.0/go.mod h1:7RHC7eUKBx6RLS2lDaNXrQ83zY9iPH/aQSTxk1I4/j4=
 github.com/siderolabs/gen v0.8.0 h1:Pj93+hexkk5hQ7izjJ6YXnEWc8vlzOmDwFz13/VzS7o=
 github.com/siderolabs/gen v0.8.0/go.mod h1:an3a2Y53O7kUjnnK8Bfu3gewtvnIOu5RTU6HalFtXQQ=
 github.com/siderolabs/go-api-signature v0.3.6 h1:wDIsXbpl7Oa/FXvxB6uz4VL9INA9fmr3EbmjEZYFJrU=
@@ -359,8 +359,8 @@ github.com/siderolabs/protoenc v0.2.2 h1:vVQDrTjV+QSOiroWTca6h2Sn5XWYk7VSUPav5J0
 github.com/siderolabs/protoenc v0.2.2/go.mod h1:gtkHkjSCFEceXUHUzKDpnuvXu1mab9D3pVxTnQN+z+o=
 github.com/siderolabs/talos v1.10.0 h1:aOq1xI65lZEl7/Xy43cfMwcxkTPBOZ3xaDz/ulYrRbw=
 github.com/siderolabs/talos v1.10.0/go.mod h1:l15CwRpZYzU2Z0zWbxzATTzO2A5Me2Vdzf5obIJ3iU8=
-github.com/siderolabs/talos/pkg/machinery v1.10.0 h1:XMwL9OBULHfGWcwMwPS9BhxPD1r/lcySbZspDLcX064=
-github.com/siderolabs/talos/pkg/machinery v1.10.0/go.mod h1:MVJs1hsKm7N2GkQVeByjoDoLJmU/VhQO0cLJRZPxlZk=
+github.com/siderolabs/talos/pkg/machinery v1.10.3 h1:otoAMrxvQBdkdQDPREJH+pa6bebuA7HK3Vb0qgpeIgA=
+github.com/siderolabs/talos/pkg/machinery v1.10.3/go.mod h1:gNv/CPK+2tRIhQvmd7h2bgoYGxzoHHWbaejXpNyZvDo=
 github.com/siderolabs/tcpproxy v0.1.0 h1:IbkS9vRhjMOscc1US3M5P1RnsGKFgB6U5IzUk+4WkKA=
 github.com/siderolabs/tcpproxy v0.1.0/go.mod h1:onn6CPPj/w1UNqQ0U97oRPF0CqbrgEApYCw4P9IiCW8=
 github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
