@@ -1,3 +1,30 @@
+## [Sidero 0.6.10](https://github.com/talos-systems/sidero/releases/tag/v0.6.10) (2025-06-11)
+
+Welcome to the v0.6.10 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>1 commit</summary>
+<p>
+
+* [`0dcfd1b`](https://github.com/talos-systems/sidero/commit/0dcfd1b57a35d46bf0f172bb126424114536f4ec) fix: multi doc machine config generation
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.6.9](https://github.com/talos-systems/sidero/releases/tag/v0.6.9)
+
 ## [Sidero 0.6.9](https://github.com/talos-systems/sidero/releases/tag/v0.6.9) (2025-05-02)
 
 Welcome to the v0.6.9 release of Sidero!
