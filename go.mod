@@ -8,7 +8,7 @@ replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.
 replace github.com/google/cel-go => github.com/google/cel-go v0.22.0
 
 require (
-	github.com/go-logr/logr v1.4.2
+	github.com/go-logr/logr v1.4.3
 	github.com/google/go-cmp v0.7.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hashicorp/go-multierror v1.1.1
