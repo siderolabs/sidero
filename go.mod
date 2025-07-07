@@ -28,7 +28,7 @@ require (
 	github.com/siderolabs/go-smbios v0.3.3
 	github.com/siderolabs/grpc-proxy v0.5.1
 	github.com/siderolabs/siderolink v0.3.14
-	github.com/siderolabs/talos/pkg/machinery v1.10.0
+	github.com/siderolabs/talos/pkg/machinery v1.10.5
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
@@ -112,7 +112,7 @@ require (
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.5 // indirect
-	github.com/siderolabs/crypto v0.5.1 // indirect
+	github.com/siderolabs/crypto v0.6.0 // indirect
 	github.com/siderolabs/net v0.4.0 // indirect
 	github.com/siderolabs/protoenc v0.2.2 // indirect
 	github.com/spf13/cobra v1.9.1 // indirect
