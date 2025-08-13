@@ -1,8 +1,7 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED, PLEASE DO NOT EDIT.
 #
-# Generated on 2025-05-02T10:35:05Z by kres 6cbcbd1.
+# Generated on 2025-08-13T16:47:00Z by kres 9f63e23.
 
-name: default
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -17,6 +16,7 @@ concurrency:
     branches:
       - main
       - release-*
+name: default
 jobs:
   default:
     permissions:
@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: gather-system-info
         id: system-info
-        uses: kenchan0130/actions-system-info@v1.3.0
+        uses: kenchan0130/actions-system-info@v1.3.1
         continue-on-error: true
       - name: print-system-info
         run: |
@@ -108,7 +108,7 @@ jobs:
     steps:
       - name: gather-system-info
         id: system-info
-        uses: kenchan0130/actions-system-info@v1.3.0
+        uses: kenchan0130/actions-system-info@v1.3.1
         continue-on-error: true
       - name: print-system-info
         run: |
@@ -159,6 +159,7 @@ jobs:
     permissions:
       actions: read
       contents: write
+      id-token: write
       issues: read
       packages: write
       pull-requests: read
@@ -169,7 +170,7 @@ jobs:
     steps:
       - name: gather-system-info
         id: system-info
-        uses: kenchan0130/actions-system-info@v1.3.0
+        uses: kenchan0130/actions-system-info@v1.3.1
         continue-on-error: true
       - name: print-system-info
         run: |
