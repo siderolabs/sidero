@@ -37,7 +37,7 @@ require (
 	github.com/siderolabs/net v0.4.0
 	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
 	github.com/siderolabs/talos v1.11.0-beta.2
-	github.com/siderolabs/talos/pkg/machinery v1.11.0-beta.2
+	github.com/siderolabs/talos/pkg/machinery v1.11.0-rc.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
@@ -165,7 +165,7 @@ require (
 	github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.6.10-0.20250811162926-710fae2a8bc0 // indirect
 	github.com/siderolabs/crypto v0.6.3 // indirect
 	github.com/siderolabs/gen v0.8.5 // indirect
-	github.com/siderolabs/go-api-signature v0.3.6 // indirect
+	github.com/siderolabs/go-api-signature v0.3.7 // indirect
 	github.com/siderolabs/go-blockdevice/v2 v2.0.19 // indirect
 	github.com/siderolabs/go-cmd v0.1.3 // indirect
 	github.com/siderolabs/go-kubernetes v0.2.25 // indirect
