@@ -5,22 +5,22 @@ go 1.24.5
 replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67
 
 // compatibility with kube-apiserver v0.32.3, should be dropped once kube-apiserver dependency is updated
-replace github.com/google/cel-go => github.com/google/cel-go v0.22.0
+replace github.com/google/cel-go => github.com/google/cel-go v0.26.0
 
 require (
 	github.com/go-logr/logr v1.4.3
 	github.com/google/go-cmp v0.7.0
-	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.2
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/insomniacslk/dhcp v0.0.0-20250417080101-5f8cf70e8c5f
-	github.com/jsimonetti/rtnetlink v1.4.2
-	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
-	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
+	github.com/jsimonetti/rtnetlink/v2 v2.0.5
+	github.com/pensando/goipmi eb122d901c23
+	github.com/pin/tftp f723ab0c80ed
 	github.com/pkg/errors v0.9.1
 	github.com/siderolabs/gen v0.8.5
-	github.com/siderolabs/go-blockdevice v0.4.8
+	github.com/siderolabs/go-blockdevice/v2 v2.0.19
 	github.com/siderolabs/go-cmd v0.1.3
-	github.com/siderolabs/go-debug v0.5.0
+	github.com/siderolabs/go-debug v0.6.0
 	github.com/siderolabs/go-kmsg v0.1.4
 	github.com/siderolabs/go-pointer v1.0.1
 	github.com/siderolabs/go-procfs v0.1.2
@@ -28,25 +28,25 @@ require (
 	github.com/siderolabs/go-smbios v0.3.3
 	github.com/siderolabs/grpc-proxy v0.5.1
 	github.com/siderolabs/siderolink v0.3.15
-	github.com/siderolabs/talos/pkg/machinery v1.11.0-beta.2
+	github.com/siderolabs/talos/pkg/machinery v1.11.0-rc.0
 	github.com/spf13/pflag v1.0.7
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/net v0.43.0
 	golang.org/x/sync v0.16.0
 	golang.org/x/sys v0.35.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20241231184526-a9ab2273dd10
-	google.golang.org/grpc v1.74.2
-	google.golang.org/protobuf v1.36.7
+	google.golang.org/grpc v1.75.0
+	google.golang.org/protobuf v1.36.8
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.32.3
-	k8s.io/apiextensions-apiserver v0.32.3
-	k8s.io/apimachinery v0.32.3
-	k8s.io/client-go v0.32.3
-	k8s.io/component-base v0.32.3
+	k8s.io/api v0.33.4
+	k8s.io/apiextensions-apiserver v0.33.4
+	k8s.io/apimachinery v0.33.4
+	k8s.io/client-go v0.33.4
+	k8s.io/component-base v0.33.4
 	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/cluster-api v1.10.4
-	sigs.k8s.io/controller-runtime v0.20.4
+	sigs.k8s.io/cluster-api v1.11.0
+	sigs.k8s.io/controller-runtime v0.21.0
 )
 
 require (
