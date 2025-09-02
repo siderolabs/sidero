@@ -1,3 +1,46 @@
+## [Sidero 0.6.11](https://github.com/talos-systems/sidero/releases/tag/v0.6.11) (2025-09-02)
+
+Welcome to the v0.6.11 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Talos Linux
+
+Sidero Metal now supports Talos Linux v1.11.x.
+
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>2 commits</summary>
+<p>
+
+* [`55df6d4`](https://github.com/talos-systems/sidero/commit/55df6d441b977d2198f4a0080e3ccc0a517b4e7e) feat: update Talos to v1.11.0
+* [`0939b37`](https://github.com/talos-systems/sidero/commit/0939b37b42fea33eb1d6f235f0107d6f71839d7e) feat: update to Talos v1.11.0-beta.2
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/go-logr/logr**                    v1.4.2 -> v1.4.3
+* **github.com/siderolabs/gen**                  v0.8.0 -> v0.8.5
+* **github.com/siderolabs/siderolink**           v0.3.14 -> v0.3.15
+* **github.com/siderolabs/talos/pkg/machinery**  v1.10.0 -> v1.11.0
+* **github.com/spf13/pflag**                     v1.0.6 -> v1.0.7
+* **golang.org/x/net**                           v0.39.0 -> v0.43.0
+* **golang.org/x/sync**                          v0.13.0 -> v0.16.0
+* **golang.org/x/sys**                           v0.32.0 -> v0.35.0
+* **google.golang.org/grpc**                     v1.72.0 -> v1.74.2
+* **google.golang.org/protobuf**                 v1.36.6 -> v1.36.7
+* **sigs.k8s.io/cluster-api**                    v1.10.1 -> v1.10.4
+
+Previous release can be found at [v0.6.10](https://github.com/talos-systems/sidero/releases/tag/v0.6.10)
+
 ## [Sidero 0.6.10](https://github.com/talos-systems/sidero/releases/tag/v0.6.10) (2025-06-11)
 
 Welcome to the v0.6.10 release of Sidero!
