@@ -28,7 +28,7 @@ replace (
 )
 
 require (
-	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.11-0.20250813101532-702501b5c3f3
+	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.11
 	github.com/siderolabs/go-debug v0.5.0
 	github.com/siderolabs/go-loadbalancer v0.4.0
 	github.com/siderolabs/go-pointer v1.0.1
@@ -36,17 +36,17 @@ require (
 	github.com/siderolabs/go-retry v0.3.3
 	github.com/siderolabs/net v0.4.0
 	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
-	github.com/siderolabs/talos v1.11.0-beta.2
-	github.com/siderolabs/talos/pkg/machinery v1.11.0-beta.2
+	github.com/siderolabs/talos v1.11.0
+	github.com/siderolabs/talos/pkg/machinery v1.11.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.74.2
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.34.0-rc.1
-	k8s.io/apiextensions-apiserver v0.34.0-rc.1
-	k8s.io/apimachinery v0.34.0-rc.1
-	k8s.io/client-go v0.34.0-rc.1
+	k8s.io/api v0.34.0
+	k8s.io/apiextensions-apiserver v0.34.0
+	k8s.io/apimachinery v0.34.0
+	k8s.io/client-go v0.34.0
 	sigs.k8s.io/cluster-api v1.10.4
 	sigs.k8s.io/controller-runtime v0.20.4
 )
@@ -162,13 +162,13 @@ require (
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.5 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
-	github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.6.10-0.20250811162926-710fae2a8bc0 // indirect
+	github.com/siderolabs/cluster-api-bootstrap-provider-talos v0.6.10 // indirect
 	github.com/siderolabs/crypto v0.6.3 // indirect
 	github.com/siderolabs/gen v0.8.5 // indirect
-	github.com/siderolabs/go-api-signature v0.3.6 // indirect
+	github.com/siderolabs/go-api-signature v0.3.7 // indirect
 	github.com/siderolabs/go-blockdevice/v2 v2.0.19 // indirect
 	github.com/siderolabs/go-cmd v0.1.3 // indirect
-	github.com/siderolabs/go-kubernetes v0.2.25 // indirect
+	github.com/siderolabs/go-kubernetes v0.2.26 // indirect
 	github.com/siderolabs/go-talos-support v0.1.2 // indirect
 	github.com/siderolabs/protoenc v0.2.2 // indirect
 	github.com/siderolabs/tcpproxy v0.1.0 // indirect
@@ -180,7 +180,7 @@ require (
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/u-root/uio v0.0.0-20240224005618-d2acac8f3701 // indirect
-	github.com/ulikunitz/xz v0.5.12 // indirect
+	github.com/ulikunitz/xz v0.5.15 // indirect
 	github.com/valyala/fastjson v1.6.4 // indirect
 	github.com/vbatts/tar-split v0.12.1 // indirect
 	github.com/vishvananda/netlink v1.3.1-0.20250303224720-0e7078ed04c8 // indirect
@@ -212,9 +212,9 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/apiserver v0.34.0-rc.1 // indirect
+	k8s.io/apiserver v0.34.0 // indirect
 	k8s.io/cluster-bootstrap v0.32.3 // indirect
-	k8s.io/component-base v0.34.0-rc.1 // indirect
+	k8s.io/component-base v0.34.0 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250710124328-f3f2b991d03b // indirect
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397 // indirect

@@ -7,6 +7,7 @@ package dhcp
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"strconv"
 
@@ -19,8 +20,22 @@ import (
 
 // ServeDHCP starts the DHCP proxy server.
 func ServeDHCP(logger logr.Logger, apiEndpoint string, apiPort int) error {
+	serverIPs, err := net.LookupIP(apiEndpoint)
+	if err != nil {
+		return err
+	}
+
+	if len(serverIPs) == 0 {
+		return fmt.Errorf("no IPs found for %s", apiEndpoint)
+	}
+
+	iface, err := findMatchingInterface(serverIPs[0])
+	if err != nil {
+		return err
+	}
+
 	server, err := server4.NewServer(
-		"",
+		iface,
 		nil,
 		handlePacket(logger, apiEndpoint, apiPort),
 	)
@@ -31,6 +46,37 @@ func ServeDHCP(logger logr.Logger, apiEndpoint string, apiPort int) error {
 	}
 
 	return server.Serve()
+}
+
+func findMatchingInterface(targetIP net.IP) (string, error) {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return "", fmt.Errorf("failed to get network interfaces: %w", err)
+	}
+
+	for _, iface := range interfaces {
+		addrs, addrsErr := iface.Addrs()
+		if addrsErr != nil {
+			log.Printf("failed to list addresses for interface %s: %v", iface.Name, addrsErr)
+		}
+
+		for _, addr := range addrs {
+			// Extract IP from address
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+
+			if ip != nil && ip.Equal(targetIP) {
+				return iface.Name, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("no interface found for: %s", targetIP)
 }
 
 func handlePacket(logger logr.Logger, apiEndpoint string, apiPort int) func(conn net.PacketConn, peer net.Addr, m *dhcpv4.DHCPv4) {
