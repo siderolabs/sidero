@@ -4,51 +4,51 @@ go 1.24.5
 
 replace (
 	// compatibility with kube-apiserver v0.32.3, should be dropped once kube-apiserver dependency is updated
-	github.com/google/cel-go => github.com/google/cel-go v0.22.0
-	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.9
+	github.com/google/cel-go => github.com/google/cel-go v0.26.1
+	github.com/google/gnostic-models => github.com/google/gnostic-models v0.7.0
 
 	// local replace
 	github.com/siderolabs/sidero => ../
 
 	// See https://github.com/talos-systems/go-loadbalancer/pull/4
 	// `go get github.com/smira/tcpproxy@combined-fixes`, then copy pseudo-version there
-	inet.af/tcpproxy => github.com/smira/tcpproxy v0.0.0-20201015133617-de5f7797b95b
+	inet.af/tcpproxy => github.com/smira/tcpproxy b6bb9b5b8252
 
-	k8s.io/api => k8s.io/api v0.32.3
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.32.3
-	k8s.io/apimachinery => k8s.io/apimachinery v0.32.3
-	k8s.io/apiserver => k8s.io/apiserver v0.32.3
-	k8s.io/client-go => k8s.io/client-go v0.32.3
-	k8s.io/component-base => k8s.io/component-base v0.32.3
-	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20250318190949-c8a335a9a2ff
-	k8s.io/utils => k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738
-	sigs.k8s.io/apiserver-network-proxy/konnectivity-client => sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.0
-	sigs.k8s.io/yaml => sigs.k8s.io/yaml v1.4.0
+	k8s.io/api => k8s.io/api v0.34.0
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.34.0
+	k8s.io/apimachinery => k8s.io/apimachinery v0.34.0
+	k8s.io/apiserver => k8s.io/apiserver v0.34.0
+	k8s.io/client-go => k8s.io/client-go v0.34.0
+	k8s.io/component-base => k8s.io/component-base v0.34.0
+	k8s.io/kube-openapi => k8s.io/kube-openapi 66792eed8611
+	k8s.io/utils => k8s.io/utils 0af2bda4dd1d
+	sigs.k8s.io/apiserver-network-proxy/konnectivity-client => sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.33.0
+	sigs.k8s.io/yaml => sigs.k8s.io/yaml v1.6.0
 	sigs.k8s.json => sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3
 )
 
 require (
 	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.11
-	github.com/siderolabs/go-debug v0.5.0
-	github.com/siderolabs/go-loadbalancer v0.4.0
+	github.com/siderolabs/go-debug v0.6.0
+	github.com/siderolabs/go-loadbalancer v0.5.0
 	github.com/siderolabs/go-pointer v1.0.1
 	github.com/siderolabs/go-procfs v0.1.2
 	github.com/siderolabs/go-retry v0.3.3
 	github.com/siderolabs/net v0.4.0
-	github.com/siderolabs/sidero v0.0.0-00010101000000-000000000000
+	github.com/siderolabs/sidero v0.6.11
 	github.com/siderolabs/talos v1.11.0
 	github.com/siderolabs/talos/pkg/machinery v1.11.0
-	github.com/spf13/cobra v1.9.1
-	github.com/stretchr/testify v1.10.0
+	github.com/spf13/cobra v1.10.1
+	github.com/stretchr/testify v1.11.1
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.74.2
+	google.golang.org/grpc v1.75.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.34.0
 	k8s.io/apiextensions-apiserver v0.34.0
 	k8s.io/apimachinery v0.34.0
 	k8s.io/client-go v0.34.0
-	sigs.k8s.io/cluster-api v1.10.4
-	sigs.k8s.io/controller-runtime v0.20.4
+	sigs.k8s.io/cluster-api v1.11.1
+	sigs.k8s.io/controller-runtime v0.22.0
 )
 
 require (
