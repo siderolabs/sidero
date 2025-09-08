@@ -29,7 +29,7 @@ require (
 	github.com/siderolabs/grpc-proxy v0.5.1
 	github.com/siderolabs/siderolink v0.3.15
 	github.com/siderolabs/talos/pkg/machinery v1.11.0
-	github.com/spf13/pflag v1.0.7
+	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/net v0.43.0
