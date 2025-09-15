@@ -30,7 +30,7 @@ replace (
 require (
 	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.11
 	github.com/siderolabs/go-debug v0.5.0
-	github.com/siderolabs/go-loadbalancer v0.4.0
+	github.com/siderolabs/go-loadbalancer v0.5.0
 	github.com/siderolabs/go-pointer v1.0.1
 	github.com/siderolabs/go-procfs v0.1.2
 	github.com/siderolabs/go-retry v0.3.3
