@@ -1,6 +1,6 @@
 module github.com/siderolabs/sidero
 
-go 1.24.5
+go 1.25.0
 
 replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67
 
@@ -20,7 +20,7 @@ require (
 	github.com/siderolabs/gen v0.8.5
 	github.com/siderolabs/go-blockdevice v0.4.8
 	github.com/siderolabs/go-cmd v0.1.3
-	github.com/siderolabs/go-debug v0.5.0
+	github.com/siderolabs/go-debug v0.6.0
 	github.com/siderolabs/go-kmsg v0.1.4
 	github.com/siderolabs/go-pointer v1.0.1
 	github.com/siderolabs/go-procfs v0.1.2
