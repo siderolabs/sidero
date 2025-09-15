@@ -1,6 +1,6 @@
 module github.com/siderolabs/sidero/sfyra
 
-go 1.24.5
+go 1.25.0
 
 replace (
 	// compatibility with kube-apiserver v0.32.3, should be dropped once kube-apiserver dependency is updated
@@ -29,7 +29,7 @@ replace (
 
 require (
 	github.com/siderolabs/cluster-api-control-plane-provider-talos v0.5.11
-	github.com/siderolabs/go-debug v0.5.0
+	github.com/siderolabs/go-debug v0.6.0
 	github.com/siderolabs/go-loadbalancer v0.4.0
 	github.com/siderolabs/go-pointer v1.0.1
 	github.com/siderolabs/go-procfs v0.1.2
