@@ -10,9 +10,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
+	"net/url"
+	"strconv"
 
 	"github.com/siderolabs/talos/pkg/machinery/config/configpatcher"
+	"github.com/siderolabs/talos/pkg/machinery/config/container"
+	"github.com/siderolabs/talos/pkg/machinery/config/encoder"
+	"github.com/siderolabs/talos/pkg/machinery/config/types/meta"
+	runtimetypes "github.com/siderolabs/talos/pkg/machinery/config/types/runtime"
+	siderolinktypes "github.com/siderolabs/talos/pkg/machinery/config/types/siderolink"
 	"gopkg.in/yaml.v3"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -489,25 +497,9 @@ func (m *metadataConfigs) findMetalMachineServerBinding(ctx context.Context, ser
 func (m *metadataConfigs) patchSideroLinkConfig(decodedData []byte) ([]byte, errorWithCode) {
 	var ewc errorWithCode
 
-	var cfg struct {
-		Version string `yaml:"version"`
-	}
+	sideroLinkPatch := siderolinktypes.NewConfigV1Alpha1()
 
-	if err := yaml.Unmarshal(decodedData, &cfg); err != nil {
-		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure decoding config struct: %s", err)}
-	}
-
-	if cfg.Version != "v1alpha1" {
-		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unknown config type")}
-	}
-
-	sideroLinkPatch := map[string]string{
-		"apiVersion": "v1alpha1",
-		"kind":       "SideroLinkConfig",
-		"apiUrl":     fmt.Sprintf("%s:%d", m.apiEndpoint, m.apiPort),
-	}
-
-	sideroLinkPatchB, err := yaml.Marshal(sideroLinkPatch)
+	apiUrl, err := url.Parse(fmt.Sprintf("grpc://%s", net.JoinHostPort(m.apiEndpoint, strconv.Itoa(m.apiPort))))
 	if err != nil {
 		return decodedData, errorWithCode{
 			errorCode: http.StatusInternalServerError,
@@ -515,18 +507,23 @@ func (m *metadataConfigs) patchSideroLinkConfig(decodedData []byte) ([]byte, err
 		}
 	}
 
-	decodedData, ewc = patchConfig(decodedData, sideroLinkPatchB)
-	if ewc.errorObj != nil {
-		return decodedData, ewc
+	apiMetaURL := meta.URL{
+		URL: apiUrl,
 	}
+	sideroLinkPatch.APIUrlConfig = apiMetaURL
 
-	eventsSinkPatch := map[string]string{
-		"apiVersion": "v1alpha1",
-		"kind":       "EventSinkConfig",
-		"endpoint":   fmt.Sprintf("[%s]:%d", siderolink.Cfg.ServerAddress.Addr(), siderolink.EventsSinkPort),
+	eventsSinkPatch := runtimetypes.NewEventSinkV1Alpha1()
+	eventsSinkPatch.Endpoint = net.JoinHostPort(siderolink.Cfg.ServerAddress.Addr().String(), strconv.Itoa(siderolink.EventsSinkPort))
+
+	kmsgLogPatch := runtimetypes.NewKmsgLogV1Alpha1()
+	kmsgLogURL, _ := url.Parse(fmt.Sprintf("tcp://%s", net.JoinHostPort(siderolink.Cfg.ServerAddress.Addr().String(), strconv.Itoa(siderolink.LogReceiverPort))))
+	kmsgLogMetaURL := meta.URL{
+		URL: kmsgLogURL,
 	}
+	kmsgLogPatch.KmsgLogURL = kmsgLogMetaURL
+	kmsgLogPatch.MetaName = "remote-log"
 
-	eventsSinkPatchB, err := yaml.Marshal(eventsSinkPatch)
+	ctr, err := container.New(sideroLinkPatch, eventsSinkPatch, kmsgLogPatch)
 	if err != nil {
 		return decodedData, errorWithCode{
 			errorCode: http.StatusInternalServerError,
@@ -534,19 +531,7 @@ func (m *metadataConfigs) patchSideroLinkConfig(decodedData []byte) ([]byte, err
 		}
 	}
 
-	decodedData, ewc = patchConfig(decodedData, eventsSinkPatchB)
-	if ewc.errorObj != nil {
-		return decodedData, ewc
-	}
-
-	kmsLogPatch := map[string]string{
-		"apiVersion": "v1alpha1",
-		"kind":       "KmsgLogConfig",
-		"name":       "remote-log",
-		"url":        fmt.Sprintf("tcp://[%s]:%d", siderolink.Cfg.ServerAddress.Addr(), siderolink.LogReceiverPort),
-	}
-
-	kmsLogPatchB, err := yaml.Marshal(kmsLogPatch)
+	_, err = ctr.Validate(validationMode{})
 	if err != nil {
 		return decodedData, errorWithCode{
 			errorCode: http.StatusInternalServerError,
@@ -554,7 +539,15 @@ func (m *metadataConfigs) patchSideroLinkConfig(decodedData []byte) ([]byte, err
 		}
 	}
 
-	decodedData, ewc = patchConfig(decodedData, kmsLogPatchB)
+	patchData, err := ctr.EncodeBytes(encoder.WithComments(encoder.CommentsDisabled))
+	if err != nil {
+		return decodedData, errorWithCode{
+			errorCode: http.StatusInternalServerError,
+			errorObj:  err,
+		}
+	}
+
+	decodedData, ewc = patchConfig(decodedData, patchData)
 	if ewc.errorObj != nil {
 		return decodedData, ewc
 	}
@@ -584,4 +577,18 @@ func (m *metadataConfigs) fetchBootstrapSecret(ctx context.Context, secretNSN ty
 	}
 
 	return bootstrapSecretData.Data["value"], errorWithCode{}
+}
+
+type validationMode struct{}
+
+func (validationMode) String() string {
+	return "metadata-server"
+}
+
+func (validationMode) RequiresInstall() bool {
+	return true
+}
+
+func (validationMode) InContainer() bool {
+	return false
 }

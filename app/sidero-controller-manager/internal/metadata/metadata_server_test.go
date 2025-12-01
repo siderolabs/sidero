@@ -31,18 +31,18 @@ var sideroLinkCfgs = []map[string]any{
 	{
 		"apiVersion": "v1alpha1",
 		"kind":       "SideroLinkConfig",
-		"apiUrl":     "https://192.168.1.1:8081",
+		"apiUrl":     "grpc://192.168.1.1:8081",
 	},
 	{
 		"apiVersion": "v1alpha1",
 		"kind":       "EventSinkConfig",
-		"endpoint":   "[192.168.1.1]:4002",
+		"endpoint":   "192.168.1.1:4002",
 	},
 	{
 		"apiVersion": "v1alpha1",
 		"kind":       "KmsgLogConfig",
 		"name":       "remote-log",
-		"url":        "tcp://[192.168.1.1]:4001",
+		"url":        "tcp://192.168.1.1:4001",
 	},
 }
 
@@ -82,7 +82,7 @@ func TestMetadataService(t *testing.T) {
 
 	mux := http.NewServeMux()
 
-	metadata.RegisterServer(mux, fakeClient, "https://192.168.1.1", 8081)
+	metadata.RegisterServer(mux, fakeClient, "192.168.1.1", 8081)
 
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)

@@ -556,12 +556,8 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 			EnvironmentRef: &v1.ObjectReference{
 				Name: environmentName,
 			},
-			ConfigPatches: []metalv1.ConfigPatches{
-				{
-					Op:    "add",
-					Path:  "/fake",
-					Value: apiextensions.JSON{Raw: []byte("\":|\"")},
-				},
+			StrategicPatches: []string{
+				`{"machine": {"nodeLabels": {"/1": "2"}}}`,
 			},
 		}
 
@@ -609,7 +605,7 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 		patchHelper, err := patch.NewHelper(&serverClass, metalClient)
 		require.NoError(t, err)
 
-		serverClass.Spec.ConfigPatches = nil
+		serverClass.Spec.StrategicPatches = nil
 
 		err = patchHelper.Patch(ctx, &serverClass)
 		require.NoError(t, err)

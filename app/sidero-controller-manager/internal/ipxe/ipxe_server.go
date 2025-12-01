@@ -505,22 +505,22 @@ outer:
 		case talosConfigPrefix:
 			// patch environment with the link to the metadata server
 			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
-				fmt.Sprintf("%s=http://%s:%d/configdata?uuid=", talosconstants.KernelParamConfig, apiEndpoint, apiPort),
+				fmt.Sprintf("%s=http://%s/configdata?uuid=", talosconstants.KernelParamConfig, net.JoinHostPort(apiEndpoint, strconv.Itoa(apiPort))),
 			)
 		case sideroLinkPrefix:
 			// patch environment with the SideroLink API
 			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
-				fmt.Sprintf("%s=%s:%d", talosconstants.KernelParamSideroLink, apiEndpoint, apiPort),
+				fmt.Sprintf("%s=%s", talosconstants.KernelParamSideroLink, net.JoinHostPort(apiEndpoint, strconv.Itoa(apiPort))),
 			)
 		case logDeliveryPrefix:
 			// patch environment with the log receiver endpoint
 			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
-				fmt.Sprintf("%s=tcp://[%s]:%d", talosconstants.KernelParamLoggingKernel, siderolink.Cfg.ServerAddress.Addr(), siderolink.LogReceiverPort),
+				fmt.Sprintf("%s=tcp://%s", talosconstants.KernelParamLoggingKernel, net.JoinHostPort(siderolink.Cfg.ServerAddress.Addr().String(), strconv.Itoa(siderolink.LogReceiverPort))),
 			)
 		case eventsSinkPrefix:
 			// patch environment with the events sink endpoint
 			env.Spec.Kernel.Args = append(env.Spec.Kernel.Args,
-				fmt.Sprintf("%s=[%s]:%d", talosconstants.KernelParamEventsSink, siderolink.Cfg.ServerAddress.Addr(), siderolink.EventsSinkPort),
+				fmt.Sprintf("%s=%s", talosconstants.KernelParamEventsSink, net.JoinHostPort(siderolink.Cfg.ServerAddress.Addr().String(), strconv.Itoa(siderolink.EventsSinkPort))),
 			)
 		}
 	}
