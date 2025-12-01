@@ -22,6 +22,7 @@ import (
 
 	infrav1 "github.com/siderolabs/sidero/app/caps-controller-manager/api/v1alpha3"
 	metalv1 "github.com/siderolabs/sidero/app/sidero-controller-manager/api/v1alpha2"
+	"github.com/siderolabs/sidero/app/sidero-controller-manager/internal/siderolink"
 )
 
 type errorWithCode struct {
@@ -30,7 +31,9 @@ type errorWithCode struct {
 }
 
 type metadataConfigs struct {
-	client runtimeclient.Client
+	client      runtimeclient.Client
+	apiEndpoint string
+	apiPort     int
 }
 
 func throwError(w http.ResponseWriter, ewc errorWithCode) {
@@ -38,9 +41,11 @@ func throwError(w http.ResponseWriter, ewc errorWithCode) {
 	log.Println(ewc.errorObj)
 }
 
-func RegisterServer(mux *http.ServeMux, k8sClient runtimeclient.Client) error {
+func RegisterServer(mux *http.ServeMux, k8sClient runtimeclient.Client, apiEndpoint string, apiPort int) error {
 	mm := metadataConfigs{
-		client: k8sClient,
+		client:      k8sClient,
+		apiEndpoint: apiEndpoint,
+		apiPort:     apiPort,
 	}
 
 	mux.HandleFunc("/configdata", mm.FetchConfig)
@@ -219,6 +224,18 @@ func (m *metadataConfigs) FetchConfig(w http.ResponseWriter, r *http.Request) {
 	// Append or add a node label to kubelet extra args.
 	// We must do this so that we can map a given server resource to a k8s node in the workload cluster.
 	decodedData, ewc = labelNodes(decodedData, serverObj.Name)
+	if ewc.errorObj != nil {
+		throwError(
+			w,
+			ewc,
+		)
+
+		return
+	}
+
+	// Patch machine configuration with SideroLink config so it survives reboots
+	// TODO(laurazard): only do this if Talos v1.10+
+	decodedData, ewc = m.patchSideroLinkConfig(decodedData)
 	if ewc.errorObj != nil {
 		throwError(
 			w,
@@ -467,6 +484,82 @@ func (m *metadataConfigs) findMetalMachineServerBinding(ctx context.Context, ser
 	}
 
 	return metalMachine, serverBinding, errorWithCode{}
+}
+
+func (m *metadataConfigs) patchSideroLinkConfig(decodedData []byte) ([]byte, errorWithCode) {
+	var ewc errorWithCode
+
+	var cfg struct {
+		Version string `yaml:"version"`
+	}
+
+	if err := yaml.Unmarshal(decodedData, &cfg); err != nil {
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("failure decoding config struct: %s", err)}
+	}
+
+	if cfg.Version != "v1alpha1" {
+		return nil, errorWithCode{http.StatusInternalServerError, fmt.Errorf("unknown config type")}
+	}
+
+	sideroLinkPatch := map[string]string{
+		"apiVersion": "v1alpha1",
+		"kind":       "SideroLinkConfig",
+		"apiUrl":     fmt.Sprintf("%s:%d", m.apiEndpoint, m.apiPort),
+	}
+
+	sideroLinkPatchB, err := yaml.Marshal(sideroLinkPatch)
+	if err != nil {
+		return decodedData, errorWithCode{
+			errorCode: http.StatusInternalServerError,
+			errorObj:  err,
+		}
+	}
+
+	decodedData, ewc = patchConfig(decodedData, sideroLinkPatchB)
+	if ewc.errorObj != nil {
+		return decodedData, ewc
+	}
+
+	eventsSinkPatch := map[string]string{
+		"apiVersion": "v1alpha1",
+		"kind":       "EventSinkConfig",
+		"endpoint":   fmt.Sprintf("[%s]:%d", siderolink.Cfg.ServerAddress.Addr(), siderolink.EventsSinkPort),
+	}
+
+	eventsSinkPatchB, err := yaml.Marshal(eventsSinkPatch)
+	if err != nil {
+		return decodedData, errorWithCode{
+			errorCode: http.StatusInternalServerError,
+			errorObj:  err,
+		}
+	}
+
+	decodedData, ewc = patchConfig(decodedData, eventsSinkPatchB)
+	if ewc.errorObj != nil {
+		return decodedData, ewc
+	}
+
+	kmsLogPatch := map[string]string{
+		"apiVersion": "v1alpha1",
+		"kind":       "KmsgLogConfig",
+		"name":       "remote-log",
+		"url":        fmt.Sprintf("tcp://[%s]:%d", siderolink.Cfg.ServerAddress.Addr(), siderolink.LogReceiverPort),
+	}
+
+	kmsLogPatchB, err := yaml.Marshal(kmsLogPatch)
+	if err != nil {
+		return decodedData, errorWithCode{
+			errorCode: http.StatusInternalServerError,
+			errorObj:  err,
+		}
+	}
+
+	decodedData, ewc = patchConfig(decodedData, kmsLogPatchB)
+	if ewc.errorObj != nil {
+		return decodedData, ewc
+	}
+
+	return decodedData, errorWithCode{}
 }
 
 // fetchBootstrapSecret is responsible for fetching a secret that contains the bootstrap data created by our bootstrap provider.

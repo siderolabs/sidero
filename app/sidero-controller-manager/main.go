@@ -303,7 +303,7 @@ func main() {
 
 	setupLog.Info("starting metadata server")
 
-	if err := metadata.RegisterServer(httpMux, mgr.GetClient()); err != nil {
+	if err := metadata.RegisterServer(httpMux, mgr.GetClient(), apiEndpoint, apiPort); err != nil {
 		setupLog.Error(err, "unable to start metadata server", "controller", "Environment")
 		os.Exit(1)
 	}
