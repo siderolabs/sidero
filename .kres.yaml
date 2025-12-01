@@ -34,9 +34,7 @@ spec:
     - name: default
       buildxOptions:
         enabled: true
-      runners:
-        - self-hosted
-        - generic
+      runnerGroup: large
       conditions:
         - on-pull-request
       steps:
@@ -57,9 +55,7 @@ spec:
     - name: push
       buildxOptions:
         enabled: true
-      runners:
-        - self-hosted
-        - generic
+      runnerGroup: large
       conditions:
         - except-pull-request
         - not-on-tag
@@ -75,9 +71,7 @@ spec:
     - name: tag
       buildxOptions:
         enabled: true
-      runners:
-        - self-hosted
-        - generic
+      runnerGroup: large
       conditions:
         - only-on-tag
       steps:
