@@ -47,7 +47,7 @@ func IPAddrs() (ips []net.IP, err error) {
 
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
-		return
+		return ips, err
 	}
 
 	for _, a := range addrs {
