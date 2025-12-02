@@ -278,6 +278,7 @@ func main() {
 		go func() {
 			if err := dhcp.ServeDHCP(ctrl.Log.WithName("dhcp-proxy"), apiEndpoint, apiPort); err != nil {
 				setupLog.Error(err, "unable to start proxy DHCP server", "controller", "Environment")
+
 				errCh <- err
 			}
 		}()
@@ -288,6 +289,7 @@ func main() {
 	go func() {
 		if err := tftp.ServeTFTP(); err != nil {
 			setupLog.Error(err, "unable to start TFTP server", "controller", "Environment")
+
 			errCh <- err
 		}
 	}()
@@ -342,6 +344,7 @@ func main() {
 	go func() {
 		if err := mgr.Start(ctx); err != nil {
 			setupLog.Error(err, "problem running manager")
+
 			errCh <- err
 		}
 	}()
@@ -369,6 +372,7 @@ func main() {
 
 		if err := http.ListenAndServe(fmt.Sprintf(":%d", httpPort), h2c.NewHandler(grpcHandler, h2s)); err != nil {
 			setupLog.Error(err, "problem running HTTP server")
+
 			errCh <- err
 		}
 	}()

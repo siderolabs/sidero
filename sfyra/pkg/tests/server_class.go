@@ -49,6 +49,7 @@ func TestServerClassAny(ctx context.Context, metalClient client.Client, capiClus
 		numNodes := len(capiCluster.Nodes())
 
 		var serverClass metalv1.ServerClass
+
 		err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.ServerClassAny}, &serverClass)
 		require.NoError(t, err)
 		assert.Empty(t, serverClass.Spec.Qualifiers)

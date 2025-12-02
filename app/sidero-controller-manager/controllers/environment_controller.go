@@ -106,7 +106,9 @@ func (r *EnvironmentReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			}
 
 			mu.Lock()
+
 			conditions = append(conditions, condition)
+
 			mu.Unlock()
 		}
 

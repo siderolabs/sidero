@@ -55,6 +55,7 @@ func (b *backend) GetConnection(ctx context.Context, _ string) (context.Context,
 	}
 
 	var err error
+
 	b.conn, err = grpc.NewClient(
 		b.target,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),

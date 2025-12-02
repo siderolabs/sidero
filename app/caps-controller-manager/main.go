@@ -233,7 +233,6 @@ func main() {
 
 func setupWebhooks(mgr ctrl.Manager) {
 	var err error
-
 	if err = (&infrav1alpha3.MetalCluster{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "MetalCluster")
 		os.Exit(1)

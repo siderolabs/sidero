@@ -30,6 +30,7 @@ const environmentName = "sfyra"
 func TestEnvironmentDefault(ctx context.Context, metalClient client.Client, cluster talos.Cluster, kernelURL, initrdURL string) TestFunc {
 	return func(t *testing.T) {
 		var environment metalv1.Environment
+
 		err := metalClient.Get(ctx, types.NamespacedName{Name: metalv1.EnvironmentDefault}, &environment)
 		require.NoError(t, err)
 		assert.True(t, environment.IsReady())
