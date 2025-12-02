@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	apiextensions "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
@@ -553,7 +552,7 @@ func TestServerPXEBoot(ctx context.Context, metalClient client.Client, cluster t
 					},
 				},
 			},
-			EnvironmentRef: &v1.ObjectReference{
+			EnvironmentRef: &corev1.ObjectReference{
 				Name: environmentName,
 			},
 			StrategicPatches: []string{

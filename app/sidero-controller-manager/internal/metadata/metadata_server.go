@@ -499,7 +499,7 @@ func (m *metadataConfigs) patchSideroLinkConfig(decodedData []byte) ([]byte, err
 
 	sideroLinkPatch := siderolinktypes.NewConfigV1Alpha1()
 
-	apiUrl, err := url.Parse(fmt.Sprintf("grpc://%s", net.JoinHostPort(m.apiEndpoint, strconv.Itoa(m.apiPort))))
+	apiURL, err := url.Parse(fmt.Sprintf("grpc://%s", net.JoinHostPort(m.apiEndpoint, strconv.Itoa(m.apiPort))))
 	if err != nil {
 		return decodedData, errorWithCode{
 			errorCode: http.StatusInternalServerError,
@@ -508,7 +508,7 @@ func (m *metadataConfigs) patchSideroLinkConfig(decodedData []byte) ([]byte, err
 	}
 
 	apiMetaURL := meta.URL{
-		URL: apiUrl,
+		URL: apiURL,
 	}
 	sideroLinkPatch.APIUrlConfig = apiMetaURL
 
