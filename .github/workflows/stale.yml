@@ -15,7 +15,7 @@ jobs:
       - ubuntu-latest
     steps:
       - name: Close stale issues and PRs
-        uses: actions/stale@5f858e3efba33a5ca4407a664cc011ad407f2008 # version: v10.1.0
+        uses: actions/stale@5611b9defa6b7799a950489b00163db69f7a3ece # version: v10.1.0
         with:
           close-issue-message: This issue was closed because it has been stalled for 7 days with no activity.
           days-before-issue-close: "5"
