@@ -54,13 +54,13 @@ ENV GOCACHE=/.cache/go-build
 ENV GOMODCACHE=/.cache/mod
 SHELL ["/bin/bash", "-c"]
 RUN --mount=type=cache,target=/.cache go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.17.0 \
-  && mv /root/go/bin/controller-gen /usr/bin/controller-gen
+    && mv /root/go/bin/controller-gen /usr/bin/controller-gen
 RUN --mount=type=cache,target=/.cache go install k8s.io/code-generator/cmd/conversion-gen@v0.32.3 \
-  && mv /root/go/bin/conversion-gen /usr/bin/conversion-gen
+    && mv /root/go/bin/conversion-gen /usr/bin/conversion-gen
 RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.1.1 \
-  && mv /root/go/bin/gofumports /usr/bin/gofumports
-RUN --mount=type=cache,target=/.cache go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.62.2 \
-  && mv /root/go/bin/golangci-lint /usr/bin/golangci-lint
+    && mv /root/go/bin/gofumports /usr/bin/gofumports
+RUN --mount=type=cache,target=/.cache go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.5.0 \
+    && mv /root/go/bin/golangci-lint /usr/bin/golangci-lint
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
@@ -73,13 +73,13 @@ RUN --mount=type=cache,target=/.cache go list -mod=readonly all >/dev/null
 
 FROM base AS manifests-build
 RUN --mount=type=cache,target=/.cache controller-gen \
-  crd:crdVersions=v1 paths="./app/caps-controller-manager/api/..." output:crd:dir="./app/caps-controller-manager/config/crd/bases" \
-  rbac:roleName=manager-role paths="./app/caps-controller-manager/controllers/..." output:rbac:dir="./app/caps-controller-manager/config/rbac" \
-  webhook output:webhook:dir="./app/caps-controller-manager/config/webhook"
+    crd:crdVersions=v1 paths="./app/caps-controller-manager/api/..." output:crd:dir="./app/caps-controller-manager/config/crd/bases" \
+    rbac:roleName=manager-role paths="./app/caps-controller-manager/controllers/..." output:rbac:dir="./app/caps-controller-manager/config/rbac" \
+    webhook output:webhook:dir="./app/caps-controller-manager/config/webhook"
 RUN --mount=type=cache,target=/.cache controller-gen \
-  crd:crdVersions=v1 paths="./app/sidero-controller-manager/api/..." output:crd:dir="./app/sidero-controller-manager/config/crd/bases" \
-  rbac:roleName=manager-role paths="./app/sidero-controller-manager/controllers/..." output:rbac:dir="./app/sidero-controller-manager/config/rbac" \
-  webhook output:webhook:dir="./app/sidero-controller-manager/config/webhook"
+    crd:crdVersions=v1 paths="./app/sidero-controller-manager/api/..." output:crd:dir="./app/sidero-controller-manager/config/crd/bases" \
+    rbac:roleName=manager-role paths="./app/sidero-controller-manager/controllers/..." output:rbac:dir="./app/sidero-controller-manager/config/rbac" \
+    webhook output:webhook:dir="./app/sidero-controller-manager/config/webhook"
 
 FROM scratch AS manifests
 COPY --from=manifests-build /src/app/caps-controller-manager/config ./app/caps-controller-manager/config
@@ -87,10 +87,10 @@ COPY --from=manifests-build /src/app/sidero-controller-manager/config ./app/side
 
 FROM base AS generate-build
 COPY ./app/sidero-controller-manager/internal/api/api.proto \
-  /src/app/sidero-controller-manager/internal/api/api.proto
+    /src/app/sidero-controller-manager/internal/api/api.proto
 RUN protoc -I/src/app/sidero-controller-manager/internal/api \
-  --go_out=paths=source_relative:/src/app/sidero-controller-manager/internal/api --go-grpc_out=paths=source_relative:/src/app/sidero-controller-manager/internal/api \
-  api.proto
+    --go_out=paths=source_relative:/src/app/sidero-controller-manager/internal/api --go-grpc_out=paths=source_relative:/src/app/sidero-controller-manager/internal/api \
+    api.proto
 RUN --mount=type=cache,target=/.cache controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
 RUN --mount=type=cache,target=/.cache conversion-gen --output-file=zz_generated.conversion.go --go-header-file="./hack/boilerplate.go.txt" ./app/caps-controller-manager/api/v1alpha2
 RUN --mount=type=cache,target=/.cache conversion-gen --output-file=zz_generated.conversion.go --go-header-file="./hack/boilerplate.go.txt" ./app/sidero-controller-manager/api/v1alpha1
@@ -112,12 +112,12 @@ COPY ./app/sidero-controller-manager/config ./app/sidero-controller-manager/conf
 ARG REGISTRY_AND_USERNAME
 ARG TAG
 RUN cd ./app/caps-controller-manager/config/manager \
-  && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/caps-controller-manager:${TAG}
+    && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/caps-controller-manager:${TAG}
 RUN cd ./app/sidero-controller-manager/config/manager \
-  && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/sidero-controller-manager:${TAG}
+    && kustomize edit set image controller=${REGISTRY_AND_USERNAME}/sidero-controller-manager:${TAG}
 RUN kustomize build config > /infrastructure-components.yaml \
-  && cp ./config/metadata/metadata.yaml /metadata.yaml \
-  && cp ./templates/cluster-template.yaml /cluster-template.yaml
+    && cp ./config/metadata/metadata.yaml /metadata.yaml \
+    && cp ./templates/cluster-template.yaml /cluster-template.yaml
 
 FROM scratch AS release
 ARG TAG
