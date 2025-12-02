@@ -1,0 +1,3 @@
+version: v2
+modules:
+  - path: app/sidero-controller-manager/internal/api

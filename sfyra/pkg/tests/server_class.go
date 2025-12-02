@@ -317,9 +317,9 @@ func TestServerClassPatch(ctx context.Context, metalClient client.Client, cluste
 			t.Error("unable to cast config")
 		}
 
-		require.Len(t, configV1Alpha1.MachineConfig.MachineInstall.InstallExtraKernelArgs, 1)
+		require.Len(t, configV1Alpha1.MachineConfig.MachineInstall.InstallExtraKernelArgs, 1) //nolint: staticcheck
 
-		if configV1Alpha1.MachineConfig.MachineInstall.InstallExtraKernelArgs[0] != "woot" {
+		if configV1Alpha1.MachineConfig.MachineInstall.InstallExtraKernelArgs[0] != "woot" { //nolint: staticcheck
 			t.Error("unable to validate server class patch was applied to kernel args")
 		}
 	}

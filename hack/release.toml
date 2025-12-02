@@ -18,5 +18,5 @@ preface = """\
 [notes.talos]
     title = "Talos Linux"
         description = """\
-Sidero Metal now supports Talos Linux v1.11.x.
+Sidero Metal now supports Talos Linux v1.12.x.
 """

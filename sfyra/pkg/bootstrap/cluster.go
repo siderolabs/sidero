@@ -17,6 +17,7 @@ import (
 	taloscluster "github.com/siderolabs/talos/pkg/cluster"
 	"github.com/siderolabs/talos/pkg/cluster/check"
 	clientconfig "github.com/siderolabs/talos/pkg/machinery/client/config"
+	"github.com/siderolabs/talos/pkg/machinery/config"
 	"github.com/siderolabs/talos/pkg/machinery/config/bundle"
 	"github.com/siderolabs/talos/pkg/machinery/config/generate"
 	"github.com/siderolabs/talos/pkg/machinery/config/machine"
@@ -202,7 +203,7 @@ func (cluster *Cluster) create(ctx context.Context) error {
 
 	defaultInternalLB := cluster.provisioner.GetInClusterKubernetesControlPlaneEndpoint(request.Network, 6443)
 
-	genOptions := cluster.provisioner.GenOptions(request.Network)
+	genOptions, _ := cluster.provisioner.GenOptions(request.Network, config.TalosVersionCurrent)
 
 	for _, registryMirror := range cluster.options.RegistryMirrors {
 		parts := strings.SplitN(registryMirror, "=", 2)

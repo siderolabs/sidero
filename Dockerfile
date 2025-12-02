@@ -61,6 +61,8 @@ RUN --mount=type=cache,target=/.cache go install mvdan.cc/gofumpt/gofumports@v0.
     && mv /root/go/bin/gofumports /usr/bin/gofumports
 RUN --mount=type=cache,target=/.cache go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.5.0 \
     && mv /root/go/bin/golangci-lint /usr/bin/golangci-lint
+RUN --mount=type=cache,target=/.cache go install github.com/bufbuild/buf/cmd/buf@v1.61.0 \
+    && mv /root/go/bin/buf /usr/bin/buf
 WORKDIR /src
 COPY ./go.mod ./
 COPY ./go.sum ./
@@ -88,9 +90,7 @@ COPY --from=manifests-build /src/app/sidero-controller-manager/config ./app/side
 FROM base AS generate-build
 COPY ./app/sidero-controller-manager/internal/api/api.proto \
     /src/app/sidero-controller-manager/internal/api/api.proto
-RUN protoc -I/src/app/sidero-controller-manager/internal/api \
-    --go_out=paths=source_relative:/src/app/sidero-controller-manager/internal/api --go-grpc_out=paths=source_relative:/src/app/sidero-controller-manager/internal/api \
-    api.proto
+RUN buf build
 RUN --mount=type=cache,target=/.cache controller-gen object:headerFile="./hack/boilerplate.go.txt" paths="./..."
 RUN --mount=type=cache,target=/.cache conversion-gen --output-file=zz_generated.conversion.go --go-header-file="./hack/boilerplate.go.txt" ./app/caps-controller-manager/api/v1alpha2
 RUN --mount=type=cache,target=/.cache conversion-gen --output-file=zz_generated.conversion.go --go-header-file="./hack/boilerplate.go.txt" ./app/sidero-controller-manager/api/v1alpha1
