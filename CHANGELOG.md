@@ -1,3 +1,53 @@
+## [Sidero 0.6.12](https://github.com/talos-systems/sidero/releases/tag/v0.6.12) (2025-12-24)
+
+Welcome to the v0.6.12 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Talos Linux
+
+Sidero Metal now supports Talos Linux v1.12.x.
+
+
+### Contributors
+
+* Laura Brehm
+* Andrey Smirnov
+
+### Changes
+<details><summary>9 commits</summary>
+<p>
+
+* [`bf6c2e7`](https://github.com/talos-systems/sidero/commit/bf6c2e7db2fd6ec6187aee2dda3f89de18f58697) feat: update to Talos 1.12.0
+* [`3f1c8dc`](https://github.com/talos-systems/sidero/commit/3f1c8dc81e049675d375aeb7f3c254601c1b4d2e) feat: bump talos to v1.12.0-beta.0
+* [`13de044`](https://github.com/talos-systems/sidero/commit/13de0445c410255fd5ac3392eb4b7eb201b0d256) chore: address `staticcheck` api naming var things
+* [`280a513`](https://github.com/talos-systems/sidero/commit/280a51389a143e9b39e88f33a8fb2e0bfd3e79f3) chore: address `gofumpt` linter issues
+* [`7bcc16b`](https://github.com/talos-systems/sidero/commit/7bcc16b050765dd171e109b9d8a5dee43a66537b) chore: address wsl_v5 linter checks
+* [`ccaba74`](https://github.com/talos-systems/sidero/commit/ccaba7425d3b9c485f1b58489e0e17e7029fd491) chore: migrate .golangci.yml to v2
+* [`caea4b3`](https://github.com/talos-systems/sidero/commit/caea4b3ad1723ece38fde2391ee6188a71fb315f) chore: rekres with latest changes
+* [`0826793`](https://github.com/talos-systems/sidero/commit/08267933be79f8024f3382e505302dcc4b085af9) chore: use typed config resources in metadata server
+* [`d0fbc6f`](https://github.com/talos-systems/sidero/commit/d0fbc6f7d90588adc7a3a5f86d1110ad815637e6) feat: inject SideroLink config documents into machine config for UKI
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/siderolabs/gen**                  v0.8.5 -> v0.8.6
+* **github.com/siderolabs/go-debug**             v0.5.0 -> v0.6.1
+* **github.com/siderolabs/talos/pkg/machinery**  v1.11.0 -> v1.12.0
+* **github.com/stretchr/testify**                v1.10.0 -> v1.11.1
+* **golang.org/x/net**                           v0.43.0 -> v0.47.0
+* **golang.org/x/sync**                          v0.16.0 -> v0.18.0
+* **golang.org/x/sys**                           v0.35.0 -> v0.38.0
+* **google.golang.org/grpc**                     v1.74.2 -> v1.76.0
+* **google.golang.org/protobuf**                 v1.36.7 -> v1.36.10
+* **sigs.k8s.io/cluster-api**                    v1.10.4 -> v1.10.9
+
+Previous release can be found at [v0.6.11](https://github.com/talos-systems/sidero/releases/tag/v0.6.11)
+
 ## [Sidero 0.6.11](https://github.com/talos-systems/sidero/releases/tag/v0.6.11) (2025-09-02)
 
 Welcome to the v0.6.11 release of Sidero!
