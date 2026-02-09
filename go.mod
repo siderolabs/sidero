@@ -31,7 +31,7 @@ require (
 	github.com/siderolabs/talos/pkg/machinery v1.12.0
 	github.com/spf13/pflag v1.0.7
 	github.com/stretchr/testify v1.11.1
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 	golang.org/x/net v0.47.0
 	golang.org/x/sync v0.18.0
 	golang.org/x/sys v0.38.0
