@@ -40,7 +40,7 @@ require (
 	github.com/siderolabs/talos/pkg/machinery v1.12.0
 	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.11.1
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 	google.golang.org/grpc v1.76.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.35.0-alpha.3
