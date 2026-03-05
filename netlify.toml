@@ -5,3 +5,9 @@ publish = "website/public"
 [build.environment]
 HUGO_VERSION = "0.93.2"
 NODE_VERSION = "12.21.0"
+
+[[redirects]]
+  from = "https://sidero.dev/*"
+  to = "https://siderolabs.com/:splat"
+  status = 301
+  force = true
