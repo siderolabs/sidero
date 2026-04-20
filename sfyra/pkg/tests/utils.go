@@ -34,6 +34,8 @@ func (f matchStringOnly) WriteProfileTo(string, io.Writer, int) error { return e
 
 func (f matchStringOnly) ImportPath() string { return "" }
 
+func (f matchStringOnly) ModulePath() string { return "" }
+
 func (f matchStringOnly) StartTestLog(io.Writer) {}
 
 func (f matchStringOnly) StopTestLog() error { return errMain }

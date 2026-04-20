@@ -1,7 +1,0 @@
-[build]
-command = "hugo --source website --gc --minify"
-publish = "website/public"
-
-[build.environment]
-HUGO_VERSION = "0.93.2"
-NODE_VERSION = "12.21.0"
