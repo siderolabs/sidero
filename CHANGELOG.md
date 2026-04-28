@@ -1,3 +1,47 @@
+## [Sidero 0.6.13](https://github.com/talos-systems/sidero/releases/tag/v0.6.13) (2026-04-28)
+
+Welcome to the v0.6.13 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/talos-systems/sidero/issues.
+
+### Talos Linux
+
+Sidero Metal now supports Talos Linux v1.13.x.
+
+
+### Contributors
+
+* Andrey Smirnov
+* Spencer Smith
+
+### Changes
+<details><summary>3 commits</summary>
+<p>
+
+* [`9403167`](https://github.com/talos-systems/sidero/commit/9403167eaba0c2dbcd4091832d428d1cca61593b) feat: update Talos to 1.13.0
+* [`25b235a`](https://github.com/talos-systems/sidero/commit/25b235aa4d97d291b1f8bdd763f28b2f1f35ea23) feat: update Talos to v1.13.0-rc.0
+* [`7157ea7`](https://github.com/talos-systems/sidero/commit/7157ea74abf3ac961b60ee1f0de32050182c8018) chore: bump dependencies crypto and containernetworking plugins
+</p>
+</details>
+
+### Dependency Changes
+
+* **github.com/siderolabs/go-debug**             v0.6.1 -> v0.6.2
+* **github.com/siderolabs/go-kmsg**              v0.1.4 -> v0.1.5
+* **github.com/siderolabs/talos/pkg/machinery**  v1.12.0 -> v1.13.0
+* **github.com/spf13/pflag**                     v1.0.7 -> v1.0.10
+* **go.uber.org/zap**                            v1.27.0 -> v1.27.1
+* **golang.org/x/net**                           v0.47.0 -> v0.53.0
+* **golang.org/x/sync**                          v0.18.0 -> v0.20.0
+* **golang.org/x/sys**                           v0.38.0 -> v0.43.0
+* **google.golang.org/grpc**                     v1.76.0 -> v1.80.0
+* **google.golang.org/protobuf**                 v1.36.10 -> f2248ac996af
+
+Previous release can be found at [v0.6.12](https://github.com/talos-systems/sidero/releases/tag/v0.6.12)
+
 ## [Sidero 0.6.12](https://github.com/talos-systems/sidero/releases/tag/v0.6.12) (2025-12-24)
 
 Welcome to the v0.6.12 release of Sidero!
