@@ -246,6 +246,12 @@ type ServerSpec struct {
 	//
 	// +optional
 	StrategicPatches []string `json:"strategicPatches,omitempty"`
+	// InstallDisk defines the Talos installation disk.
+	// +optional
+	InstallDisk *InstallDisk `json:"installDisk,omitempty"`
+	// WipeOnlyInstallDisk wipes only the resolved install disk when true.
+	// +optional
+	WipeOnlyInstallDisk bool `json:"wipeOnlyInstallDisk,omitempty"`
 	Accepted         bool     `json:"accepted"`
 	Cordoned         bool     `json:"cordoned,omitempty"`
 	PXEBootAlways    bool     `json:"pxeBootAlways,omitempty"`

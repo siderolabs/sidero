@@ -73,6 +73,7 @@ func (r *Server) validate() error {
 	allErrs = append(allErrs, r.validateBootFromDisk()...)
 	allErrs = append(allErrs, r.validatePXEMode()...)
 	allErrs = append(allErrs, r.validateConfigPatches()...)
+	allErrs = append(allErrs, validateInstallDisk(field.NewPath("spec").Child("installDisk"), r.Spec.InstallDisk, r.Spec.WipeOnlyInstallDisk)...)
 
 	if len(allErrs) == 0 {
 		return nil
