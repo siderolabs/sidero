@@ -415,6 +415,12 @@ spec:
                   endpoint:
                     description: BMC endpoint.
                     type: string
+                  extraArgs:
+                    description: Additional args to pass to ipmitool when talking
+                      to this BMC.
+                    items:
+                      type: string
+                    type: array
                   interface:
                     description: BMC Interface Type. Defaults to lanplus.
                     type: string

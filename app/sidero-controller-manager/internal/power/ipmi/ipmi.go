@@ -30,6 +30,7 @@ func NewClient(bmcInfo metalv1.BMC) (*Client, error) {
 		Username:  bmcInfo.User,
 		Password:  bmcInfo.Pass,
 		Interface: bmcInfo.Interface,
+		ExtraArgs: bmcInfo.ExtraArgs,
 	}
 
 	ipmiClient, err := goipmi.NewClient(conn)

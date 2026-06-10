@@ -2,7 +2,7 @@ module github.com/siderolabs/sidero
 
 go 1.26.1
 
-replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67
+replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/siderolabs/goipmi v0.0.0-20260610145539-dbbe8944445b
 
 // compatibility with kube-apiserver v0.32.3, should be dropped once kube-apiserver dependency is updated
 replace github.com/google/cel-go => github.com/google/cel-go v0.22.0

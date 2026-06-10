@@ -131,3 +131,7 @@ func Convert_v1alpha2_ServerSpec_To_v1alpha1_ServerSpec(in *metalv1alpha2.Server
 func Convert_v1alpha2_SystemInformation_To_v1alpha1_SystemInformation(in *metalv1alpha2.SystemInformation, out *SystemInformation, s apiconversion.Scope) error {
 	return autoConvert_v1alpha2_SystemInformation_To_v1alpha1_SystemInformation(in, out, s)
 }
+
+func Convert_v1alpha2_BMC_To_v1alpha1_BMC(in *metalv1alpha2.BMC, out *BMC, s apiconversion.Scope) error {
+	return autoConvert_v1alpha2_BMC_To_v1alpha1_BMC(in, out, s)
+}

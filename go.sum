@@ -267,6 +267,8 @@ github.com/siderolabs/go-retry v0.3.3 h1:zKV+S1vumtO72E6sYsLlmIdV/G/GcYSBLiEx/c9
 github.com/siderolabs/go-retry v0.3.3/go.mod h1:Ff/VGc7v7un4uQg3DybgrmOWHEmJ8BzZds/XNn/BqMI=
 github.com/siderolabs/go-smbios v0.3.3 h1:rM3UKHQ8in1mqNRkpV75Ls3Wnk6rAhQJVYKUsKkQS20=
 github.com/siderolabs/go-smbios v0.3.3/go.mod h1:kScnr0XSyzLfkRo/ChjITgI0rPRQnIi6PdgbxVCwA9U=
+github.com/siderolabs/goipmi v0.0.0-20260610145539-dbbe8944445b h1:YxSuydWbdPz5YZN7kr2UCgRW11xUMos4O3SahAn9C2o=
+github.com/siderolabs/goipmi v0.0.0-20260610145539-dbbe8944445b/go.mod h1:Vr1Oadtcem03hG2RUT/dpSQS5md9d6rJ9nA0lUBC91Q=
 github.com/siderolabs/grpc-proxy v0.5.1 h1:WTZYLMPTZPt43BzEJ02LT9kYA9qAfquWwCezc6NPPYE=
 github.com/siderolabs/grpc-proxy v0.5.1/go.mod h1:EQwE87LiWxhiIUPBeWmpjJb9DIWxWID8R6ARtdTC+8A=
 github.com/siderolabs/net v0.4.0 h1:1bOgVay/ijPkJz4qct98nHsiB/ysLQU0KLoBC4qLm7I=
@@ -306,8 +308,6 @@ github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
-github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67 h1:1MyiKkPFn0OnpOnmMMVlvFtmeUB/HIRzDVL66DQBOXg=
-github.com/talos-systems/goipmi v0.0.0-20211214143420-35f956689e67/go.mod h1:Vr1Oadtcem03hG2RUT/dpSQS5md9d6rJ9nA0lUBC91Q=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75 h1:6fotK7otjonDflCTK0BCfls4SPy3NcCVb5dqqmbRknE=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20220101234140-673ab2c3ae75/go.mod h1:KO6IkyS8Y3j8OdNO85qEYBsRPuteD+YciPomcXdrMnk=
 github.com/u-root/uio v0.0.0-20230220225925-ffce2a382923 h1:tHNk7XK9GkmKUR6Gh8gVBKXc2MVSZ4G/NnWLtzw4gNA=

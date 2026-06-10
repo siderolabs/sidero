@@ -40,6 +40,9 @@ type BMC struct {
 	// BMC Interface Type. Defaults to lanplus.
 	// +optional
 	Interface string `json:"interface,omitempty"`
+	// Additional args to pass to ipmitool when talking to this BMC.
+	// +optional
+	ExtraArgs []string `json:"extraArgs,omitempty"`
 }
 
 // CredentialSource defines a reference to the credential value.
