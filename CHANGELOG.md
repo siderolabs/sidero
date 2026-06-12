@@ -1,3 +1,36 @@
+## [Sidero 0.6.14](https://github.com/siderolabs/sidero/releases/tag/v0.6.14) (2026-06-12)
+
+Welcome to the v0.6.14 release of Sidero!
+
+
+
+Please try out the release binaries and report any issues at
+https://github.com/siderolabs/sidero/issues.
+
+### IPMI
+
+Sidero Metal now supports passing custom args to `ipmitool` invocation via Server.BMC.ExtraArgs field.
+
+
+### Contributors
+
+* Andrey Smirnov
+
+### Changes
+<details><summary>2 commits</summary>
+<p>
+
+* [`f7b030d`](https://github.com/siderolabs/sidero/commit/f7b030db323a2ea21f072ee31556cdcc4af96517) release(v0.6.14): prepare release
+* [`dc44d39`](https://github.com/siderolabs/sidero/commit/dc44d396227a2855393c0719bee7f93e6d9f7dcd) feat: add support for custom ipmitool invocation args
+</p>
+</details>
+
+### Dependency Changes
+
+This release has no dependency changes
+
+Previous release can be found at [v0.6.13](https://github.com/siderolabs/sidero/releases/tag/v0.6.13)
+
 ## [Sidero 0.6.13](https://github.com/talos-systems/sidero/releases/tag/v0.6.13) (2026-04-28)
 
 Welcome to the v0.6.13 release of Sidero!
