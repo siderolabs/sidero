@@ -8,9 +8,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	"github.com/go-logr/logr"
 	"github.com/siderolabs/go-pointer"
+	talosclient "github.com/siderolabs/talos/pkg/machinery/client"
+	clientconfig "github.com/siderolabs/talos/pkg/machinery/client/config"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/fields"
@@ -253,6 +254,9 @@ func (r *MetalMachineReconciler) reconcileDelete(ctx context.Context, metalMachi
 
 		err := r.Get(ctx, types.NamespacedName{Namespace: metalMachine.Spec.ServerRef.Namespace, Name: metalMachine.Spec.ServerRef.Name}, &serverBinding)
 		if err == nil {
+			if err = r.ResetServer(ctx, metalMachine, &serverBinding); err != nil {
+				return ctrl.Result{}, err
+			}
 			return ctrl.Result{Requeue: true}, r.Delete(ctx, &serverBinding)
 		}
 
@@ -466,4 +470,59 @@ func (r *MetalMachineReconciler) fetchServerClass(ctx context.Context, classRef 
 	}
 
 	return serverClassResource, nil
+}
+
+func (r *MetalMachineReconciler) ResetServer(ctx context.Context, metalMachine *infrav1.MetalMachine, serverBinding *infrav1.ServerBinding) error {
+	var (
+		talosSecret corev1.Secret
+		serverObj   metalv1.Server
+	)
+
+	if err := r.Get(ctx, types.NamespacedName{Namespace: "", Name: metalMachine.Spec.ServerRef.Name}, &serverObj); err != nil {
+		return err
+	}
+
+	if serverObj.Spec.BMC != nil {
+		// let BMC configuration to reboot and wipe te machine using pxe.
+		return nil
+	}
+
+	cluster, err := util.GetClusterFromMetadata(ctx, r.Client, metalMachine.ObjectMeta)
+	if err != nil {
+		return fmt.Errorf("no cluster label or cluster does not exist")
+	}
+
+	if err = r.Get(ctx, types.NamespacedName{Namespace: cluster.Namespace, Name: fmt.Sprintf("%s-talosconfig", cluster.Name)}, &talosSecret); err != nil {
+		return err
+	}
+
+	config, ok := talosSecret.Data["talosconfig"]
+	if !ok {
+		return fmt.Errorf("failed to find talosconfig data in the talosconfig secret")
+	}
+
+	var clientConfig *clientconfig.Config
+	clientConfig, err = clientconfig.FromBytes(config)
+
+	if err != nil {
+		return err
+	}
+
+	var talosClient *talosclient.Client
+	talosClient, err = talosclient.New(ctx,
+		talosclient.WithConfig(clientConfig),
+		talosclient.WithEndpoints(serverBinding.Spec.Addresses...),
+	)
+	if err != nil {
+		return err
+	}
+
+	// ignore error if the machine is already reset, reboot, offline, but record event
+	if err = talosClient.Reset(ctx, false, true); err != nil {
+		r.Recorder.Event(metalMachine.Spec.ServerRef, corev1.EventTypeWarning, "Server Allocation", fmt.Sprintf("Software reset failed on %q, %s", metalMachine.Name, err))
+	} else {
+		r.Recorder.Event(metalMachine.Spec.ServerRef, corev1.EventTypeNormal, "Server Allocation", fmt.Sprintf("Software reset called on %q", metalMachine.Name))
+	}
+
+	return nil
 }
