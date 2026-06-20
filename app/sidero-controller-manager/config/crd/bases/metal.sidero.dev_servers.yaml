@@ -152,6 +152,42 @@ spec:
                   If not set, controller default is used.
                   Valid values: ipxe-exit, http-404, ipxe-sanboot.
                 type: string
+              installDisk:
+                description: InstallDisk defines the Talos installation disk.
+                properties:
+                  deviceName:
+                    description: DeviceName is an explicit block device path, e.g. "/dev/sda" or "/dev/disk/by-id/...".
+                    type: string
+                  selector:
+                    description: Selector selects a disk by stable hardware attributes.
+                    minProperties: 1
+                    properties:
+                      model:
+                        type: string
+                      name:
+                        type: string
+                      serial:
+                        type: string
+                      size:
+                        format: int64
+                        minimum: 0
+                        type: integer
+                      type:
+                        enum:
+                        - ssd
+                        - hdd
+                        - nvme
+                        - sd
+                        type: string
+                      uuid:
+                        type: string
+                      wwid:
+                        type: string
+                    type: object
+                type: object
+              wipeOnlyInstallDisk:
+                description: WipeOnlyInstallDisk wipes only the resolved install disk when true.
+                type: boolean
               configPatches:
                 items:
                   properties:

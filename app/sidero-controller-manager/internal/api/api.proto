@@ -120,11 +120,28 @@ message Address {
   string address = 2;
 }
 
+message InstallDiskSelector {
+  string name = 1;
+  string model = 2;
+  string serial = 3;
+  string uuid = 4;
+  string wwid = 5;
+  string type = 6;
+  uint64 size = 7;
+}
+
+message InstallDisk {
+  string device_name = 1;
+  InstallDiskSelector selector = 2;
+}
+
 message CreateServerResponse {
   bool wipe = 1;
   bool insecure_wipe = 2;
   bool setup_bmc = 3;
   double reboot_timeout = 4;
+  bool wipe_install_disk_only = 5;
+  InstallDisk install_disk = 6;
 }
 
 message MarkServerAsWipedRequest {string uuid = 1;}
