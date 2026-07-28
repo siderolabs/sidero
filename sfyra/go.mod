@@ -4,7 +4,7 @@ go 1.26.1
 
 replace (
 	// compatibility with kube-apiserver v0.32.3, should be dropped once kube-apiserver dependency is updated
-	github.com/google/cel-go => github.com/google/cel-go v0.22.0
+	github.com/google/cel-go => github.com/google/cel-go v0.29.0
 	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.9
 
 	// local replace
