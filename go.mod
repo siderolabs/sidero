@@ -5,7 +5,7 @@ go 1.26.1
 replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/siderolabs/goipmi v0.0.0-20260610145539-dbbe8944445b
 
 // compatibility with kube-apiserver v0.32.3, should be dropped once kube-apiserver dependency is updated
-replace github.com/google/cel-go => github.com/google/cel-go v0.22.0
+replace github.com/google/cel-go => github.com/google/cel-go v0.29.0
 
 require (
 	github.com/go-logr/logr v1.4.3
