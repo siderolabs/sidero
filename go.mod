@@ -5,48 +5,48 @@ go 1.26.1
 replace github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5 => github.com/siderolabs/goipmi v0.0.0-20260610145539-dbbe8944445b
 
 // compatibility with kube-apiserver v0.32.3, should be dropped once kube-apiserver dependency is updated
-replace github.com/google/cel-go => github.com/google/cel-go v0.22.0
+replace github.com/google/cel-go => github.com/google/cel-go v0.32.0
 
 require (
 	github.com/go-logr/logr v1.4.3
 	github.com/google/go-cmp v0.7.0
-	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/insomniacslk/dhcp v0.0.0-20250417080101-5f8cf70e8c5f
-	github.com/jsimonetti/rtnetlink v1.4.2
-	github.com/pensando/goipmi v0.0.0-20200303170213-e858ec1cf0b5
-	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
+	github.com/insomniacslk/dhcp v0.0.0-20260728151720-c308df0fdcef
+	github.com/jsimonetti/rtnetlink/v2 v2.2.0
+	github.com/pensando/goipmi v0.0.0-20240603174436-eb122d901c23
+	github.com/pin/tftp c8cc87866790
 	github.com/pkg/errors v0.9.1
-	github.com/siderolabs/gen v0.8.6
-	github.com/siderolabs/go-blockdevice v0.4.8
-	github.com/siderolabs/go-cmd v0.1.3
+	github.com/siderolabs/gen v0.8.7
+	github.com/siderolabs/go-blockdevice/v2 v2.0.32
+	github.com/siderolabs/go-cmd v0.2.1
 	github.com/siderolabs/go-debug v0.6.2
-	github.com/siderolabs/go-kmsg v0.1.5
+	github.com/siderolabs/go-kmsg v0.1.6
 	github.com/siderolabs/go-pointer v1.0.1
 	github.com/siderolabs/go-procfs v0.1.2
 	github.com/siderolabs/go-retry v0.3.3
-	github.com/siderolabs/go-smbios v0.3.3
-	github.com/siderolabs/grpc-proxy v0.5.1
-	github.com/siderolabs/siderolink v0.3.15
-	github.com/siderolabs/talos/pkg/machinery v1.13.0
+	github.com/siderolabs/go-smbios v0.3.4
+	github.com/siderolabs/grpc-proxy v0.5.2
+	github.com/siderolabs/siderolink v0.3.17
+	github.com/siderolabs/talos/pkg/machinery v1.13.9
 	github.com/spf13/pflag v1.0.10
-	github.com/stretchr/testify v1.11.1
-	go.uber.org/zap v1.27.1
+	github.com/stretchr/testify v1.12.1
+	go.uber.org/zap v1.28.0
 	golang.org/x/net v0.53.0
-	golang.org/x/sync v0.20.0
-	golang.org/x/sys v0.43.0
+	golang.org/x/sync v0.22.0
+	golang.org/x/sys v0.47.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20241231184526-a9ab2273dd10
 	google.golang.org/grpc v1.80.0
-	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af
+	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.32.3
-	k8s.io/apiextensions-apiserver v0.32.3
-	k8s.io/apimachinery v0.32.3
-	k8s.io/client-go v0.32.3
-	k8s.io/component-base v0.32.3
-	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/cluster-api v1.10.9
-	sigs.k8s.io/controller-runtime v0.20.4
+	k8s.io/api v0.36.4
+	k8s.io/apiextensions-apiserver v0.36.4
+	k8s.io/apimachinery v0.36.4
+	k8s.io/client-go v0.36.4
+	k8s.io/component-base v0.36.4
+	k8s.io/klog/v2 v2.140.0
+	sigs.k8s.io/cluster-api v1.14.0
+	sigs.k8s.io/controller-runtime v0.24.1
 )
 
 require (
