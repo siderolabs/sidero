@@ -211,6 +211,11 @@ func (r *MetalMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 		addresses := make([]capiv1.MachineAddress, 0, len(serverBinding.Spec.Addresses))
 		for _, addr := range serverBinding.Spec.Addresses {
+			// skip shared control plane endpoint unless it's the only address (single-node)
+			if addr == cluster.Spec.ControlPlaneEndpoint.Host && len(serverBinding.Spec.Addresses) > 1 {
+				continue
+			}
+
 			addresses = append(addresses, capiv1.MachineAddress{
 				Type:    capiv1.MachineInternalIP,
 				Address: addr,
