@@ -42,6 +42,12 @@ type ServerClassSpec struct {
 	// +optional
 	// +k8s:conversion-gen=false
 	StrategicPatches []string `json:"strategicPatches,omitempty"`
+	// InstallDisk defines the Talos installation disk.
+	// +optional
+	InstallDisk *InstallDisk `json:"installDisk,omitempty"`
+	// WipeOnlyInstallDisk wipes only the resolved install disk when true.
+	// +optional
+	WipeOnlyInstallDisk bool `json:"wipeOnlyInstallDisk,omitempty"`
 	// BootFromDiskMethod specifies the method to exit iPXE to force boot from disk.
 	//
 	// If not set, controller default is used.
